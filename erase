@@ -1,0 +1,6 @@
+source ./env
+
+while :
+do
+esptool.py --port /dev/tty.usbserial-14XS0X0N  erase_flash
+done

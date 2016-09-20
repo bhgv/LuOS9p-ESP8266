@@ -1,0 +1,5 @@
+source ./env
+cd main
+make clean
+cd ..
+make flash -j4 -C main ESPPORT=/dev/tty.usbserial-14XS0X0N 

@@ -1,0 +1,2 @@
+export PATH=/usr/local/xtensa-lx106-elf/bin:$PATH
+export SDK_PATH=/usr/local/xtensa-lx106-elf/sdk/ESP8266_RTOS_SDK

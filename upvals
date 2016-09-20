@@ -1,0 +1,51 @@
+Lua/src/lapi.c:      setobj(L, f->upvals[0]->v, gt);
+Lua/src/lapi.c:      luaC_upvalbarrier(L, f->upvals[0]);
+Lua/src/lapi.c:      *val = f->upvals[n-1]->v;
+Lua/src/lapi.c:      if (uv) *uv = f->upvals[n - 1];
+Lua/src/lapi.c:  return &f->upvals[n - 1];  /* get its upvalue pointer */
+Lua/src/ldebug.c:    if (c->upvals[i]->v == o) {
+Lua/src/ldo.c:  luaF_initupvals(L, cl);
+Lua/src/lfunc.c:  while (n--) c->upvals[n] = NULL;
+Lua/src/lfunc.c:void luaF_initupvals (lua_State *L, LClosure *cl) {
+Lua/src/lfunc.c:    cl->upvals[i] = uv;
+Lua/src/lfunc.h:LUAI_FUNC void luaF_initupvals (lua_State *L, LClosure *cl);
+Lua/src/lgc.c:static void remarkupvals (global_State *g) {
+Lua/src/lgc.c:    UpVal *uv = cl->upvals[i];
+Lua/src/lgc.c:        uv->u.open.touched = 1;  /* can be marked in 'remarkupvals' */
+Lua/src/lgc.c:    /* 'remarkupvals' may have removed thread from 'twups' list */ 
+Lua/src/lgc.c:    UpVal *uv = cl->upvals[i];
+Lua/src/lgc.c:  remarkupvals(g);
+Lua/src/lobject.h:  UpVal *upvals[1];  /* list of upvalues */
+Lua/src/lvm.c:      if (c->upvals[i]->v != v)
+Lua/src/lvm.c:      ncl->upvals[i] = luaF_findupval(L, base + uv[i].idx);
+Lua/src/lvm.c:      ncl->upvals[i] = encup[uv[i].idx];
+Lua/src/lvm.c:    ncl->upvals[i]->refcount++;
+Lua/src/lvm.c:        setobj2s(L, ra, cl->upvals[b]->v);
+Lua/src/lvm.c:        TValue *upval = cl->upvals[GETARG_B(i)]->v;
+Lua/src/lvm.c:        TValue *upval = cl->upvals[GETARG_A(i)]->v;
+Lua/src/lvm.c:        UpVal *uv = cl->upvals[GETARG_B(i)];
+Lua/src/lvm.c:        LClosure *ncl = getcached(p, cl->upvals, base);  /* cached closure */
+Lua/src/lvm.c:          pushclosure(L, p, cl->upvals, base, ra);  /* create a new one */
+Binary file main/build/lua/common/lrotable.o matches
+Binary file main/build/lua/src/lapi.o matches
+Binary file main/build/lua/src/lcode.o matches
+Binary file main/build/lua/src/ldebug.o matches
+Binary file main/build/lua/src/ldo.o matches
+Binary file main/build/lua/src/ldump.o matches
+Binary file main/build/lua/src/lfunc.o matches
+Binary file main/build/lua/src/lgc.o matches
+Binary file main/build/lua/src/llex.o matches
+Binary file main/build/lua/src/lobject.o matches
+Binary file main/build/lua/src/lparser.o matches
+Binary file main/build/lua/src/lstate.o matches
+Binary file main/build/lua/src/lstring.o matches
+Binary file main/build/lua/src/ltable.o matches
+Binary file main/build/lua/src/ltm.o matches
+Binary file main/build/lua/src/luac.o matches
+Binary file main/build/lua/src/lundump.o matches
+Binary file main/build/lua/src/lvm.o matches
+Binary file main/build/lua.a matches
+main/build/main.map: .literal.luaF_initupvals
+main/build/main.map: .text.luaF_initupvals
+main/build/main.map:                0x0000000040217824                luaF_initupvals
+Binary file main/build/main.out matches
