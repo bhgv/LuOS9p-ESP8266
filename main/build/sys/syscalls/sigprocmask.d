@@ -1,5 +1,5 @@
 build/sys//syscalls/sigprocmask.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/sigprocmask.c \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/sigprocmask.c \
  ../libc/xtensa-lx106-elf/include/signal.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

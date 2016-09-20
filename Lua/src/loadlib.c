@@ -23,6 +23,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+// WHITECAT BEGIN
+#include "lrotable.h"
+// WHITECAT END
 
 /*
 ** LUA_PATH_VAR and LUA_CPATH_VAR are the names of the environment
@@ -565,7 +568,7 @@ static int ll_require (lua_State *L) {
 
   // WHITECAT BEGIN
   /* Is this a readonly table? */
-  void *res = luaR_findglobal(name, c_strlen(name));
+  void *res = luaR_findglobal((char *)name, strlen(name));
   if (res) {
     lua_pushrotable(L, res);
     return 1;

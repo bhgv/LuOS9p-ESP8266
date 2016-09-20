@@ -1,5 +1,5 @@
 build/freertos//Source/tasks.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/tasks.c \
+ /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/tasks.c \
  ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
@@ -48,4 +48,4 @@ build/freertos//Source/tasks.o: \
  ../FreeRTOS/Source/include/task.h ../FreeRTOS/Source/include/list.h \
  ../FreeRTOS/Source/include/timers.h ../FreeRTOS/Source/include/task.h \
  ../FreeRTOS/Source/include/StackMacros.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/tasks_adds.inc
+ /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/tasks_adds.inc

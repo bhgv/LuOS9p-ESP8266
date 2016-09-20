@@ -1,5 +1,5 @@
 build/open_esplibs_libmain//spi_flash.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/open_esplibs/libmain/spi_flash.c \
+ /Users/jolive/Lua-OSESP8266/open_esplibs/libmain/spi_flash.c \
  ../open_esplibs/include/open_esplibs.h \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \

@@ -1,5 +1,5 @@
 build/open_esplibs_libmain//uart.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/open_esplibs/libmain/uart.c \
+ /Users/jolive/Lua-OSESP8266/open_esplibs/libmain/uart.c \
  ../open_esplibs/include/open_esplibs.h \
  ../include/espressif/sdk_private.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \

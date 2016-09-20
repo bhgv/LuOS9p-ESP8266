@@ -1,5 +1,5 @@
 build/core//esp_gpio_interrupts.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/core/esp_gpio_interrupts.c \
+ /Users/jolive/Lua-OSESP8266/core/esp_gpio_interrupts.c \
  ../core/include/esp8266.h ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

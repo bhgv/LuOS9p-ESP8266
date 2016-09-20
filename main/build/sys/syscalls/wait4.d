@@ -1,5 +1,5 @@
 build/sys//syscalls/wait4.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/wait4.c \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/wait4.c \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

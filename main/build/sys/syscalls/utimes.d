@@ -1,5 +1,5 @@
 build/sys//syscalls/utimes.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/utimes.c \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/utimes.c \
  ../libc/xtensa-lx106-elf/include/sys/time.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

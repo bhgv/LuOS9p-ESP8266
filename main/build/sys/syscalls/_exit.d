@@ -1,2 +1,2 @@
 build/sys//syscalls/_exit.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/_exit.c
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/_exit.c

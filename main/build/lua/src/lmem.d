@@ -1,8 +1,7 @@
-build/lua//src/lmem.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lmem.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
+build/lua//src/lmem.o: /Users/jolive/Lua-OSESP8266/Lua/src/lmem.c \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
@@ -22,12 +21,12 @@ build/lua//src/lmem.o: \
  ../libc/xtensa-lx106-elf/include/sys/_types.h \
  ../libc/xtensa-lx106-elf/include/sys/lock.h \
  ../libc/xtensa-lx106-elf/include/machine/types.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ldebug.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lstate.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lobject.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/llimits.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ltm.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lzio.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lmem.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ldo.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lgc.h
+ /Users/jolive/Lua-OSESP8266/Lua/src/ldebug.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lstate.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lobject.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/llimits.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/ltm.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lzio.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lmem.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/ldo.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lgc.h

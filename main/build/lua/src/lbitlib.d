@@ -1,8 +1,7 @@
-build/lua//src/lbitlib.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lbitlib.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
+build/lua//src/lbitlib.o: /Users/jolive/Lua-OSESP8266/Lua/src/lbitlib.c \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
@@ -22,9 +21,9 @@ build/lua//src/lbitlib.o: \
  ../libc/xtensa-lx106-elf/include/sys/_types.h \
  ../libc/xtensa-lx106-elf/include/sys/lock.h \
  ../libc/xtensa-lx106-elf/include/machine/types.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lauxlib.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lauxlib.h \
  ../libc/xtensa-lx106-elf/include/stdio.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/sys/reent.h \
  ../libc/xtensa-lx106-elf/include/sys/stdio.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lualib.h
+ /Users/jolive/Lua-OSESP8266/Lua/src/lualib.h

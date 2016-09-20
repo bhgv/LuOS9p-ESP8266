@@ -1,6 +1,6 @@
 build/sys//syscalls/e_remainder.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/e_remainder.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/fdlibm.h \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/e_remainder.c \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/fdlibm.h \
  ../libc/xtensa-lx106-elf/include/math.h \
  ../libc/xtensa-lx106-elf/include/sys/reent.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \

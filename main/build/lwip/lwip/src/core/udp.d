@@ -1,5 +1,5 @@
 build/lwip//lwip/src/core/udp.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/lwip/lwip/src/core/udp.c \
+ /Users/jolive/Lua-OSESP8266/lwip/lwip/src/core/udp.c \
  ../lwip/lwip/src/include/lwip/opt.h ../lwip/include/lwipopts.h \
  ../lwip/lwip/src/include/lwip/debug.h \
  ../lwip/lwip/src/include/lwip/arch.h ../lwip/include/arch/cc.h \

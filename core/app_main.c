@@ -335,13 +335,13 @@ void sdk_wdt_init(void) {
 
 // .irom0.text+0x474
 void sdk_user_init_task(void *params) {
-    int phy_ver, pp_ver;
+    //int phy_ver, pp_ver;
 
     sdk_ets_timer_init();
     //printf("\nESP-Open-SDK ver: %s compiled @ %s %s\n", OS_VERSION_STR, __DATE__, __TIME__);
-    phy_ver = RTCMEM_BACKUP[RTCMEM_BACKUP_PHY_VER] >> 16;
+    //phy_ver = RTCMEM_BACKUP[RTCMEM_BACKUP_PHY_VER] >> 16;
     //printf("phy ver: %d, ", phy_ver);
-    pp_ver = RTCMEM_SYSTEM[RTCMEM_SYSTEM_PP_VER];
+    //pp_ver = RTCMEM_SYSTEM[RTCMEM_SYSTEM_PP_VER];
     //printf("pp ver: %d.%d\n\n", (pp_ver >> 8) & 0xff, pp_ver & 0xff);
 	
 	// WHITECAT BEGIN

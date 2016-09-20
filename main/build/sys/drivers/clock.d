@@ -1,6 +1,6 @@
 build/sys//drivers/clock.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/drivers/clock.c whitecat.h \
- build.h ../sys/../sys/drivers/gpio.h ../include/espressif/esp_common.h \
+ /Users/jolive/Lua-OSESP8266/sys/drivers/clock.c whitecat.h build.h \
+ ../sys/../sys/drivers/gpio.h ../include/espressif/esp_common.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

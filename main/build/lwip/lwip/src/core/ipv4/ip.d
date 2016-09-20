@@ -1,5 +1,5 @@
 build/lwip//lwip/src/core/ipv4/ip.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/lwip/lwip/src/core/ipv4/ip.c \
+ /Users/jolive/Lua-OSESP8266/lwip/lwip/src/core/ipv4/ip.c \
  ../lwip/lwip/src/include/lwip/opt.h ../lwip/include/lwipopts.h \
  ../lwip/lwip/src/include/lwip/debug.h \
  ../lwip/lwip/src/include/lwip/arch.h ../lwip/include/arch/cc.h \

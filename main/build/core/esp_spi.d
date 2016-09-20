@@ -1,5 +1,4 @@
-build/core//esp_spi.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/core/esp_spi.c \
+build/core//esp_spi.o: /Users/jolive/Lua-OSESP8266/core/esp_spi.c \
  ../core/include/esp/spi.h ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

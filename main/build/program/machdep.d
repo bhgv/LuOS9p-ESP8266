@@ -1,5 +1,4 @@
-build/program//machdep.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/main/machdep.c \
+build/program//machdep.o: /Users/jolive/Lua-OSESP8266/main/machdep.c \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
@@ -41,5 +40,5 @@ build/program//machdep.o: \
  ../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
  ../FreeRTOS/Source/include/mpu_wrappers.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/main/whitecat.h \
- ../core/include/esp/uart.h ../core/include/esp/clocks.h
+ /Users/jolive/Lua-OSESP8266/main/whitecat.h ../core/include/esp/uart.h \
+ ../core/include/esp/clocks.h

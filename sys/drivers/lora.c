@@ -591,8 +591,6 @@ retry:
 int lora_tx(int cnf, int port, const char *data) {
     int resp;
     char buffer[1024];
-    int res;
-    int retries = 0;
     
     mtx_lock(&lora_mtx);
 
@@ -607,7 +605,6 @@ int lora_tx(int cnf, int port, const char *data) {
         sprintf(buffer,"mac tx uncnf %d %s\r\n", port, data);        
     }
 
-retry:      
     syslog(LOG_DEBUG, "lora: %s", buffer);
     uart_writes(LORA_UART, buffer);    
     resp = lora_response(portMAX_DELAY);

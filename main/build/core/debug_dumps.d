@@ -1,5 +1,4 @@
-build/core//debug_dumps.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/core/debug_dumps.c \
+build/core//debug_dumps.o: /Users/jolive/Lua-OSESP8266/core/debug_dumps.c \
  ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

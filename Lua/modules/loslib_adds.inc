@@ -1,5 +1,6 @@
 
 #include "whitecat.h"
+#include "FreeRTOS.h"
 #include "lauxlib.h"
 
 #undef ARG_MAX
@@ -18,6 +19,7 @@
 #include <sys/syslog.h>
 
 #include <sys/drivers/console.h>
+#include <sys/drivers/cpu.h>
 #include <sys/syscalls/mount.h>
 #include <sys/syscalls/device.h>
 
@@ -128,6 +130,8 @@ static int more(const char *path, int stop) {
     }
 
     fclose(fp);
+	
+	return 0;
 }
 
 static int os_cat(lua_State *L) {
@@ -342,8 +346,8 @@ static int os_stats(lua_State *L) {
 
 static int os_format(lua_State *L) {
     const char *device = luaL_checkstring(L, 1);
+    const struct devops *ops;
     char response = ' ';
-    struct devops *ops;
 
     // This if check is for future use, to determine drive number
     if (strcmp(device,"cfi") == 0) {
@@ -390,8 +394,6 @@ static int os_cp(lua_State *L) {
     FILE *fsrc, *fdst;
     char c;
     int res1, res2;
-
-    int line = 0;
 
     fsrc = fopen(src,"r");
     if (!fsrc) {

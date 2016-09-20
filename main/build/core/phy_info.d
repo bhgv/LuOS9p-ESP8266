@@ -1,5 +1,4 @@
-build/core//phy_info.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/core/phy_info.c \
+build/core//phy_info.o: /Users/jolive/Lua-OSESP8266/core/phy_info.c \
  ../include/espressif/phy_info.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

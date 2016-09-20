@@ -84,6 +84,7 @@ void luaR_next(lua_State *L, void *data, TValue *key, TValue *val);
 void* luaR_getmeta(void *data);
 //#ifdef LUA_META_ROTABLES
 int luaR_isrotable(const void *p);
+LUA_API void lua_pushrotable (lua_State *L, void *p);
 //#else
 //#define luaR_isrotable(p)     (0)
 //#endif

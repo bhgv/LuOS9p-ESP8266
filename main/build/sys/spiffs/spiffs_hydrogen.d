@@ -1,8 +1,8 @@
 build/sys//spiffs/spiffs_hydrogen.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs_hydrogen.c \
+ /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs_hydrogen.c \
  ../sys/../sys/drivers/console.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs_config.h \
+ /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs.h \
+ /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs_config.h \
  ../libc/xtensa-lx106-elf/include/sys/param.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
@@ -32,4 +32,4 @@ build/sys//spiffs/spiffs_hydrogen.o: \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
  ../libc/xtensa-lx106-elf/include/ctype.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs_nucleus.h
+ /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs_nucleus.h

@@ -7,6 +7,7 @@ extern void _clock_init();
 extern void _syscalls_init();
 extern void _pthread_init();
 extern void _console_init();
+extern void _lora_init();
 
 void mach_init() {  
     //resource_init();

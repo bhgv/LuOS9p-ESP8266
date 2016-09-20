@@ -1,6 +1,6 @@
 build/sys//syscalls/tty_ops.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/tty_ops.c \
- whitecat.h ../libc/xtensa-lx106-elf/include/stdlib.h \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/tty_ops.c whitecat.h \
+ ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

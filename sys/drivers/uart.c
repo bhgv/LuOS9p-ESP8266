@@ -65,6 +65,7 @@
 #include <sys/drivers/gpio.h>
 #include <sys/drivers/console.h>
 #include <sys/syslog.h>
+#include <sys/delay.h>
 
 extern int lua_running;
 

@@ -1,5 +1,5 @@
 build/sys//syscalls/newlib.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/newlib.c \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/newlib.c \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

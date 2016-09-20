@@ -1,6 +1,6 @@
 build/lua//common/linenoise.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/common/linenoise.c \
- whitecat.h ../libc/xtensa-lx106-elf/include/stdio.h \
+ /Users/jolive/Lua-OSESP8266/Lua/common/linenoise.c whitecat.h \
+ ../libc/xtensa-lx106-elf/include/stdio.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \
@@ -27,9 +27,8 @@ build/lua//common/linenoise.o: \
  ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/sys/string.h \
  ../libc/xtensa-lx106-elf/include/ctype.h ../sys/../sys/syscalls/mount.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/common/linenoise.h \
- ../Lua/src/lua.h ../Lua/src/luaconf.h \
- ../libc/xtensa-lx106-elf/include/limits.h \
+ /Users/jolive/Lua-OSESP8266/Lua/common/linenoise.h ../Lua/src/lua.h \
+ ../Lua/src/luaconf.h ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
  ../sys/../Lua/adds/luaconf.h ../Lua/modules/auxmods.h

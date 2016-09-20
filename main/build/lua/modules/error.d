@@ -1,7 +1,7 @@
 build/lua//modules/error.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/error.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/error.h \
- ../Lua/src/lstate.h ../Lua/src/lua.h ../Lua/src/luaconf.h \
+ /Users/jolive/Lua-OSESP8266/Lua/modules/error.c \
+ /Users/jolive/Lua-OSESP8266/Lua/modules/error.h ../Lua/src/lstate.h \
+ ../Lua/src/lua.h ../Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \

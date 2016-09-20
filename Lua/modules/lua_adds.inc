@@ -28,6 +28,7 @@
  */
 
 #include "pthread.h"
+#include "linenoise.h"
 #include <sys/debug.h>
 #include <sys/syscalls/mount.h>
 

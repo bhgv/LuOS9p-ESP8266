@@ -94,7 +94,7 @@ realpath(path, resolved)
 	 */
 	(void)strncpy(resolved, path, MAXPATHLEN - 1);
 	resolved[MAXPATHLEN - 1] = '\0';
-loop:
+// loop:
 	q = strrchr(resolved, '/');
 	if (q != NULL) {
 		p = q + 1;

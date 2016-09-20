@@ -1,5 +1,5 @@
 build/sys//syscalls/prot.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/prot.c \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/prot.c \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
@@ -42,8 +42,8 @@ build/sys//syscalls/prot.o: \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
  ../FreeRTOS/Source/include/mpu_wrappers.h \
  ../FreeRTOS/Source/include/task.h ../FreeRTOS/Source/include/list.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/syscalls.h \
- whitecat.h ../libc/xtensa-lx106-elf/include/unistd.h \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/syscalls.h whitecat.h \
+ ../libc/xtensa-lx106-elf/include/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/machine/types.h \

@@ -1,6 +1,5 @@
-build/lua//src/lstring.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lstring.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
+build/lua//src/lstring.o: /Users/jolive/Lua-OSESP8266/Lua/src/lstring.c \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
  ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
@@ -16,8 +15,8 @@ build/lua//src/lstring.o: \
  ../libc/xtensa-lx106-elf/include/sys/lock.h \
  ../libc/xtensa-lx106-elf/include/sys/cdefs.h \
  ../libc/xtensa-lx106-elf/include/sys/string.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
@@ -26,13 +25,13 @@ build/lua//src/lstring.o: \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/machine/types.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ldebug.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lstate.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lobject.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/llimits.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ltm.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lzio.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lmem.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ldo.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lstring.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lgc.h
+ /Users/jolive/Lua-OSESP8266/Lua/src/ldebug.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lstate.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lobject.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/llimits.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/ltm.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lzio.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lmem.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/ldo.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lstring.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lgc.h

@@ -1,2 +1,2 @@
-build/lua//modules/http.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/http.c whitecat.h
+build/lua//modules/http.o: /Users/jolive/Lua-OSESP8266/Lua/modules/http.c \
+ whitecat.h

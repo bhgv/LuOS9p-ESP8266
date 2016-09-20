@@ -1,5 +1,5 @@
 build/sys//drivers/console.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/drivers/console.c \
+ /Users/jolive/Lua-OSESP8266/sys/drivers/console.c \
  ../libc/xtensa-lx106-elf/include/stdio.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

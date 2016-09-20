@@ -1,5 +1,5 @@
 build/freertos//Source/queue.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/queue.c \
+ /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/queue.c \
  ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \

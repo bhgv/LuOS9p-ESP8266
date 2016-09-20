@@ -1,5 +1,4 @@
-build/core//esp_hwrand.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/core/esp_hwrand.c \
+build/core//esp_hwrand.o: /Users/jolive/Lua-OSESP8266/core/esp_hwrand.c \
  ../core/include/esp/hwrand.h ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

@@ -1,6 +1,6 @@
 build/lua//modules/linit.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/linit.c \
- ../Lua/src/lprefix.h ../Lua/src/lua.h ../Lua/src/luaconf.h \
+ /Users/jolive/Lua-OSESP8266/Lua/modules/linit.c ../Lua/src/lprefix.h \
+ ../Lua/src/lua.h ../Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \

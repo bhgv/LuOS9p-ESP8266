@@ -1,5 +1,4 @@
-build/core//sdk_compat.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/core/sdk_compat.c \
+build/core//sdk_compat.o: /Users/jolive/Lua-OSESP8266/core/sdk_compat.c \
  ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \

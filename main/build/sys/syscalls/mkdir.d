@@ -1,7 +1,7 @@
 build/sys//syscalls/mkdir.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/mkdir.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/syscalls.h \
- whitecat.h ../libc/xtensa-lx106-elf/include/unistd.h \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/mkdir.c \
+ /Users/jolive/Lua-OSESP8266/sys/syscalls/syscalls.h whitecat.h \
+ ../libc/xtensa-lx106-elf/include/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
@@ -65,6 +65,5 @@ build/sys//syscalls/mkdir.o: \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
  ../FreeRTOS/Source/include/mpu_wrappers.h \
  ../FreeRTOS/Source/include/semphr.h ../FreeRTOS/Source/include/queue.h \
- ../sys/../sys/mount.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/mount.h \
+ ../sys/../sys/mount.h /Users/jolive/Lua-OSESP8266/sys/syscalls/mount.h \
  ../libc/xtensa-lx106-elf/include/fcntl.h

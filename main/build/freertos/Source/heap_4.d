@@ -1,5 +1,5 @@
 build/freertos//Source/heap_4.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/heap_4.c \
+ /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/heap_4.c \
  ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
@@ -46,4 +46,4 @@ build/freertos//Source/heap_4.o: \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
  ../FreeRTOS/Source/include/mpu_wrappers.h \
  ../FreeRTOS/Source/include/task.h ../FreeRTOS/Source/include/list.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/heap_adds.inc
+ /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/heap_adds.inc

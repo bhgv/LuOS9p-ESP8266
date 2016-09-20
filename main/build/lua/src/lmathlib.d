@@ -1,6 +1,5 @@
-build/lua//src/lmathlib.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lmathlib.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
+build/lua//src/lmathlib.o: /Users/jolive/Lua-OSESP8266/Lua/src/lmathlib.c \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
  ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
@@ -18,8 +17,8 @@ build/lua//src/lmathlib.o: \
  ../libc/xtensa-lx106-elf/include/machine/stdlib.h \
  ../libc/xtensa-lx106-elf/include/alloca.h \
  ../libc/xtensa-lx106-elf/include/math.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
@@ -28,7 +27,7 @@ build/lua//src/lmathlib.o: \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/machine/types.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lauxlib.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lauxlib.h \
  ../libc/xtensa-lx106-elf/include/stdio.h \
  ../libc/xtensa-lx106-elf/include/sys/stdio.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lualib.h
+ /Users/jolive/Lua-OSESP8266/Lua/src/lualib.h

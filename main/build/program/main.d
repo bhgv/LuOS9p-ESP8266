@@ -1,6 +1,5 @@
-build/program//main.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/main/main.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/main/whitecat.h \
+build/program//main.o: /Users/jolive/Lua-OSESP8266/main/main.c \
+ /Users/jolive/Lua-OSESP8266/main/whitecat.h \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
@@ -73,8 +72,7 @@ build/program//main.o: \
  ../include/espressif/esp8266/uart_register.h \
  ../include/espressif/spi_flash.h ../core/include/flashchip.h \
  ../sys/../sys/drivers/uart.h ../FreeRTOS/Source/include/queue.h \
- ../sys/../sys/syslog.h ../libc/xtensa-lx106-elf/include/machine/ansi.h \
- ../libc/xtensa-lx106-elf/include/fcntl.h \
+ ../sys/../sys/syslog.h ../libc/xtensa-lx106-elf/include/fcntl.h \
  ../libc/xtensa-lx106-elf/include/sys/fcntl.h \
  ../libc/xtensa-lx106-elf/include/sys/_default_fcntl.h \
  ../libc/xtensa-lx106-elf/include/sys/stat.h \

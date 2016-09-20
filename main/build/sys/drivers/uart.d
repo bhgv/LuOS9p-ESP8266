@@ -1,6 +1,5 @@
-build/sys//drivers/uart.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/sys/drivers/uart.c whitecat.h \
- ../include/espressif/esp_common.h \
+build/sys//drivers/uart.o: /Users/jolive/Lua-OSESP8266/sys/drivers/uart.c \
+ whitecat.h ../include/espressif/esp_common.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \
@@ -73,4 +72,5 @@ build/sys//drivers/uart.o: \
  ../libc/xtensa-lx106-elf/include/signal.h \
  ../libc/xtensa-lx106-elf/include/sys/signal.h \
  ../sys/../sys/drivers/uart.h ../sys/../sys/drivers/gpio.h \
- ../sys/../sys/drivers/console.h ../sys/../sys/syslog.h
+ ../sys/../sys/drivers/console.h ../sys/../sys/syslog.h \
+ ../sys/../sys/delay.h

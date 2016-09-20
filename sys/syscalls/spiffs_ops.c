@@ -29,6 +29,8 @@
 
 #include "whitecat.h"
 
+#include <string.h>
+#include <ctype.h>
 #include <unistd.h> 
 #include <sys/dirent.h>
 #include <errno.h>
@@ -71,7 +73,7 @@ int is_dir(const char *path) {
     
     SPIFFS_opendir(&fs, "/", &d);   
     while (SPIFFS_readdir(&d, &e)) {
-        if (strncmp(npath, e.name, strlen(npath)) == 0) {
+        if (strncmp(npath, (const char *)e.name, strlen(npath)) == 0) {
             res = 1;
             break;
         }
@@ -80,90 +82,6 @@ int is_dir(const char *path) {
     SPIFFS_closedir(&d);
 
     return res;
-}
-
-int spiffs_mount() {
-    spiffs_config cfg;
-    int unit = 0;
-    int res = 0;
-    int retries = 0;
-
-    cfg.phys_addr 		 = SPIFFS_BASE_ADDR;
-    cfg.phys_size 		 = SPIFFS_SIZE;
-    cfg.phys_erase_block = SPIFFS_ERASE_SIZE;
-    cfg.log_page_size    = SPIFFS_LOG_PAGE_SIZE;
-    cfg.log_block_size   = SPIFFS_LOG_BLOCK_SIZE;
-    
-    syslog(LOG_INFO, "spiffs%d start address at 0x%x, size %d Kb",
-           unit, cfg.phys_addr, cfg.phys_size / 1024
-    );
-    
-	cfg.hal_read_f = esp_spiffs_read;
-	cfg.hal_write_f = esp_spiffs_write;
-	cfg.hal_erase_f = esp_spiffs_erase;
-    
-    my_spiffs_work_buf = malloc(cfg.log_page_size * 2);
-    if (!my_spiffs_work_buf) {
-        errno = ENOMEM;
-        return -1;
-    }
-    
-    int fds_len = sizeof(spiffs_fd) * 5;
-    my_spiffs_fds = malloc(fds_len);
-    if (!my_spiffs_fds) {
-        free(my_spiffs_work_buf);
-        errno = ENOMEM;
-        return -1;                
-    }
-    
-    int cache_len = cfg.log_page_size * 5;
-    my_spiffs_cache = malloc(cache_len);
-    if (!my_spiffs_cache) {
-        free(my_spiffs_work_buf);
-        free(my_spiffs_fds);
-        errno = ENOMEM;
-        return -1;        
-    }
-    
-    retries = 0;
-    
-retry:
-    if (retries > 2) {
-        syslog(LOG_ERR, "spiffs%d can't mount file", unit);
-        return -1;
-    }
-
-    res = SPIFFS_mount(
-            &fs, &cfg, my_spiffs_work_buf, my_spiffs_fds,
-            fds_len, my_spiffs_cache, cache_len,NULL
-    );
-
-    if (res < 0) {
-        if (fs.err_code == SPIFFS_ERR_NOT_A_FS) {
-            syslog(LOG_ERR, "spiffs%d no file system detect, formating", unit);
-            SPIFFS_unmount(&fs);
-            res = SPIFFS_format(&fs);
-            if (res < 0) {
-                syslog(LOG_ERR, "spiffs%d format error",unit);
-                return -1;
-            }
-                        
-            retries++;
-            goto retry;
-        }
-    } else {
-        if (retries > 0) {
-            spiffs_mkdir_op("/.");
-        }
-    }
-    
-    syslog(LOG_INFO, "spiffs%d mounted", unit);
-
-    return 1;
-}
-
-int spiffs_init() {
-    return spiffs_mount();
 }
 
 int spiffs_result(int res) {
@@ -245,10 +163,7 @@ int spiffs_close_op(struct file *fp) {
     int res;
     int result = 0;
 
-    if (fp->f_fs) {     
-        spiffs_stat stat;
-        char c = ' ';
-        
+    if (fp->f_fs) {    
         res = SPIFFS_close(&fs, *(spiffs_file *)fp->f_fs);
         if (res < 0) {
             result = spiffs_result(fs.err_code);
@@ -559,5 +474,91 @@ int spiffs_format() {
     SPIFFS_format(&fs);
     
     //cpu_reset();
+	
+	return 0;
+}
+
+int spiffs_mount() {
+    spiffs_config cfg;
+    int unit = 0;
+    int res = 0;
+    int retries = 0;
+
+    cfg.phys_addr 		 = SPIFFS_BASE_ADDR;
+    cfg.phys_size 		 = SPIFFS_SIZE;
+    cfg.phys_erase_block = SPIFFS_ERASE_SIZE;
+    cfg.log_page_size    = SPIFFS_LOG_PAGE_SIZE;
+    cfg.log_block_size   = SPIFFS_LOG_BLOCK_SIZE;
+    
+    syslog(LOG_INFO, "spiffs%d start address at 0x%x, size %d Kb",
+           unit, cfg.phys_addr, cfg.phys_size / 1024
+    );
+    
+	cfg.hal_read_f = esp_spiffs_read;
+	cfg.hal_write_f = esp_spiffs_write;
+	cfg.hal_erase_f = esp_spiffs_erase;
+    
+    my_spiffs_work_buf = malloc(cfg.log_page_size * 2);
+    if (!my_spiffs_work_buf) {
+        errno = ENOMEM;
+        return -1;
+    }
+    
+    int fds_len = sizeof(spiffs_fd) * 5;
+    my_spiffs_fds = malloc(fds_len);
+    if (!my_spiffs_fds) {
+        free(my_spiffs_work_buf);
+        errno = ENOMEM;
+        return -1;                
+    }
+    
+    int cache_len = cfg.log_page_size * 5;
+    my_spiffs_cache = malloc(cache_len);
+    if (!my_spiffs_cache) {
+        free(my_spiffs_work_buf);
+        free(my_spiffs_fds);
+        errno = ENOMEM;
+        return -1;        
+    }
+    
+    retries = 0;
+    
+retry:
+    if (retries > 2) {
+        syslog(LOG_ERR, "spiffs%d can't mount file", unit);
+        return -1;
+    }
+
+    res = SPIFFS_mount(
+            &fs, &cfg, my_spiffs_work_buf, my_spiffs_fds,
+            fds_len, my_spiffs_cache, cache_len,NULL
+    );
+
+    if (res < 0) {
+        if (fs.err_code == SPIFFS_ERR_NOT_A_FS) {
+            syslog(LOG_ERR, "spiffs%d no file system detect, formating", unit);
+            SPIFFS_unmount(&fs);
+            res = SPIFFS_format(&fs);
+            if (res < 0) {
+                syslog(LOG_ERR, "spiffs%d format error",unit);
+                return -1;
+            }
+                        
+            retries++;
+            goto retry;
+        }
+    } else {
+        if (retries > 0) {
+            spiffs_mkdir_op("/.");
+        }
+    }
+    
+    syslog(LOG_INFO, "spiffs%d mounted", unit);
+
+    return 1;
+}
+
+int spiffs_init() {
+    return spiffs_mount();
 }
 #endif

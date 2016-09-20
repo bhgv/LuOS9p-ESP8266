@@ -1,5 +1,5 @@
 build/open_esplibs_libmain//misc.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/open_esplibs/libmain/misc.c \
+ /Users/jolive/Lua-OSESP8266/open_esplibs/libmain/misc.c \
  ../open_esplibs/include/open_esplibs.h ../include/espressif/esp_misc.h \
  ../lwip/lwip/src/include/ipv4/lwip/ip_addr.h \
  ../lwip/lwip/src/include/lwip/opt.h ../lwip/include/lwipopts.h \

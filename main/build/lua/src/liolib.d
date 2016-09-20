@@ -1,6 +1,5 @@
-build/lua//src/liolib.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/liolib.c \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
+build/lua//src/liolib.o: /Users/jolive/Lua-OSESP8266/Lua/src/liolib.c \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
  ../libc/xtensa-lx106-elf/include/ctype.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
@@ -27,8 +26,8 @@ build/lua//src/liolib.o: \
  ../libc/xtensa-lx106-elf/include/alloca.h \
  ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/sys/string.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
@@ -65,5 +64,5 @@ build/lua//src/liolib.o: \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
  ../FreeRTOS/Source/include/mpu_wrappers.h \
  ../FreeRTOS/Source/include/queue.h ../sys/../sys/syscalls/mount.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lauxlib.h \
- /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lualib.h
+ /Users/jolive/Lua-OSESP8266/Lua/src/lauxlib.h \
+ /Users/jolive/Lua-OSESP8266/Lua/src/lualib.h

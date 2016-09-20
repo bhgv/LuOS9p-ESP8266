@@ -1,5 +1,5 @@
 build/lwip//lwip/src/api/netdb.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/lwip/lwip/src/api/netdb.c \
+ /Users/jolive/Lua-OSESP8266/lwip/lwip/src/api/netdb.c \
  ../lwip/lwip/src/include/lwip/netdb.h \
  ../lwip/lwip/src/include/lwip/opt.h ../lwip/include/lwipopts.h \
  ../lwip/lwip/src/include/lwip/debug.h \

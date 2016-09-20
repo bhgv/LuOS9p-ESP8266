@@ -1,5 +1,5 @@
 build/freertos//Source/croutine.o: \
- /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/croutine.c \
+ /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/croutine.c \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
