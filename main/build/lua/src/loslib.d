@@ -1,5 +1,6 @@
-build/lua//src/loslib.o: /Users/jolive/Lua-OSESP8266/Lua/src/loslib.c \
- /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
+build/lua//src/loslib.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/loslib.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
  ../libc/xtensa-lx106-elf/include/errno.h \
  ../libc/xtensa-lx106-elf/include/sys/errno.h \
  ../libc/xtensa-lx106-elf/include/sys/reent.h \
@@ -25,8 +26,8 @@ build/lua//src/loslib.o: /Users/jolive/Lua-OSESP8266/Lua/src/loslib.c \
  ../libc/xtensa-lx106-elf/include/machine/time.h \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/machine/types.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
@@ -71,7 +72,8 @@ build/lua//src/loslib.o: /Users/jolive/Lua-OSESP8266/Lua/src/loslib.c \
  ../sys/../sys/drivers/cpu.h ../sys/../sys/syscalls/mount.h \
  ../sys/../sys/syscalls/device.h ../sys/../sys/uio.h ../sys/../sys/file.h \
  ../libc/xtensa-lx106-elf/include/sys/queue.h ../sys/../main/build.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lauxlib.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lualib.h ../Lua/adds/modules.h \
- ../Lua/adds/lrodefs.h ../Lua/adds/lrotable.h ../Lua/src/llimits.h \
- ../Lua/src/lobject.h ../Lua/src/llimits.h ../Lua/adds/luaconf.h
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lauxlib.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lualib.h \
+ ../Lua/adds/modules.h ../Lua/adds/lrodefs.h ../Lua/adds/lrotable.h \
+ ../Lua/src/llimits.h ../Lua/src/lobject.h ../Lua/src/llimits.h \
+ ../Lua/adds/luaconf.h

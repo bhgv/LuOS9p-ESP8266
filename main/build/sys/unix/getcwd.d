@@ -1,4 +1,5 @@
-build/sys//unix/getcwd.o: /Users/jolive/Lua-OSESP8266/sys/unix/getcwd.c \
+build/sys//unix/getcwd.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/unix/getcwd.c \
  ../libc/xtensa-lx106-elf/include/sys/param.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \

@@ -1,5 +1,5 @@
 build/sys//unix/closedir.o: \
- /Users/jolive/Lua-OSESP8266/sys/unix/closedir.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/unix/closedir.c \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

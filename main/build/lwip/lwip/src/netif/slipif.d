@@ -1,5 +1,5 @@
 build/lwip//lwip/src/netif/slipif.o: \
- /Users/jolive/Lua-OSESP8266/lwip/lwip/src/netif/slipif.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/lwip/lwip/src/netif/slipif.c \
  ../lwip/lwip/src/include/netif/slipif.h \
  ../lwip/lwip/src/include/lwip/opt.h ../lwip/include/lwipopts.h \
  ../lwip/lwip/src/include/lwip/debug.h \

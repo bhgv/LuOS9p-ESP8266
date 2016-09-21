@@ -1,5 +1,6 @@
-build/lua//src/lua.o: /Users/jolive/Lua-OSESP8266/Lua/src/lua.c \
- /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
+build/lua//src/lua.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
  ../libc/xtensa-lx106-elf/include/signal.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
@@ -24,8 +25,8 @@ build/lua//src/lua.o: /Users/jolive/Lua-OSESP8266/Lua/src/lua.c \
  ../libc/xtensa-lx106-elf/include/alloca.h \
  ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/sys/string.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
@@ -67,5 +68,5 @@ build/lua//src/lua.o: /Users/jolive/Lua-OSESP8266/Lua/src/lua.c \
  ../sys/../sys/list/list.h ../libc/xtensa-lx106-elf/include/sys/time.h \
  ../Lua/common/linenoise.h ../sys/../sys/debug.h \
  ../sys/../sys/syscalls/mount.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lauxlib.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lualib.h
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lauxlib.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lualib.h

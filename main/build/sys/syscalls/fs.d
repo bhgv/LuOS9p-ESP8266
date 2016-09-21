@@ -1,6 +1,7 @@
-build/sys//syscalls/fs.o: /Users/jolive/Lua-OSESP8266/sys/syscalls/fs.c \
- /Users/jolive/Lua-OSESP8266/sys/syscalls/syscalls.h whitecat.h \
- ../libc/xtensa-lx106-elf/include/unistd.h \
+build/sys//syscalls/fs.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/fs.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/syscalls.h \
+ whitecat.h ../libc/xtensa-lx106-elf/include/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

@@ -597,6 +597,7 @@ int luaopen_lora(lua_State* L) {
 	#endif		   
 }
 
+LIB_INIT(LORA, lora, luaopen_lora);
 LUA_OS_MODULE(LORA, lora, lora_map);
 
 #endif

@@ -99,16 +99,9 @@ CPPFLAGS	+= -mlongcalls -mtext-section-literals
 
 include $(ROOT)esp8266.mk
 
-ifeq ($(USE_CUSTOM_HEAP),1)
-#LDFLAGS		= -nostdlib -Wl,--gc-section,-u,main -Wl,--no-check-sections -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,-static #-Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
 LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
-CFLAGS += -DUSE_CUSTOM_HEAP=1
+CFLAGS      += -DUSE_CUSTOM_HEAP=1
 LINKER_SCRIPTS += $(ROOT)ld/program.ld $(ROOT)ld/rom.ld
-else
-LDFLAGS		= -nostdlib -Wl,--gc-sections,-u,main -Wl,--no-check-sections -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,-static -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map -Wl,--wrap,malloc -Wl,--wrap,calloc -Wl,--wrap,realloc $(EXTRA_LDFLAGS)
-CFLAGS += -DUSE_CUSTOM_HEAP=0
-LINKER_SCRIPTS += $(ROOT)ld/program-custom-heap.ld $(ROOT)ld/rom.ld
-endif
 
 ifeq ($(WARNINGS_AS_ERRORS),1)
     C_CXX_FLAGS += -Werror

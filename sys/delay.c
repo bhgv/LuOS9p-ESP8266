@@ -26,7 +26,9 @@
  * arising out of or in connection with the use or performance of
  * this software.
  */
- 
+
+#include "FreeRTOS.h"
+
 #include <sys/delay.h>
  
 void delay(unsigned int msec) {

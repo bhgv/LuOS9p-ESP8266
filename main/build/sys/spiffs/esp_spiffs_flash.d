@@ -1,6 +1,6 @@
 build/sys//spiffs/esp_spiffs_flash.o: \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/esp_spiffs_flash.c \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/esp_spiffs_flash.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/esp_spiffs_flash.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/esp_spiffs_flash.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

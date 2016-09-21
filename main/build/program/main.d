@@ -1,5 +1,6 @@
-build/program//main.o: /Users/jolive/Lua-OSESP8266/main/main.c \
- /Users/jolive/Lua-OSESP8266/main/whitecat.h \
+build/program//main.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/main/main.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/main/whitecat.h \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

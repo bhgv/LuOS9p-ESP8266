@@ -1,11 +1,12 @@
-build/lua//src/lopcodes.o: /Users/jolive/Lua-OSESP8266/Lua/src/lopcodes.c \
- /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lopcodes.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/llimits.h \
+build/lua//src/lopcodes.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lopcodes.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lopcodes.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/llimits.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

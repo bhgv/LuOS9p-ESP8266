@@ -1,5 +1,5 @@
 build/sys//syscalls/__sysctl.o: \
- /Users/jolive/Lua-OSESP8266/sys/syscalls/__sysctl.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/__sysctl.c \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

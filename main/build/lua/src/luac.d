@@ -1,5 +1,6 @@
-build/lua//src/luac.o: /Users/jolive/Lua-OSESP8266/Lua/src/luac.c \
- /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
+build/lua//src/luac.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luac.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
  ../libc/xtensa-lx106-elf/include/ctype.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
@@ -25,21 +26,21 @@ build/lua//src/luac.o: /Users/jolive/Lua-OSESP8266/Lua/src/luac.c \
  ../libc/xtensa-lx106-elf/include/alloca.h \
  ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/sys/string.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
  ../sys/../Lua/adds/luaconf.h whitecat.h ../Lua/modules/auxmods.h \
  ../Lua/src/lua.h ../libc/xtensa-lx106-elf/include/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lauxlib.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lobject.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/llimits.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lstate.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/ltm.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lzio.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lmem.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lundump.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/ldebug.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lopcodes.h
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lauxlib.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lobject.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/llimits.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lstate.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ltm.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lzio.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lmem.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lundump.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/ldebug.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lopcodes.h

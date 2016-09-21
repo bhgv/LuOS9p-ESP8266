@@ -1,2 +1,2 @@
-build/lua//modules/adc.o: /Users/jolive/Lua-OSESP8266/Lua/modules/adc.c \
- whitecat.h
+build/lua//modules/adc.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/adc.c whitecat.h

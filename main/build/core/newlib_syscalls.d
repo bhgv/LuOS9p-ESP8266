@@ -1,5 +1,5 @@
 build/core//newlib_syscalls.o: \
- /Users/jolive/Lua-OSESP8266/core/newlib_syscalls.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/core/newlib_syscalls.c \
  ../libc/xtensa-lx106-elf/include/sys/reent.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

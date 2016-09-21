@@ -1,4 +1,5 @@
-build/lua//modules/lora.o: /Users/jolive/Lua-OSESP8266/Lua/modules/lora.c \
+build/lua//modules/lora.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/lora.c \
  ../Lua/src/lua.h ../Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
@@ -26,9 +27,9 @@ build/lua//modules/lora.o: /Users/jolive/Lua-OSESP8266/Lua/modules/lora.c \
  ../libc/xtensa-lx106-elf/include/sys/stdio.h ../Lua/adds/modules.h \
  ../Lua/adds/lrodefs.h ../Lua/adds/lrotable.h ../Lua/src/llimits.h \
  ../Lua/src/lobject.h ../Lua/src/llimits.h ../Lua/adds/luaconf.h \
- /Users/jolive/Lua-OSESP8266/Lua/modules/error.h ../Lua/src/lstate.h \
- ../Lua/src/lobject.h ../Lua/src/ltm.h ../Lua/src/lzio.h \
- ../Lua/src/lmem.h ../sys/../sys/drivers/error.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/error.h \
+ ../Lua/src/lstate.h ../Lua/src/lobject.h ../Lua/src/ltm.h \
+ ../Lua/src/lzio.h ../Lua/src/lmem.h ../sys/../sys/drivers/error.h \
  ../sys/../sys/drivers/resource.h \
  ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/sys/string.h \

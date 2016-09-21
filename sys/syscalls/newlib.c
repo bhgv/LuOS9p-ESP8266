@@ -1,4 +1,5 @@
 #include "FreeRTOS.h"
+#include "task.h"
 
 #include "lua.h"
 #include <stdio.h>
@@ -184,3 +185,16 @@ int _read_r(struct _reent *r, int fd, void *buf, size_t nbyte) {
 	
 	return nbyte;
 }
+
+unsigned sleep(unsigned int secs) {
+    vTaskDelay( (secs * 1000) / portTICK_PERIOD_MS );
+    
+    return 0;
+}
+
+int usleep(useconds_t usec) {
+	vTaskDelay(usec / portTICK_PERIOD_US);
+	
+	return 0;
+}
+

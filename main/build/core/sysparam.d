@@ -1,4 +1,5 @@
-build/core//sysparam.o: /Users/jolive/Lua-OSESP8266/core/sysparam.c \
+build/core//sysparam.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/core/sysparam.c \
  ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \

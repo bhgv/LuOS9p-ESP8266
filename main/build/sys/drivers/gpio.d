@@ -1,1 +1,2 @@
-build/sys//drivers/gpio.o: /Users/jolive/Lua-OSESP8266/sys/drivers/gpio.c
+build/sys//drivers/gpio.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/drivers/gpio.c

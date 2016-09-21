@@ -1,5 +1,6 @@
-build/sys//unix/syslog.o: /Users/jolive/Lua-OSESP8266/sys/unix/syslog.c \
- whitecat.h ../libc/xtensa-lx106-elf/include/sys/types.h \
+build/sys//unix/syslog.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/unix/syslog.c whitecat.h \
+ ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \

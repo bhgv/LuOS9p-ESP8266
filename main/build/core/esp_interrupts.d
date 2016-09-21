@@ -1,5 +1,5 @@
 build/core//esp_interrupts.o: \
- /Users/jolive/Lua-OSESP8266/core/esp_interrupts.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/core/esp_interrupts.c \
  ../core/include/esp/interrupts.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

@@ -1,5 +1,6 @@
-build/sys//drivers/lora.o: /Users/jolive/Lua-OSESP8266/sys/drivers/lora.c \
- whitecat.h ../FreeRTOS/Source/include/FreeRTOS.h \
+build/sys//drivers/lora.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/drivers/lora.c whitecat.h \
+ ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

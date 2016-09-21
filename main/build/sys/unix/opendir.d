@@ -1,4 +1,5 @@
-build/sys//unix/opendir.o: /Users/jolive/Lua-OSESP8266/sys/unix/opendir.c \
+build/sys//unix/opendir.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/unix/opendir.c \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
  ../libc/xtensa-lx106-elf/include/sys/features.h \

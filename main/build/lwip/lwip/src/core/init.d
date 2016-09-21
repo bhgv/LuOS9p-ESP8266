@@ -1,5 +1,5 @@
 build/lwip//lwip/src/core/init.o: \
- /Users/jolive/Lua-OSESP8266/lwip/lwip/src/core/init.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/lwip/lwip/src/core/init.c \
  ../lwip/lwip/src/include/lwip/opt.h ../lwip/include/lwipopts.h \
  ../lwip/lwip/src/include/lwip/debug.h \
  ../lwip/lwip/src/include/lwip/arch.h ../lwip/include/arch/cc.h \

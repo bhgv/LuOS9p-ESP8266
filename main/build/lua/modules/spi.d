@@ -1,2 +1,2 @@
-build/lua//modules/spi.o: /Users/jolive/Lua-OSESP8266/Lua/modules/spi.c \
- whitecat.h
+build/lua//modules/spi.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/spi.c whitecat.h

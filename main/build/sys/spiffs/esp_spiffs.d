@@ -1,8 +1,8 @@
 build/sys//spiffs/esp_spiffs.o: \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/esp_spiffs.c \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/esp_spiffs.h \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs.h \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs_config.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/esp_spiffs.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/esp_spiffs.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs_config.h \
  ../libc/xtensa-lx106-elf/include/sys/param.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
@@ -33,5 +33,5 @@ build/sys//spiffs/esp_spiffs.o: \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
  ../libc/xtensa-lx106-elf/include/ctype.h \
  ../include/espressif/spi_flash.h ../core/include/flashchip.h \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/esp_spiffs_flash.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/esp_spiffs_flash.h \
  ../core/include/common_macros.h

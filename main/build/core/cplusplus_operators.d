@@ -1,5 +1,5 @@
 build/core//cplusplus_operators.o: \
- /Users/jolive/Lua-OSESP8266/core/cplusplus_operators.cpp \
+ /Users/jaumeolivepetrus/whitecat-esp8266/core/cplusplus_operators.cpp \
  ../libc/xtensa-lx106-elf/include/stdio.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

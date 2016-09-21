@@ -1,5 +1,5 @@
 build/freertos//Source/event_groups.o: \
- /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/event_groups.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/event_groups.c \
  ../libc/xtensa-lx106-elf/include/stdlib.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \

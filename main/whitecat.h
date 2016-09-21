@@ -293,7 +293,6 @@
 // Lua modules
 // ---------------------------------------------------------------------------
 #define LUA_USE_PIO         0
-#define LUA_USE_TMR         0
 #define LUA_USE_CAN         (1 && USE_CAN)
 #define LUA_USE_NET         (1 && (USE_ETHERNET || USE_WIFI || USE_GPRS))
 #define LUA_USE_ADC         0
@@ -312,6 +311,4 @@
 #define LUA_USE_SHELL       0
 #define LUA_USE_EDITOR      0
 #define LUA_USE_HISTORY	    0
-#define LUA_USE__G	    	1		
-#define LUA_USE_OS	    	1		
 #endif	/* CONFIG_H */

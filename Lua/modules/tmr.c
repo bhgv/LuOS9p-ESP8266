@@ -27,14 +27,14 @@
  * this software.
  */
 
-#include "whitecat.h"
-
 #if LUA_USE_TMR
 
 #include "lua.h"
 #include "lauxlib.h"
+#include "modules.h"
 
-#include <signal.h>
+#include <unistd.h>
+#include <sys/delay.h>
 
 static int tmr_delay( lua_State* L ) {
     unsigned long long period;
@@ -90,20 +90,26 @@ static int tmr_sleep_us( lua_State* L ) {
     return 0;
 }
 
-const luaL_Reg tmr_map[] = {
-    {"delay", tmr_delay},
-    {"delayms", tmr_delay_ms},
-    {"delayus", tmr_delay_us},
-    {"sleep", tmr_sleep},
-    {"sleepms", tmr_sleep_ms},
-    {"sleepus", tmr_sleep_us},
-    {NULL, NULL}
+static const LUA_REG_TYPE tmr_map[] = {
+    { LSTRKEY( "delay" ),			LFUNCVAL( tmr_delay ) },
+    { LSTRKEY( "delayms" ),			LFUNCVAL( tmr_delay_ms ) },
+    { LSTRKEY( "delayus" ),			LFUNCVAL( tmr_delay_us ) },
+    { LSTRKEY( "sleep" ),			LFUNCVAL( tmr_sleep ) },
+    { LSTRKEY( "sleepms" ),			LFUNCVAL( tmr_sleep_ms ) },
+    { LSTRKEY( "sleepus" ),			LFUNCVAL( tmr_sleep_us ) },
+    { LNILKEY, LNILVAL }
 };
 
 LUALIB_API int luaopen_tmr( lua_State *L ) {
+#if !LUA_USE_ROTABLE
     luaL_newlib(L, tmr_map);
 
     return 1;
+#else
+	return 0;
+#endif
 }
+
+LUA_OS_MODULE(TMR, tmr, tmr_map);
 
 #endif

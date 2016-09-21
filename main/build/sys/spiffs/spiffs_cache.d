@@ -1,7 +1,7 @@
 build/sys//spiffs/spiffs_cache.o: \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs_cache.c \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs.h \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs_config.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs_cache.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs_config.h \
  ../libc/xtensa-lx106-elf/include/sys/param.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \
  ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
@@ -31,4 +31,4 @@ build/sys//spiffs/spiffs_cache.o: \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
  ../libc/xtensa-lx106-elf/include/ctype.h \
- /Users/jolive/Lua-OSESP8266/sys/spiffs/spiffs_nucleus.h
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/spiffs/spiffs_nucleus.h

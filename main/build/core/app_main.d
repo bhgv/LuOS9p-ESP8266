@@ -1,5 +1,6 @@
-build/core//app_main.o: /Users/jolive/Lua-OSESP8266/core/app_main.c \
- whitecat.h ../libc/xtensa-lx106-elf/include/string.h \
+build/core//app_main.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/core/app_main.c whitecat.h \
+ ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \

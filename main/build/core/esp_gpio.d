@@ -1,4 +1,5 @@
-build/core//esp_gpio.o: /Users/jolive/Lua-OSESP8266/core/esp_gpio.c \
+build/core//esp_gpio.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/core/esp_gpio.c \
  ../core/include/esp/gpio.h ../core/include/esp/gpio_regs.h \
  ../core/include/esp/types.h ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

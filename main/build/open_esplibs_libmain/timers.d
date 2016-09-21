@@ -1,5 +1,5 @@
 build/open_esplibs_libmain//timers.o: \
- /Users/jolive/Lua-OSESP8266/open_esplibs/libmain/timers.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/open_esplibs/libmain/timers.c \
  ../open_esplibs/include/open_esplibs.h ../include/etstimer.h \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \

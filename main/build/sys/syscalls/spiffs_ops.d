@@ -1,6 +1,6 @@
 build/sys//syscalls/spiffs_ops.o: \
- /Users/jolive/Lua-OSESP8266/sys/syscalls/spiffs_ops.c whitecat.h \
- ../libc/xtensa-lx106-elf/include/string.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/spiffs_ops.c \
+ whitecat.h ../libc/xtensa-lx106-elf/include/string.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/sys/config.h \

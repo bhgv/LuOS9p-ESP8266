@@ -1,4 +1,5 @@
-build/core//esp_timer.o: /Users/jolive/Lua-OSESP8266/core/esp_timer.c \
+build/core//esp_timer.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/core/esp_timer.c \
  ../core/include/esp/timer.h ../libc/xtensa-lx106-elf/include/errno.h \
  ../libc/xtensa-lx106-elf/include/sys/errno.h \
  ../libc/xtensa-lx106-elf/include/sys/reent.h \

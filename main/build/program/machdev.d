@@ -1,5 +1,6 @@
-build/program//machdev.o: /Users/jolive/Lua-OSESP8266/main/machdev.c \
- /Users/jolive/Lua-OSESP8266/main/whitecat.h \
+build/program//machdev.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/main/machdev.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/main/whitecat.h \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
@@ -41,8 +42,9 @@ build/program//machdev.o: /Users/jolive/Lua-OSESP8266/main/machdev.c \
  ../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
  ../FreeRTOS/Source/include/mpu_wrappers.h \
- /Users/jolive/Lua-OSESP8266/main/build.h ../sys/../sys/drivers/console.h \
- ../sys/../sys/drivers/cpu.h ../libc/xtensa-lx106-elf/include/stdio.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/main/build.h \
+ ../sys/../sys/drivers/console.h ../sys/../sys/drivers/cpu.h \
+ ../libc/xtensa-lx106-elf/include/stdio.h \
  ../libc/xtensa-lx106-elf/include/sys/types.h \
  ../libc/xtensa-lx106-elf/include/machine/types.h \
  ../libc/xtensa-lx106-elf/include/sys/stdio.h \

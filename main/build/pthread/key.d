@@ -1,4 +1,5 @@
-build/pthread//key.o: /Users/jolive/Lua-OSESP8266/pthread/key.c \
+build/pthread//key.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/pthread/key.c \
  ../include/pthread.h whitecat.h ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

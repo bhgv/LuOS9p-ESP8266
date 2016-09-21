@@ -1,5 +1,5 @@
 build/freertos//Source/portable/esp8266/port.o: \
- /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/portable/esp8266/port.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/portable/esp8266/port.c \
  ../libc/xtensa-lx106-elf/include/malloc.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
@@ -50,4 +50,4 @@ build/freertos//Source/portable/esp8266/port.o: \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
  ../FreeRTOS/Source/include/mpu_wrappers.h \
  ../FreeRTOS/Source/include/task.h ../FreeRTOS/Source/include/list.h \
- /Users/jolive/Lua-OSESP8266/FreeRTOS/Source/portable/esp8266/xtensa_rtos.h
+ /Users/jaumeolivepetrus/whitecat-esp8266/FreeRTOS/Source/portable/esp8266/xtensa_rtos.h

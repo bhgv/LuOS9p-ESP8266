@@ -1,6 +1,7 @@
 build/lua//common/lrotable.o: \
- /Users/jolive/Lua-OSESP8266/Lua/common/lrotable.c ../Lua/src/lua.h \
- ../Lua/src/luaconf.h ../libc/xtensa-lx106-elf/include/limits.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/common/lrotable.c \
+ ../Lua/src/lua.h ../Lua/src/luaconf.h \
+ ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

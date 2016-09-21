@@ -1,7 +1,7 @@
 build/sys//syscalls/lseek.o: \
- /Users/jolive/Lua-OSESP8266/sys/syscalls/lseek.c \
- /Users/jolive/Lua-OSESP8266/sys/syscalls/syscalls.h whitecat.h \
- ../libc/xtensa-lx106-elf/include/unistd.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/lseek.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/syscalls.h \
+ whitecat.h ../libc/xtensa-lx106-elf/include/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
  ../libc/xtensa-lx106-elf/include/_ansi.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \

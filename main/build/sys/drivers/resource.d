@@ -1,6 +1,7 @@
 build/sys//drivers/resource.o: \
- /Users/jolive/Lua-OSESP8266/sys/drivers/resource.c ../Lua/src/lua.h \
- ../Lua/src/luaconf.h ../libc/xtensa-lx106-elf/include/limits.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/drivers/resource.c \
+ ../Lua/src/lua.h ../Lua/src/luaconf.h \
+ ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \

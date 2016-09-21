@@ -34,20 +34,16 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-
 /*
 ** these libs are loaded by lua.c and are readily available to any Lua
 ** program
 */
 //static const luaL_Reg loadedlibs[] = {
-//  {"_G", luaopen_base},
 //  {LUA_LOADLIBNAME, luaopen_package},
 //  {LUA_COLIBNAME, luaopen_coroutine},
-//  {LUA_TABLIBNAME, luaopen_table},
 //  {LUA_IOLIBNAME, luaopen_io},
 //    {LUA_OSLIBNAME, luaopen_os},
 //  {LUA_STRLIBNAME, luaopen_string},
-//  {LUA_MATHLIBNAME, luaopen_math},
 //  {LUA_UTF8LIBNAME, luaopen_utf8},
 //  {LUA_DBLIBNAME, luaopen_debug},
 //#if defined(LUA_COMPAT_BITLIB)
@@ -63,13 +59,16 @@
 extern const luaL_Reg lua_libs1[];
  
 LIB_INIT(_G, _G, luaopen_base);
+LIB_INIT(TABLE, table, luaopen_table);
 LIB_INIT(OS, os, luaopen_os);
+LIB_INIT(MATH, math, luaopen_math);
 
 LIB_INIT(PACK, pack, luaopen_pack);
-LIB_INIT(LORA, lora, luaopen_lora);
+LIB_INIT(TMR, tmr, luaopen_tmr);
 
 LUALIB_API void luaL_openlibs (lua_State *L) {
   const luaL_Reg *lib = lua_libs1;
+
   for (; lib->name; lib++) {
     if (lib->func) {
   		debug_free_mem_begin(luaL_openlibs);
@@ -92,4 +91,3 @@ LUALIB_API void luaL_openlibs (lua_State *L) {
     }
   }
 }
-

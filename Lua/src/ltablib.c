@@ -422,22 +422,25 @@ static int sort (lua_State *L) {
 /* }====================================================== */
 
 
-static const luaL_Reg tab_funcs[] = {
-  {"concat", tconcat},
+#include "modules.h"
+
+static const LUA_REG_TYPE tab_funcs[] = {
+  { LSTRKEY( "concat" ),		LFUNCVAL( tconcat ) },
 #if defined(LUA_COMPAT_MAXN)
-  {"maxn", maxn},
+  { LSTRKEY( "maxn" ),			LFUNCVAL( maxn ) },
 #endif
-  {"insert", tinsert},
-  {"pack", pack},
-  {"unpack", unpack},
-  {"remove", tremove},
-  {"move", tmove},
-  {"sort", sort},
-  {NULL, NULL}
+  { LSTRKEY( "insert" ),		LFUNCVAL( tinsert ) },
+  { LSTRKEY( "pack" ),			LFUNCVAL( pack ) },
+  { LSTRKEY( "unpack" ),		LFUNCVAL( unpack ) },
+  { LSTRKEY( "remove" ),		LFUNCVAL( tremove ) },
+  { LSTRKEY( "move" ),			LFUNCVAL( tmove ) },
+  { LSTRKEY( "sort" ),			LFUNCVAL( sort ) },
+  { LNILKEY, LNILVAL }
 };
 
 
 LUAMOD_API int luaopen_table (lua_State *L) {
+ #if !LUA_USE_ROTABLE
   luaL_newlib(L, tab_funcs);
 #if defined(LUA_COMPAT_UNPACK)
   /* _G.unpack = table.unpack */
@@ -445,5 +448,9 @@ LUAMOD_API int luaopen_table (lua_State *L) {
   lua_setglobal(L, "unpack");
 #endif
   return 1;
+#else
+  return 0;
+#endif
 }
 
+LUA_OS_MODULE(TABLE, table, tab_funcs);

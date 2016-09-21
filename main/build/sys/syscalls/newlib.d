@@ -1,5 +1,5 @@
 build/sys//syscalls/newlib.o: \
- /Users/jolive/Lua-OSESP8266/sys/syscalls/newlib.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/newlib.c \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
  ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
@@ -40,9 +40,11 @@ build/sys//syscalls/newlib.o: \
  ../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
- ../FreeRTOS/Source/include/mpu_wrappers.h ../Lua/src/lua.h \
- ../Lua/src/luaconf.h ../libc/xtensa-lx106-elf/include/limits.h \
- ../sys/../Lua/adds/luaconf.h whitecat.h ../Lua/modules/auxmods.h \
+ ../FreeRTOS/Source/include/mpu_wrappers.h \
+ ../FreeRTOS/Source/include/task.h ../FreeRTOS/Source/include/list.h \
+ ../Lua/src/lua.h ../Lua/src/luaconf.h \
+ ../libc/xtensa-lx106-elf/include/limits.h ../sys/../Lua/adds/luaconf.h \
+ whitecat.h ../Lua/modules/auxmods.h \
  ../libc/xtensa-lx106-elf/include/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/unistd.h \
  ../libc/xtensa-lx106-elf/include/sys/types.h \

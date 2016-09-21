@@ -1,8 +1,9 @@
-build/lua//src/lctype.o: /Users/jolive/Lua-OSESP8266/Lua/src/lctype.c \
- /Users/jolive/Lua-OSESP8266/Lua/src/lprefix.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lctype.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/lua.h \
- /Users/jolive/Lua-OSESP8266/Lua/src/luaconf.h \
+build/lua//src/lctype.o: \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lctype.c \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lprefix.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lctype.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/lua.h \
+ /Users/jaumeolivepetrus/whitecat-esp8266/Lua/src/luaconf.h \
  ../libc/xtensa-lx106-elf/include/limits.h \
  ../libc/xtensa-lx106-elf/include/newlib.h \
  ../libc/xtensa-lx106-elf/include/stdint.h \
