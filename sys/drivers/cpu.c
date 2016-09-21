@@ -52,73 +52,45 @@
 #include <syslog.h>
 */
 
-/*
-const char *pin_names[] = {
-"E5",
-"E6",
-"E7",
-"G6",
-"G7",
-"G8",
-"?",
-"?",
-"?",
-"G9",
-"B5",
-"B4",
-"B3",
-"B2",
-"B1",
-"B0",
-"B6",
-"B7",
-"?",
-"?",
-"B8",
-"B9",
-"B10",
-"B11",
-"?",
-"?",
-"B12",
-"B13",
-"B14",
-"B15",
-"C12",
-"C15",
+
+
+
+static const char *pin_names[] = {
 "?",
 "?",
 "?",
 "?",
 "?",
-"F3",
+"TOUT",
+"?",
+"GPIO16",
+"GPIO14",
+"GPIO12",
+"?",
+"GPIO13",
+"GPIO15",
+"GPIO2",
+"GPIO0",
+"GPIO4",
+"?",
+"SD_D2",
+"SD_D3",
+"SD_CMD",
+"SD_CLK",
+"SD_D0",
+"SD_D1",
+"GPIO5",
+"GPIO3",
+"GPIO1",
 "?",
 "?",
-"F4",
-"F5",
-"D9",
-"D10",
-"D11",
-"D0",
-"C13",
-"C14",
-"D1",
-"D2",
-"D3",
-"D4",
-"D5",
 "?",
 "?",
-"F0",
-"F1",
-"E0",
 "?",
 "?",
-"E1",
-"E2",
-"E3",
-"E4"
 };
+
+/*
 
 typedef enum {
     EC = 0x43, EF = 0x46
@@ -229,17 +201,17 @@ static unsigned int pin_number_64(unsigned int pin) {
     
     return 0;
 }
+*/
 
 unsigned int cpu_pin_number(unsigned int pin) {
-    switch (pins) {
-        case 64: return pin_number_64(pin);
-    }
+	return pin;
 }
 
 const char *cpu_pin_name(unsigned int pin) {
     return pin_names[pin];
 }
 
+/*
 unsigned int cpu_port_io_pin_mask(unsigned int port) {
     switch (pins) {
         case 64: return port_io_pin_mask_64(port);

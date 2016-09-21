@@ -30,6 +30,26 @@
 #ifndef CPU_H
 #define	CPU_H
 
+#define PIN_TOUT   5
+#define PIN_GPIO16 7
+#define PIN_GPIO14 8
+#define PIN_GPIO12 9
+#define PIN_GPIO13 11
+#define PIN_GPIO15 12
+#define PIN_GPIO2  13
+#define PIN_GPIO0  14
+#define PIN_GPIO4  15
+#define PIN_SD_D2  17
+#define PIN_SD_D3  18
+#define PIN_SD_CMD 19
+#define PIN_SD_CLK 20
+#define PIN_SD_D0  21
+#define PIN_SD_D1  22
+#define PIN_GPIO5  23
+#define PIN_GPIO3  24
+#define PIN_GPIO1  25
+#define PIN_NOPIN  32
+
 void cpu_init();
 int cpu_revission();
 void cpu_model(char *buffer);

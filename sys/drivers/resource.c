@@ -32,14 +32,9 @@
 #include <stdlib.h>
 #include <sys/mutex.h>
 
-//#include <sys/drivers/cpu.h>
+#include <sys/drivers/cpu.h>
 #include <sys/drivers/resource.h>
 
-// TO DO
-const char *cpu_pin_name(int unit) {
-	return "?";
-}
-	
 static struct mtx resource_mtx;
 
 typedef struct {

@@ -64,6 +64,7 @@
 #include <sys/drivers/uart.h>
 #include <sys/drivers/gpio.h>
 #include <sys/drivers/console.h>
+#include <sys/drivers/cpu.h>
 #include <sys/syslog.h>
 #include <sys/delay.h>
 
@@ -72,7 +73,6 @@ extern int lua_running;
 // Flags for determine some UART states
 #define UART_FLAG_INIT		(1 << 1)
 #define UART_FLAG_IRQ_INIT	(1 << 2)
-#define UART_FLAG_DEBUG		(1 << 3)
 
 // Names for the uarts
 static const char *names[] = {
@@ -85,7 +85,7 @@ struct uart {
     u8_t          flags;
     QueueHandle_t q;         // RX queue
     u16_t         qs;        // Queue size
-    u32_t         brg;        // Queue size
+    u32_t         brg;       // Queue size
 	u8_t		  phys;
 };
 
@@ -101,12 +101,18 @@ struct uart uart[NUART] = {
     },
 };
 
-int swaped = 0;
+static int output_enabled = 0;
 
 #define wait_tx_empty(unit) \
 while ((READ_PERI_REG(UART_STATUS(unit)) >> UART_TXFIFO_CNT_S) & UART_TXFIFO_CNT);delay(1);
 
+void uart0_swap();
+void uart0_default();
+	
 void uart_update_params(u8_t unit, UART_BautRate brg, UART_WordLength data, UART_ParityMode parity, UART_StopBits stop) {
+	wait_tx_empty(0);
+	wait_tx_empty(1);
+
     sdk_uart_div_modify(unit, UART_CLK_FREQ / brg);
 
     WRITE_PERI_REG(UART_CONF0(unit),
@@ -115,7 +121,7 @@ void uart_update_params(u8_t unit, UART_BautRate brg, UART_WordLength data, UART
                    | (data << UART_BIT_NUM_S));				   
 }
 
-void uart_pin_config(u8_t unit) {
+void uart_pin_config(u8_t unit, u8_t *rx, u8_t *tx) {
 	wait_tx_empty(0);
 	wait_tx_empty(1);
 
@@ -132,6 +138,9 @@ void uart_pin_config(u8_t unit) {
 			// Disable U1TX
 	   	 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);					
 
+			if (rx) *rx = PIN_GPIO3;
+			if (tx) *tx = PIN_GPIO1;
+			
 			break;
 						
 		case 1:
@@ -142,6 +151,10 @@ void uart_pin_config(u8_t unit) {
 		    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO2_U);
 		    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_U1TXD_BK);	
 							
+
+			if (rx) *rx = PIN_NOPIN;
+			if (tx) *tx = PIN_GPIO2;
+
 			break;
 
 		case 2:
@@ -160,6 +173,9 @@ void uart_pin_config(u8_t unit) {
 		    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO2_U);
 		    PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_U1TXD_BK);					
 
+			if (rx) *rx = PIN_GPIO13;
+			if (tx) *tx = PIN_GPIO15;
+			
 			break;
 	}
 	
@@ -169,21 +185,23 @@ void uart_pin_config(u8_t unit) {
 }
 
 void uart0_swap() {
-	uart_pin_config(2);
+	uart_pin_config(2, NULL, NULL);
 	uart_update_params(0, 57600, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
     IOSWAP |= (1 << IOSWAPU0);
 	
-	console_swap();
+	console_swap();	
 	
-	swaped = 1;
+	output_enabled = (1 << 1); // Output on UART2
 }
 
 void uart0_default() {
-	uart_pin_config(0);
+	uart_pin_config(0, NULL, NULL);
 	uart_update_params(0, 115200, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
     IOSWAP &= ~(1 << IOSWAPU0);
 
 	console_default();
+	
+	output_enabled = (1 << 0); // Output on UART1
 }
 
 void UART_IntrConfig(UART_Port uart_no,  UART_IntrConfTypeDef *pUARTIntrConf) {
@@ -279,6 +297,8 @@ static void uart_rx_intr_handler(void) {
 // UART is configured by setting baud rate, 8N1
 // Interrupts are not enabled in this function
 void uart_init(u8_t unit, u32_t brg, u32_t mode, u32_t qs) {
+	u8_t rx, tx;
+	
     unit--;
 	
 	// If requestes queue size is greater than current size, delete queue and create
@@ -293,7 +313,13 @@ void uart_init(u8_t unit, u32_t brg, u32_t mode, u32_t qs) {
 	
 	uart[unit].q  = uart[uart[unit].phys].q;
 	
-	uart_pin_config(uart[unit].phys);
+	uart_pin_config(uart[unit].phys, &rx, &tx);
+
+	if (output_enabled) {
+		syslog(LOG_INFO, "%s: at pins rx=%s/tx=%s", names[unit], cpu_pin_name(rx), cpu_pin_name(tx));
+		syslog(LOG_INFO, "%s: speed %d bauds",names[unit], brg);  
+	}  
+
 	uart_update_params(uart[unit].phys, brg, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
 	
     uart[unit].brg = brg; 
@@ -338,11 +364,7 @@ void uart_write(u8_t unit, char byte) {
     unit--;
 
     while (((READ_PERI_REG(UART_STATUS(uart[unit].phys)) & (UART_TXFIFO_CNT << UART_TXFIFO_CNT_S)) >> UART_TXFIFO_CNT_S & UART_TXFIFO_CNT) >= 126);
-    WRITE_PERI_REG(UART_FIFO(uart[unit].phys) , byte);
-
-    //if (uart[unit].flags & UART_FLAG_DEBUG) {
-    //    uart_write(CONSOLE_UART, byte);
-    //}
+    WRITE_PERI_REG(UART_FIFO(uart[unit].phys), byte);
 }
 
 // Writes a null-terminated string to the UART
@@ -352,10 +374,6 @@ void uart_writes(u8_t unit, char *s) {
     while (*s) {
 	    while (((READ_PERI_REG(UART_STATUS(uart[unit].phys)) & (UART_TXFIFO_CNT << UART_TXFIFO_CNT_S)) >> UART_TXFIFO_CNT_S & UART_TXFIFO_CNT) >= 126);
 	    WRITE_PERI_REG(UART_FIFO(uart[unit].phys) , *s++);
-
-        //if (uart[unit].flags & UART_FLAG_DEBUG) {
-        //    uart_write(CONSOLE_UART, *s);
-        //}
    }
 }
 
@@ -368,10 +386,6 @@ u8_t uart_read(u8_t unit, char *c, u32_t timeout) {
     }
 	
     if (xQueueReceive(uart[unit].q, c, (TickType_t)(timeout)) == pdTRUE) {
-        //if (uart[unit].flags & UART_FLAG_DEBUG) {
-        //    uart_write(CONSOLE_UART, *c);
-        //}
-        
         return 1;
     } else {
         return 0;
@@ -517,10 +531,6 @@ QueueHandle_t *uart_get_queue(u8_t unit) {
     unit--;
 
     return  uart[unit].q;
-}
-
-void uart_debug(int unit, int debug) {
-    uart[unit - 1].flags |= UART_FLAG_DEBUG;   
 }
 
 int uart_get_br(int unit) {

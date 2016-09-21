@@ -153,7 +153,6 @@ uint8_t  uart_wait_response(u8_t unit, char *command, uint8_t echo, char *ret, u
 uint8_t  uart_send_command(u8_t unit, char *command, uint8_t echo, uint8_t crlf, char *ret, uint8_t substring, u32_t timeout, int nargs, ...);
 void     uart_consume(u8_t unit);
 const char  *uart_name(u8_t unit);
-void     uart_debug(int unit, int debug);
 int      uart_get_br(int unit);
 int      uart_inited(int unit);
 void uart0_swap();
