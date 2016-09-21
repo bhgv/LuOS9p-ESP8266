@@ -1,0 +1,7 @@
+/main/build/*
+/main/firmware/*
+*.dis
+*.elf
+*.hex
+*.map
+*.DS_Store
