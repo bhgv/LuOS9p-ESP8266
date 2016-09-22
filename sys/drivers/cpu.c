@@ -329,6 +329,9 @@ void cpu_show_info() {
 	}
 }
 
+void cpu_sleep(unsigned int seconds) {
+	sdk_system_deep_sleep(seconds * 1000000);
+}
 
 void cpu_reset() {
 //	gpio_pin_output(16);

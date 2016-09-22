@@ -57,13 +57,23 @@ static int os_edit (lua_State *L) {
     return 0;    
 }
 
-static int os_idle(lua_State *L) {   
-    cpu_idle(10);
+static int os_idle(lua_State *L) {  
+	unsigned int seconds = luaL_checkinteger(L, 1);
+	 
+    cpu_idle(seconds);
     
     return 0;
 }
 
 #endif
+
+static int os_sleep(lua_State *L) {
+	unsigned int seconds = luaL_checkinteger(L, 1);
+
+	cpu_sleep(seconds);
+
+	return 0;
+}
 
 static int os_loglevel(lua_State *L) {   
     int total = lua_gettop(L);

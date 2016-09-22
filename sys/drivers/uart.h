@@ -54,10 +54,13 @@
 #ifndef __UART_H__
 #define __UART_H__
 
+
 #include <FreeRTOS.h>
 #include <queue.h>
-
 #include <sys/types.h>
+#include <sys/delay.h>
+#include <espressif/esp_common.h>
+
 	
 #define NUART 3
 	
@@ -65,6 +68,9 @@
 #define ETS_UART_INTR_DISABLE() _xt_isr_mask(1 << ETS_UART_INUM)
 #define UART_INTR_MASK          0x1ff
 #define UART_LINE_INV_MASK      (0x3f<<19)
+
+#define wait_tx_empty(unit) \
+while ((READ_PERI_REG(UART_STATUS(unit)) >> UART_TXFIFO_CNT_S) & UART_TXFIFO_CNT);delay(1);
 
 typedef enum {
     UART_WordLength_5b = 0x0,

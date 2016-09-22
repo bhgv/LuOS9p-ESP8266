@@ -37,6 +37,10 @@
 #include "esplibs/libphy.h"
 #include "esplibs/libnet80211.h"
 
+// WHITECAT BEGIN
+#include <sys/drivers/uart.h>
+// WHITECAT END
+
 // Structure for the data contained in the last sector of Flash which contains
 // meta-info about the saved wifi param sectors.
 struct param_dir_st {
@@ -367,9 +371,14 @@ bool sdk_system_upgrade_reboot(void) {
 static void _deep_sleep_phase2(void *timer_arg) {
     uint32_t time_in_us = (uint32_t)timer_arg;
 
-    printf("deep sleep %ds\n\n", time_in_us / 1000000);
-    while (FIELD2VAL(UART_STATUS_TXFIFO_COUNT, UART(0).STATUS)) {}
-    while (FIELD2VAL(UART_STATUS_TXFIFO_COUNT, UART(1).STATUS)) {}
+	// WHITECAT BEGIN
+    //printf("deep sleep %ds\n\n", time_in_us / 1000000);
+    //while (FIELD2VAL(UART_STATUS_TXFIFO_COUNT, UART(0).STATUS)) {}
+    //while (FIELD2VAL(UART_STATUS_TXFIFO_COUNT, UART(1).STATUS)) {}
+    wait_tx_empty(0);
+    wait_tx_empty(1);
+    // WHITECAT END
+    
     RTC.CTRL0 = 0;
     RTC.CTRL0 &= 0xffffbfff;
     RTC.CTRL0 |= 0x00000030;

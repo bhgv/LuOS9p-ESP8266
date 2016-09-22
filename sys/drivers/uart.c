@@ -53,8 +53,6 @@
 
 #include "whitecat.h"
 
-#include <espressif/esp_common.h>
-
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <stdio.h>
@@ -66,7 +64,6 @@
 #include <sys/drivers/console.h>
 #include <sys/drivers/cpu.h>
 #include <sys/syslog.h>
-#include <sys/delay.h>
 
 extern int lua_running;
 
@@ -102,9 +99,6 @@ struct uart uart[NUART] = {
 };
 
 static int output_enabled = 0;
-
-#define wait_tx_empty(unit) \
-while ((READ_PERI_REG(UART_STATUS(unit)) >> UART_TXFIFO_CNT_S) & UART_TXFIFO_CNT);delay(1);
 
 void uart0_swap();
 void uart0_default();

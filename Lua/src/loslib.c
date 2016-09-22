@@ -376,6 +376,7 @@ static const LUA_REG_TYPE syslib[] =
 
   { LSTRKEY( "clear" ),      LFUNCVAL( os_clear ) },
   { LSTRKEY( "cpu" ),        LFUNCVAL( os_cpu ) },
+  { LSTRKEY( "sleep" ),      LFUNCVAL( os_sleep ) },
   { LSTRKEY( "version" ),    LFUNCVAL( os_version ) },
   { LSTRKEY( "ls" ),         LFUNCVAL( os_ls ) },
   { LSTRKEY( "cd" ),         LFUNCVAL( os_cd ) },

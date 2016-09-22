@@ -100,5 +100,7 @@ void cpu_idle(int seconds);
 const char *cpu_pin_name(unsigned int pin);
 unsigned int cpu_has_gpio(unsigned int port, unsigned int pin);
 unsigned int cpu_has_port(unsigned int port);
+void cpu_sleep(unsigned int seconds);
 
+void cpu_sleep();
 #endif
