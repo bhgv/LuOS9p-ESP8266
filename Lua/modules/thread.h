@@ -32,6 +32,8 @@
 
 #include "lstate.h"
 
+#include <pthread.h>
+
 struct lthread {
     lua_State *PL; // Parent thread
     lua_State *L;  // Thread state

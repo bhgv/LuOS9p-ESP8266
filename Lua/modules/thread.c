@@ -31,20 +31,20 @@
 
 #if LUA_USE_THREAD
 
-#include <stdlib.h>
-#include <assert.h>
-#include <signal.h>
-#include <errno.h>
-
 #include "lua.h"
 #include "lapi.h"
 #include "lauxlib.h"
 #include "lgc.h"
 #include "lmem.h"
 #include "ldo.h"
+#include "thread.h"
 
-#include <lib/pthread/pthread.h>
-#include <Lua/modules/thread.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <signal.h>
+#include <errno.h>
+
+#include "pthread.h"
 
 #define LTHREAD_STATUS_RUNNING   1
 #define LTHREAD_STATUS_SUSPENDED 2
@@ -285,7 +285,8 @@ static int new_thread(lua_State* L, int run) {
     thread->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
     thread->status = LTHREAD_STATUS_SUSPENDED;
     
-    uxSetLuaState(thread->L);
+    // TO DO
+    //uxSetLuaState(thread->L);
 
     lua_rawgeti(L, LUA_REGISTRYINDEX, thread->function_ref);                
     lua_xmove(L, thread->L, 1);
@@ -299,7 +300,7 @@ static int new_thread(lua_State* L, int run) {
 
     // Create pthread
     pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, configMINIMAL_STACK_SIZE * 20);
+    pthread_attr_setstacksize(&attr, defaultStack);
 
     if (run)  {
         pthread_attr_setinitialstate(&attr, PTHREAD_INITIAL_STATE_RUN);
@@ -431,25 +432,32 @@ static int thread_status(lua_State* L) {
     return 1;
 }
 
-static const luaL_Reg thread[] = {
-    {"status", thread_status},
-    {"create", thread_create},
-    {"start", thread_start},
-    {"suspend", thread_suspend},
-    {"resume", thread_resume},
-    {"stop", thread_stop},
-    {"list", thread_list},
-    {"sleep", thread_sleep},
-    {"sleepms", thread_sleepms},
-    {"sleepus", thread_sleepus},
-    {"usleep", thread_sleepus},
-    {NULL, NULL}
+#include "modules.h"
+
+static const LUA_REG_TYPE thread[] = {
+    { LSTRKEY( "status" ),			LFUNCVAL( thread_status ) },
+    { LSTRKEY( "create" ),			LFUNCVAL( thread_create ) },
+    { LSTRKEY( "start" ),			LFUNCVAL( thread_start ) },
+    { LSTRKEY( "suspend" ),			LFUNCVAL( thread_suspend ) },
+    { LSTRKEY( "resume" ),			LFUNCVAL( thread_resume ) },
+    { LSTRKEY( "stop" ),			LFUNCVAL( thread_stop ) },
+    { LSTRKEY( "list" ),			LFUNCVAL( thread_list ) },
+    { LSTRKEY( "sleep" ),			LFUNCVAL( thread_sleep ) },
+    { LSTRKEY( "sleepms" ),			LFUNCVAL( thread_sleepms ) },
+    { LSTRKEY( "sleepus" ),			LFUNCVAL( thread_sleepus ) },
+    { LSTRKEY( "usleep" ),			LFUNCVAL( thread_sleepus ) },
+    { LNILKEY, LNILVAL }
 };
 
-int luaopen_thread(lua_State* L)
-{
+int luaopen_thread(lua_State* L) {
+#if !LUA_USE_ROTABLE
     luaL_newlib(L, thread);
     return 1;
+#else
+	return 0;
+#endif
 } 
  
+LUA_OS_MODULE(THREAD, thread, thread);
+
 #endif

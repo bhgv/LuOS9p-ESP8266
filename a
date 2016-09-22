@@ -1,0 +1,72 @@
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c: In function 'thread_terminated':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:70:5: warning: passing argument 3 of 'list_get' from incompatible pointer type [enabled by default]
+     int res = list_get(&lthread_list, *thid, &thread);
+     ^
+In file included from ../include/pthread.h:41:0,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.h:35,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:45:
+../sys/../sys/list/list.h:52:5: note: expected 'void **' but argument is of type 'struct lthread **'
+ int list_get(struct list *list, int index, void **item);
+     ^
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c: In function 'thread_suspend_pthreads':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:114:9: warning: passing argument 3 of 'list_get' from incompatible pointer type [enabled by default]
+         res = list_get(&lthread_list, idx, &thread);
+         ^
+In file included from ../include/pthread.h:41:0,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.h:35,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:45:
+../sys/../sys/list/list.h:52:5: note: expected 'void **' but argument is of type 'struct lthread **'
+ int list_get(struct list *list, int index, void **item);
+     ^
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c: In function 'thread_resume_pthreads':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:148:9: warning: passing argument 3 of 'list_get' from incompatible pointer type [enabled by default]
+         res = list_get(&lthread_list, idx, &thread);
+         ^
+In file included from ../include/pthread.h:41:0,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.h:35,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:45:
+../sys/../sys/list/list.h:52:5: note: expected 'void **' but argument is of type 'struct lthread **'
+ int list_get(struct list *list, int index, void **item);
+     ^
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c: In function 'thread_stop_pthreads':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:182:9: warning: passing argument 3 of 'list_get' from incompatible pointer type [enabled by default]
+         res = list_get(&lthread_list, idx, &thread);
+         ^
+In file included from ../include/pthread.h:41:0,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.h:35,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:45:
+../sys/../sys/list/list.h:52:5: note: expected 'void **' but argument is of type 'struct lthread **'
+ int list_get(struct list *list, int index, void **item);
+     ^
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c: In function 'thread_list':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:242:13: warning: passing argument 3 of 'list_get' from incompatible pointer type [enabled by default]
+             list_get(&lthread_list, idx, &thread);
+             ^
+In file included from ../include/pthread.h:41:0,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.h:35,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:45:
+../sys/../sys/list/list.h:52:5: note: expected 'void **' but argument is of type 'struct lthread **'
+ int list_get(struct list *list, int index, void **item);
+     ^
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c: In function 'new_thread':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:288:5: warning: implicit declaration of function 'uxSetLuaState' [-Wimplicit-function-declaration]
+     uxSetLuaState(thread->L);
+     ^
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:268:19: warning: unused variable 'g' [-Wunused-variable]
+     global_State *g;
+                   ^
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c: In function 'thread_status':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:420:5: warning: passing argument 3 of 'list_get' from incompatible pointer type [enabled by default]
+     res = list_get(&lthread_list, thid, &thread);
+     ^
+In file included from ../include/pthread.h:41:0,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.h:35,
+                 from /Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:45:
+../sys/../sys/list/list.h:52:5: note: expected 'void **' but argument is of type 'struct lthread **'
+ int list_get(struct list *list, int index, void **item);
+     ^
+./build/lua.a(thread.o): In function `thread_suspend_pthreads':
+/Users/jaumeolivepetrus/whitecat-esp8266/Lua/modules/thread.c:128: undefined reference to `uxSetLuaState'
+./build/lua.a(thread.o):(.text.new_thread+0x72): undefined reference to `uxSetLuaState'
+collect2: error: ld returned 1 exit status
+make: *** [build/main.out] Error 1

@@ -223,10 +223,10 @@
 #define tskDEF_PRIORITY tskIDLE_PRIORITY
 
 #define tcpipTaskStack configMINIMAL_STACK_SIZE * 64
-#define defaultStack   configMINIMAL_STACK_SIZE * 20
+#define defaultStack   configMINIMAL_STACK_SIZE * 4
 #define initTaskStack  configMINIMAL_STACK_SIZE * 10
 #define netTaskStack   configMINIMAL_STACK_SIZE * 10
-#define luaTaskStack   configMINIMAL_STACK_SIZE * 10
+#define luaTaskStack   configMINIMAL_STACK_SIZE * 4
 #define mqttStack      configMINIMAL_STACK_SIZE * 10
 #define ppinTaskStack  configMINIMAL_STACK_SIZE * 10
 #define loraTaskStack  configMINIMAL_STACK_SIZE * 10
@@ -297,7 +297,6 @@
 #define LUA_USE_ADC         0
 #define LUA_USE_SPI         0
 #define LUA_USE_MQTT        (1 && (USE_ETHERNET || USE_WIFI || USE_GPRS))
-#define LUA_USE_THREAD      0
 #define LUA_USE_SCREEN      (1 && USE_DISPLAY)
 #define LUA_USE_UART        0
 #define LUA_USE_PWM         0
