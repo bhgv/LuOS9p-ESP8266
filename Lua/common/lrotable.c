@@ -18,12 +18,12 @@
 /* Externally defined read-only table array */
 extern const luaR_entry lua_rotable[];
 
-LUA_API void lua_pushrotable (lua_State *L, void *p) {
-  lua_lock(L);
-  setrvalue(L->top, p);
-  api_incr_top(L);
-  lua_unlock(L);
-}
+//LUA_API void lua_pushrotable (lua_State *L, void *p) {
+//  lua_lock(L);
+//  setrvalue(L->top, p);
+//  api_incr_top(L);
+//  lua_unlock(L);
+//}
 
 void luaA_pushobject (lua_State *L, const TValue *o) {
   setobj2s(L, L->top, o);
@@ -45,11 +45,12 @@ const TValue* luaR_findglobal(const char *name, unsigned len) {
 
 /* Find an entry in a rotable and return it */
 static const TValue* luaR_auxfind(const luaR_entry *pentry, const char *strkey, luaR_numkey numkey, unsigned *ppos) {
-  const TValue *res = NULL;
+  const TValue *res = luaO_nilobject;
   unsigned i = 0;
   
   if (pentry == NULL)
-    return NULL;  
+    return luaO_nilobject;  
+    
   while(pentry->key.type != LUA_TNIL) {
     if ((strkey && (pentry->key.type == LUA_TSTRING) && (!strcmp(pentry->key.id.strkey, strkey))) || 
         (!strkey && ((pentry->key.type & 0b111) == LUA_TNUMBER) && ((luaR_numkey)pentry->key.id.numkey == numkey))) {

@@ -66,6 +66,7 @@ LIB_INIT(MATH, math, luaopen_math);
 LIB_INIT(LORA, lora, luaopen_lora);
 LIB_INIT(PACK, pack, luaopen_pack);
 LIB_INIT(TMR, tmr, luaopen_tmr);
+LIB_INIT(PIO, pio, luaopen_pio);
 
 LUALIB_API void luaL_openlibs (lua_State *L) {
   const luaL_Reg *lib = lua_libs1;

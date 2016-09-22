@@ -122,19 +122,6 @@ static unsigned int *assigned_pins;
 */
 
 /*
-// Available i/o pins for each port (64 pin parts)
-static unsigned int port_io_pin_mask_64(unsigned int port) {
-    switch (port) {
-        case 1: return 0b0000000000000000; // PORT A
-        case 2: return 0b1111111111111111; // PORT B
-        case 3: return 0b1111000000000000; // PORT C
-        case 4: return 0b0000111000111111; // PORT D
-        case 5: return 0b0000000011111111; // PORT E
-        case 7: return 0b0000000000111011; // PORT F
-        case 8: return 0b0000001111000000; // PORT G
-    }
-}
-
 // Available adc pins for each port (64 pin parts)
 static unsigned int port_adc_pin_mask_64(unsigned int port) {
     switch (port) {
@@ -203,6 +190,10 @@ static unsigned int pin_number_64(unsigned int pin) {
 }
 */
 
+unsigned int cpu_port_number(unsigned int pin) {
+	return 0;
+}
+
 unsigned int cpu_pin_number(unsigned int pin) {
 	return pin;
 }
@@ -211,13 +202,19 @@ const char *cpu_pin_name(unsigned int pin) {
     return pin_names[pin];
 }
 
-/*
 unsigned int cpu_port_io_pin_mask(unsigned int port) {
-    switch (pins) {
-        case 64: return port_io_pin_mask_64(port);
-    }
+	return 0b11111000000111110;
 }
 
+unsigned int cpu_has_gpio(unsigned int port, unsigned int bit) {
+	return (cpu_port_io_pin_mask(port) & (1 << bit));
+}
+
+unsigned int cpu_has_port(unsigned int port) {
+	return (port == 0);
+}
+
+/*
 unsigned int cpu_port_adc_pin_mask(unsigned int port) {
     switch (pins) {
         case 64: return port_adc_pin_mask_64(port);
@@ -334,8 +331,8 @@ void cpu_show_info() {
 
 
 void cpu_reset() {
-	gpio_pin_output(16);
-	gpio_pin_clr(16);
+//	gpio_pin_output(16);
+//	gpio_pin_clr(16);
 }
 /*
 unsigned int cpu_pins() {

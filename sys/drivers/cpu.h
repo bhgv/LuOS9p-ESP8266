@@ -30,6 +30,7 @@
 #ifndef CPU_H
 #define	CPU_H
 
+// ESP8266 pin constants
 #define PIN_TOUT   5
 #define PIN_GPIO16 7
 #define PIN_GPIO14 8
@@ -50,6 +51,38 @@
 #define PIN_GPIO1  25
 #define PIN_NOPIN  32
 
+// ESP8266 available GPIO pins
+#define GPIO1  1
+#define GPIO2  2
+#define GPIO3  3
+#define GPIO4  4
+#define GPIO5  5
+#define GPIO12 12
+#define GPIO13 13
+#define GPIO14 14
+#define GPIO15 15
+#define GPIO16 16
+
+// ESP8266 available pin names
+#define GPIO1_NAME  "GPIO1"
+#define GPIO2_NAME  "GPIO2"
+#define GPIO3_NAME  "GPIO3"
+#define GPIO4_NAME  "GPIO4"
+#define GPIO5_NAME  "GPIO5"
+#define GPIO12_NAME "GPIO12"
+#define GPIO13_NAME "GPIO13"
+#define GPIO14_NAME "GPIO14"
+#define GPIO15_NAME "GPIO15"
+#define GPIO16_NAME "GPIO16"
+
+// ESP8266 has only 1 GPIO port
+#define GPIO_PORTS 1
+
+// ESP8266 has 16 GPIO per port
+#define GPIO_PER_PORT 16
+
+#define GPIO_ALL 0b11111000000111110
+
 void cpu_init();
 int cpu_revission();
 void cpu_model(char *buffer);
@@ -60,9 +93,12 @@ void cpu_assign_pin(unsigned int pin, unsigned int by);
 void cpu_release_pin(unsigned int pin);
 unsigned int cpu_pin_assigned(unsigned int pin);
 unsigned int cpu_pin_number(unsigned int pin);
+unsigned int cpu_port_number(unsigned int pin);
 unsigned int cpu_port_io_pin_mask(unsigned int port);
 unsigned int cpu_port_adc_pin_mask(unsigned int port);
 void cpu_idle(int seconds);
 const char *cpu_pin_name(unsigned int pin);
+unsigned int cpu_has_gpio(unsigned int port, unsigned int pin);
+unsigned int cpu_has_port(unsigned int port);
 
 #endif

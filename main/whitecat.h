@@ -292,7 +292,6 @@
 // ---------------------------------------------------------------------------
 // Lua modules
 // ---------------------------------------------------------------------------
-#define LUA_USE_PIO         0
 #define LUA_USE_CAN         (1 && USE_CAN)
 #define LUA_USE_NET         (1 && (USE_ETHERNET || USE_WIFI || USE_GPRS))
 #define LUA_USE_ADC         0
@@ -306,8 +305,6 @@
 #define LUA_USE_HTTP        (1 && (USE_ETHERNET || USE_WIFI || USE_GPRS))
 #define LUA_USE_STEPPER     (1 && USE_STEPPER)
 #define LUA_USE_I2C         0
-#define LUA_USE_LORA        1
-#define LUA_USE_PACK        1
 #define LUA_USE_SHELL       0
 #define LUA_USE_EDITOR      0
 #define LUA_USE_HISTORY	    0

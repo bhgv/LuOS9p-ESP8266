@@ -39,10 +39,13 @@
 
 #define gpio_pin_set(gpio) GPIO.OUT_SET = BIT(gpio)
 #define gpio_pin_clr(gpio) GPIO.OUT_CLEAR = BIT(gpio)
-
 #define gpio_pin_inv(gpio) if (GPIO.OUT & BIT(gpio)) {gpio_pin_clr(gpio);} else {gpio_pin_set(gpio);}
-
 #define gpio_pin_get(gpio) ((GPIO.IN & BIT(gpio))?1:0)
+
+
+#define gpio_pin_pullup(gpio) SET_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLUP)
+#define gpio_pin_pulldwn(gpio) SET_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLDWN)
+#define gpio_pin_nopull(gpio) CLEAR_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLUP);CLEAR_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLDWN)
 
 /*
 void gpio_enable_analog(int pin);
@@ -54,5 +57,18 @@ int gpio_is_io_port(int port);
 int gpio_is_io_port_pin(int pin);
 int gpio_port_has_analog(int port);
 */
+
+void gpio_pin_input_mask(unsigned int port, unsigned int pinmask);
+void gpio_pin_output_mask(unsigned int port, unsigned int pinmask);
+void gpio_pin_set_mask(unsigned int port, unsigned int pinmask);
+void gpio_pin_clr_mask(unsigned int port, unsigned int pinmask);
+unsigned int gpio_pin_get_mask(unsigned int port, unsigned int pinmask);
+void gpio_pin_pullup_mask(unsigned int port, unsigned int pinmask);
+void gpio_pin_pulldwn_mask(unsigned int port, unsigned int pinmask);
+void gpio_pin_nopull_mask(unsigned int port, unsigned int pinmask);
+void gpio_port_input(unsigned int port);
+void gpio_port_output(unsigned int port);
+void gpio_port_set(unsigned int port, unsigned int mask);
+unsigned int gpio_port_get(unsigned int port);
 
 #endif
