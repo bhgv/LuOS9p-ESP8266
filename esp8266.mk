@@ -14,6 +14,8 @@ CFLAGS += -DSPIFFS_LOG_BLOCK_SIZE=8192 # Logical block size, must be a miltiple 
 CFLAGS += -DSPIFFS_BASE_ADDR=0x100000  # SPI FLASH start adress for SPIFFS
 CFLAGS += -DSPIFFS_SIZE=0x80000        # SPIFFS size
 
+SPIFFS_ESPTOOL_ARGS = 0x100000 $(BUILD_DIR)spiffs_image.img
+
 #
 # Console configuration
 #

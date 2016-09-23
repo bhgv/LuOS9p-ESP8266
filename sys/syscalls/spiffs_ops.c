@@ -111,7 +111,7 @@ int spiffs_open_op(struct file *fp, int flags) {
     spiffs_file *FP;
     char *path = fp->f_path;
     int result = 0;
-
+	
     // Calculate open mode
     if (flags == O_RDONLY)
         mode |= SPIFFS_RDONLY;
@@ -534,24 +534,24 @@ retry:
             fds_len, my_spiffs_cache, cache_len,NULL
     );
 
-    if (res < 0) {
-        if (fs.err_code == SPIFFS_ERR_NOT_A_FS) {
-            syslog(LOG_ERR, "spiffs%d no file system detect, formating", unit);
-            SPIFFS_unmount(&fs);
-            res = SPIFFS_format(&fs);
-            if (res < 0) {
-                syslog(LOG_ERR, "spiffs%d format error",unit);
-                return -1;
-            }
+    //if (res < 0) {
+    //    if (fs.err_code == SPIFFS_ERR_NOT_A_FS) {
+    //        syslog(LOG_ERR, "spiffs%d no file system detect, formating", unit);
+    //        SPIFFS_unmount(&fs);
+    //        res = SPIFFS_format(&fs);
+    //        if (res < 0) {
+    //            syslog(LOG_ERR, "spiffs%d format error",unit);
+    //            return -1;
+    //        }
                         
-            retries++;
-            goto retry;
-        }
-    } else {
-        if (retries > 0) {
-            spiffs_mkdir_op("/.");
-        }
-    }
+    //        retries++;
+    //        goto retry;
+    //    }
+    //} else {
+    //    if (retries > 0) {
+    //        spiffs_mkdir_op("/.");
+    //    }
+    //}
     
     syslog(LOG_INFO, "spiffs%d mounted", unit);
 

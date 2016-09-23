@@ -99,33 +99,33 @@ void mach_dev() {
         }
     #endif
 
-    #if (USE_CFI || USE_SD)
+   // #if (USE_CFI || USE_SD)
         // Create mandatory folders on primary device
-        if (primary_is_mounted()) {
-            create_folder("/sys");
-            create_folder("/sys/conf");
-            create_folder("/sys/font");
-            create_folder("/sys/zoneinfo");
-            create_folder("/lib");
-            create_folder("/lib/share");
-            create_folder("/lib/share/lua");
-            create_folder("/lib/lua");
-            create_folder("/tmp");
+   //     if (primary_is_mounted()) {
+   //         create_folder("/sys");
+   //         create_folder("/sys/conf");
+   //         create_folder("/sys/font");
+   //         create_folder("/sys/zoneinfo");
+   //         create_folder("/lib");
+   //         create_folder("/lib/share");
+   //         create_folder("/lib/share/lua");
+   //         create_folder("/lib/lua");
+    //        create_folder("/tmp");
 
             //spiffs_copy_image("/sd/cfi-image");
-        }
+     //   }
 
-        if (mount_is_mounted("sd")) {
-            create_folder("/sd/log");
-            create_folder("/sd/lib");
-            create_folder("/sd/lib/share");
-            create_folder("/sd/lib/share/lua");
-            create_folder("/sd/lib/lua");
-            create_folder("/sd/tmp");
-        }
+       // if (mount_is_mounted("sd")) {
+        //    create_folder("/sd/log");
+        //    create_folder("/sd/lib");
+        //    create_folder("/sd/lib/share");
+        //    create_folder("/sd/lib/share/lua");
+        //    create_folder("/sd/lib/lua");
+         //   create_folder("/sd/tmp");
+       // }
 
         //tzset();
-    #endif
+    //#endif
 
     #if USE_RTC
         rtc_init(time(NULL));

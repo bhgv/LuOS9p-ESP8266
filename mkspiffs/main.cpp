@@ -107,6 +107,34 @@ void spiffsUnmount(){
     SPIFFS_unmount(&s_fs);
 }
 
+// WHITECAT BEGIN
+int addDir(const char* name) {
+    std::string fileName = name;
+    fileName += "/.";
+
+	std::cout << fileName << std::endl;
+	
+    spiffs_file dst = SPIFFS_open(&s_fs, fileName.c_str(), SPIFFS_CREAT, 0);
+    if (dst < 0) {
+        std::cerr << "SPIFFS_write error(" << s_fs.err_code << "): ";
+
+        if (s_fs.err_code == SPIFFS_ERR_FULL) {
+            std::cerr << "File system is full." << std::endl;
+        } else {
+            std::cerr << "unknown";
+        }
+        std::cerr << std::endl;
+
+        SPIFFS_close(&s_fs, dst);
+        return 1;
+    }
+
+    SPIFFS_close(&s_fs, dst);
+
+    return 0;
+}
+// WHITECAT END
+
 int addFile(char* name, const char* path) {
     FILE* src = fopen(path, "rb");
     if (!src) {
@@ -176,8 +204,8 @@ int addFiles(const char* dirname, const char* subPath) {
         // Read files from directory.
         while ((ent = readdir (dir)) != NULL) {
             // Ignore dir itself.
-            if (ent->d_name[0] == '.')
-                continue;
+            if (ent->d_name[0] == '.')				
+                continue;            	
 
             std::string fullpath = dirPath;
             fullpath += ent->d_name;
@@ -190,6 +218,11 @@ int addFiles(const char* dirname, const char* subPath) {
                     // Prepare new sub path.
                     std::string newSubPath = subPath;
                     newSubPath += ent->d_name;
+					
+					// WHITECAT BEGIN
+					addDir(newSubPath.c_str());
+					// WHITECAT END
+					
                     newSubPath += "/";
 
                     if (addFiles(dirname, newSubPath.c_str()) != 0)
@@ -416,6 +449,11 @@ int actionPack() {
     }
 
     spiffsFormat();
+
+	// WHITECAT BEGIN
+	addDir("");
+	// WHITECAT END
+	
     int result = addFiles(s_dirName.c_str(), "/");
     spiffsUnmount();
 
