@@ -113,7 +113,7 @@ SECTIONS
     *(.entry.text)
     *(.init.literal)
     *(.init)
-
+	
     /* esp-open-rtos compiled source files use the .iram1.* section names for IRAM
        functions, etc. */
     *(.iram1.*)

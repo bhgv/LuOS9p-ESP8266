@@ -139,7 +139,7 @@ void uart_pin_config(u8_t unit, u8_t *rx, u8_t *tx) {
 						
 		case 1:
 			// Disable UTX0
-		PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
+			PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
 
 			// Enable U1TX
 		    PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO2_U);
@@ -153,7 +153,7 @@ void uart_pin_config(u8_t unit, u8_t *rx, u8_t *tx) {
 
 		case 2:
 			// Disable UTX0
-		PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
+			PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
 		
 			// Enable U0TX*
 		    PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTDO_U);

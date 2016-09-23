@@ -27,10 +27,11 @@
  * this software.
  */
 
-//#include <drivers/cpu/cpu.h>
+#include <sys/drivers/cpu.h>
 
-// In white cat there is only a main process. Calling to exit systemcall
-// performs a board reset
-void _exit(int status) {    
-//    cpu_reset();
+void __attribute__((__noreturn__)) _exit(int status) {    
+	cpu_reset();
+	
+	for(;;) {
+	}
 }

@@ -36,6 +36,7 @@
 #include <sys/syslog.h>
 
 #include <sys/drivers/gpio.h>
+#include <sys/delay.h>
 
 #include <string.h>
 /*
@@ -51,9 +52,6 @@
 #include <stdlib.h>
 #include <syslog.h>
 */
-
-
-
 
 static const char *pin_names[] = {
 "?",
@@ -89,6 +87,8 @@ static const char *pin_names[] = {
 "?",
 "?",
 };
+
+extern void sdk_system_restart_in_nmi(void);
 
 /*
 
@@ -334,9 +334,9 @@ void cpu_sleep(unsigned int seconds) {
 }
 
 void cpu_reset() {
-//	gpio_pin_output(16);
-//	gpio_pin_clr(16);
+	cpu_sleep(1);
 }
+
 /*
 unsigned int cpu_pins() {
     return pins;

@@ -206,6 +206,7 @@ void IRAM sdk_user_start(void) {
     sdk_SPIRead(ic_flash_addr, buf32, sizeof(struct sdk_g_ic_saved_st));
     Cache_Read_Enable(0, 0, 1);
     zero_bss();
+
     sdk_os_install_putc1(default_putc);
     if (cksum_magic == 0xffffffff) {
         // No checksum required
@@ -269,6 +270,7 @@ static void init_networking(sdk_phy_info_t *phy_info, uint8_t *mac_addr) {
     }
     uart_set_baud(0, 115200);
     uart_set_baud(1, 115200);
+        
     sdk_phy_disable_agc();
     sdk_ieee80211_phy_init(sdk_g_ic.s.phy_mode);
     sdk_lmacInit();
