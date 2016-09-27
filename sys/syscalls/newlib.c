@@ -110,6 +110,7 @@ extern uint32_t _irom0_text_end;
 extern void __real_free(void *ptr);
 void __wrap_free(void *ptr) {
 	if (((&_irom0_text_start) <= (uint32_t *)ptr && (uint32_t *)ptr <= (&_irom0_text_end))) {
+		uart_writes(1, "oops\r\n");
 		return;
 	}
 	__real_free(ptr);

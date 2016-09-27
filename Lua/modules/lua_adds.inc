@@ -32,6 +32,10 @@
 #include <sys/debug.h>
 #include <sys/syscalls/mount.h>
 
+#undef ARG_MAX
+
+#include <sys/param.h>
+
 lua_State *gLuaState;
 
 pthread_mutex_t lua_mutex;
@@ -59,41 +63,33 @@ inline void LuaUnlock(lua_State *L) {
     pthread_mutex_unlock(&lua_mutex);
 }
 
-static char *get_prompt (lua_State *L, int firstline) { 
-  char *p;
-  
+static void get_prompt (lua_State *L, int firstline, char *path) {   
   lua_getglobal(L, firstline ? "_PROMPT" : "_PROMPT2");
-  p = (char *)lua_tostring(L, -1);
+  char *p = (char *)lua_tostring(L, -1);
 
   if (p == NULL) {
       if (firstline) {
-          char *path;
-          
-          path = (char *)malloc(256);
-          if (!path) {
-              return LUA_PROMPT;
-          }
-          
-          if (getcwd(path, 256)) {
+          if (getcwd(path, MAXPATHLEN + 10)) {
               path = strcat(path, " ");
               path = strcat(path, LUA_PROMPT);
-              
-              return path;
           }
       } else {
-          return LUA_PROMPT2;
+		  
+		  strcpy(path, LUA_PROMPT2);
       }
+  } else {
+      strcpy(path, p);
   }
-
-  return p;
 }
 
 static int luaos_pushline (lua_State *L, int firstline) {
   char buffer[LUA_MAXINPUT];
+  char prmt[MAXPATHLEN + 20];
+  
   char *b = buffer;
   size_t l;
     
-  char *prmt = get_prompt(L, firstline);
+  get_prompt(L, firstline, prmt);
   int readstatus = lua_readline(L, b, prmt);
   if (readstatus == 0)
     return 0;  /* no input (prompt will be popped by caller) */
@@ -114,8 +110,6 @@ static int luaos_pushline (lua_State *L, int firstline) {
     lua_pushlstring(L, b, l);
 
   lua_freeline(L, b);
-  
-  free(prmt);
   
   return 1;
 }
