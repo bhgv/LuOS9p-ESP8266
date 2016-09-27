@@ -8,8 +8,6 @@
 -include $(ROOT)local.mk
 -include local.mk
 
-USE_CUSTOM_HEAP ?= 1
-
 # Flash size in megabits
 # Valid values are same as for esptool.py - 2,4,8,16,32
 FLASH_SIZE ?= 32
@@ -98,9 +96,9 @@ CXXFLAGS	?= $(C_CXX_FLAGS) -fno-exceptions -fno-rtti $(EXTRA_CXXFLAGS)
 CPPFLAGS	+= -mlongcalls -mtext-section-literals
 
 include $(ROOT)esp8266.mk
-
+EXTRA_LDFLAGS   = -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc
 LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
-CFLAGS      += -DUSE_CUSTOM_HEAP=1
+CFLAGS      += -DUSE_CUSTOM_HEAP=0
 LINKER_SCRIPTS += $(ROOT)ld/program.ld $(ROOT)ld/rom.ld
 
 ifeq ($(WARNINGS_AS_ERRORS),1)

@@ -45,6 +45,7 @@
 #include "syscalls.h"
 
 #include <stdarg.h>
+#include <sys/panic.h>
 
 int _syscalls_inited = 0;
 
@@ -59,7 +60,6 @@ struct ucred *p_cred;
 struct  filedesc *p_fd; 
 
 static int nfiles = 0;        // Actual number of open files
-static int maxfiles = NDFILE; // Max number of open files
 
 struct filelist filehead;   /* head of list of open files */
 
@@ -99,10 +99,6 @@ const struct device devs[] = {
 
 int ndevs = sizeof(devs) / sizeof(struct device);
 
-void panic(char *str) {
-    printf("%s\n", str);
-}
-
 // Do some initializations for sys calls
 //   * initialization of file descriptor structure
 //   * creation of file drscriptor mutex
@@ -121,17 +117,17 @@ void _syscalls_init() {
         panic("Cannot allocate space for file descriptors");
     }
     
-    p_fd->fd_ofiles = (struct  file **)calloc(1, sizeof(struct  file *) * maxfiles);
+    p_fd->fd_ofiles = (struct  file **)calloc(1, sizeof(struct  file *) * NDFILE);
     if (!p_fd->fd_ofiles) {
         panic("Cannot allocate space for open files");
     }
     
-    p_fd->fd_ofileflags = (char *)calloc(1, sizeof(char) * maxfiles);
+    p_fd->fd_ofileflags = (char *)calloc(1, sizeof(char) * NDFILE);
     if (!p_fd->fd_ofileflags) {
         panic("Cannot allocate space for open file flags");        
     }
     
-    p_fd->fd_nfiles = maxfiles;
+    p_fd->fd_nfiles = NDFILE;
     
     // Create file descriptor mutex
     mtx_init(&fd_mtx, NULL, NULL, 0);
@@ -183,7 +179,7 @@ int fdalloc(want, result)
      * of want or fd_freefile.  If that fails, consider
      * expanding the ofile array.
      */
-    lim = maxfiles;
+    lim = NDFILE;
     for (;;) {
         last = min(fdp->fd_nfiles, lim);
         if ((i = want) < fdp->fd_freefile)
@@ -223,7 +219,7 @@ falloc(resultfp, resultfd)
     error = fdalloc(0, &i);
     if (error)
         return (error);
-    if (get_nfiles() >= maxfiles) {
+    if (get_nfiles() >= NDFILE) {
         panic("file descriptor table full");
         return (ENFILE);
     }
@@ -375,7 +371,7 @@ int closef(fp)
 }
      
 int getdtablesize() {
-    return maxfiles;
+    return NDFILE;
 }
 
 /*
@@ -420,7 +416,7 @@ int dup2(int oldfd, int newfd) {
     mtx_lock(&fd_mtx);
     if (old >= fdp->fd_nfiles ||
         fdp->fd_ofiles[old] == NULL ||
-        new >= maxfiles) {
+        new >= NDFILE) {
         mtx_unlock(&fd_mtx);
         errno = EBADF;
         return -1;
@@ -523,7 +519,7 @@ int fcntl(int fd, int cmd, ... ) {
         int arg1 = va_arg(valist, int);
         va_end(valist);
 
-        if (arg1 >= maxfiles) {
+        if (arg1 >= NDFILE) {
             errno = EINVAL;
             return -1;
         }

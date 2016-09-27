@@ -1,3 +1,5 @@
+#include "syscalls.h"
+
 #include <signal.h>
 
 int sigvec(int sig, struct sigvec *vec, struct sigvec *ovec) {

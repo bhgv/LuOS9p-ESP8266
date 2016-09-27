@@ -2969,6 +2969,7 @@ UBaseType_t x;
          * WHITECAT
          */
         pxTCB->signaled = 0;
+	pxTCB->threadid = 0;
 }
 /*-----------------------------------------------------------*/
 

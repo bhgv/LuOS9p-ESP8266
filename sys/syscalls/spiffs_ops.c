@@ -244,8 +244,8 @@ int spiffs_stat_op(struct file *fp, struct stat *sb) {
 }
 
 off_t spiffs_seek_op(struct file *fp, off_t offset, int where) {
+    int whence = SPIFFS_SEEK_CUR;
     int res;
-    int whence;
     
     switch (where) {
         case SEEK_SET: whence = SPIFFS_SEEK_SET;break;
@@ -359,7 +359,7 @@ int spiffs_readdir_op(struct file *fp, struct dirent *ent) {
         if (pe->name[0] == 0) break;            
                 
         // Get name and length
-        fn = pe->name;
+        fn = (char *)pe->name;
         len = strlen(fn);
 
         // Get entry type and size
@@ -534,24 +534,24 @@ retry:
             fds_len, my_spiffs_cache, cache_len,NULL
     );
 
-    //if (res < 0) {
-    //    if (fs.err_code == SPIFFS_ERR_NOT_A_FS) {
-    //        syslog(LOG_ERR, "spiffs%d no file system detect, formating", unit);
-    //        SPIFFS_unmount(&fs);
-    //        res = SPIFFS_format(&fs);
-    //        if (res < 0) {
-    //            syslog(LOG_ERR, "spiffs%d format error",unit);
-    //            return -1;
-    //        }
+    if (res < 0) {
+        if (fs.err_code == SPIFFS_ERR_NOT_A_FS) {
+            syslog(LOG_ERR, "spiffs%d no file system detect, formating", unit);
+            SPIFFS_unmount(&fs);
+            res = SPIFFS_format(&fs);
+            if (res < 0) {
+                syslog(LOG_ERR, "spiffs%d format error",unit);
+                return -1;
+            }
                         
-    //        retries++;
-    //        goto retry;
-    //    }
-    //} else {
-    //    if (retries > 0) {
-    //        spiffs_mkdir_op("/.");
-    //    }
-    //}
+            retries++;
+            goto retry;
+        }
+    } else {
+        if (retries > 0) {
+            spiffs_mkdir_op("/.");
+        }
+    }
     
     syslog(LOG_INFO, "spiffs%d mounted", unit);
 

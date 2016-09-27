@@ -9,10 +9,7 @@ int read(int fd, void *buf, size_t nbyte) {
     struct uio auio;
     struct iovec aiov;
     long cnt, error = 0;
-#ifdef KTRACE
-    struct iovec ktriov;
-#endif
-    
+
     mtx_lock(&fd_mtx);
     if (((u_int)fd) >= fdp->fd_nfiles ||
         (fp = fdp->fd_ofiles[fd]) == NULL ||
@@ -29,25 +26,14 @@ int read(int fd, void *buf, size_t nbyte) {
     auio.uio_iovcnt = 1;
     auio.uio_resid = nbyte;
     auio.uio_rw = UIO_READ;
-#ifdef KTRACE
-    /*
-     * if tracing, save a copy of iovec
-     */
-    if (KTRPOINT(p, KTR_GENIO))
-        ktriov = aiov;
-#endif
+
     cnt = nbyte;
     error = (*fp->f_ops->fo_read)(fp, &auio, fp->f_cred);
     if (error && auio.uio_resid != cnt &&
         (error == ERESTART || error == EINTR || error == EWOULDBLOCK))
         error = 0;
+
     cnt -= auio.uio_resid;
-    
-#ifdef KTRACE
-    if (KTRPOINT(p, KTR_GENIO) && error == 0)
-        ktrgenio(p->p_tracep, SCARG(uap, fd), UIO_READ, &ktriov,
-            cnt, error);
-#endif
     
     if (error) {
         errno = error;
@@ -63,9 +49,7 @@ int write(int fd, const void *buf, size_t nbyte) {
     struct uio auio;
     struct iovec aiov;
     long cnt, error = 0;
-#ifdef KTRACE
-    struct iovec ktriov;
-#endif
+
     mtx_lock(&fd_mtx);
     if (((u_int)fd) >= fdp->fd_nfiles ||
         (fp = fdp->fd_ofiles[fd]) == NULL ||
@@ -82,13 +66,7 @@ int write(int fd, const void *buf, size_t nbyte) {
     auio.uio_iovcnt = 1;
     auio.uio_resid = nbyte;
     auio.uio_rw = UIO_WRITE;
-#ifdef KTRACE
-    /*
-     * if tracing, save a copy of iovec
-     */
-    if (KTRPOINT(p, KTR_GENIO))
-        ktriov = aiov;
-#endif
+
     cnt = nbyte;
     error = (*fp->f_ops->fo_write)(fp, &auio, fp->f_cred);
     if (error) {
@@ -100,11 +78,6 @@ int write(int fd, const void *buf, size_t nbyte) {
             //            psignal(p, SIGPIPE);
     }
     cnt -= auio.uio_resid;
-#ifdef KTRACE
-    if (KTRPOINT(p, KTR_GENIO) && error == 0)
-        ktrgenio(p->p_tracep, SCARG(uap, fd), UIO_WRITE,
-            &ktriov, cnt, error);
-#endif
     
     if (error) {
         errno = error;

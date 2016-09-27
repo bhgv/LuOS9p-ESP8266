@@ -103,7 +103,7 @@ static int more(const char *path, int stop) {
     FILE *fp;
     int rows = 0;
     int cols = 0;
-    char c;
+    int c;
     char ch;
     int lines;
 
@@ -437,13 +437,12 @@ static int os_cp(lua_State *L) {
     return 1;
 }
 
-#if 0
 static int os_run (lua_State *L) {
     const char *argCode = luaL_optstring(L, 1, "");
     unsigned int i;
     int done;
 
-    unsigned char *code;
+    unsigned char *code = NULL;
     unsigned int code_size = 0;
     
     unsigned char *cchunk;
@@ -544,4 +543,3 @@ static int os_run (lua_State *L) {
 
     return 0;
 }
-#endif

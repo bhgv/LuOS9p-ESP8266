@@ -76,7 +76,6 @@ int _pthread_create(pthread_t *id, int stacksize, int initial_state,
     BaseType_t res;
     struct pthread *thread;
     struct pthread *parent_thread;
-    char name[configMAX_TASK_NAME_LEN];
     int current_thread, i;
     
     // Set pthread arguments for creation
@@ -135,14 +134,11 @@ int _pthread_create(pthread_t *id, int stacksize, int initial_state,
     taskArgs->id = *id;
     thread->thread = *id;
     
-    // Set taskname
-    sprintf(name,"thread%d",*id);
-
     mtx_lock(&thread->init_mtx);
 
     // Create related task
     res = xTaskCreate(
-            pthreadTask, name, stacksize, taskArgs, 
+            pthreadTask, "lthread", stacksize, taskArgs, 
             tskDEF_PRIORITY, &xCreatedTask
     );
    

@@ -43,6 +43,7 @@ CFLAGS += -DLUA_USE__G=1			   # base
 CFLAGS += -DLUA_USE_OS=1			   # os
 CFLAGS += -DLUA_USE_MATH=1		       # math
 CFLAGS += -DLUA_USE_TABLE=1		       # table
+CFLAGS += -DLUA_USE_IO=1		       # io
 
 
 #

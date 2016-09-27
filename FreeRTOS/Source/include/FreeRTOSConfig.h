@@ -97,7 +97,7 @@
 #define configMAX_PRIORITIES					( 10UL )
 #define configMINIMAL_STACK_SIZE				( 190 )
 #define configISR_STACK_SIZE					( 400 )
-#define configTOTAL_HEAP_SIZE					( ( size_t ) 40 * 1024 )
+#define configTOTAL_HEAP_SIZE					( ( size_t ) 39 * 1024 )
 #define configMAX_TASK_NAME_LEN					( 8 )
 #define configUSE_TRACE_FACILITY				1
 #define configUSE_16_BIT_TICKS					0

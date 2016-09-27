@@ -1,5 +1,5 @@
 /*
- * Whitecat, lseek implementation
+ * Whitecat, panic functions
  *
  * Copyright (C) 2015 - 2016
  * IBEROXARXA SERVICIOS INTEGRALES, S.L. & CSS IBÉRICA, S.L.
@@ -27,49 +27,10 @@
  * this software.
  */
 
-#include "syscalls.h"
+#include <stdio.h>
 
-extern struct filedesc *p_fd;
-
-off_t lseek(int fd, off_t offset, int whence) {
-    register struct filedesc *fdp = p_fd;
-    register struct file *fp;
-    int error;
-
-    mtx_lock(&fd_mtx);
-    if ((u_int)fd >= fdp->fd_nfiles ||
-        (fp = fdp->fd_ofiles[fd]) == NULL) {
-        mtx_unlock(&fd_mtx);
-        errno = EBADF;
-        return -1;
-    }
-    mtx_unlock(&fd_mtx);
-
-    if (fp->f_type != DTYPE_VNODE) {
-        errno = ESPIPE;
-        return -1;
-    }
-    
-    switch (whence) {
-        case L_INCR:
-            fp->f_offset += offset;
-            break;
-        case L_XTND:
-//            fp->f_offset = offset + ((FIL *)fp->f_fs)->fsize;              
-            break;
-        case L_SET:
-            fp->f_offset = offset;
-            break;
-        default:
-            errno = EINVAL;
-            return -1;
-    }
-    
-    error = (*fp->f_ops->fo_seek)(fp, offset, whence);
-    if (error){
-        errno = error;
-        return -1;
-    }
-
-    return fp->f_offset;
+void panic(char *str) {
+	printf("%s\n", str);
+	for(;;) {
+	}
 }

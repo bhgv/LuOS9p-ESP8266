@@ -203,10 +203,12 @@ static int thread_stop_pthreads(lua_State *L, int thid) {
     }  
     
     if (!thid) {
+    	#if LUA_USE_PWM
         lua_getglobal(L, "pwm"); 
         lua_getfield(L, -1, "down");
         lua_remove(L, -2);
-        lua_pcall(L, 0, 0, 0); 
+        lua_pcall(L, 0, 0, 0);
+        #endif 
     }
     
     return 0;

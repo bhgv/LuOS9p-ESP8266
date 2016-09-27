@@ -19,15 +19,13 @@ MEMORY
    time as binary libraries use these symbols too.)
 */
 
-malloc = __malloc;
-_malloc_r = __malloc_r;
-free = __free;
-_free_r = __free_r;
-realloc = __realloc; 
-_realloc_r = __realloc_r; 
+pvPortMalloc = malloc;
+vPortFree = free;
+
 clock = _clock_;
 _remove_r = __remove_r;
 _read_core_timer = xthal_get_ccount;
+
 
 /* FreeRTOS lock functions.
 
@@ -125,21 +123,22 @@ SECTIONS
     *libgcc.a:*i3.o(.literal .text .literal.* .text.*)
 
     /* libc also in IRAM */
-    *libc.a:*malloc.o(.literal .text .literal.* .text.*)
-    *libc.a:*mallocr.o(.literal .text .literal.* .text.*)
-    *libc.a:*freer.o(.literal .text .literal.* .text.*)
-    *libc.a:*memcpy.o(.literal .text .literal.* .text.*)
-    *libc.a:*memset.o(.literal .text .literal.* .text.*)
-    *libc.a:*memcmp.o(.literal .text .literal.* .text.*)
-    *libc.a:*memmove.o(.literal .text .literal.* .text.*)
-    *libc.a:*rand.o(.literal .text .literal.* .text.*)
-    *libc.a:*bzero.o(.literal .text .literal.* .text.*)
-    *libc.a:*lock.o(.literal .text .literal.* .text.*)
+/*
+     *libc.a:*malloc.o(.literal .text .literal.* .text.*)
+     *libc.a:*mallocr.o(.literal .text .literal.* .text.*)
+     *libc.a:*freer.o(.literal .text .literal.* .text.*)
+     *libc.a:*memcpy.o(.literal .text .literal.* .text.*)
+     *libc.a:*memset.o(.literal .text .literal.* .text.*)
+     *libc.a:*memcmp.o(.literal .text .literal.* .text.*)
+     *libc.a:*memmove.o(.literal .text .literal.* .text.*)
+     *libc.a:*rand.o(.literal .text .literal.* .text.*)
+     *libc.a:*bzero.o(.literal .text .literal.* .text.*)
+     *libc.a:*lock.o(.literal .text .literal.* .text.*)
 
-    *libc.a:*printf.o(.literal .text .literal.* .text.*)
-    *libc.a:*findfp.o(.literal .text .literal.* .text.*)
-    *libc.a:*fputwc.o(.literal .text .literal.* .text.*)
-
+     *libc.a:*printf.o(.literal .text .literal.* .text.*)
+     *libc.a:*findfp.o(.literal .text .literal.* .text.*)
+     *libc.a:*fputwc.o(.literal .text .literal.* .text.*)
+*/
     *sys.a:*uart.o(.literal .text .literal.* .text.*)
     *sys.a:*console.o(.literal .text .literal.* .text.*)
     *sys.a:*clock.o(.literal .text .literal.* .text.*)

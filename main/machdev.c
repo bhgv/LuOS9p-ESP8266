@@ -45,29 +45,17 @@
 #include <unistd.h>
 #include <errno.h>
 
-//#include <sys/syscalls/mount.h>
 
 
-const char *__progname = "whitecat";
+//const char *__progname = "whitecat";
+extern const char *__progname;
 
 #include <sys/filedesc.h>
 #include <sys/file.h>
 
-#if (USE_CFI || USE_SD)
-static int create_folder(char *path) {
-    struct stat s;
 
-    if (stat(path, &s) < 0) {
-		if (errno == ENOENT) {
-            syslog(LOG_INFO, "creating %s folder",path);
-            mkdir(path, 0);
-            
-            return 1;
-		}
-	}    
-    
-	return 0;
-}
+#if USE_CFI
+extern int spiffs_init();
 #endif
 
 void mach_dev() { 
@@ -98,34 +86,6 @@ void mach_dev() {
             }
         }
     #endif
-
-   // #if (USE_CFI || USE_SD)
-        // Create mandatory folders on primary device
-   //     if (primary_is_mounted()) {
-   //         create_folder("/sys");
-   //         create_folder("/sys/conf");
-   //         create_folder("/sys/font");
-   //         create_folder("/sys/zoneinfo");
-   //         create_folder("/lib");
-   //         create_folder("/lib/share");
-   //         create_folder("/lib/share/lua");
-   //         create_folder("/lib/lua");
-    //        create_folder("/tmp");
-
-            //spiffs_copy_image("/sd/cfi-image");
-     //   }
-
-       // if (mount_is_mounted("sd")) {
-        //    create_folder("/sd/log");
-        //    create_folder("/sd/lib");
-        //    create_folder("/sd/lib/share");
-        //    create_folder("/sd/lib/share/lua");
-        //    create_folder("/sd/lib/lua");
-         //   create_folder("/sd/tmp");
-       // }
-
-        //tzset();
-    //#endif
 
     #if USE_RTC
         rtc_init(time(NULL));

@@ -664,20 +664,23 @@ static int f_flush (lua_State *L) {
 /*
 ** functions for 'io' library
 */
-static const luaL_Reg iolib[] = {
-  {"close", io_close},
-  {"flush", io_flush},
-  {"input", io_input},
-  {"lines", io_lines},
-  {"open", io_open},
-  {"output", io_output},
-  {"popen", io_popen},
-  {"read", io_read},
-  {"tmpfile", io_tmpfile},
-  {"type", io_type},
-  {"write", io_write},
-  LIOLIB_REG_ADDS
-  {NULL, NULL}
+#include "modules.h"
+
+static const LUA_REG_TYPE iolib[] = {
+  { LSTRKEY( "close"   ),			LFUNCVAL( io_close   ) },
+  { LSTRKEY( "flush"   ),			LFUNCVAL( io_flush   ) },
+  { LSTRKEY( "input"   ),			LFUNCVAL( io_input   ) },
+  { LSTRKEY( "lines"   ),			LFUNCVAL( io_lines   ) },
+  { LSTRKEY( "open"    ),			LFUNCVAL( io_open    ) },
+  { LSTRKEY( "output"  ),			LFUNCVAL( io_output  ) },
+  { LSTRKEY( "popen"   ),			LFUNCVAL( io_popen   ) },
+  { LSTRKEY( "read"    ),			LFUNCVAL( io_read    ) },
+  { LSTRKEY( "tmpfile" ),			LFUNCVAL( io_tmpfile ) },
+  { LSTRKEY( "type"    ),			LFUNCVAL( io_type    ) },
+  { LSTRKEY( "write"   ),			LFUNCVAL( io_write   ) },
+  { LSTRKEY( "receive" ),			LFUNCVAL( f_receive  ) }, 
+  { LSTRKEY( "send"    ),			LFUNCVAL( f_send     ) },
+  { LNILKEY, LNILVAL }
 };
 
 
@@ -733,6 +736,7 @@ static void createstdfile (lua_State *L, FILE *f, const char *k,
 
 
 LUAMOD_API int luaopen_io (lua_State *L) {
+#if !LUA_USE_ROTABLE
   luaL_newlib(L, iolib);  /* new module */
   createmeta(L);
   /* create (and set) default files */
@@ -743,5 +747,9 @@ LUAMOD_API int luaopen_io (lua_State *L) {
   LIOLIB_OPEN_ADDS
           
   return 1;
+#else
+  return 0;
+#endif
 }
 
+LUA_OS_MODULE(IO, io, iolib);

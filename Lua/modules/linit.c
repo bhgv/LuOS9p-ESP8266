@@ -62,6 +62,7 @@ LIB_INIT(_G, _G, luaopen_base);
 LIB_INIT(TABLE, table, luaopen_table);
 LIB_INIT(OS, os, luaopen_os);
 LIB_INIT(MATH, math, luaopen_math);
+LIB_INIT(IO, io, luaopen_io);
 
 LIB_INIT(LORA, lora, luaopen_lora);
 LIB_INIT(PACK, pack, luaopen_pack);

@@ -589,12 +589,12 @@ static const LUA_REG_TYPE lora_map[] = {
 };
 
 int luaopen_lora(lua_State* L) {
-	#if !LUA_USE_ROTABLE
+#if !LUA_USE_ROTABLE
 	luaL_newlib(L, lora_map);
 	return 1;
-	#else
+#else
 	return 0;
-	#endif		   
+#endif		   
 }
 
 LUA_OS_MODULE(LORA, lora, lora_map);

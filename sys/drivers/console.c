@@ -80,18 +80,8 @@ void console_swap() {
 }
 
 void console_put(const char *c) {
-    char nc[2];
-    
-    nc[1] = 0;
-    
     while (*c) {
-        uart_write(CONSOLE_UART, *c);
-        
-        //if (tty_redirect_to_display()) {
-        //    nc[0] = *c;
-        //    display_text(-1,-1, NULL, nc);    
-        //}
-        c++;
+        uart_write(CONSOLE_UART, *c++);
     }   
 }
 

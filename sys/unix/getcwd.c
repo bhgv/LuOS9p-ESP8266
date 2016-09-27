@@ -75,7 +75,7 @@ realpath(path, resolved)
 	char *resolved;
 {
 	struct stat sb;
-	int fd, n, rootd, serrno;
+	int fd, rootd, serrno;
 	char *p, *q, wbuf[MAXPATHLEN];
 
 	/* Save the starting point. */

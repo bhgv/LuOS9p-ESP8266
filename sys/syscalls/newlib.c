@@ -1,6 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include "syscalls.h"
 #include "lua.h"
 #include <stdio.h>
 #include <sys/reent.h>
@@ -23,7 +23,16 @@ void vPortFree(void *pv);
 void *pvPortMalloc(size_t xWantedSize);
 void *pvPortRealloc(void *pv, size_t size);
 long long ticks();
- 
+
+int __open(const char *path, int flags, ...);
+int __close(int fd);
+int __unlink(const char *path);
+int __unlink(const char *path);
+int __fstat(int fd, struct stat *sb);
+int _stat_r(struct _reent *r, const char *pathname, void *buf);
+off_t __lseek(int fd, off_t offset, int whence);
+int __read(int fd, void *buf, size_t nbyte);
+
 clock_t _clock_(void) {
 	return (clock_t)ticks();
 }
@@ -53,12 +62,12 @@ clock_t _times_r(struct _reent *r, struct tms *ptms) {
 //
 // If memory cannot be allocated, launch Lua garbage collector and
 // try again with the hope that then more memory will be available
-void* __real_malloc(size_t bytes);
+extern void* __real_malloc(size_t bytes);
 void* __wrap_malloc(size_t bytes) {
 	void *ptr = __real_malloc(bytes);
 	
 	if (!ptr) {
-        if (gLuaState) {
+        if (gLuaState) {        
            luaC_fullgc(gLuaState, 1);
            ptr = __real_malloc(bytes);
         }		
@@ -67,24 +76,24 @@ void* __wrap_malloc(size_t bytes) {
 	return ptr;
 }
 
-void* __real_calloc(size_t bytes);
-void* __wrap_calloc(size_t bytes) {
-	void *ptr = __real_calloc(bytes);
+extern void* __real_calloc(size_t n, size_t bytes);
+void* __wrap_calloc(size_t n, size_t bytes) {
+	void *ptr = __real_calloc(n, bytes);
 	
 	if (!ptr) {
         if (gLuaState) {
            luaC_fullgc(gLuaState, 1);
-           ptr = __real_calloc(bytes);
+           ptr = __real_calloc(n, bytes);
         }		
 	}
 	
 	return ptr;
 }
 
-void* __real_realloc(void *ptr, size_t bytes);
+extern void* __real_realloc(void *ptr, size_t bytes);
 void* __wrap_realloc(void *ptr, size_t bytes) {
 	void *nptr = __real_realloc(ptr, bytes);
-	
+
 	if (!nptr) {
         if (gLuaState) {
            luaC_fullgc(gLuaState, 1);
@@ -101,7 +110,6 @@ void __free(void *cp) {
 
 void* __malloc(size_t bytes) {
     void *p;
-
     p = (void *)pvPortMalloc(bytes);
     if (!p) {
         if (gLuaState) {
@@ -170,6 +178,42 @@ void *__calloc_r(struct _reent *r, size_t items, size_t size) {
 }
 #endif
 
+unsigned sleep(unsigned int secs) {
+    vTaskDelay( (secs * 1000) / portTICK_PERIOD_MS );
+    
+    return 0;
+}
+
+int usleep(useconds_t usec) {
+	vTaskDelay(usec / portTICK_PERIOD_US);
+	
+	return 0;
+}
+ 
+int _open_r(struct _reent *r, const char *pathname, int flags, int mode) {
+	return open(pathname, flags, mode);
+}
+
+int _close_r(struct _reent *r, int fd) {
+	return close(fd);
+}
+
+int _unlink_r(struct _reent *r, const char *path) {
+	return unlink(path);
+}
+
+int _fstat_r(struct _reent *r, int fd, void *buf) {
+	return fstat(fd, buf);
+}	
+
+int _stat_r(struct _reent *r, const char *pathname, void *buf) {
+	return stat(pathname, buf);
+}
+
+off_t _lseek_r(struct _reent *r, int fd, off_t offset, int whence) {
+	return lseek(fd, offset, whence);
+}
+
 int _write_r(struct _reent *r, int fd, const void *buf, size_t nbyte) {
 	if (_syscalls_inited) {
 		return write(fd, buf, nbyte);		
@@ -186,15 +230,7 @@ int _read_r(struct _reent *r, int fd, void *buf, size_t nbyte) {
 	return nbyte;
 }
 
-unsigned sleep(unsigned int secs) {
-    vTaskDelay( (secs * 1000) / portTICK_PERIOD_MS );
-    
-    return 0;
-}
 
-int usleep(useconds_t usec) {
-	vTaskDelay(usec / portTICK_PERIOD_US);
-	
-	return 0;
+void (*signal(int sig, void (*func)(int)))(int) {
+return NULL;
 }
-

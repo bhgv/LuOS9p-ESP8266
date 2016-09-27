@@ -38,6 +38,7 @@
 #include <sys/drivers/gpio.h>
 #include <sys/drivers/uart.h>
 #include <sys/syslog.h>
+#include <sys/panic.h>
 //#include <drivers/network/network.h>
 //#include <drivers/lora/lora.h>
 //#include <utils/delay.h>
@@ -88,6 +89,9 @@ void user_init(void) {
     	gpio_pin_clr(LED_ACT);
 	#endif
 
+	void *p;
+	
+	
     pthread_attr_t attr;
     pthread_t thread;
     int res;

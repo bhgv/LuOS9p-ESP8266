@@ -237,7 +237,7 @@ static int queue_byte(u8_t unit, u8_t byte) {
             //    return 0;
             //}
 			
-			return 0;
+			return 1;
         }
     }
 	

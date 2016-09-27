@@ -28,7 +28,9 @@
  */
 
 #include "syscalls.h"
+
 #include <string.h>
+#include <stdarg.h>
 
 #include <sys/syscalls/mount.h>
 
