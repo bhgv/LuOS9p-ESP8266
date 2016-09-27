@@ -220,7 +220,7 @@
 // ---------------------------------------------------------------------------
 // Task / threads stack sizes
 // ---------------------------------------------------------------------------
-#define tskDEF_PRIORITY tskIDLE_PRIORITY
+#define tskDEF_PRIORITY tskIDLE_PRIORITY + 1
 
 #define tcpipTaskStack configMINIMAL_STACK_SIZE * 64
 #define defaultStack   configMINIMAL_STACK_SIZE * 4

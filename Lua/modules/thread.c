@@ -65,10 +65,10 @@ static void init() {
 
 void thread_terminated(void *args) {
     struct lthread *thread;
-    
+
     int *thid = (void *)args;
     int res = list_get(&lthread_list, *thid, (void **)&thread);
-    if (!res) {    
+    if (!res) {  
         luaL_unref(thread->PL, LUA_REGISTRYINDEX, thread->function_ref);
         luaL_unref(thread->PL, LUA_REGISTRYINDEX, thread->thread_ref);
             
@@ -211,6 +211,11 @@ static int thread_stop_pthreads(lua_State *L, int thid) {
         #endif 
     }
     
+	// Do a garbage collection
+	lua_lock(L);
+	luaC_fullgc(L, 1);
+	lua_unlock(L);
+	
     return 0;
 }
 

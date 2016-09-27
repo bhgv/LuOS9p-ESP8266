@@ -70,6 +70,8 @@ int lua_running = 0;
 
 // #include "math.h"
 
+int luaos_main (void);
+
 void *lua_start(void *arg) {
 	for(;;) {
 		luaos_main();
@@ -89,9 +91,6 @@ void user_init(void) {
     	gpio_pin_clr(LED_ACT);
 	#endif
 
-	void *p;
-	
-	
     pthread_attr_t attr;
     pthread_t thread;
     int res;

@@ -3,6 +3,9 @@
 #include "FreeRTOS.h"
 #include "lauxlib.h"
 
+#include "lapi.h"
+#include "lauxlib.h"
+
 #undef ARG_MAX
 
 #include <sys/param.h>
@@ -30,6 +33,8 @@ extern const char *__progname;
 
 char lua_history_on = HISTORY_DEFAULT_STATE;
 char lua_syslog_level = 0xff;
+
+void luaC_fullgc (lua_State *L, int isemergency) ;
 
 #if 0
 
@@ -344,6 +349,11 @@ static int os_logcons(lua_State *L) {
 static int os_stats(lua_State *L) {
     const char *stat = luaL_optstring(L, 1, NULL);
 
+	// Do a garbage collection
+	lua_lock(L);
+	luaC_fullgc(L, 1);
+	lua_unlock(L);
+	
     if (stat && strcmp(stat,"mem") == 0) {
         lua_pushinteger(L, xPortGetFreeHeapSize());
         return 1;
