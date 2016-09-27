@@ -254,7 +254,12 @@ typedef struct lua_TValue {
 
 #define setdeadvalue(obj)	settt_(obj, LUA_TDEADKEY)
 
-
+#if LUA_USE_ROTABLES
+#define setrvalue(obj,x) \
+  { TValue *i_o=(obj); i_o->value.p=(x); i_o->_ts.tt_sig=add_sig(LUA_TROTABLE);}
+#else
+ #define setrvalue(obj,x)
+#endif
 
 #define setobj(L,obj1,obj2) \
 	{ TValue *io1=(obj1); *io1 = *(obj2); \

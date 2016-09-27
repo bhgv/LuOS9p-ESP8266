@@ -18,12 +18,22 @@
 /* Externally defined read-only table array */
 extern const luaR_entry lua_rotable[];
 
-// TO DO
 LUA_API void lua_pushrotable (lua_State *L, void *p) {
-//  lua_lock(L);
-//  setrvalue(L->top, p);
-//  api_incr_top(L);
-//  lua_unlock(L);
+	lua_lock(L);
+    setrvalue(L->top, p);
+    api_incr_top(L);
+	lua_unlock(L);
+}
+
+LUALIB_API int luaL_rometatable (lua_State *L, const char* tname, void *p) {
+  lua_getfield(L, LUA_REGISTRYINDEX, tname);  /* get registry.name */
+  if (!lua_isnil(L, -1))  /* name already in use? */
+    return 0;  /* leave previous value on top, but return 0 */
+  lua_pop(L, 1);
+  lua_pushrotable(L, p);
+  lua_pushvalue(L, -1);
+  lua_setfield(L, LUA_REGISTRYINDEX, tname);  /* registry.name = metatable */
+  return 1;
 }
 
 void luaA_pushobject (lua_State *L, const TValue *o) {

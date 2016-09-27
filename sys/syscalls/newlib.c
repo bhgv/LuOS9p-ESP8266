@@ -103,6 +103,20 @@ void* __wrap_realloc(void *ptr, size_t bytes) {
 	
 	return nptr;
 }
+
+
+extern uint32_t _irom0_text_start;
+extern uint32_t _irom0_text_end;
+
+extern void __real_free(void *ptr);
+void __wrap_free(void *ptr) {
+	if (((&_irom0_text_start) <= (uint32_t *)ptr && (uint32_t *)ptr <= (&_irom0_text_end))) {
+		uart_writes(1,"free on read only memory\r\n");
+		return;
+	}
+	__real_free(ptr);
+}
+
 #else
 void __free(void *cp) {
     vPortFree(cp);

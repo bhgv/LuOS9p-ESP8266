@@ -1,71 +1,70 @@
-FreeRTOS/Source/portable/esp8266/port.c:    SET_STKREG( XT_STK_EXIT,    _xt_user_exit               );  /* user exception exit dispatcher   */
-FreeRTOS/Source/portable/esp8266/port.c:    /* mark the supervisor stack pointer high water mark. xt_int_exit
-FreeRTOS/Source/portable/esp8266/port.c:    sdk__xt_int_exit();
-FreeRTOS/Source/portable/esp8266/xtensa_rtos.h:#define XT_RTOS_INT_EXIT    _xt_int_exit
-Lua/src/loslib.c:static int os_exit (lua_State *L) {
-Lua/src/loslib.c:  { LSTRKEY( "exit" ),       LFUNCVAL( os_exit ) },
-bootloader/rboot/eagle.rom.addr.v6.ld:PROVIDE ( rom_pbus_exit_debugmode = 0x40007448 );
-core/exception_vectors.S:        movi    a0, _xt_user_exit
-core/exception_vectors.S:        call0   sdk__xt_int_exit # once finished, jumps to _xt_user_exit via stack
-core/exception_vectors.S:/* _xt_user_exit is pushed onto the stack as part of the user exception handler,
-core/exception_vectors.S:_xt_user_exit:
-core/exception_vectors.S:        .global _xt_user_exit
-core/exception_vectors.S:        .type _xt_user_exit, @function
-core/include/esp/interrupts.h:void sdk__xt_int_exit (void);
-core/include/esp/interrupts.h:void _xt_user_exit (void);
-lib/allsymbols.rename:rom_pbus_exit_debugmode sdk_rom_pbus_exit_debugmode
-lib/allsymbols.rename:wdev_exit_sniffer sdk_wdev_exit_sniffer
-lib/allsymbols.rename:_xt_int_exit sdk__xt_int_exit
-Binary file lib/libmain.a matches
-Binary file lib/libphy.a matches
-Binary file lib/libpp.a matches
-libc/xtensa-lx106-elf/include/pthread.h:void	_EXFUN(pthread_exit, (void *__value_ptr));
-libc/xtensa-lx106-elf/include/stdlib.h:int	_EXFUN(on_exit,(_VOID (*__func)(int, _PTR),_PTR __arg));
-libc/xtensa-lx106-elf/include/sys/reent.h:struct _on_exit_args {
-libc/xtensa-lx106-elf/include/sys/reent.h:        struct _on_exit_args * _on_exit_args_ptr;
-libc/xtensa-lx106-elf/include/sys/reent.h:        struct _on_exit_args _on_exit_args;
-libc/xtensa-lx106-elf/include/sys/unistd.h:void	_EXFUN(_exit, (int __status ) _ATTRIBUTE ((__noreturn__)));
-Binary file libc/xtensa-lx106-elf/lib/libc.a matches
-Binary file libc/xtensa-lx106-elf/lib/libg.a matches
-Binary file libc/xtensa-lx106-elf/lib/libm.a matches
-Binary file main/build/core/app_main.o matches
-Binary file main/build/core/exception_vectors.o matches
-Binary file main/build/core/newlib_syscalls.o matches
-Binary file main/build/core.a matches
-Binary file main/build/freertos/Source/portable/esp8266/port.o matches
-Binary file main/build/freertos.a matches
-Binary file main/build/lua/common/linenoise.o matches
-Binary file main/build/lua/src/lauxlib.o matches
-Binary file main/build/lua/src/lbaselib.o matches
-Binary file main/build/lua/src/ldblib.o matches
-Binary file main/build/lua/src/liolib.o matches
-Binary file main/build/lua/src/loadlib.o matches
-Binary file main/build/lua/src/loslib.o matches
-Binary file main/build/lua/src/lua.o matches
-Binary file main/build/lua/src/luac.o matches
-Binary file main/build/lua.a matches
-main/build/main.map:                              ../libc/xtensa-lx106-elf/lib/libc.a(lib_a-exit.o) (__call_exitprocs)
-main/build/main.map: .literal.os_exit
-main/build/main.map:                0x0000000040100376                _xt_user_exit
-main/build/main.map:                0x00000000401008c0                sdk__xt_int_exit
-main/build/main.map: .text.os_exit  0x0000000040223460       0x59 ./build/lua.a(loslib.o)
-main/build/main.map:                0x000000004022ee60                __call_exitprocs
-main/build/main.map:                0x000000004024c9d0                sdk_rom_pbus_exit_debugmode
-main/build/main.map:                0x0000000040252468                sdk_wdev_exit_sniffer
-Binary file main/build/open_esplibs_libmain/os_cpu_a.o matches
-Binary file main/build/open_esplibs_libmain.a matches
-Binary file main/build/sdklib/libmain.a matches
-Binary file main/build/sdklib/libmain_stage1.a matches
-Binary file main/build/sdklib/libphy.a matches
-Binary file main/build/sdklib/libphy_stage1.a matches
-Binary file main/build/sdklib/libpp.a matches
-Binary file main/build/sdklib/libpp_stage1.a matches
-main/build/sys/syscalls/_exit.d:build/sys//syscalls/_exit.o: \
-main/build/sys/syscalls/_exit.d: /Users/jaumeolivepetrus/whitecat-esp8266/sys/syscalls/_exit.c
-Binary file main/build/sys/syscalls/_exit.o matches
-Binary file main/build/sys/syscalls/newlib.o matches
-Binary file main/build/sys/unix/syslog.o matches
-Binary file main/build/sys.a matches
-open_esplibs/libmain/os_cpu_a.c:            movi   a0, _xt_user_exit       \n\
-open_esplibs/libmain/os_cpu_a.c:            call0  sdk__xt_int_exit        \n\
-open_esplibs/libmain/os_cpu_a.c:void IRAM sdk__xt_int_exit(void) {
+/Users/jolive/Lua-OSESP8266/main/main.c: In function 'lua_start':
+/Users/jolive/Lua-OSESP8266/main/main.c:75:3: warning: implicit declaration of function 'luaos_main' [-Wimplicit-function-declaration]
+   luaos_main();
+   ^
+/Users/jolive/Lua-OSESP8266/main/main.c: In function 'user_init':
+/Users/jolive/Lua-OSESP8266/main/main.c:92:8: warning: unused variable 'p' [-Wunused-variable]
+  void *p;
+        ^
+/Users/jolive/Lua-OSESP8266/core/app_main.c: In function 'vAssertCalled':
+/Users/jolive/Lua-OSESP8266/core/app_main.c:255:2: warning: passing argument 2 of 'uart_writes' discards 'const' qualifier from pointer target type [enabled by default]
+  uart_writes(1,pcFile);
+  ^
+In file included from /Users/jolive/Lua-OSESP8266/core/app_main.c:35:0:
+../sys/../sys/drivers/uart.h:155:10: note: expected 'char *' but argument is of type 'const char *'
+ void     uart_writes(u8_t unit, char *s);
+          ^
+/Users/jolive/Lua-OSESP8266/sys/syscalls/sigblock.c:5:48: warning: 'struct sigvec' declared inside parameter list [enabled by default]
+ int sigvec(int sig, struct sigvec *vec, struct sigvec *ovec) {
+                                                ^
+/Users/jolive/Lua-OSESP8266/sys/syscalls/sigblock.c:5:48: warning: its scope is only this definition or declaration, which is probably not what you want [enabled by default]
+/Users/jolive/Lua-OSESP8266/sys/drivers/uart.c: In function 'queue_byte':
+/Users/jolive/Lua-OSESP8266/sys/drivers/uart.c:222:6: warning: variable 'signal' set but not used [-Wunused-but-set-variable]
+  int signal;
+      ^
+/Users/jolive/Lua-OSESP8266/Lua/src/liolib.c:704:13: warning: 'createmeta' defined but not used [-Wunused-function]
+ static void createmeta (lua_State *L) {
+             ^
+/Users/jolive/Lua-OSESP8266/Lua/src/liolib.c:725:13: warning: 'createstdfile' defined but not used [-Wunused-function]
+ static void createstdfile (lua_State *L, FILE *f, const char *k,
+             ^
+In file included from ../sys/../Lua/adds/luaconf.h:261:0,
+                 from /Users/jolive/Lua-OSESP8266/Lua/src/lua.h:487,
+                 from /Users/jolive/Lua-OSESP8266/Lua/src/loslib.c:19:
+../sys/../Lua/modules/loslib_adds.inc: In function 'os_ls':
+../sys/../Lua/modules/loslib_adds.inc:233:16: warning: unused variable 'tm_info' [-Wunused-variable]
+     struct tm *tm_info;
+                ^
+/Users/jolive/Lua-OSESP8266/Lua/src/loslib.c: At top level:
+/Users/jolive/Lua-OSESP8266/Lua/src/loslib.c:166:12: warning: 'os_getenv' defined but not used [-Wunused-function]
+ static int os_getenv (lua_State *L) {
+            ^
+/Users/jolive/Lua-OSESP8266/Lua/src/loslib.c:260:12: warning: 'os_date' defined but not used [-Wunused-function]
+ static int os_date (lua_State *L) {
+            ^
+/Users/jolive/Lua-OSESP8266/Lua/src/loslib.c:340:12: warning: 'os_setlocale' defined but not used [-Wunused-function]
+ static int os_setlocale (lua_State *L) {
+            ^
+Traceback (most recent call last):
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 1233, in <module>
+    main()
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 1144, in main
+    operation_func(esp, args)
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 831, in write_flash
+    flasher = CesantaFlasher(esp, args.baud)
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 565, in __init__
+    esp.run_stub(json.loads(_CESANTA_FLASHER_STUB), [baud_rate], read_output=False)
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 305, in run_stub
+    self.mem_block(pc, 0)
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 179, in mem_block
+    ESPROM.checksum(data))[1] != "\0\0":
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 108, in command
+    p = self.read()
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 81, in read
+    return self._slip_reader.next()
+  File "/usr/local/xtensa-lx106-elf/bin/esptool.py", line 690, in slip_reader
+    read_bytes = port.read(1 if waiting == 0 else waiting)
+  File "/Library/Python/2.7/site-packages/serial/serialposix.py", line 461, in read
+    ready,_,_ = select.select([self.fd],[],[], self._timeout)
+KeyboardInterrupt
+make: *** [flash] Error 1

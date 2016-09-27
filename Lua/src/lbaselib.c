@@ -450,52 +450,93 @@ static int luaB_tostring (lua_State *L) {
   return 1;
 }
 
+#include "modules.h"
 
-static const luaL_Reg base_funcs[] = {
-  LBASELIB_REG_ADDS
-  {"assert", luaB_assert},
-  {"collectgarbage", luaB_collectgarbage},
-  {"dofile", luaB_dofile},
-  {"error", luaB_error},
-  {"getmetatable", luaB_getmetatable},
-  {"ipairs", luaB_ipairs},
-  {"loadfile", luaB_loadfile},
-  {"load", luaB_load},
+static const LUA_REG_TYPE base_funcs[] = {
+  { LSTRKEY( "dumpstack" 	  ),			LFUNCVAL( stackDump 			) },
+  { LSTRKEY( "try" 			  ),			LFUNCVAL( luaB_try 				) }, 
+  { LSTRKEY( "assert" 		  ),			LFUNCVAL( luaB_assert 			) },
+  { LSTRKEY( "collectgarbage" ),			LFUNCVAL( luaB_collectgarbage 	) },
+  { LSTRKEY( "dofile" 		  ),			LFUNCVAL( luaB_dofile 			) },
+  { LSTRKEY( "error" 		  ),			LFUNCVAL( luaB_error 			) },
+  { LSTRKEY( "getmetatable"   ),			LFUNCVAL( luaB_getmetatable 	) },
+  { LSTRKEY( "ipairs" 		  ),			LFUNCVAL( luaB_ipairs 			) },
+  { LSTRKEY( "loadfile" 	  ),			LFUNCVAL( luaB_loadfile 		) },
+  { LSTRKEY( "load" 		  ),			LFUNCVAL( luaB_load 			) },
 #if defined(LUA_COMPAT_LOADSTRING)
-  {"loadstring", luaB_load},
+  { LSTRKEY( "loadstring" 	  ),			LFUNCVAL( luaB_load 			) },
 #endif
-  {"next", luaB_next},
-  {"pairs", luaB_pairs},
-  {"pcall", luaB_pcall},
-  {"print", luaB_print},
-  {"rawequal", luaB_rawequal},
-  {"rawlen", luaB_rawlen},
-  {"rawget", luaB_rawget},
-  {"rawset", luaB_rawset},
-  {"select", luaB_select},
-  {"setmetatable", luaB_setmetatable},
-  {"tonumber", luaB_tonumber},
-  {"tostring", luaB_tostring},
-  {"type", luaB_type},
-  {"xpcall", luaB_xpcall},
+  { LSTRKEY( "next" 		  ),			LFUNCVAL( luaB_next 			) },
+  { LSTRKEY( "pairs" 		  ),			LFUNCVAL( luaB_pairs 			) },
+  { LSTRKEY( "pcall" 		  ),			LFUNCVAL( luaB_pcall 			) },
+  { LSTRKEY( "print" 		  ),			LFUNCVAL( luaB_print 			) },
+  { LSTRKEY( "rawequal" 	  ),			LFUNCVAL( luaB_rawequal 		) },
+  { LSTRKEY( "rawlen" 		  ),			LFUNCVAL( luaB_rawlen 			) },
+  { LSTRKEY( "rawget" 		  ),			LFUNCVAL( luaB_rawget 			) },
+  { LSTRKEY( "rawset" 		  ),			LFUNCVAL( luaB_rawset 			) },
+  { LSTRKEY( "select" 		  ),			LFUNCVAL( luaB_select 			) },
+  { LSTRKEY( "setmetatable"   ),			LFUNCVAL( luaB_setmetatable 	) },
+  { LSTRKEY( "tonumber" 	  ),			LFUNCVAL( luaB_tonumber 		) },
+  { LSTRKEY( "tostring" 	  ),			LFUNCVAL( luaB_tostring 		) },
+  { LSTRKEY( "type" 		  ),			LFUNCVAL( luaB_type 			) },
+  { LSTRKEY( "xpcall" 		  ),			LFUNCVAL( luaB_xpcall 			) },
+#if !LUA_USE_ROTABLE
   /* placeholders */
-  {"_G", NULL},
-  {"_VERSION", NULL},
-  {NULL, NULL}
+  { LSTRKEY( "_G" 			  ),			LFUNCVAL( NULL 					) },
+  { LSTRKEY( "_VERSION" 	  ),			LFUNCVAL( NULL 					) },
+#endif
+  { LNILKEY, LNILVAL }
 };
 
+#if LUA_USE_ROTABLE
+
+static int luaB_index (lua_State *L) {
+  int fres;
+  if ((fres = luaR_findfunction(L, base_funcs)) != 0)
+    return fres;
+
+  const char *keyname = luaL_checkstring(L, 2);
+  if (!strcmp(keyname, "_VERSION")) {
+    lua_pushliteral(L, LUA_VERSION);
+    return 1;
+  }
+
+ const TValue *res = luaR_findglobal(keyname, strlen(keyname));
+  if (!res)
+    return 0;
+  else {
+    lua_pushrotable(L, (void *)res);
+    return 1;
+  }
+}
+
+static const luaL_Reg base_load_funcs[] = {
+    { "__index", luaB_index},
+    { NULL, NULL }
+};
+#endif
+
 LUAMOD_API int luaopen_base (lua_State *L) {
-  /* open lib into global table */
-  lua_pushglobaltable(L);
-  luaL_setfuncs(L, base_funcs, 0);
-  /* set global _G */
-  lua_pushvalue(L, -1);
-  lua_setfield(L, -2, "_G");
-  /* set global _VERSION */
-  lua_pushliteral(L, LUA_VERSION);
-  lua_setfield(L, -2, "_VERSION");
-
-  LBASELIB_OPEN_ADDS
-
-  return 1;
+#if !LUA_USE_ROTABLE
+    /* open lib into global table */
+    lua_pushglobaltable(L);
+    luaL_setfuncs(L, base_funcs, 0);  
+    /* set global _G */
+    lua_pushvalue(L, -1);
+    lua_setfield(L, -2, "_G");
+    /* set global _VERSION */
+    lua_pushliteral(L, LUA_VERSION);
+    lua_setfield(L, -2, "_VERSION");
+	
+	return 1;
+#else
+    /* open lib into global table */
+    lua_pushglobaltable(L);
+    luaL_setfuncs(L, base_load_funcs, 0);
+  
+    lua_pushvalue(L, -1);
+    lua_setmetatable(L, -2); 
+	
+	return 1;
+#endif	
 }

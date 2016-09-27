@@ -239,6 +239,7 @@ void IRAM sdk_user_start(void) {
 
 // .text+0x3a8
 void IRAM vApplicationStackOverflowHook(xTaskHandle task, char *task_name) {
+	uart_writes(1,"vApplicationStackOverflowHook");
 }
 
 // .text+0x3d8
@@ -251,6 +252,9 @@ void IRAM vApplicationTickHook(void) {
 }
 
 void vAssertCalled( const char * pcFile, unsigned long ulLine ) {
+	uart_writes(1,pcFile);
+
+
 }
 
 // .Lfunc005 -- .irom0.text+0x8

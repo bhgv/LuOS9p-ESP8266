@@ -96,7 +96,7 @@ CXXFLAGS	?= $(C_CXX_FLAGS) -fno-exceptions -fno-rtti $(EXTRA_CXXFLAGS)
 CPPFLAGS	+= -mlongcalls -mtext-section-literals
 
 include $(ROOT)esp8266.mk
-EXTRA_LDFLAGS   = -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc
+EXTRA_LDFLAGS   = -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=free
 LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
 CFLAGS      += -DUSE_CUSTOM_HEAP=0
 LINKER_SCRIPTS += $(ROOT)ld/program.ld $(ROOT)ld/rom.ld
