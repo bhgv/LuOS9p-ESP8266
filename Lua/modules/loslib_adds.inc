@@ -47,6 +47,17 @@ static int os_shell(lua_State *L) {
     return 0;
 }
 
+static int os_idle(lua_State *L) {  
+	unsigned int seconds = luaL_checkinteger(L, 1);
+	 
+    cpu_idle(seconds);
+    
+    return 0;
+}
+
+#endif
+
+#if LUA_USE_EDITOR
 static int os_edit (lua_State *L) {
     const char *path = luaL_checkstring(L, 1);
 
@@ -62,15 +73,6 @@ static int os_edit (lua_State *L) {
     console_clear();
     return 0;    
 }
-
-static int os_idle(lua_State *L) {  
-	unsigned int seconds = luaL_checkinteger(L, 1);
-	 
-    cpu_idle(seconds);
-    
-    return 0;
-}
-
 #endif
 
 static int os_sleep(lua_State *L) {

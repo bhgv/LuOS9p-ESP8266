@@ -305,6 +305,5 @@
 #define LUA_USE_STEPPER     (1 && USE_STEPPER)
 #define LUA_USE_I2C         0
 #define LUA_USE_SHELL       0
-#define LUA_USE_EDITOR      0
 #define LUA_USE_HISTORY	    0
 #endif	/* CONFIG_H */

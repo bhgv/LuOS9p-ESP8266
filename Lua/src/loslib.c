@@ -393,7 +393,9 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "more" ),       LFUNCVAL( os_more ) },
   { LSTRKEY( "dmesg" ),      LFUNCVAL( os_dmesg ) },
   { LSTRKEY( "run" ),        LFUNCVAL( os_run ) },
-
+#if LUA_USE_EDITOR
+  { LSTRKEY( "edit" ),       LFUNCVAL( os_edit ) },
+#endif
   { LSTRKEY( "LOG_EMERG" ),  LINTVAL( LOG_EMERG ) },
   { LSTRKEY( "LOG_ALERT" ),  LINTVAL( LOG_ALERT ) },
   { LSTRKEY( "LOG_CRIT" ),   LINTVAL( LOG_CRIT ) },
