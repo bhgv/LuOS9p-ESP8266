@@ -63,7 +63,7 @@ int pthread_mutex_init(pthread_mutex_t *mut, const pthread_mutexattr_t *attr) {
     }
 
     // Test if it's init yet
-    res = list_get(&mutex_list, *mut, &mutex);
+    res = list_get(&mutex_list, *mut, (void **)&mutex);
     if (!res) {
         errno = EBUSY;
         return EBUSY;
@@ -94,7 +94,7 @@ int pthread_mutex_init(pthread_mutex_t *mut, const pthread_mutexattr_t *attr) {
     mutex->owner = pthread_self();
     
     // Add mutext to the list
-    res = list_add(&mutex_list, mutex, mut);
+    res = list_add(&mutex_list, mutex, (int *)mut);
     if (res) {
         free(mutex->sem);
         vSemaphoreDelete(mutex->sem);
@@ -111,7 +111,7 @@ int pthread_mutex_lock(pthread_mutex_t *mut) {
     int res;
     
     // Get mutex
-    res = list_get(&mutex_list, *mut, &mutex);
+    res = list_get(&mutex_list, *mut, (void **)&mutex);
     if (res) {
         errno = res;
         return res;
@@ -140,7 +140,7 @@ int pthread_mutex_unlock(pthread_mutex_t *mut) {
     int res;
 
     // Get mutex
-    res = list_get(&mutex_list, *mut, &mutex);
+    res = list_get(&mutex_list, *mut, (void **)&mutex);
     if (res) {
         errno = res;
         return res;
@@ -161,7 +161,7 @@ int pthread_mutex_trylock(pthread_mutex_t *mut) {
     int res;
     
     // Get mutex
-    res = list_get(&mutex_list, *mut, &mutex);
+    res = list_get(&mutex_list, *mut, (void **)&mutex);
     if (res) {
         errno = res;
         return res;
@@ -188,7 +188,7 @@ int pthread_mutex_destroy(pthread_mutex_t *mut) {
     int res;
     
     // Get mutex
-    res = list_get(&mutex_list, *mut, &mutex);
+    res = list_get(&mutex_list, *mut, (void **)&mutex);
     if (res) {
         errno = res;
         return res;
@@ -240,7 +240,7 @@ void _pthread_mutex_free() {
     
     index = list_first(&mutex_list);
     while (index >= 0) {
-        list_get(&mutex_list, index, &mutex);
+        list_get(&mutex_list, index, (void **)&mutex);
          
         if (mutex->type == PTHREAD_MUTEX_RECURSIVE) {
             while (xSemaphoreGiveRecursive(mutex->sem) == pdTRUE);  

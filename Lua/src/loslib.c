@@ -373,6 +373,7 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "time" ),       LFUNCVAL( os_time ) },
   { LSTRKEY( "tmpname" ),    LFUNCVAL( os_tmpname ) },
   { LSTRKEY( "exit" ),       LFUNCVAL( os_exit ) },
+  { LSTRKEY( "execute" ),    LFUNCVAL( os_execute ) },
 
   { LSTRKEY( "clear" ),      LFUNCVAL( os_clear ) },
   { LSTRKEY( "cpu" ),        LFUNCVAL( os_cpu ) },
@@ -407,20 +408,13 @@ static const LUA_REG_TYPE syslib[] =
 
 
 #if 0
-#define LOSLIB_REG_ADDS \
-  LOSLIB_REG_SHELL \
-  LOSLIB_REG_EDITOR \
-  {"idle",      os_idle}, \
-  {"run",       os_run}, 
-#endif
-
 //static const luaL_Reg syslib[] = {
-//  {"execute",   os_execute},
 //  {"getenv",    os_getenv},
 //  {"setlocale", os_setlocale},
 //  LOSLIB_REG_ADDS
 //  {NULL, NULL}
 //};
+#endif
  
 /* }====================================================== */
 

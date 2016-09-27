@@ -18,12 +18,13 @@
 /* Externally defined read-only table array */
 extern const luaR_entry lua_rotable[];
 
-//LUA_API void lua_pushrotable (lua_State *L, void *p) {
+// TO DO
+LUA_API void lua_pushrotable (lua_State *L, void *p) {
 //  lua_lock(L);
 //  setrvalue(L->top, p);
 //  api_incr_top(L);
 //  lua_unlock(L);
-//}
+}
 
 void luaA_pushobject (lua_State *L, const TValue *o) {
   setobj2s(L, L->top, o);

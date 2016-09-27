@@ -82,10 +82,12 @@ int tty_read(struct file *fp, struct uio *uio, struct ucred *cred) {
 int tty_write(struct file *fp, struct uio *uio, struct ucred *cred) {
     int unit = fp->f_devunit;
     char *buf = uio->uio_iov->iov_base;
-    char dbuf[2];
-    
+	
+#if USE_DISPLAY	
+    char dbuf[2];    
     dbuf[1] = '\0';
-    
+#endif
+	
     if (!tty_mutex) {
         pthread_mutexattr_t attr;
 

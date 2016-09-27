@@ -29,6 +29,10 @@
 #include "lundump.h"
 #include "lvm.h"
 
+// WHITECAT BEGIN
+#include <sys/drivers/uart.h>
+// WHITECAT END
+
 const char lua_ident[] =
   "$LuaVersion: " LUA_COPYRIGHT " $"
   "$LuaAuthors: " LUA_AUTHORS " $";

@@ -36,10 +36,11 @@
 #define debug_free_mem_begin(var) \
 int elapsed_begin_##var = xPortGetFreeHeapSize(); 
 
-#define debug_free_mem_end(var, msg) \
+#define debug_free_mem_end(var,msg) \
 int elapsed_end_##var = xPortGetFreeHeapSize(); \
-if (msg) { \
-	printf("%s (%s) comsumption %d bytes\n", (char *)#var, (char *)msg, elapsed_begin_##var - elapsed_end_##var); \
+const char *elapsed_end_##var_msg = msg; \
+if (elapsed_end_##var_msg) { \
+	printf("%s (%s) comsumption %d bytes\n", (char *)#var, elapsed_end_##var_msg, elapsed_begin_##var - elapsed_end_##var); \
 } else { \
 	printf("%s comsumption %d bytes\n", (char *)#var, elapsed_begin_##var - elapsed_end_##var);	\
 }

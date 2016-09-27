@@ -51,6 +51,11 @@ static char sccsid[] = "@(#)getcwd.c	8.5 (Berkeley) 2/7/95";
 
 #define	ISDOT(a) (a->d_name[0] == '.' && (!a->d_name[1] || a->d_name[1] == '.' && !a->d_name[2]))
 
+void __getcwd(char *pt, size_t size);
+int lstat(const char *str, struct stat *sb);
+int chdir(const char *path);
+int fchdir(int fd);
+
 char *
 getcwd(pt, size)
 	char *pt;

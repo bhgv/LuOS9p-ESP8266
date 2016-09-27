@@ -5,5 +5,5 @@
 
 pid_t wait4(pid_t pid, int *status, int options,
             struct rusage *rusage) {
-    
+				return 0;
 }

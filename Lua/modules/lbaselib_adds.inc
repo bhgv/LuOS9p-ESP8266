@@ -44,7 +44,7 @@ int stackDump(lua_State *L) {
 static int luaB_try (lua_State *L) {
     int total = lua_gettop(L);
     
-    int tryFunc, catchFunc, finallyFunc;
+    int tryFunc = LUA_NOREF, catchFunc = LUA_NOREF, finallyFunc = LUA_NOREF;
 
     if (total == 3) {
         luaL_checktype(L, 1, LUA_TFUNCTION);
@@ -64,7 +64,7 @@ static int luaB_try (lua_State *L) {
     // Call try function
     lua_rawgeti(L, LUA_REGISTRYINDEX, tryFunc);
     
-    int status = lua_pcall(L, 0, 0, NULL); 
+    int status = lua_pcall(L, 0, 0, 0); 
     if (status != LUA_OK) {
         if (catchFunc != LUA_NOREF) {
             const char *msg = lua_tostring(L, -1);
@@ -110,14 +110,14 @@ static int luaB_try (lua_State *L) {
             // Push error message
             lua_pushstring(L, messageStart);
             
-            lua_pcall(L, 4, 0, NULL);    
+            lua_pcall(L, 4, 0, 0);    
         }
     }
     
     if (finallyFunc != LUA_NOREF) {
        // Call finally
         lua_rawgeti(L, LUA_REGISTRYINDEX, finallyFunc);
-        lua_pcall(L, 0, 0, NULL); 
+        lua_pcall(L, 0, 0, 0); 
     }
     
     if ( tryFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, tryFunc);

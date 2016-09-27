@@ -568,9 +568,9 @@ static int ll_require (lua_State *L) {
 
   // WHITECAT BEGIN
   /* Is this a readonly table? */
-  void *res = luaR_findglobal((char *)name, strlen(name));
+  const TValue *res = luaR_findglobal(name, strlen(name));
   if (res) {
-    lua_pushrotable(L, res);
+    lua_pushrotable(L, (void *)res);
     return 1;
   }
   // WHITECAT END

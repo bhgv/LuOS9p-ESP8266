@@ -22,6 +22,7 @@
 #include <sys/drivers/cpu.h>
 #include <sys/syscalls/mount.h>
 #include <sys/syscalls/device.h>
+#include <sys/drivers/uart.h>
 
 #include <main/build.h>
 
@@ -205,7 +206,6 @@ static int os_pwd (lua_State *L) {
 
 static int os_mkdir (lua_State *L) {
     const char *path = luaL_optstring(L, 1, NULL);
-    char size[9];
     char cpath[MAXPATHLEN];
     
     // If path is not present get the current directory as path
@@ -442,17 +442,17 @@ static int os_run (lua_State *L) {
     unsigned int i;
     int done;
 
-    unsigned char *code = NULL;
-    unsigned int code_size = 0;
+    char *code = NULL;
+    int code_size = 0;
     
-    unsigned char *cchunk;
-    unsigned char chunk_size;
+    char *cchunk;
+    char chunk_size;
 
     // Lock tty, avoid other threads to write to console
     tty_lock();
 
     if (*argCode) {
-        code = (unsigned char *)argCode;
+        code = (char *)argCode;
         lua_pop(L, 1);
 
         
@@ -513,7 +513,7 @@ static int os_run (lua_State *L) {
  skip:
     // Call load
     lua_getglobal(L, "load"); 
-    lua_pushstring(L, code);
+    lua_pushstring(L, (const char *)code);
     lua_pcall(L, 1, 2, 0);
 
     if (!lua_isnil(L, -1)) {

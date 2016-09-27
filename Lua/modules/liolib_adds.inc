@@ -14,6 +14,9 @@
 #define l_lockfile(f)   ((void)0)
 #define l_unlockfile(f)	((void)0)
 
+void tty_lock();
+void tty_unlock();
+
 static int read_line (lua_State *L, FILE *f, int chop) {
   luaL_Buffer b;
   int c = '\0';
@@ -52,9 +55,9 @@ static int f_receive (lua_State *L) {
     unsigned int i;
     int done;
 
-    unsigned char chunk[255];
-    unsigned char *cchunk;
-    unsigned char chunk_size;
+    char chunk[255];
+    char *cchunk;
+    char chunk_size;
   
     if (strlen(filename) == 0) return 0;
 
@@ -122,7 +125,7 @@ static int f_receive (lua_State *L) {
 static int f_send (lua_State *L) {
     const char *filename = luaL_optstring(L, 1, "");
     int i;
-    int done, readed;
+    int done;
     char c;
 
     unsigned char chunk[255];

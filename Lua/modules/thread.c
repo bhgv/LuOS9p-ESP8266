@@ -67,7 +67,7 @@ void thread_terminated(void *args) {
     struct lthread *thread;
     
     int *thid = (void *)args;
-    int res = list_get(&lthread_list, *thid, &thread);
+    int res = list_get(&lthread_list, *thid, (void **)&thread);
     if (!res) {    
         luaL_unref(thread->PL, LUA_REGISTRYINDEX, thread->function_ref);
         luaL_unref(thread->PL, LUA_REGISTRYINDEX, thread->thread_ref);
@@ -111,7 +111,7 @@ static int thread_suspend_pthreads(lua_State *L, int thid) {
     }
     
     while (idx >= 0) {
-        res = list_get(&lthread_list, idx, &thread);
+        res = list_get(&lthread_list, idx, (void **)&thread);
         if (res) {
             return luaL_error(L, "can't suspend thread %d", idx);
         }
@@ -145,7 +145,7 @@ static int thread_resume_pthreads(lua_State *L, int thid) {
     }
     
     while (idx >= 0) {
-        res = list_get(&lthread_list, idx, &thread);
+        res = list_get(&lthread_list, idx, (void **)&thread);
         if (res) {
             return luaL_error(L, "can't resume thread %d", idx);
         }
@@ -179,7 +179,7 @@ static int thread_stop_pthreads(lua_State *L, int thid) {
     }
     
     while (idx >= 0) {
-        res = list_get(&lthread_list, idx, &thread);
+        res = list_get(&lthread_list, idx, (void **)&thread);
         if (res) {
             return luaL_error(L, "can't stop thread %d", idx);
         }
@@ -241,7 +241,7 @@ static int thread_list(lua_State *L) {
         // For each lthread in list ...
         idx = list_first(&lthread_list);
         while (idx >= 0) {
-            list_get(&lthread_list, idx, &thread);
+            list_get(&lthread_list, idx, (void **)&thread);
 
             // Get status
             switch (thread->status) {
@@ -267,7 +267,6 @@ static int new_thread(lua_State* L, int run) {
     int res, idx;
     pthread_t id;
     int retries;
-    global_State *g;
     
     init();
 
@@ -420,7 +419,7 @@ static int thread_status(lua_State* L) {
     
     thid = luaL_checkinteger(L, 1);
     
-    res = list_get(&lthread_list, thid, &thread);
+    res = list_get(&lthread_list, thid, (void **)&thread);
     if (res) {
         lua_pushnil(L);
         return 1;
