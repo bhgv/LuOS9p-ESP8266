@@ -61,6 +61,7 @@ LIB_INIT(OS, os, luaopen_os);
 LIB_INIT(MATH, math, luaopen_math);
 LIB_INIT(IO, io, luaopen_io);
 LIB_INIT(STRING, string, luaopen_string);
+LIB_INIT(COROUTINE, coroutine, luaopen_coroutine);
 
 LIB_INIT(LORA, lora, luaopen_lora);
 LIB_INIT(PACK, pack, luaopen_pack);

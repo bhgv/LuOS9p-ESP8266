@@ -1,10 +1,11 @@
 CFLAGS += -DRBOOT_GPIO_ENABLED=0
 
-CFLAGS += -DCPU_HZ=80000000L           # CPU frequency in hertz
-CFLAGS += -DCORE_TIMER_HZ=CPU_HZ       # CPU core timer frequency
-CFLAGS += -D_CLOCKS_PER_SEC_=100       # Number of interrupt ticks for reach 1 second
+CFLAGS += -DCPU_HZ=80000000L                 # CPU frequency in hertz
+CFLAGS += -DCORE_TIMER_HZ=CPU_HZ             # CPU core timer frequency
+CFLAGS += -D_CLOCKS_PER_SEC_=100             # Number of interrupt ticks for reach 1 second
 
-CFLAGS += -DluaTaskStack=1024*4	       # Stck size assigned to lua thread
+CFLAGS += -DluaTaskStack=1024*2	             # Stck size assigned to lua thread
+CFLAGS += -DtskDEF_PRIORITY=tskIDLE_PRIORITY # Default task priority
 
 #
 # File system configuration
@@ -47,6 +48,7 @@ CFLAGS += -DLUA_USE_MATH=1		       # math
 CFLAGS += -DLUA_USE_TABLE=1		       # table
 CFLAGS += -DLUA_USE_IO=1		       # io
 CFLAGS += -DLUA_USE_STRING=1		   # string
+CFLAGS += -DLUA_USE_COROUTINE=1		   # coroutine
 
 
 #
