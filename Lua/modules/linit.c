@@ -41,7 +41,6 @@
 //static const luaL_Reg loadedlibs[] = {
 //  {LUA_LOADLIBNAME, luaopen_package},
 //  {LUA_COLIBNAME, luaopen_coroutine},
-//  {LUA_STRLIBNAME, luaopen_string},
 //  {LUA_UTF8LIBNAME, luaopen_utf8},
 //  {LUA_DBLIBNAME, luaopen_debug},
 //#if defined(LUA_COMPAT_BITLIB)
@@ -61,6 +60,7 @@ LIB_INIT(TABLE, table, luaopen_table);
 LIB_INIT(OS, os, luaopen_os);
 LIB_INIT(MATH, math, luaopen_math);
 LIB_INIT(IO, io, luaopen_io);
+LIB_INIT(STRING, string, luaopen_string);
 
 LIB_INIT(LORA, lora, luaopen_lora);
 LIB_INIT(PACK, pack, luaopen_pack);

@@ -1508,28 +1508,30 @@ static int str_unpack (lua_State *L) {
 /* }====================================================== */
 
 
-static const luaL_Reg strlib[] = {
-  {"byte", str_byte},
-  {"char", str_char},
-  {"dump", str_dump},
-  {"find", str_find},
-  {"format", str_format},
-  {"gmatch", gmatch},
-  {"gsub", str_gsub},
-  {"len", str_len},
-  {"lower", str_lower},
-  {"match", str_match},
-  {"rep", str_rep},
-  {"reverse", str_reverse},
-  {"sub", str_sub},
-  {"upper", str_upper},
-  {"pack", str_pack},
-  {"packsize", str_packsize},
-  {"unpack", str_unpack},
-  {NULL, NULL}
+#include "modules.h"
+
+static const LUA_REG_TYPE strlib[] = {
+  { LSTRKEY( "byte"     ),			LFUNCVAL( str_byte     ) },
+  { LSTRKEY( "char"     ),			LFUNCVAL( str_char     ) },
+  { LSTRKEY( "dump"     ),			LFUNCVAL( str_dump     ) },
+  { LSTRKEY( "find"     ),			LFUNCVAL( str_find     ) },
+  { LSTRKEY( "format"   ),			LFUNCVAL( str_format   ) },
+  { LSTRKEY( "gmatch"   ),			LFUNCVAL( gmatch       ) },
+  { LSTRKEY( "gsub"     ),			LFUNCVAL( str_gsub     ) },
+  { LSTRKEY( "len" 	    ),			LFUNCVAL( str_len      ) },
+  { LSTRKEY( "lower"    ),			LFUNCVAL( str_lower    ) },
+  { LSTRKEY( "match"    ),			LFUNCVAL( str_match    ) },
+  { LSTRKEY( "rep" 	    ),			LFUNCVAL( str_rep 	   ) },
+  { LSTRKEY( "reverse"  ),			LFUNCVAL( str_reverse  ) },
+  { LSTRKEY( "sub"      ),			LFUNCVAL( str_sub 	   ) },
+  { LSTRKEY( "upper"    ),			LFUNCVAL( str_upper    ) },
+  { LSTRKEY( "pack"     ),			LFUNCVAL( str_pack 	   ) },
+  { LSTRKEY( "packsize" ),			LFUNCVAL( str_packsize ) },
+  { LSTRKEY( "unpack"   ),			LFUNCVAL( str_unpack   ) },
+  { LNILKEY, LNILVAL }
 };
 
-
+#if !LUA_USE_ROTABLE
 static void createmetatable (lua_State *L) {
   lua_createtable(L, 0, 1);  /* table to be metatable for strings */
   lua_pushliteral(L, "");  /* dummy string */
@@ -1540,14 +1542,19 @@ static void createmetatable (lua_State *L) {
   lua_setfield(L, -2, "__index");  /* metatable.__index = string */
   lua_pop(L, 1);  /* pop metatable */
 }
-
+#endif
 
 /*
 ** Open string library
 */
 LUAMOD_API int luaopen_string (lua_State *L) {
+#if !LUA_USE_ROTABLE
   luaL_newlib(L, strlib);
   createmetatable(L);
   return 1;
+#else
+  return 0;
+#endif
 }
 
+LUA_OS_MODULE(STRING, string, strlib);

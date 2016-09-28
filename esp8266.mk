@@ -4,6 +4,8 @@ CFLAGS += -DCPU_HZ=80000000L           # CPU frequency in hertz
 CFLAGS += -DCORE_TIMER_HZ=CPU_HZ       # CPU core timer frequency
 CFLAGS += -D_CLOCKS_PER_SEC_=100       # Number of interrupt ticks for reach 1 second
 
+CFLAGS += -DluaTaskStack=1024*4	       # Stck size assigned to lua thread
+
 #
 # File system configuration
 # 
@@ -44,6 +46,7 @@ CFLAGS += -DLUA_USE_OS=1			   # os
 CFLAGS += -DLUA_USE_MATH=1		       # math
 CFLAGS += -DLUA_USE_TABLE=1		       # table
 CFLAGS += -DLUA_USE_IO=1		       # io
+CFLAGS += -DLUA_USE_STRING=1		   # string
 
 
 #
