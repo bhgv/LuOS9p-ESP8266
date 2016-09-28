@@ -372,6 +372,15 @@ LUALIB_API void luaL_checkany (lua_State *L, int arg) {
     luaL_argerror(L, arg, "value expected");
 }
 
+#if LUA_USE_ROTABLE
+LUALIB_API void luaL_checkanytable (lua_State *L, int arg) {
+  if (lua_type(L, arg) != LUA_TTABLE && lua_type(L, arg) != LUA_TROTABLE) {
+    const char *msg = lua_pushfstring(L, "table or rotable expected, got %s",
+                                      luaL_typename(L, arg));
+    luaL_argerror(L, arg, msg);    
+  }
+}
+#endif
 
 LUALIB_API const char *luaL_checklstring (lua_State *L, int arg, size_t *len) {
   const char *s = lua_tolstring(L, arg, len);

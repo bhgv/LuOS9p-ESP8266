@@ -131,6 +131,10 @@ static Node *mainposition (const Table *t, const TValue *key) {
       return hashpow2(t, luaS_hashlongstr(tsvalue(key)));
     case LUA_TBOOLEAN:
       return hashboolean(t, bvalue(key));
+#if LUA_USE_ROTABLE  
+    case LUA_TROTABLE:
+      return hashpointer(t, pvalue(key));
+#endif
     case LUA_TLIGHTUSERDATA:
       return hashpointer(t, pvalue(key));
     case LUA_TLCF:
@@ -189,6 +193,12 @@ static unsigned int findindex (lua_State *L, Table *t, StkId key) {
 
 
 int luaH_next (lua_State *L, Table *t, StkId key) {
+#if LUA_USE_ROTABLE
+  if (luaR_isrotable((const void *)t)) {
+  	luaR_next(L, t, key, key+1);
+  	return ttisnil(key) ? 0 : 1;
+  }
+#endif
   unsigned int i = findindex(L, t, key);  /* find original element */
   for (; i < t->sizearray; i++) {  /* try first array part */
     if (!ttisnil(&t->array[i])) {  /* a non-nil value? */
@@ -498,6 +508,12 @@ TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key) {
 ** search function for integers
 */
 const TValue *luaH_getint (Table *t, lua_Integer key) {
+#if LUA_USE_ROTABLE
+  if (luaR_isrotable((const void *)t)) {
+	  return luaR_findentry((const void *)t, NULL, key, NULL);
+  }
+#endif
+
   /* (1 <= key && key <= t->sizearray) */
   if (l_castS2U(key) - 1 < t->sizearray)
     return &t->array[key - 1];
@@ -516,12 +532,18 @@ const TValue *luaH_getint (Table *t, lua_Integer key) {
   }
 }
 
-#if !LUA_USE_ROTABLE
 /*
 ** search function for short strings
 */
 const TValue *luaH_getshortstr (Table *t, TString *key) {
   Node *n = hashstr(t, key);
+
+#if LUA_USE_ROTABLE
+  if (luaR_isrotable((const void *)t)) {
+	  return luaR_findentry((const void *)t, getstr(key), 0, NULL);
+  }
+#endif
+
   lua_assert(key->tt == LUA_TSHRSTR);
   for (;;) {  /* check whether 'key' is somewhere in the chain */
     const TValue *k = gkey(n);
@@ -529,44 +551,17 @@ const TValue *luaH_getshortstr (Table *t, TString *key) {
       return gval(n);  /* that's it */
     else {
       int nx = gnext(n);
+#if !LUA_USE_ROTABLE
       if (nx == 0)
         return luaO_nilobject;  /* not found */
-      n += nx;
-    }
-  }
-}
 #else
-const TValue *luaH_getshortstr_ro (TString *key) {
-	const TValue *v = luaR_findentry(NULL, getstr(key), 0, NULL);
-	
-	if (v) {
-		return v;
-	}
-
-	return luaO_nilobject;  /* not found */
-}
-
-const TValue *luaH_getshortstr (Table *t, TString *key) {
-  Node *n = hashstr(t, key);
-
-  if (luaR_isrotable((const void *)t)) {
-	  return luaR_findentry((const void *)t, getstr(key), 0, NULL);
-  }
-
-  lua_assert(key->tt == LUA_TSHRSTR);
-  for (;;) {  /* check whether 'key' is somewhere in the chain */
-    const TValue *k = gkey(n);
-    if (ttisshrstring(k) && eqshrstr(tsvalue(k), key)) {
-      return gval(n);  /* that's it */
-    } else {
-      int nx = gnext(n);
       if (nx == 0)
-        return luaH_getshortstr_ro(key);  /* not found */
+      	return luaR_findentry(NULL, getstr(key), 0, NULL);
+#endif
       n += nx;
     }
   }
 }
-#endif
 
 
 /*
@@ -574,11 +569,17 @@ const TValue *luaH_getshortstr (Table *t, TString *key) {
 ** which may be in array part, nor for floats with integral values.)
 */
 static const TValue *getgeneric (Table *t, const TValue *key) {
+#if LUA_USE_ROTABLE
+  if (luaR_isrotable((const void *)t)) {
+	  return luaR_findentry((const void *)t, getstr(key), 0, NULL);
+  }
+#endif
+
   Node *n = mainposition(t, key);
   for (;;) {  /* check whether 'key' is somewhere in the chain */
-    if (luaV_rawequalobj(gkey(n), key))
+    if (luaV_rawequalobj(gkey(n), key)) {
       return gval(n);  /* that's it */
-    else {
+    } else {
       int nx = gnext(n);
       if (nx == 0)
         return luaO_nilobject;  /* not found */
@@ -618,26 +619,20 @@ const TValue *luaH_get (Table *t, const TValue *key) {
   }
 }
 
-#if !LUA_USE_ROTABLE
 /*
 ** beware: when using this function you probably need to check a GC
 ** barrier and invalidate the TM cache.
 */
 TValue *luaH_set (lua_State *L, Table *t, const TValue *key) {
   const TValue *p = luaH_get(t, key);
+#if !LUA_USE_ROTABLE
   if (p != luaO_nilobject)
-    return cast(TValue *, p);
-  else return luaH_newkey(L, t, key);
-}
 #else
-TValue *luaH_set (lua_State *L, Table *t, const TValue *key) {
-  const TValue *p = luaH_get(t, key);
   if ((p != luaO_nilobject) && (ttype(p) != LUA_TROTABLE))
+#endif
     return cast(TValue *, p);
   else return luaH_newkey(L, t, key);
 }
-#endif
-
 
 void luaH_setint (lua_State *L, Table *t, lua_Integer key, TValue *value) {
   const TValue *p = luaH_getint(t, key);

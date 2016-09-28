@@ -145,8 +145,13 @@ static int luaB_rawequal (lua_State *L) {
 
 static int luaB_rawlen (lua_State *L) {
   int t = lua_type(L, 1);
+#if !LUA_USE_ROTABLE
   luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TSTRING, 1,
                    "table or string expected");
+#else
+  luaL_argcheck(L, t == LUA_TTABLE || t == LUA_TROTABLE || t == LUA_TSTRING, 1,
+                   "table, rotable, or string expected");
+#endif
   lua_pushinteger(L, lua_rawlen(L, 1));
   return 1;
 }
@@ -209,7 +214,11 @@ static int luaB_type (lua_State *L) {
 static int pairsmeta (lua_State *L, const char *method, int iszero,
                       lua_CFunction iter) {
   if (luaL_getmetafield(L, 1, method) == LUA_TNIL) {  /* no metamethod? */
-    luaL_checktype(L, 1, LUA_TTABLE);  /* argument must be a table */
+#if !LUA_USE_ROTABLE
+  luaL_checktype(L, 1, LUA_TTABLE);
+#else
+  luaL_checkanytable(L, 1);
+#endif
     lua_pushcfunction(L, iter);  /* will return generator, */
     lua_pushvalue(L, 1);  /* state, */
     if (iszero) lua_pushinteger(L, 0);  /* and initial value */
@@ -224,7 +233,11 @@ static int pairsmeta (lua_State *L, const char *method, int iszero,
 
 
 static int luaB_next (lua_State *L) {
+#if !LUA_USE_ROTABLE
   luaL_checktype(L, 1, LUA_TTABLE);
+#else
+  luaL_checkanytable(L, 1);
+#endif
   lua_settop(L, 2);  /* create a 2nd argument if there isn't one */
   if (lua_next(L, 1))
     return 2;
@@ -501,7 +514,7 @@ static int luaB_index (lua_State *L) {
     return 1;
   }
 
- const TValue *res = luaR_findglobal(keyname, strlen(keyname));
+  const TValue *res = luaR_findglobal(keyname, strlen(keyname));
   if (!res)
     return 0;
   else {
@@ -526,9 +539,7 @@ LUAMOD_API int luaopen_base (lua_State *L) {
     lua_setfield(L, -2, "_G");
     /* set global _VERSION */
     lua_pushliteral(L, LUA_VERSION);
-    lua_setfield(L, -2, "_VERSION");
-	
-	return 1;
+    lua_setfield(L, -2, "_VERSION");	
 #else
     /* open lib into global table */
     lua_pushglobaltable(L);
@@ -536,7 +547,7 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   
     lua_pushvalue(L, -1);
     lua_setmetatable(L, -2); 
-	
-	return 1;
 #endif	
+
+	return 1;
 }

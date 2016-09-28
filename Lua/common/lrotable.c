@@ -7,9 +7,9 @@
 #include <string.h>
 #include "lauxlib.h"
 #include "lstring.h"
-#include "lobject.h"
 #include "lapi.h"
 #include "lrotable.h"
+#include "lobject.h"
 
 /* Local defines */
 #define LUAR_FINDFUNCTION     0
@@ -106,15 +106,18 @@ int luaR_isrotable(const void *p) {
 	return ((&_irom0_text_start) <= (uint32_t *)p && (uint32_t *)p <= (&_irom0_text_end));
 }
 
-#if 0
 /* Find the metatable of a given table */
 void* luaR_getmeta(void *data) {
-#ifdef LUA_META_ROTABLES
   const TValue *res = luaR_auxfind((const luaR_entry*)data, "__metatable", 0, NULL);
   return res && ttisrotable(res) ? rvalue(res) : NULL;
-#else
-  return NULL;
-#endif
+}
+
+int luaH_getn_ro (void *t) {
+  int i = 1, len=0;
+  
+  while(luaR_findentry(t, NULL, i ++, NULL))
+    len ++;
+  return len;
 }
 
 static void luaR_next_helper(lua_State *L, const luaR_entry *pentries, int pos, TValue *key, TValue *val) {
@@ -129,6 +132,7 @@ static void luaR_next_helper(lua_State *L, const luaR_entry *pentries, int pos, 
    setobj2s(L, val, &pentries[pos].value);
   }
 }
+
 /* next (used for iteration) */
 void luaR_next(lua_State *L, void *data, TValue *key, TValue *val) {
   const luaR_entry* pentries = (const luaR_entry*)data;
@@ -168,17 +172,9 @@ void luaR_getcstr(char *dest, const TString *src, size_t maxsize) {
   } 
 }
 
-/* Return 1 if the given pointer is a rotable */
-#ifdef LUA_META_ROTABLES
-
-#include "compiler.h"
-
-int luaR_isrotable(void *p) {
-  return RODATA_START_ADDRESS <= (char*)p && (char*)p <= RODATA_END_ADDRESS;
+int luaH_next_ro (lua_State *L, void *t, StkId key) {
+  luaR_next(L, t, key, key+1);
+  return ttisnil(key) ? 0 : 1;
 }
-
-#endif
-
-#endif
 
 #endif

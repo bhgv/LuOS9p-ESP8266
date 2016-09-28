@@ -157,7 +157,10 @@ typedef struct lua_TValue {
 #define ttisfulluserdata(o)	checktag((o), ctb(LUA_TUSERDATA))
 #define ttisthread(o)		checktag((o), ctb(LUA_TTHREAD))
 #define ttisdeadkey(o)		checktag((o), LUA_TDEADKEY)
-#define ttisrotable(o) 	   (ttype(o) == LUA_TROTABLE)
+
+#if LUA_USE_ROTABLE
+#define ttisrotable(o) 	    checktag((o), LUA_TROTABLE)
+#endif
 
 /* Macros to access values */
 #define ivalue(o)	check_exp(ttisinteger(o), val_(o).i)
@@ -175,6 +178,11 @@ typedef struct lua_TValue {
 #define hvalue(o)	check_exp(ttistable(o), gco2t(val_(o).gc))
 #define bvalue(o)	check_exp(ttisboolean(o), val_(o).b)
 #define thvalue(o)	check_exp(ttisthread(o), gco2th(val_(o).gc))
+
+#if LUA_USE_ROTABLE
+#define rvalue(o)	check_exp(ttisrotable(o), gco2t(val_(o).gc))
+#endif
+
 /* a dead value may get the 'gc' field, but cannot access its contents */
 #define deadvalue(o)	check_exp(ttisdeadkey(o), cast(void *, val_(o).gc))
 
@@ -254,11 +262,11 @@ typedef struct lua_TValue {
 
 #define setdeadvalue(obj)	settt_(obj, LUA_TDEADKEY)
 
-#if LUA_USE_ROTABLES
+#if LUA_USE_ROTABLE
 #define setrvalue(obj,x) \
-  { TValue *i_o=(obj); i_o->value.p=(x); i_o->_ts.tt_sig=add_sig(LUA_TROTABLE);}
-#else
- #define setrvalue(obj,x)
+  { TValue *io=(obj); luaR_table *x_ = (x); \
+    val_(io).gc = obj2gco(x_); settt_(io, LUA_TROTABLE); \
+    checkliveness(L,io); }
 #endif
 
 #define setobj(L,obj1,obj2) \

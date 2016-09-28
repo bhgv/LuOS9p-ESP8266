@@ -33,6 +33,10 @@
 #include <sys/drivers/uart.h>
 // WHITECAT END
 
+#if LUA_USE_ROTABLE
+#include "lrotable.h"
+#endif
+
 const char lua_ident[] =
   "$LuaVersion: " LUA_COPYRIGHT " $"
   "$LuaAuthors: " LUA_AUTHORS " $";
@@ -1148,8 +1152,13 @@ LUA_API int lua_next (lua_State *L, int idx) {
   int more;
   lua_lock(L);
   t = index2addr(L, idx);
+#if !LUA_USE_ROTABLE
   api_check(L, ttistable(t), "table expected");
   more = luaH_next(L, hvalue(t), L->top - 1);
+#else
+  api_check(L, ttistable(t) || ttisrotable(t), "table or rotable expected");
+  more = ttistable(t)?luaH_next(L, hvalue(t), L->top - 1):luaH_next_ro(L, rvalue(t), L->top - 1);
+#endif
   if (more) {
     api_incr_top(L);
   }

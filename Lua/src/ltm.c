@@ -91,6 +91,11 @@ const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
     case LUA_TTABLE:
       mt = hvalue(o)->metatable;
       break;
+#if LUA_USE_ROTABLE
+    case LUA_TROTABLE:
+      mt = (Table*)luaR_getmeta(rvalue(o));
+      break;
+#endif
     case LUA_TUSERDATA:
       mt = uvalue(o)->metatable;
       break;

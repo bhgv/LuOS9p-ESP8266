@@ -82,12 +82,12 @@ const TValue* luaR_findentry(const void *pentry, const char *strkey, luaR_numkey
 void luaR_getcstr(char *dest, const TString *src, size_t maxsize);
 void luaR_next(lua_State *L, void *data, TValue *key, TValue *val);
 void* luaR_getmeta(void *data);
-//#ifdef LUA_META_ROTABLES
 int luaR_isrotable(const void *p);
 LUA_API void lua_pushrotable (lua_State *L, void *p);
-//#else
-//#define luaR_isrotable(p)     (0)
-//#endif
+LUALIB_API int luaL_rometatable (lua_State *L, const char* tname, void *p);
+int luaH_getn_ro (void *t);
+void luaR_next(lua_State *L, void *data, TValue *key, TValue *val);
+int luaH_next_ro (lua_State *L, void *t, StkId key);
 
 #endif
 

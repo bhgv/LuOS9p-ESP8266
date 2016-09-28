@@ -90,11 +90,7 @@
 ** mark an object that can be NULL (either because it is really optional,
 ** or it was stripped as debug info, or inside an uncompleted structure)
 */
-#if LUA_USE_ROTABLE
-#define markobjectN(g,t)	{ if (t && !luaR_isrotable(t)) markobject(g,t); }
-#else
 #define markobjectN(g,t)	{ if (t) markobject(g,t); }
-#endif
 
 static void reallymarkobject (global_State *g, GCObject *o);
 

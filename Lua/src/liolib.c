@@ -22,8 +22,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-
-
+#if LUA_USE_ROTABLE
+#include "lrotable.h"
+#endif
 
 /*
 ** Change this macro to accept other modes for 'fopen' besides
@@ -286,10 +287,12 @@ static int io_tmpfile (lua_State *L) {
 
 static FILE *getiofile (lua_State *L, const char *findex) {
   LStream *p;
+
   lua_getfield(L, LUA_REGISTRYINDEX, findex);
   p = (LStream *)lua_touserdata(L, -1);
   if (isclosed(p))
     luaL_error(L, "standard %s file is closed", findex + IOPREF_LEN);
+
   return p->f;
 }
 
@@ -683,23 +686,52 @@ static const LUA_REG_TYPE iolib[] = {
   { LNILKEY, LNILVAL }
 };
 
+#if LUA_USE_ROTABLE  	
+static int luaL_io_index(lua_State *L) {
+  int fres;
+  if ((fres = luaR_findfunction(L, iolib)) != 0)
+    return fres;
+
+  return (int)luaO_nilobject;
+}
+
+static const luaL_Reg io_load_funcs[] = {
+    { "__index", luaL_io_index },
+    { NULL, NULL }
+};
+#endif
 
 /*
 ** methods for file handles
 */
-static const luaL_Reg flib[] = {
-  {"close", io_close},
-  {"flush", f_flush},
-  {"lines", f_lines},
-  {"read", f_read},
-  {"seek", f_seek},
-  {"setvbuf", f_setvbuf},
-  {"write", f_write},
-  {"__gc", f_gc},
-  {"__tostring", f_tostring},
-  {NULL, NULL}
+static const LUA_REG_TYPE flib[] = {
+  { LSTRKEY( "close" 	  ),			LFUNCVAL( io_close 	 ) },
+  { LSTRKEY( "flush" 	  ),			LFUNCVAL( f_flush 	 ) },
+  { LSTRKEY( "lines" 	  ),			LFUNCVAL( f_lines 	 ) },
+  { LSTRKEY( "read" 	  ),			LFUNCVAL( f_read 	 ) },
+  { LSTRKEY( "seek" 	  ),			LFUNCVAL( f_seek 	 ) },
+  { LSTRKEY( "setvbuf" 	  ),			LFUNCVAL( f_setvbuf  ) },
+  { LSTRKEY( "write" 	  ),			LFUNCVAL( f_write 	 ) },
+  { LNILKEY, LNILVAL }
 };
 
+#if LUA_USE_ROTABLE  	
+static int luaL_flib_index(lua_State *L) {
+  int fres;
+  if ((fres = luaR_findfunction(L, flib)) != 0)
+    return fres;
+    
+  return (int)luaO_nilobject;
+}
+
+static const luaL_Reg flib_load_funcs[] = {
+    { "__index"    , 	luaL_flib_index },
+    {  "__gc" 	   , 	f_gc 		    },
+    { "__tostring" , 	f_tostring      },
+    { NULL, NULL }
+};
+
+#else
 
 static void createmeta (lua_State *L) {
   luaL_newmetatable(L, LUA_FILEHANDLE);  /* create metatable for file handles */
@@ -709,6 +741,7 @@ static void createmeta (lua_State *L) {
   lua_pop(L, 1);  /* pop new metatable */
 }
 
+#endif
 
 /*
 ** function to (not) close the standard files stdin, stdout, and stderr
@@ -720,7 +753,6 @@ static int io_noclose (lua_State *L) {
   lua_pushliteral(L, "cannot close standard file");
   return 2;
 }
-
 
 static void createstdfile (lua_State *L, FILE *f, const char *k,
                            const char *fname) {
@@ -734,7 +766,6 @@ static void createstdfile (lua_State *L, FILE *f, const char *k,
   lua_setfield(L, -2, fname);  /* add file to module */
 }
 
-
 LUAMOD_API int luaopen_io (lua_State *L) {
 #if !LUA_USE_ROTABLE
   luaL_newlib(L, iolib);  /* new module */
@@ -743,13 +774,22 @@ LUAMOD_API int luaopen_io (lua_State *L) {
   createstdfile(L, stdin, IO_INPUT, "stdin");
   createstdfile(L, stdout, IO_OUTPUT, "stdout");
   createstdfile(L, stderr, NULL, "stderr");
-
-  LIOLIB_OPEN_ADDS
-          
-  return 1;
 #else
-  return 0;
-#endif
-}
+  luaL_newlib(L, io_load_funcs);  /* new module */
+  lua_pushvalue(L, -1);
+  lua_setmetatable(L, -2); 
 
-LUA_OS_MODULE(IO, io, iolib);
+  luaL_newmetatable(L, LUA_FILEHANDLE);  /* create metatable for file handles */
+  lua_pushvalue(L, -1);  /* push metatable */
+  lua_setfield(L, -2, "__index");  /* metatable.__index = metatable */
+  luaL_setfuncs(L, flib_load_funcs, 0);  /* add file methods to new metatable */
+  lua_pop(L, 1);  /* pop new metatable */
+
+  /* create (and set) default files */
+  createstdfile(L, stdin, IO_INPUT, "stdin");
+  createstdfile(L, stdout, IO_OUTPUT, "stdout");
+  createstdfile(L, stderr, NULL, "stderr");
+#endif
+
+  return 1;
+}

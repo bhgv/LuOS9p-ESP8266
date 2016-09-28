@@ -239,7 +239,6 @@ void IRAM sdk_user_start(void) {
 
 // .text+0x3a8
 void IRAM vApplicationStackOverflowHook(xTaskHandle task, char *task_name) {
-	uart_writes(1,"vApplicationStackOverflowHook");
 }
 
 // .text+0x3d8

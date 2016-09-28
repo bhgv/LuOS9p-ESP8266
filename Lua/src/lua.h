@@ -71,10 +71,12 @@ typedef struct lua_State lua_State;
 #define LUA_TUSERDATA	7
 #define LUA_TTHREAD		8
 
-// WHITECAT BEGIN
+#if LUA_USE_ROTABLE
 #define LUA_TROTABLE	9
 #define LUA_NUMTAGS		10
-// WHITECAT END
+#else
+#define LUA_NUMTAGS		9
+#endif
 
 /* minimum Lua stack available to a C function */
 #define LUA_MINSTACK	20

@@ -30,6 +30,9 @@
 #include "ltm.h"
 #include "lvm.h"
 
+#if LUA_USE_ROTABLE
+#include "lrotable.h"
+#endif
 
 /* limit for table tag-method chains (to avoid loops) */
 #define MAXTAGLOOP	2000
@@ -407,6 +410,10 @@ int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
     case LUA_TNUMFLT: return luai_numeq(fltvalue(t1), fltvalue(t2));
     case LUA_TBOOLEAN: return bvalue(t1) == bvalue(t2);  /* true must be 1 !! */
     case LUA_TLIGHTUSERDATA: return pvalue(t1) == pvalue(t2);
+#if LUA_USE_ROTABLE
+    case LUA_TROTABLE:
+      return (rvalue(t1) == rvalue(t2));
+#endif
     case LUA_TLCF: return fvalue(t1) == fvalue(t2);
     case LUA_TSHRSTR: return eqshrstr(tsvalue(t1), tsvalue(t2));
     case LUA_TLNGSTR: return luaS_eqlngstr(tsvalue(t1), tsvalue(t2));
@@ -496,7 +503,6 @@ void luaV_concat (lua_State *L, int total) {
   } while (total > 1);  /* repeat until only 1 result left */
 }
 
-
 /*
 ** Main operation 'ra' = #rb'.
 */
@@ -518,6 +524,12 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
       setivalue(ra, tsvalue(rb)->u.lnglen);
       return;
     }
+#if LUA_USE_ROTABLE    
+    case LUA_TROTABLE: {
+       setivalue(ra, luaH_getn_ro(rvalue(rb)));
+       return;
+    }
+#endif    
     default: {  /* try metamethod */
       tm = luaT_gettmbyobj(L, rb, TM_LEN);
       if (ttisnil(tm))  /* no metamethod? */
