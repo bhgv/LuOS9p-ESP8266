@@ -220,7 +220,6 @@ falloc(resultfp, resultfd)
     if (error)
         return (error);
     if (get_nfiles() >= NDFILE) {
-        panic("file descriptor table full");
         return (ENFILE);
     }
     

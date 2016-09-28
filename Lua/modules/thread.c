@@ -216,6 +216,10 @@ static int thread_stop_pthreads(lua_State *L, int thid) {
 	luaC_fullgc(L, 1);
 	lua_unlock(L);
 	
+	TickType_t xLastWakeTime;
+	
+	vTaskDelayUntil( &xLastWakeTime, 10 );
+	
     return 0;
 }
 

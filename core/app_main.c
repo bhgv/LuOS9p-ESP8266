@@ -239,6 +239,11 @@ void IRAM sdk_user_start(void) {
 
 // .text+0x3a8
 void IRAM vApplicationStackOverflowHook(xTaskHandle task, char *task_name) {
+    taskDISABLE_INTERRUPTS();
+    
+	printf("\r\rtos: stack overflow, task '%s'\r\n", task_name);
+
+    for( ;; );
 }
 
 // .text+0x3d8
@@ -251,9 +256,27 @@ void IRAM vApplicationTickHook(void) {
 }
 
 void vAssertCalled( const char * pcFile, unsigned long ulLine ) {
-	uart_writes(1,pcFile);
+    volatile char *pcFileName;
+    volatile unsigned long ulLineNumber;
 
+    /* Prevent things that are useful to view in the debugger from being
+    optimised away. */
+    pcFileName = ( char * ) pcFile;
+    ( void ) pcFileName;
+    ulLineNumber = ulLine;
 
+    printf("\r\nassert: at %s, line %lu\r\n", pcFileName, ulLine);
+
+    /* Set ulLineNumber to 0 in the debugger to break out of this loop and
+    return to the line that triggered the assert. */
+    while( ulLineNumber != 0 )
+    {
+            __asm volatile( "NOP" );
+            __asm volatile( "NOP" );
+            __asm volatile( "NOP" );
+            __asm volatile( "NOP" );
+            __asm volatile( "NOP" );
+    }
 }
 
 // .Lfunc005 -- .irom0.text+0x8

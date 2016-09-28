@@ -230,6 +230,14 @@ off_t _lseek_r(struct _reent *r, int fd, off_t offset, int whence) {
 int _write_r(struct _reent *r, int fd, const void *buf, size_t nbyte) {
 	if (_syscalls_inited) {
 		return write(fd, buf, nbyte);		
+	} else {
+		int i = 0;
+		
+		while (i < nbyte) {
+			uart_write(1, *((char *)buf++));
+			i++;
+		}
+		
 	}
 	
 	return nbyte;

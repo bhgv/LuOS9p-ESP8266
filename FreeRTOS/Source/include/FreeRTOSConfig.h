@@ -94,7 +94,7 @@
 #define configUSE_TICK_HOOK					1
 #define configTICK_RATE_HZ					( ( TickType_t ) 100 )
 #define configCPU_CLOCK_HZ					( 80000000 )
-#define configMAX_PRIORITIES					( 10UL )
+#define configMAX_PRIORITIES					( 15UL )
 #define configMINIMAL_STACK_SIZE				( 190 )
 #define configISR_STACK_SIZE					( 400 )
 #define configTOTAL_HEAP_SIZE					( ( size_t ) 39 * 1024 )
