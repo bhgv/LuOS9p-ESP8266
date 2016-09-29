@@ -74,6 +74,10 @@ void thread_terminated(void *args) {
             
         list_remove(&lthread_list, *thid);
     }
+
+	// Delay a number of ticks for take the iddle
+	// task an opportunity for free allocated memory
+	vTaskDelay(10);	
 }
 
 void *thread_start_task(void *arg) {
@@ -215,10 +219,10 @@ static int thread_stop_pthreads(lua_State *L, int thid) {
 	lua_lock(L);
 	luaC_fullgc(L, 1);
 	lua_unlock(L);
-	
-	TickType_t xLastWakeTime;
-	
-	vTaskDelayUntil( &xLastWakeTime, 10 );
+
+	// Delay a number of ticks for take the iddle
+	// task an opportunity for free allocated memory
+	vTaskDelay(10);	
 	
     return 0;
 }
@@ -295,8 +299,7 @@ static int new_thread(lua_State* L, int run) {
     thread->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
     thread->status = LTHREAD_STATUS_SUSPENDED;
     
-    // TO DO
-    //uxSetLuaState(thread->L);
+    uxSetLuaState(thread->L);
 
     lua_rawgeti(L, LUA_REGISTRYINDEX, thread->function_ref);                
     lua_xmove(L, thread->L, 1);

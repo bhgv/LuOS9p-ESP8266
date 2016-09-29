@@ -5,7 +5,7 @@ CFLAGS += -DCORE_TIMER_HZ=CPU_HZ             # CPU core timer frequency
 CFLAGS += -D_CLOCKS_PER_SEC_=100             # Number of interrupt ticks for reach 1 second
 
 CFLAGS += -DluaTaskStack=1024*2	             # Stck size assigned to lua thread
-CFLAGS += -DtskDEF_PRIORITY=tskIDLE_PRIORITY # Default task priority
+CFLAGS += -DtskDEF_PRIORITY=0				 # Default task priority
 
 #
 # File system configuration
@@ -37,7 +37,12 @@ CFLAGS += -DLORA_UART_BUFF_SIZE=1024   # Buffer size for RX
 CFLAGS += -DLORA_RST_PIN=14			   # RN2483 hardware reset pin
 
 
-CFLAGS += -DDEBUG_FREE_MEM=1           # Enable LUA free mem debug utility
+#
+# Lua configuration
+#
+CFLAGS += -DDEBUG_FREE_MEM=1           # Enable LUA free mem debug utility (only for debug purposes)
+CFLAGS += -DLUA_USE_LUA_LOCK=1		   # Enable if Lua must use real lua_lock / lua_unlock implementation
+
 
 #
 # Standard Lua modules to include
@@ -49,7 +54,6 @@ CFLAGS += -DLUA_USE_TABLE=1		       # table
 CFLAGS += -DLUA_USE_IO=1		       # io
 CFLAGS += -DLUA_USE_STRING=1		   # string
 CFLAGS += -DLUA_USE_COROUTINE=1		   # coroutine
-
 
 #
 # LuaOS Lua modules to include

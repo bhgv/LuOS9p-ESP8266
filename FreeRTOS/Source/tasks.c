@@ -67,11 +67,6 @@
     1 tab == 4 spaces!
 */
 
-/*
- * WHITECAT
- */ 
-//#include <lua.h>
-
 /* Standard includes. */
 #include <stdlib.h>
 #include <string.h>
@@ -213,7 +208,7 @@ typedef struct tskTaskControlBlock
         /*
          * Lua state of current thread
          */
-        // lua_State *L;
+         lua_State *L;
         
         /*
          * Received signal
@@ -2969,7 +2964,8 @@ UBaseType_t x;
          * WHITECAT
          */
         pxTCB->signaled = 0;
-	pxTCB->threadid = 0;
+		pxTCB->threadid = 0;
+		pxTCB->L = NULL;
 }
 /*-----------------------------------------------------------*/
 

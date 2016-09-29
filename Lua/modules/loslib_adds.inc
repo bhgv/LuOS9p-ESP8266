@@ -6,8 +6,6 @@
 #include "lapi.h"
 #include "lauxlib.h"
 
-#undef ARG_MAX
-
 #include <sys/param.h>
 #include <sys/stat.h>
 

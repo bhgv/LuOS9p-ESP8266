@@ -32,19 +32,16 @@
 #include <sys/debug.h>
 #include <sys/syscalls/mount.h>
 
-#undef ARG_MAX
-
 #include <sys/param.h>
-
-lua_State *gLuaState;
-
-pthread_mutex_t lua_mutex;
 
 static int dofile (lua_State *L, const char *name);
 
 extern int threadInited;
 extern int lua_shell_on;
 extern int lua_running;
+
+#if LUA_USE_LUA_LOCK
+pthread_mutex_t lua_mutex;
 
 inline void LuaLockInit(lua_State *L) {
     pthread_mutexattr_t attr;
@@ -62,6 +59,11 @@ inline void LuaLock(lua_State *L) {
 inline void LuaUnlock(lua_State *L) {
     pthread_mutex_unlock(&lua_mutex);
 }
+#else
+#define LuaLockInit(L)
+#define LuaLock(L)
+#define LuaUnlock(L)
+#endif
 
 static void get_prompt (lua_State *L, int firstline, char *path) {   
   lua_getglobal(L, firstline ? "_PROMPT" : "_PROMPT2");
@@ -234,8 +236,7 @@ int luaos_main (void) {
   }
 
   //WHITECAT BEGIN
-  //uxSetLuaState(L);
-  gLuaState = L;
+  uxSetLuaState(L);
   //WHITECAT END
 
   lua_pushcfunction(L, &luaos_pmain);  /* to call 'pmain' in protected mode */
@@ -244,10 +245,6 @@ int luaos_main (void) {
   result = lua_toboolean(L, -1);  /* get result */
   report(L, status);
 
-  //WHITECAT BEGIN
-  gLuaState = NULL;
-  //WHITECAT END
-  
   lua_close(L);
 
   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
