@@ -36,7 +36,9 @@
 #include <stdlib.h>
 
 #include <sys/queue.h>
-//#include <Lua/modules/thread.h>
+
+#include "thread.h"
+#include "lauxlib.h"
  
 extern void uxSetThreadId(UBaseType_t id);
 extern void uxIncSignaled(TaskHandle_t h, int s);
@@ -384,14 +386,14 @@ void pthreadTask(void *taskArgs) {
     // Call start function
     int *status = args->pthread_function(args->args);
     if (status) {
-        //if (*status != LUA_OK) {
-        //    struct lthread *thread;
-        //    thread = (struct lthread *)args->args;
+        if (*status != LUA_OK) {
+            struct lthread *thread;
+            thread = (struct lthread *)args->args;
 
-        //    const char *msg = lua_tostring(thread->L, -1);
-        //    lua_writestringerror("%s\n", msg);
-        //    lua_pop(thread->L, 1);  
-        //}
+            const char *msg = lua_tostring(thread->L, -1);
+            lua_writestringerror("%s\n", msg);
+            lua_pop(thread->L, 1);  
+        }
         
         free(status);
     }
