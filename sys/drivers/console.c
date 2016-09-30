@@ -48,9 +48,7 @@ void _console_init() {
     uart_init(CONSOLE_UART, CONSOLE_BR, 0, CONSOLE_BUFFER_LEN);
     uart_init_interrupts(CONSOLE_UART);
 	
-	//if (CONSOLE_SWAP_UART) {
-		uart_init(CONSOLE_SWAP_UART, CONSOLE_BR, 0, CONSOLE_BUFFER_LEN);		
-		//}
+	uart_init(CONSOLE_SWAP_UART, CONSOLE_BR, 0, CONSOLE_BUFFER_LEN);		
 	
 	uart0_default();	
 }

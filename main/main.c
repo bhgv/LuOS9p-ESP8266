@@ -62,6 +62,7 @@
 #include "pthread.h"
 #include <stdlib.h>
 #include <sys/delay.h>
+#include <sys/debug.h>
 
 extern const char *__progname;
 
@@ -95,12 +96,16 @@ void user_init(void) {
     pthread_t thread;
     int res;
 
-    pthread_attr_init(&attr);
+	debug_free_mem_begin(lua_main_thread);
+    
+	pthread_attr_init(&attr);
     pthread_attr_setstacksize(&attr, luaTaskStack);
 
     res = pthread_create(&thread, &attr, lua_start, NULL);
     if (res) {
 		panic("Cannot start lua");
 	}
+	
+	debug_free_mem_end(lua_main_thread, NULL);
 }
 

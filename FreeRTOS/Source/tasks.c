@@ -71,6 +71,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <reent.h>
+
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
 task.h is included from an application file. */
@@ -195,10 +197,7 @@ typedef struct tskTaskControlBlock
         /*
          * WHITECAT
          * 
-         * errno is declared in TCB, so it must be thread-safe according to
-         * POSIC specs.
          */
-        //int errno;
         
         /*
          * thread id

@@ -28,7 +28,7 @@ int read(int fd, void *buf, size_t nbyte) {
     auio.uio_rw = UIO_READ;
 
     cnt = nbyte;
-    error = (*fp->f_ops->fo_read)(fp, &auio, fp->f_cred);
+    error = (*fp->f_ops->fo_read)(fp, &auio, NULL);
     if (error && auio.uio_resid != cnt &&
         (error == ERESTART || error == EINTR || error == EWOULDBLOCK))
         error = 0;
@@ -68,7 +68,7 @@ int write(int fd, const void *buf, size_t nbyte) {
     auio.uio_rw = UIO_WRITE;
 
     cnt = nbyte;
-    error = (*fp->f_ops->fo_write)(fp, &auio, fp->f_cred);
+    error = (*fp->f_ops->fo_write)(fp, &auio, NULL);
     if (error) {
         if (auio.uio_resid != cnt && (error == ERESTART ||
             error == EINTR || error == EWOULDBLOCK))
@@ -154,7 +154,7 @@ ssize_t writev(int fd, struct iovec *iovp, int iovcnt) {
     }
 #endif
     cnt = auio.uio_resid;
-    error = (*fp->f_ops->fo_write)(fp, &auio, fp->f_cred);
+    error = (*fp->f_ops->fo_write)(fp, &auio, NULL);
     if (error) {
         if (auio.uio_resid != cnt && (error == ERESTART ||
             error == EINTR || error == EWOULDBLOCK))

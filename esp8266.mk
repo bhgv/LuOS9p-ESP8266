@@ -1,8 +1,12 @@
 CFLAGS += -DRBOOT_GPIO_ENABLED=0
 
+#
+# LuaOS configuration
+# 
 CFLAGS += -DCPU_HZ=80000000L                 # CPU frequency in hertz
 CFLAGS += -DCORE_TIMER_HZ=CPU_HZ             # CPU core timer frequency
 CFLAGS += -D_CLOCKS_PER_SEC_=100             # Number of interrupt ticks for reach 1 second
+CFLAGS += -DUSE_NETWORKING=0                 # Networking is used (1 = yes, 0 = not)
 
 CFLAGS += -DluaTaskStack=1024*2	             # Stck size assigned to lua thread
 CFLAGS += -DtskDEF_PRIORITY=0				 # Default task priority
@@ -26,7 +30,7 @@ CFLAGS += -DUSE_CONSOLE=1		       # Enable console
 CFLAGS += -DCONSOLE_BR=115200	       # Console baud rate
 CFLAGS += -DCONSOLE_UART=1		       # Console UART unit
 CFLAGS += -DCONSOLE_SWAP_UART=2	       # Console alternative UART unit (0 = don't use alternative UART)
-CFLAGS += -DCONSOLE_BUFFER_LEN=1024    # Console buffer length in bytes
+CFLAGS += -DCONSOLE_BUFFER_LEN=256     # Console buffer length in bytes
 
 #
 # LoraWAN driver connfiguration for RN2483
@@ -36,13 +40,15 @@ CFLAGS += -DLORA_UART_BR=57600         # RN2483 UART speed
 CFLAGS += -DLORA_UART_BUFF_SIZE=1024   # Buffer size for RX
 CFLAGS += -DLORA_RST_PIN=14			   # RN2483 hardware reset pin
 
-
 #
 # Lua configuration
 #
 CFLAGS += -DDEBUG_FREE_MEM=1           # Enable LUA free mem debug utility (only for debug purposes)
 CFLAGS += -DLUA_USE_LUA_LOCK=0		   # Enable if Lua must use real lua_lock / lua_unlock implementation
 CFLAGS += -DLUA_USE_SAFE_SIGNAL=1      # Enable use of LuaOS safe signal
+CFLAGS += -DSTRCACHE_N=1
+CFLAGS += -DSTRCACHE_M=1
+CFLAGS += -DMINSTRTABSIZE=32
 
 #
 # Standard Lua modules to include

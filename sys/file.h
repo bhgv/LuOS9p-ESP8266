@@ -61,7 +61,7 @@ struct file {
 #define DTYPE_SOCKET    2   /* communications endpoint */
     short   f_type;         /* descriptor type */
     short   f_count;        /* reference count */
-    short   f_msgcount;     /* references from message queue */
+    //short   f_msgcount;     /* references from message queue */
     struct  ucred *f_cred;  /* credentials associated with descriptor */
     struct  fileops {
         int (*fo_open) __P((struct file *fp, int flags));

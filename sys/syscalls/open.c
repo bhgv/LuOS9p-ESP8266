@@ -36,7 +36,7 @@
 
 extern struct filedesc *p_fd;
 extern const struct device devs[];
-extern int ndevs;
+extern const int ndevs;
 
 char *normalize_path(const char *path) {
     char *rpath;

@@ -34,6 +34,8 @@
 
 #include <sys/drivers/uart.h>
 
+#include <sys/debug.h>
+
 // WHITECAT BEGIN
 extern void mach_init();
 extern void mach_dev();
@@ -72,7 +74,11 @@ xTaskHandle sdk_xWatchDogTaskHandle;
 static void IRAM get_otp_mac_address(uint8_t *buf);
 static void IRAM set_spi0_divisor(uint32_t divisor);
 static void zero_bss(void);
+
+#if USE_NETWORKING
 static void init_networking(sdk_phy_info_t *phy_info, uint8_t *mac_addr);
+#endif
+
 static void init_g_ic(void);
 static void user_start_phase2(void);
 static void dump_flash_sector(uint32_t start_sector, uint32_t length);
@@ -154,7 +160,7 @@ void IRAM sdk_user_start(void) {
     uint32_t ic_flash_addr;
     uint32_t sysparam_addr;
     sysparam_status_t status;
-
+	
     SPI(0).USER0 |= SPI_USER0_CS_SETUP;
     sdk_SPIRead(0, buf32, 4);
 
@@ -241,9 +247,9 @@ void IRAM sdk_user_start(void) {
 void IRAM vApplicationStackOverflowHook(xTaskHandle task, char *task_name) {
     taskDISABLE_INTERRUPTS();
     
-	printf("\r\rtos: stack overflow, task '%s'\r\n", task_name);
+	printf("\r\nrtos: stack overflow, task '%s'\r\n", task_name);
 
-    for( ;; );
+    for(;;);
 }
 
 // .text+0x3d8
@@ -288,6 +294,7 @@ static void zero_bss(void) {
     }
 }
 
+#if USE_NETWORKING
 // .Lfunc006 -- .irom0.text+0x70
 static void init_networking(sdk_phy_info_t *phy_info, uint8_t *mac_addr) {
     if (sdk_register_chipv6_phy(phy_info)) {
@@ -310,6 +317,7 @@ static void init_networking(sdk_phy_info_t *phy_info, uint8_t *mac_addr) {
     sdk_cnx_attach(&sdk_g_ic);
     sdk_wDevEnableRx();
 }
+#endif
 
 // .Lfunc007 -- .irom0.text+0x148
 static void init_g_ic(void) {
@@ -373,14 +381,17 @@ void sdk_user_init_task(void *params) {
     //printf("pp ver: %d.%d\n\n", (pp_ver >> 8) & 0xff, pp_ver & 0xff);
 	
 	// WHITECAT BEGIN
+	debug_free_mem_begin(rtos_sdk_phase3);
 	mach_init();
 	mach_dev();
+	debug_free_mem_end(rtos_sdk_phase3, NULL);
+
 	// WHITECAT END
 	
 	user_init();
     sdk_user_init_flag = 1;
 	
-	/*
+#if USE_NETWORKING
     sdk_wifi_mode_set(sdk_g_ic.s.wifi_mode);
     if (sdk_g_ic.s.wifi_mode == 1) {
         sdk_wifi_station_start();
@@ -398,7 +409,8 @@ void sdk_user_init_task(void *params) {
     if (sdk_wifi_station_get_auto_connect()) {
         sdk_wifi_station_connect();
     }
-	*/
+#endif
+	
     vTaskDelete(NULL);
 }
 
@@ -410,6 +422,8 @@ static __attribute__((noinline)) void user_start_phase2(void) {
     uint8_t *buf;
     sdk_phy_info_t phy_info, default_phy_info;
 
+	debug_free_mem_begin(rtos_sdk_phase2);
+	
     sdk_system_rtc_mem_read(0, &sdk_rst_if, sizeof(sdk_rst_if));
     if (sdk_rst_if.reason > 3) {
         // Bad reason. Probably garbage.
@@ -443,8 +457,15 @@ static __attribute__((noinline)) void user_start_phase2(void) {
     uart_flush_txfifo(0);
     uart_flush_txfifo(1);
 
+#if USE_NETWORKING
     init_networking(&phy_info, sdk_info.sta_mac_addr);
-
+#else
+    if (sdk_register_chipv6_phy(&phy_info)) {
+        printf("FATAL: sdk_register_chipv6_phy failed");
+        abort();
+    }	
+#endif
+	
     srand(hwrand()); /* seed libc rng */
 
     // Set intial CPU clock speed to 160MHz if necessary
@@ -457,9 +478,13 @@ static __attribute__((noinline)) void user_start_phase2(void) {
         (*ctor)();
     }
 
+#if USE_NETWORKING
     tcpip_init(NULL, NULL);
     sdk_wdt_init();
-	
+#endif
+		
+	debug_free_mem_end(rtos_sdk_phase2, NULL);
+
     xTaskCreate(sdk_user_init_task, "uiT", 1024, 0, 14, &sdk_xUserTaskHandle);
     vTaskStartScheduler();
 }

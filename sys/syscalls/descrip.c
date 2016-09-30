@@ -50,11 +50,6 @@
 int _syscalls_inited = 0;
 
 /*
- * Credentials
- */
-struct ucred *p_cred;
-
-/*
  * File descriptor structure
  */
 struct  filedesc *p_fd; 
@@ -97,19 +92,13 @@ const struct device devs[] = {
 #endif
 };
 
-int ndevs = sizeof(devs) / sizeof(struct device);
+const int ndevs = sizeof(devs) / sizeof(struct device);
 
 // Do some initializations for sys calls
 //   * initialization of file descriptor structure
 //   * creation of file drscriptor mutex
 void _syscalls_init() {
     nfiles = 0;
-    
-    // Allocate space for credentials
-    p_cred = (struct ucred *)calloc(1, sizeof(struct ucred));
-    if (!p_cred) {
-        panic("Cannot allocate space for credentials");
-    }
     
     // Allocate space for file descriptor structure
     p_fd = (struct filedesc *)calloc(1, sizeof(struct filedesc));
@@ -247,8 +236,8 @@ falloc(resultfp, resultfd)
     mtx_unlock(&fd_mtx);
     
     fp->f_count = 1;
-    fp->f_cred = p_cred;
-    crhold(fp->f_cred);
+    //fp->f_cred = p_cred;
+    //crhold(fp->f_cred);
     
     if (resultfp)
         *resultfp = fp;
@@ -269,7 +258,7 @@ ffree(fp)
     LIST_REMOVE(fp, f_list);
     mtx_unlock(&fd_mtx);
     
-    crfree(fp->f_cred);
+    //crfree(fp->f_cred);
 #ifdef DIAGNOSTIC
     fp->f_count = 0;
 #endif
