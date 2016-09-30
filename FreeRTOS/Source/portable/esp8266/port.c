@@ -206,7 +206,6 @@ portBASE_TYPE xPortStartScheduler( void )
     return pdTRUE;
 }
 
-#if (!USE_CUSTOM_HEAP)
 /* Determine free heap size via libc sbrk function & mallinfo
 
    sbrk gives total size in totally unallocated memory,
@@ -226,7 +225,6 @@ size_t xPortGetFreeHeapSize( void )
         SP(sp);
     return sp - brk_val + mi.fordblks;
 }
-#endif
 
 void vPortEndScheduler( void )
 {
@@ -260,3 +258,33 @@ void IRAM vPortExitCritical( void )
 	portENABLE_INTERRUPTS();
 }
 
+// WHITECAT BEGIN
+void _pthread_process_signal(void);
+
+void vPortProcessSignal(StackType_t *pxTopOfStack) {
+	_pthread_process_signal();
+
+	// Restore previous program counter
+	*(pxTopOfStack + (XT_STK_PC >> 2)) = *(pxTopOfStack + (XT_STK_PREVIOUS_PC >> 2));
+
+	// Restore previous A2
+	*(pxTopOfStack + (XT_STK_A2 >> 2)) = *(pxTopOfStack + (XT_STK_PREVIOUS_A2 >> 2));
+}
+
+void vPortUpdateTCBForProcessSignals(StackType_t *pxTopOfStack) {	
+	// Update TCB for call vPortProcessSignal
+	// When task will switched in vPortProcessSignal will be executed
+
+	// Save previous program counter
+	*(pxTopOfStack + (XT_STK_PREVIOUS_PC >> 2)) = *(pxTopOfStack + (XT_STK_PC >> 2));
+
+	// Save previous A2
+	*(pxTopOfStack + (XT_STK_PREVIOUS_A2 >> 2)) = *(pxTopOfStack + (XT_STK_A2 >> 2));
+
+	// Update program counter to vPortProcessSignal
+	*(pxTopOfStack + (XT_STK_PC >> 2)) = (StackType_t)vPortProcessSignal;
+
+	// Update A2 for pass vPortProcessSignal arguments
+	*(pxTopOfStack + (XT_STK_A2 >> 2)) = (StackType_t)pxTopOfStack;
+}
+// WHITECAT END

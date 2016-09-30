@@ -2035,8 +2035,13 @@ void *pvTaskIncrementMutexHeldCount( void ) PRIVILEGED_FUNCTION;
 // WHITECAT BEGIN
 #include <lua.h>
 
+UBaseType_t uxGetTaskId();
+UBaseType_t uxGetThreadId();
+void uxSetThreadId(UBaseType_t id);
 void uxSetLuaState(lua_State* L);
 lua_State* pvGetLuaState();
+void uxIncSignaled(TaskHandle_t h, int s);
+TaskHandle_t xGetCurrentTask();
 // WHITECAT END
 
 #endif /* INC_TASK_H */

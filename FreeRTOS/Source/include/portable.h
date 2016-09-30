@@ -203,5 +203,9 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
 }
 #endif
 
+// WHITECAT BEGIN
+void vPortUpdateTCBForProcessSignals(StackType_t *pxTopOfStack);
+// WHITECAT END
+
 #endif /* PORTABLE_H */
 

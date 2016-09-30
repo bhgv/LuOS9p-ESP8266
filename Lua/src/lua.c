@@ -101,15 +101,16 @@ static lua_State *globalL = NULL;
 static const char *progname = LUA_PROGNAME;
 
 
+#if !LUA_USE_SAFE_SIGNAL
 /*
 ** Hook set by signal function to stop the interpreter.
 */
 static void lstop (lua_State *L, lua_Debug *ar) {
-  (void)ar;  /* unused arg. */
-
-  lua_sethook(L, NULL, 0, 0);  /* reset hook */
-  luaL_error(L, "interrupted!");
+    (void)ar;  /* unused arg. */
+    lua_sethook(L, NULL, 0, 0);  /* reset hook */
+    luaL_error(L, "interrupted!");
 }
+#endif
 
 //lua_State*  pvGetLuaState();
 
@@ -120,11 +121,13 @@ static void lstop (lua_State *L, lua_Debug *ar) {
 ** interpreter.
 */
 static void laction (int i) {
-    // WHITECAT BEGIN
     signal(i, SIG_DFL); /* if another SIGINT happens, terminate process */
-    lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
-    //luaL_error(pvGetLuaState(), "interrupted!");
-    // WHITECAT END
+
+#if !LUA_USE_SAFE_SIGNAL
+	lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+#else
+    luaL_error(pvGetLuaState(), "interrupted!");
+#endif
 }
 
 

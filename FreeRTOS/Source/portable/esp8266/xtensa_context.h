@@ -82,9 +82,13 @@ space to help manage the spilling of the register windows.
 #define XT_STK_LBEG             0x50
 #define XT_STK_LEND             0x54
 #define XT_STK_LCOUNT           0x58
-#define XT_STK_NEXT1            0x5C    /* next unused offset */
+#define XT_STK_PREVIOUS_PC      0x5C
+#define XT_STK_PREVIOUS_A2      0x60
+#define XT_STK_NEXT1            0x64    /* next unused offset */
 #else
-#define XT_STK_NEXT1            0x50    /* next unused offset */
+#define XT_STK_PREVIOUS_PC      0x50
+#define XT_STK_PREVIOUS_A2      0x54
+#define XT_STK_NEXT1            0x58    /* next unused offset */
 #endif
                                 /* there may be some unused space here */
 #if XCHAL_EXTRA_SA_SIZE != 0

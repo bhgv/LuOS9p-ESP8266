@@ -58,6 +58,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <signal.h>
+#include <pthread.h>
 
 #include <sys/drivers/uart.h>
 #include <sys/drivers/gpio.h>
@@ -66,10 +67,17 @@
 #include <sys/syslog.h>
 
 extern int lua_running;
+extern QueueHandle_t signal_q;
 
 // Flags for determine some UART states
 #define UART_FLAG_INIT		(1 << 1)
 #define UART_FLAG_IRQ_INIT	(1 << 2)
+
+// Mask for determine if UART output is the default, or
+// the alternate (when swap is made)
+#define UART_OUTPUT_NONE 		 0
+#define UART_OUTPUT_DEFAULT 	(1 << 0)
+#define UART_OUTPUT_ALTERNATE 	(1 << 1)
 
 // Names for the uarts
 static const char *names[] = {
@@ -179,23 +187,27 @@ void uart_pin_config(u8_t unit, u8_t *rx, u8_t *tx) {
 }
 
 void uart0_swap() {
+	if (output_enabled == UART_OUTPUT_ALTERNATE) return;
+
 	uart_pin_config(2, NULL, NULL);
 	uart_update_params(0, 57600, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
     IOSWAP |= (1 << IOSWAPU0);
 	
 	console_swap();	
 	
-	output_enabled = (1 << 1); // Output on UART2
+	output_enabled = UART_OUTPUT_ALTERNATE;
 }
 
 void uart0_default() {
+	if (output_enabled == UART_OUTPUT_DEFAULT) return;
+	
 	uart_pin_config(0, NULL, NULL);
 	uart_update_params(0, 115200, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
     IOSWAP &= ~(1 << IOSWAPU0);
 
 	console_default();
 	
-	output_enabled = (1 << 0); // Output on UART1
+	output_enabled = UART_OUTPUT_DEFAULT;
 }
 
 void UART_IntrConfig(UART_Port uart_no,  UART_IntrConfTypeDef *pUARTIntrConf) {
@@ -218,9 +230,7 @@ void UART_IntrConfig(UART_Port uart_no,  UART_IntrConfTypeDef *pUARTIntrConf) {
     SET_PERI_REG_MASK(UART_INT_ENA(uart_no), pUARTIntrConf->UART_IntrEnMask);
 }
 
-static int queue_byte(u8_t unit, u8_t byte) {
-	int signal;
-	
+static int queue_byte(u8_t unit, u8_t byte, int *signal) {
     if (unit == CONSOLE_UART - 1) {
         if (byte == 0x04) {
             if (!lua_running) {
@@ -231,11 +241,10 @@ static int queue_byte(u8_t unit, u8_t byte) {
             
             return 0;
         } else if (byte == 0x03) {
-            signal = SIGINT;
-            //if (_pthread_has_signal(signal)) {
-            //    xQueueSendFromISR(signal_q, &signal, &xHigherPriorityTaskWoken);    
-            //    return 0;
-            //}
+            *signal = SIGINT;
+            if (_pthread_has_signal(*signal)) {
+            	return 0;
+            }
 			
 			return 1;
         }
@@ -249,6 +258,7 @@ static void uart_rx_intr_handler(void) {
     xHigherPriorityTaskWoken = pdFALSE;
 	u8_t byte;
 	int uart_no = 0;
+	int signal = 0;
 		
 	u32_t uart_intr_status = READ_PERI_REG(UART_INT_ST(uart_no)) ;
 
@@ -259,9 +269,11 @@ static void uart_rx_intr_handler(void) {
         } else if (UART_RXFIFO_FULL_INT_ST == (uart_intr_status & UART_RXFIFO_FULL_INT_ST)) {
             while ((READ_PERI_REG(UART_STATUS(uart_no)) >> UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT) {
 				byte = READ_PERI_REG(UART_FIFO(uart_no)) & 0xFF;
-				if (queue_byte(uart_no, byte)) {
+				if (queue_byte(uart_no, byte, &signal)) {
 		            // Put byte to UART queue
-		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		              					
+		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		              			
+				} else {
+					xQueueSendFromISR(signal_q, &signal, &xHigherPriorityTaskWoken);    
 				}
             }
 
@@ -269,9 +281,11 @@ static void uart_rx_intr_handler(void) {
         } else if (UART_RXFIFO_TOUT_INT_ST == (uart_intr_status & UART_RXFIFO_TOUT_INT_ST)) {
             while ((READ_PERI_REG(UART_STATUS(uart_no)) >> UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT) {
 				byte = READ_PERI_REG(UART_FIFO(uart_no)) & 0xFF;
-
-				if (queue_byte(uart_no, byte)) {
-		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		                        					
+				if (queue_byte(uart_no, byte, &signal)) {
+		            // Put byte to UART queue
+		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		              			
+				} else {
+					xQueueSendFromISR(signal_q, &signal, &xHigherPriorityTaskWoken);    
 				}
             }
 

@@ -61,6 +61,8 @@ void IRAM __attribute__((noreturn)) fatal_exception_handler(uint32_t *sp, bool r
 void IRAM abort(void) {
     uint32_t *sp, *caller;
     RETADDR(caller);
+    
+    printf("aborted!!!!\r\n");
     /* abort() caller is one instruction before our return address */
     caller = (uint32_t *)((intptr_t)caller - 3);
     SP(sp);

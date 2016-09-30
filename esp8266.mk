@@ -41,8 +41,8 @@ CFLAGS += -DLORA_RST_PIN=14			   # RN2483 hardware reset pin
 # Lua configuration
 #
 CFLAGS += -DDEBUG_FREE_MEM=1           # Enable LUA free mem debug utility (only for debug purposes)
-CFLAGS += -DLUA_USE_LUA_LOCK=1		   # Enable if Lua must use real lua_lock / lua_unlock implementation
-
+CFLAGS += -DLUA_USE_LUA_LOCK=0		   # Enable if Lua must use real lua_lock / lua_unlock implementation
+CFLAGS += -DLUA_USE_SAFE_SIGNAL=1      # Enable use of LuaOS safe signal
 
 #
 # Standard Lua modules to include
@@ -54,6 +54,7 @@ CFLAGS += -DLUA_USE_TABLE=1		       # table
 CFLAGS += -DLUA_USE_IO=1		       # io
 CFLAGS += -DLUA_USE_STRING=1		   # string
 CFLAGS += -DLUA_USE_COROUTINE=1		   # coroutine
+CFLAGS += -DLUA_USE_DEBUG=1			   # debug
 
 #
 # LuaOS Lua modules to include

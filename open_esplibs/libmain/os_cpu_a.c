@@ -22,9 +22,9 @@ void xPortSysTickHandle(void);
 
 void IRAM vPortYield(void) {
     asm("   wsr    a0, excsave1            \n\
-            addi   sp, sp, -80             \n\
+            addi   sp, sp, -96             \n\
             s32i   a0, sp, 4               \n\
-            addi   a0, sp, 80              \n\
+            addi   a0, sp, 96              \n\
             s32i   a0, sp, 16              \n\
             rsr    a0, ps                  \n\
             s32i   a0, sp, 8               \n\
@@ -60,7 +60,7 @@ void IRAM sdk__xt_int_exit(void) {
             l32i   sp, sp, 0               \n\
             movi   a14, pxCurrentTCB       \n\
             l32i   a14, a14, 0             \n\
-            addi   a15, sp, 80             \n\
+            addi   a15, sp, 96             \n\
             s32i   a15, a14, 0             \n\
             call0  sdk__xt_context_restore \n\
             l32i   a14, sp, 68             \n\

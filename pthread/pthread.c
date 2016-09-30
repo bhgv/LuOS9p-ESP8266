@@ -275,7 +275,7 @@ void _pthread_queue_signal(int s) {
     }    
 }
 
-void _pthread_process_signal() {
+void _pthread_process_signal(void) {
     struct pthread *thread; // Current thread
     int s;
     
@@ -285,7 +285,7 @@ void _pthread_process_signal() {
         if ((thread->signals[s] != SIG_DFL) && (thread->signals[s] != SIG_IGN)) {
             thread->signals[s](s);
         }
-    }
+    }    
 }
 
 int _pthread_has_signal(int s) {

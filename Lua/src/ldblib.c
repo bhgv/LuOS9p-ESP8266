@@ -428,29 +428,36 @@ static int db_traceback (lua_State *L) {
 }
 
 
-static const luaL_Reg dblib[] = {
-  {"debug", db_debug},
-  {"getuservalue", db_getuservalue},
-  {"gethook", db_gethook},
-  {"getinfo", db_getinfo},
-  {"getlocal", db_getlocal},
-  {"getregistry", db_getregistry},
-  {"getmetatable", db_getmetatable},
-  {"getupvalue", db_getupvalue},
-  {"upvaluejoin", db_upvaluejoin},
-  {"upvalueid", db_upvalueid},
-  {"setuservalue", db_setuservalue},
-  {"sethook", db_sethook},
-  {"setlocal", db_setlocal},
-  {"setmetatable", db_setmetatable},
-  {"setupvalue", db_setupvalue},
-  {"traceback", db_traceback},
-  {NULL, NULL}
+#include "modules.h"
+
+static const LUA_REG_TYPE dblib[] = {
+  { LSTRKEY( "debug" 		),			LFUNCVAL( db_debug 		  ) },
+  { LSTRKEY( "getuservalue" ),			LFUNCVAL( db_getuservalue ) },
+  { LSTRKEY( "gethook" 		),			LFUNCVAL( db_gethook 	  ) },
+  { LSTRKEY( "getinfo" 		),			LFUNCVAL( db_getinfo 	  ) },
+  { LSTRKEY( "getlocal" 	),			LFUNCVAL( db_getlocal 	  ) },
+  { LSTRKEY( "getregistry"  ),			LFUNCVAL( db_getregistry  ) },
+  { LSTRKEY( "getmetatable" ),			LFUNCVAL( db_getmetatable ) },
+  { LSTRKEY( "getupvalue" 	),			LFUNCVAL( db_getupvalue   ) },
+  { LSTRKEY( "upvaluejoin" 	),			LFUNCVAL( db_upvaluejoin  ) },
+  { LSTRKEY( "upvalueid" 	),			LFUNCVAL( db_upvalueid    ) },
+  { LSTRKEY( "setuservalue" ),			LFUNCVAL( db_setuservalue ) },
+  { LSTRKEY( "sethook" 		),			LFUNCVAL( db_sethook 	  ) },
+  { LSTRKEY( "setlocal" 	),			LFUNCVAL( db_setlocal 	  ) },
+  { LSTRKEY( "setmetatable" ),			LFUNCVAL( db_setmetatable ) },
+  { LSTRKEY( "setupvalue" 	),			LFUNCVAL( db_setupvalue   ) },
+  { LSTRKEY( "traceback" 	),			LFUNCVAL( db_traceback 	  ) },
+  { LNILKEY, LNILVAL }
 };
 
 
 LUAMOD_API int luaopen_debug (lua_State *L) {
+#if !LUA_USE_ROTABLE
   luaL_newlib(L, dblib);
   return 1;
+#else
+  return 0;
+#endif
 }
 
+LUA_OS_MODULE(DEBUG, debug, dblib);

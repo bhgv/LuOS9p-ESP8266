@@ -2221,6 +2221,7 @@ BaseType_t xSwitchRequired = pdFALSE;
 
 #endif /* configUSE_APPLICATION_TASK_TAG */
 /*-----------------------------------------------------------*/
+void _pthread_process_signal();
 
 void vTaskSwitchContext( void )
 {
@@ -2268,6 +2269,15 @@ void vTaskSwitchContext( void )
 		/* Select a new task to run using either the generic C or port
 		optimised asm code. */
 		taskSELECT_HIGHEST_PRIORITY_TASK();
+		
+		/* Update TCB for process signals */
+		if ((pxCurrentTCB != xIdleTaskHandle) && (pxCurrentTCB->signaled > 0) && (pxCurrentTCB->threadid > 0)) {
+			// Decrement signaled count
+			pxCurrentTCB->signaled--;
+						
+			vPortUpdateTCBForProcessSignals((StackType_t *)(pxCurrentTCB->pxTopOfStack));	
+		}
+
 		traceTASK_SWITCHED_IN();
 
 		#if ( configUSE_NEWLIB_REENTRANT == 1 )

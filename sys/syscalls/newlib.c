@@ -183,8 +183,3 @@ int _read_r(struct _reent *r, int fd, void *buf, size_t nbyte) {
 	
 	return nbyte;
 }
-
-
-void (*signal(int sig, void (*func)(int)))(int) {
-return NULL;
-}
