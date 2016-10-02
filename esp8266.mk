@@ -7,6 +7,7 @@ CFLAGS += -DCPU_HZ=80000000L                 # CPU frequency in hertz
 CFLAGS += -DCORE_TIMER_HZ=CPU_HZ             # CPU core timer frequency
 CFLAGS += -D_CLOCKS_PER_SEC_=100             # Number of interrupt ticks for reach 1 second
 CFLAGS += -DUSE_NETWORKING=0                 # Networking is used (1 = yes, 0 = not)
+CFLAGS += -DMTX_USE_EVENTS=0                 # Use event groups in mtx implementation (experimental)
 
 CFLAGS += -DluaTaskStack=1024*2	             # Stck size assigned to lua thread
 CFLAGS += -DtskDEF_PRIORITY=0				 # Default task priority
@@ -45,7 +46,7 @@ CFLAGS += -DLORA_RST_PIN=14			   # RN2483 hardware reset pin
 #
 CFLAGS += -DDEBUG_FREE_MEM=1           # Enable LUA free mem debug utility (only for debug purposes)
 CFLAGS += -DLUA_USE_LUA_LOCK=0		   # Enable if Lua must use real lua_lock / lua_unlock implementation
-CFLAGS += -DLUA_USE_SAFE_SIGNAL=1      # Enable use of LuaOS safe signal
+CFLAGS += -DLUA_USE_SAFE_SIGNAL=0      # Enable use of LuaOS safe signal (experimental)
 CFLAGS += -DSTRCACHE_N=1
 CFLAGS += -DSTRCACHE_M=1
 CFLAGS += -DMINSTRTABSIZE=32

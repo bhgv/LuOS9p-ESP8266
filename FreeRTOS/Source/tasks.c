@@ -210,9 +210,10 @@ typedef struct tskTaskControlBlock
          lua_State *L;
         
         /*
-         * Received signal
+         * Received signal for this task. If signaled bit "n" is set signal "n"
+         * is received
          */
-        int signaled;
+        uint32_t signaled;
 } tskTCB;
 
 /* The old tskTCB name is maintained above then typedefed to the new TCB_t name
@@ -2271,9 +2272,6 @@ void vTaskSwitchContext( void )
 		
 		/* Update TCB for process signals */
 		if ((pxCurrentTCB != xIdleTaskHandle) && (pxCurrentTCB->signaled > 0) && (pxCurrentTCB->threadid > 0)) {
-			// Decrement signaled count
-			pxCurrentTCB->signaled--;
-						
 			vPortUpdateTCBForProcessSignals((StackType_t *)(pxCurrentTCB->pxTopOfStack));	
 		}
 

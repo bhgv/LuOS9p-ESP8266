@@ -39,10 +39,8 @@
 
 #include "thread.h"
 #include "lauxlib.h"
+#include "task.h"
  
-extern void uxSetThreadId(UBaseType_t id);
-extern void uxIncSignaled(TaskHandle_t h, int s);
-
 struct list key_list;
 struct list mutex_list;
 struct list thread_list;
@@ -99,11 +97,9 @@ int _pthread_create(pthread_t *id, int stacksize, int initial_state,
         return EAGAIN;
     }
     
-    for(i=0; i < NSIG; i++) {
+    for(i=0; i < PTHREAD_NSIG; i++) {
         thread->signals[i] = SIG_DFL;
     }
-    
-    thread->signal_q = xQueueCreate(4, sizeof(int));
     
     current_thread = pthread_self();
     if (current_thread > 0) {
@@ -116,7 +112,7 @@ int _pthread_create(pthread_t *id, int stacksize, int initial_state,
         }
         
         // Copy signals to new thread
-        bcopy(parent_thread->signals, thread->signals, sizeof(sig_t) * NSIG);
+        bcopy(parent_thread->signals, thread->signals, sizeof(sig_t) * PTHREAD_NSIG);
     }
     
     list_init(&thread->join_list, 1);
@@ -160,6 +156,7 @@ int _pthread_create(pthread_t *id, int stacksize, int initial_state,
     }
     
     mtx_lock(&thread->init_mtx);
+    mtx_destroy(&thread->init_mtx);
     
     thread->task = xCreatedTask;
 
@@ -229,8 +226,6 @@ int _pthread_free(pthread_t id) {
     // Free clean list
     list_destroy(&thread->clean_list, 1);
     
-    vQueueDelete(thread->signal_q);
-
     mtx_destroy(&thread->init_mtx);    
     
     // Remove thread
@@ -243,7 +238,7 @@ sig_t _pthread_signal(int s, sig_t h) {
     struct pthread *thread; // Current thread
     sig_t prev_h;           // Previous handler
     
-    if (s > NSIG) {
+    if (s > PTHREAD_NSIG) {
         errno = EINVAL;
         return SIG_ERR;
     }
@@ -268,26 +263,28 @@ void _pthread_queue_signal(int s) {
         
         if (thread->thread == 1) {
             if ((thread->signals[s] != SIG_DFL) && (thread->signals[s] != SIG_IGN)) {
-                uxIncSignaled(thread->task, s);
-                xQueueSend(thread->signal_q, &s, 0);    
+            	uxSetSignaled(thread->task, s);
             }         
         }
         
         index = list_next(&thread_list, index);
-    }    
+    }
 }
 
 void _pthread_process_signal(void) {
     struct pthread *thread; // Current thread
-    int s;
+    uint32_t s;
     
     list_get(&thread_list, pthread_self(), (void **)&thread);
     
-    if (xQueueReceive(thread->signal_q, &s, 0) == pdTRUE) {
-        if ((thread->signals[s] != SIG_DFL) && (thread->signals[s] != SIG_IGN)) {
-            thread->signals[s](s);
-        }
-    }    
+    for(s=0;s < 32;s++) {
+    	if (uxGetSignaled(thread->task) & (1 << s)) {
+	        if ((thread->signals[s] != SIG_DFL) && (thread->signals[s] != SIG_IGN)) {
+    			thread->signals[s](s);
+	        }
+	        uxClearSignaled(thread->task, s);
+    	}
+    }
 }
 
 int _pthread_has_signal(int s) {

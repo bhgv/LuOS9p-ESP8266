@@ -30,19 +30,19 @@
 //static int _____errno; // Errno variable if scheluder is not started
 
 void enter_critical_section() {
-//    if (uxInterruptNesting > 0) {
-//        mips_di();
-//    } else {
-//        taskENTER_CRITICAL();            
-//    }        
+    if (portIN_ISR()) {
+        taskDISABLE_INTERRUPTS();
+    } else {
+        taskENTER_CRITICAL();            
+    }        
 }
 
 void exit_critical_section() {
-//    if (uxInterruptNesting > 0) {
-//        mips_ei();
-//    } else {
-//        taskEXIT_CRITICAL();            
-//    }        
+    if (portIN_ISR()) {
+        taskENABLE_INTERRUPTS();
+    } else {
+        taskEXIT_CRITICAL();            
+    }        
 }
 
 //void *GetErrnoRef (void) {
@@ -101,9 +101,25 @@ lua_State* pvGetLuaState() {
     return L;
 }
 
-void uxIncSignaled(TaskHandle_t h, int s) {
+uint32_t uxGetSignaled(TaskHandle_t h) {
+	uint32_t signaled;
+	
     enter_critical_section();
-    ((TCB_t *)h)->signaled++;
+    signaled = ((TCB_t *)h)->signaled;
+    exit_critical_section();
+
+	return signaled;
+}
+
+void uxSetSignaled(TaskHandle_t h, int s) {
+    enter_critical_section();
+    ((TCB_t *)h)->signaled |= (1 << s);
+    exit_critical_section();
+}
+
+void uxClearSignaled(TaskHandle_t h, int s) {
+    enter_critical_section();
+    ((TCB_t *)h)->signaled &= ~(1 << s);
     exit_critical_section();
 }
 

@@ -34,13 +34,23 @@
 #include <sys/mutex.h>
 
 extern struct mtx cond_mtx;
- 
+
+#if MTX_USE_EVENTS
+extern eventg_t eventg[MTX_EVENT_GROUPS];
+#endif
+
 int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr) {
     // Init conf, if not
     mtx_lock(&cond_mtx);
+#if !MTX_USE_EVENTS
     if (cond->mutex.sem == NULL) {
         mtx_init(&cond->mutex, NULL, NULL, 0);
     }
+#else
+    if (cond->mutex.mtxid < 0) {
+        mtx_init(&cond->mutex, NULL, NULL, 0);
+    }
+#endif
     
     mtx_unlock(&cond_mtx);  
     
@@ -50,9 +60,15 @@ int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr) {
 int pthread_cond_destroy(pthread_cond_t *cond) {
     // Destroy, if config
     mtx_lock(&cond_mtx);
+#if !MTX_USE_EVENTS
     if (cond->mutex.sem != NULL) {
         mtx_destroy(&cond->mutex);
     }
+#else
+    if (cond->mutex.mtxid >= 0) {
+        mtx_destroy(&cond->mutex);
+    }
+#endif
     
     mtx_unlock(&cond_mtx); 
 	
@@ -77,10 +93,19 @@ int pthread_cond_timedwait(pthread_cond_t *cond,
     pthread_cond_init(cond, NULL);
     
     // Wait for condition
-    if (xSemaphoreTake(cond->mutex.sem, portTICK_PERIOD_MS * 1000 * abstime->tv_sec) != pdTRUE) {
+
+#if !MTX_USE_EVENTS
+    if (xSemaphoreTake(cond->mutex.sem, (1000 * abstime->tv_sec) / portTICK_PERIOD_MS ) != pdTRUE) {
         errno = ETIMEDOUT;
         return ETIMEDOUT;
     }
+#else
+  	EventBits_t uxBits = xEventGroupWaitBits(MTX_EVENTG(cond->mutex.mtxid).eg, MTX_EVENTG_BIT(cond->mutex.mtxid), pdTRUE, pdTRUE, (1000 * abstime->tv_sec) / portTICK_PERIOD_MS );
+  	if (!(uxBits & MTX_EVENTG_BIT(cond->mutex.mtxid))) {
+        errno = ETIMEDOUT;
+        return ETIMEDOUT;
+  	}
+#endif
     
     mtx_lock(&cond->mutex);
     pthread_mutex_unlock(mutex);

@@ -493,7 +493,7 @@ UserExceptionHandler:
         .type   UserExceptionHandler, @function
         xsr     a0, excsave1    # a0 now contains sp
         mov     sp, a0
-        addi    sp, sp, -0x50
+        addi    sp, sp, -96
         s32i    a0, sp, 0x10
         rsr     a0, ps
         s32i    a0, sp, 0x08
@@ -523,7 +523,7 @@ UserExceptionHandler:
         .literal_position
 .LUserFailOtherExceptionCause:
         break   1, 1
-        addi    a2, a1, 0x50 /* UserExceptionHandler pushes stack down 0x50 */
+        addi    a2, a1, 96 /* UserExceptionHandler pushes stack down 0x50 */
         movi    a3, 1
         call0   fatal_exception_handler
 

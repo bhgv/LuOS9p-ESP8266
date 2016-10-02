@@ -42,10 +42,12 @@
 #include <sys/time.h>
 #include <signal.h>
 
+#define PTHREAD_NSIG 4
+
 #define PTHREAD_MTX_DEBUG 0
 
 #if PTHREAD_MTX_DEBUG
-#define PTHREAD_MTX_LOCK_TIMEOUT (portTICK_PERIOD_MS * 3000)
+#define PTHREAD_MTX_LOCK_TIMEOUT (3000 / portTICK_PERIOD_MS)
 #define PTHREAD_MTX_DEBUG_LOCK() printf("phread can't lock\n");
 #else
 #define PTHREAD_MTX_LOCK_TIMEOUT portMAX_DELAY
@@ -116,10 +118,9 @@ struct pthread {
     struct list join_list;
     struct list clean_list;
     struct mtx init_mtx;
-    sig_t signals[NSIG];
+    sig_t signals[PTHREAD_NSIG];
     pthread_t thread;
     xTaskHandle task;
-    QueueHandle_t signal_q;
 };
 
 struct pthread_attr {

@@ -31,11 +31,56 @@
 #define	MUTEX_H_H
 
 #include "FreeRTOS.h"
+
+#if !MTX_USE_EVENTS
 #include "semphr.h"
 
 struct mtx {
     SemaphoreHandle_t sem;
 };
+
+#else
+
+#define MTX_MAX 24
+#include "event_groups.h"
+
+// Get the mutex id, witch is calculated an event group identifier and
+// bit position within the event group
+//
+// bits 31 to 24 contains the event group identifier, and bits 23 to 0
+// contains the bit position within the event groupp
+#define MTX_ID(eventgid, bit) ((uint32_t)(eventgid << 24) | (uint32_t)((1 << bit) & 0x00ffffff))
+
+// Get the event group identifier from a mutex id
+#define MTX_EVENTG_ID(mtxid) ((mtxid >> 24) & 0x000000ff)
+
+// Get the event group bit from a mutex id
+#define MTX_EVENTG_BIT(mtxid) (mtxid &0x00ffffff)
+
+// Get the vent group from the mutext control structure that corresponds to
+// the mutex id
+#define MTX_EVENTG(mtxid) eventg[MTX_EVENTG_ID(mtxid)]
+
+// Get the number of bits available in each event group
+#if configUSE_16_BIT_TICKS
+#define BITS_PER_EVENT_GROUP 8
+#else
+#define BITS_PER_EVENT_GROUP 24
+#endif
+
+// Get the number of event groups needed for manage MTX_MAX mutexes
+#define MTX_EVENT_GROUPS (MTX_MAX / BITS_PER_EVENT_GROUP) + 1
+
+typedef struct {
+	uint32_t used;
+	EventGroupHandle_t eg;
+} eventg_t;
+
+struct mtx {
+    uint32_t mtxid; // mutex id
+};
+#endif
+
 
 void mtx_init(struct mtx *mutex, const char *name, const char *type, int opts);
 void mtx_lock(struct mtx *mutex);

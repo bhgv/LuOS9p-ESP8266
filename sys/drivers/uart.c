@@ -273,7 +273,7 @@ static void uart_rx_intr_handler(void) {
 		            // Put byte to UART queue
 		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		              			
 				} else {
-					xQueueSendFromISR(signal_q, &signal, &xHigherPriorityTaskWoken);    
+					_pthread_queue_signal(signal);
 				}
             }
 
@@ -285,7 +285,7 @@ static void uart_rx_intr_handler(void) {
 		            // Put byte to UART queue
 		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		              			
 				} else {
-					xQueueSendFromISR(signal_q, &signal, &xHigherPriorityTaskWoken);    
+					_pthread_queue_signal(signal);
 				}
             }
 

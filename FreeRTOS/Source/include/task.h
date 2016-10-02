@@ -2040,8 +2040,13 @@ UBaseType_t uxGetThreadId();
 void uxSetThreadId(UBaseType_t id);
 void uxSetLuaState(lua_State* L);
 lua_State* pvGetLuaState();
-void uxIncSignaled(TaskHandle_t h, int s);
 TaskHandle_t xGetCurrentTask();
+void uxSetSignaled(TaskHandle_t h, int s);
+void uxClearSignaled(TaskHandle_t h, int s);
+uint32_t uxGetSignaled(TaskHandle_t h);
+void enter_critical_section(void);
+void exit_critical_section(void);
+
 // WHITECAT END
 
 #endif /* INC_TASK_H */
