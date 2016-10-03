@@ -32,6 +32,7 @@
 
 #include "espressif/esp_common.h"
 #include "esp8266.h"
+#include "esp/iomux.h"
 
 #define gpio_pin_input(gpio)  GPIO.ENABLE_OUT_CLEAR = BIT(gpio);iomux_set_gpio_function(gpio, false)
 #define gpio_pin_output(gpio) GPIO.CONF[gpio] &= ~GPIO_CONF_OPEN_DRAIN;GPIO.ENABLE_OUT_SET = BIT(gpio);iomux_set_gpio_function(gpio, false)
@@ -43,9 +44,9 @@
 #define gpio_pin_get(gpio) ((GPIO.IN & BIT(gpio))?1:0)
 
 
-#define gpio_pin_pullup(gpio) SET_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLUP)
-#define gpio_pin_pulldwn(gpio) SET_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLDWN)
-#define gpio_pin_nopull(gpio) CLEAR_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLUP);CLEAR_PERI_REG_MASK(gpio, PERIPHS_IO_MUX_PULLDWN)
+#define gpio_pin_pullup(gpio) iomux_set_pullup_flags(gpio_to_iomux(gpio), IOMUX_PIN_PULLUP)
+#define gpio_pin_pulldwn(gpio) iomux_set_pullup_flags(gpio_to_iomux(gpio), IOMUX_PIN_PULLDOWN)
+#define gpio_pin_nopull(gpio) iomux_set_pullup_flags(gpio_to_iomux(gpio), 0)
 
 /*
 void gpio_enable_analog(int pin);
