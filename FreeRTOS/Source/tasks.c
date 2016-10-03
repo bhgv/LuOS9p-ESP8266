@@ -214,6 +214,8 @@ typedef struct tskTaskControlBlock
          * is received
          */
         uint32_t signaled;
+        
+        //uint16_t usStackDepth;
 } tskTCB;
 
 /* The old tskTCB name is maintained above then typedefed to the new TCB_t name
@@ -2265,11 +2267,50 @@ void vTaskSwitchContext( void )
 
 		/* Check for stack overflow, if configured. */
 		taskCHECK_FOR_STACK_OVERFLOW();
+/*
+		if ((pxCurrentTCB != xIdleTaskHandle) && (pxCurrentTCB->threadid > 1)) {
+			if( (pxCurrentTCB->pxTopOfStack - 192) <= pxCurrentTCB->pxStack ) {
+				taskENTER_CRITICAL();
+				
+				StackType_t *pxNewStack = ( StackType_t * ) pvPortMallocAligned( ( ( ( size_t ) (pxCurrentTCB->usStackDepth + 192) ) * sizeof( StackType_t ) ), NULL );
+				if (pxNewStack) {
+					printf("depth %d\r\n",pxCurrentTCB->usStackDepth);
+					printf("top %x\r\n",pxCurrentTCB->pxTopOfStack);
+					printf("stack %x\r\n",pxCurrentTCB->pxStack);
+					printf("diff %d\r\n",pxCurrentTCB->pxTopOfStack - pxCurrentTCB->pxStack);
 
+					StackType_t *pxOldStack = pxCurrentTCB->pxStack;
+					StackType_t *pxOldTopOfStack = (StackType_t *)pxCurrentTCB->pxTopOfStack;
+					uint16_t usOldStackDepth = pxCurrentTCB->usStackDepth;
+								
+					// Update new stack depth
+					pxCurrentTCB->usStackDepth += 192;
+				
+					bzero(pxNewStack, sizeof(StackType_t) * (pxCurrentTCB->usStackDepth));
+					bcopy(pxOldStack, pxNewStack, sizeof(StackType_t) * usOldStackDepth);
+
+					pxCurrentTCB->pxTopOfStack = pxNewStack + abs(pxOldTopOfStack - pxOldStack);
+					pxCurrentTCB->pxStack = pxNewStack;
+
+					printf("new depth %d\r\n",pxCurrentTCB->usStackDepth);
+					printf("new top %x\r\n",pxCurrentTCB->pxTopOfStack);
+					printf("new stack %x\r\n",pxCurrentTCB->pxStack);					
+					printf("new diff %d\r\n",pxCurrentTCB->pxTopOfStack - pxCurrentTCB->pxStack);
+					
+					configASSERT( pxCurrentTCB->pxTopOfStack >= pxCurrentTCB->pxStack);	
+					configASSERT( abs(pxCurrentTCB->pxTopOfStack - pxCurrentTCB->pxStack) == abs(pxOldTopOfStack - pxOldStack));	
+					
+					free(pxOldStack);
+				}
+				
+				taskEXIT_CRITICAL();
+			}
+		}
+*/
 		/* Select a new task to run using either the generic C or port
 		optimised asm code. */
 		taskSELECT_HIGHEST_PRIORITY_TASK();
-		
+				
 		/* Update TCB for process signals */
 		if ((pxCurrentTCB != xIdleTaskHandle) && (pxCurrentTCB->signaled > 0) && (pxCurrentTCB->threadid > 0)) {
 			vPortUpdateTCBForProcessSignals((StackType_t *)(pxCurrentTCB->pxTopOfStack));	
@@ -2967,12 +3008,13 @@ UBaseType_t x;
 	}
 	#endif /* configUSE_NEWLIB_REENTRANT */
 
-        /*
-         * WHITECAT
-         */
-        pxTCB->signaled = 0;
-		pxTCB->threadid = 0;
-		pxTCB->L = NULL;
+   /*
+    * WHITECAT
+    */
+    pxTCB->signaled = 0;
+	pxTCB->threadid = 0;
+	//pxTCB->usStackDepth = usStackDepth;
+	pxTCB->L = NULL;
 }
 /*-----------------------------------------------------------*/
 

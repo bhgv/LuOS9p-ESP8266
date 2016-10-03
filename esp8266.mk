@@ -9,8 +9,9 @@ CFLAGS += -D_CLOCKS_PER_SEC_=100             # Number of interrupt ticks for rea
 CFLAGS += -DUSE_NETWORKING=0                 # Networking is used (1 = yes, 0 = not)
 CFLAGS += -DMTX_USE_EVENTS=0                 # Use event groups in mtx implementation (experimental)
 
-CFLAGS += -DluaTaskStack=1024*2	             # Stck size assigned to lua thread
+CFLAGS += -DluaTaskStack=192*4               # Stck size assigned to lua thread
 CFLAGS += -DtskDEF_PRIORITY=0				 # Default task priority
+CFLAGS += -DdefaultThreadStack=192*4
 
 #
 # File system configuration

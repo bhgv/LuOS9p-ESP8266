@@ -49,19 +49,8 @@
 #define LTHREAD_STATUS_RUNNING   1
 #define LTHREAD_STATUS_SUSPENDED 2
 
-int threadInited = 0; // Module threadInited?
-
-
 // List of threads
 static struct list lthread_list;
-
-static void init() {
-    if (!threadInited) {
-        list_init(&lthread_list, 1);
-        
-        threadInited = 1;
-    }
-}
 
 void thread_terminated(void *args) {
     struct lthread *thread;
@@ -232,8 +221,6 @@ static int thread_list(lua_State *L) {
     int idx;
     char status[5];
 
-    init();
-    
     const char *format = luaL_optstring(L, 1, "");
 
     if (strcmp(format,"*n") == 0) {
@@ -281,8 +268,6 @@ static int new_thread(lua_State* L, int run) {
     pthread_t id;
     int retries;
     
-    init();
-
     // Allocate space for lthread info
     thread = (struct lthread *)malloc(sizeof(struct lthread));
     if (!thread) {
@@ -313,7 +298,7 @@ static int new_thread(lua_State* L, int run) {
 
     // Create pthread
     pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, defaultStack);
+    pthread_attr_setstacksize(&attr, defaultThreadStack);
 
     if (run)  {
         pthread_attr_setinitialstate(&attr, PTHREAD_INITIAL_STATE_RUN);
@@ -365,8 +350,6 @@ static int thread_create(lua_State* L) {
 static int thread_sleep(lua_State* L) {
     int seconds;
     
-    init();
-    
     // Check argument (seconds)
     seconds = luaL_checkinteger(L, 1);
     
@@ -377,8 +360,6 @@ static int thread_sleep(lua_State* L) {
 
 static int thread_sleepms(lua_State* L) {
     int milliseconds;
-    
-    init();
     
     // Check argument (seconds)
     milliseconds = luaL_checkinteger(L, 1);
@@ -391,8 +372,6 @@ static int thread_sleepms(lua_State* L) {
 static int thread_sleepus(lua_State* L) {
     int useconds;
     
-    init();
-    
     // Check argument (seconds)
     useconds = luaL_checkinteger(L, 1);
     
@@ -403,22 +382,16 @@ static int thread_sleepus(lua_State* L) {
 
 // Suspend all threads, or a specific thread
 static int thread_suspend(lua_State* L) {
-    init();
-    
     return thread_suspend_pthreads(L, luaL_optinteger(L, 1, 0));    
 }
 
 // Resume all threads, or a specific thread
 static int thread_resume(lua_State* L) {
-    init();
-    
     return thread_resume_pthreads(L, luaL_optinteger(L, 1, 0));    
 }
 
 // Stop all threads, or a specific thread
 static int thread_stop(lua_State* L) {
-    init();
-    
     return thread_stop_pthreads(L, luaL_optinteger(L, 1, 0));    
 }
 
@@ -426,8 +399,6 @@ static int thread_status(lua_State* L) {
     struct lthread *thread;
     int res;
     int thid;
-    
-    init();
     
     thid = luaL_checkinteger(L, 1);
     
@@ -463,6 +434,8 @@ static const LUA_REG_TYPE thread[] = {
 };
 
 int luaopen_thread(lua_State* L) {
+	list_init(&lthread_list, 1);
+	
 #if !LUA_USE_ROTABLE
     luaL_newlib(L, thread);
     return 1;
