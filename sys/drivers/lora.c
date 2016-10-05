@@ -101,10 +101,6 @@ static lora_rx *lora_rx_callback = NULL;
 // Mutext for lora 
 static struct mtx lora_mtx;
 
-// This is used for get commands for return to the caller function
-// the readed value from the uart
-static char *currBuffer = NULL;
-
 void _lora_init() {
     // Create lora mutex
     mtx_init(&lora_mtx, NULL, NULL, 0);
@@ -152,44 +148,40 @@ static int lora_parse_response(char *resp) {
     }
 }
 
-static int lora_response(int timeout) {
+static int lora_response(char *outBuffer, int timeout) {
     char buffer[255];
-    char payload[255];
-    char *payload_copy;
-    int  payload_len;
-    
     int resp;
-    int port;
-
+    
     if (uart_reads(LORA_UART, buffer, 1, timeout)) {
         syslog(LOG_DEBUG, "lora: %s", buffer);
         
         if ((resp = lora_parse_response(buffer)) == LORA_RX_OK) {
             // Something received
+            char *payload;
+    		int port;
+
+            // Allocate space for the payload
+            payload = (char *)malloc(255);
+            if (!payload) {
+            	return LORA_NO_MEM;
+            }
 
             // Get received port / payload
             payload[0] = 0x00;
             sscanf(buffer,"mac_rx %d %s", &port, payload);
             
-            payload_len = strlen(payload);
-            if (payload_len) {
+            if (strlen(payload)) {
                 syslog(LOG_DEBUG, "lora: received on port %d: %s", port, payload);
                 
                 if (lora_rx_callback) {
-                    // Make a copy of the payload
-                    payload_copy = (char *)malloc(payload_len + 1);
-                    if (payload_copy) {
-                        strcpy(payload_copy, payload);
-
-                        lora_rx_callback(port, payload_copy);
-                    }                            
+                     lora_rx_callback(port, payload);
                 }
             }
 
             return LORA_TX_OK;
         } else if (resp == LORA_OTHER) {
-            if (currBuffer) {
-                strcpy(currBuffer, buffer);
+            if (outBuffer) {
+                strcpy(outBuffer, buffer);
             }
 
             return LORA_OTHER;
@@ -220,7 +212,7 @@ static int lora_hw_reset() {
 
     syslog(LOG_DEBUG, "lora: hw reset");
     
-    return lora_response(1000 * 5);
+    return lora_response(NULL, 1000 * 5);
 }
 
 // Do a reset on Lora module
@@ -400,7 +392,7 @@ int lora_mac(const char *command, const char *value) {
 
     syslog(LOG_DEBUG, "lora: %s", buffer);
     uart_writes(LORA_UART, buffer);    
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(NULL, portMAX_DELAY);
     if (resp & (LORA_OK)) {
         mtx_unlock(&lora_mtx);
 
@@ -431,7 +423,7 @@ int lora_sys(const char *command, const char *value) {
     
     syslog(LOG_DEBUG, "lora: %s", buffer);
     uart_writes(LORA_UART, buffer);    
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(NULL, portMAX_DELAY);
     if (resp & (LORA_OK | LORA_OTHER)) {
         mtx_unlock(&lora_mtx);
 
@@ -458,7 +450,7 @@ int lora_mac_set(const char *command, const char *value) {
 
     syslog(LOG_DEBUG, "lora: %s", buffer);
     uart_writes(LORA_UART, buffer);    
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(NULL, portMAX_DELAY);
     if (resp & (LORA_OK)) {
         mtx_unlock(&lora_mtx);
 
@@ -478,16 +470,12 @@ char *lora_mac_get(const char *command) {
     
     mtx_lock(&lora_mtx);
     
-    currBuffer = buffer;
-    
     syslog(LOG_DEBUG, "lora: %s", buffer);
     uart_writes(LORA_UART, buffer);       
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(buffer, portMAX_DELAY);
     if (resp & (LORA_OTHER)) {
         char *result = (char *)malloc(strlen(buffer) + 1);
         strcpy(result, buffer);
-
-        currBuffer = NULL;
 
         mtx_unlock(&lora_mtx);
 
@@ -507,16 +495,12 @@ char *lora_sys_get(const char *command) {
     
     mtx_lock(&lora_mtx);
     
-    currBuffer = buffer;
-    
     syslog(LOG_DEBUG, "lora: %s", buffer);
     uart_writes(LORA_UART, buffer); 
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(buffer, portMAX_DELAY);
     if (resp & (LORA_OTHER)) {
         char *result = (char *)malloc(strlen(buffer) + 1);
         strcpy(result, buffer);
-
-        currBuffer = NULL;
 
         mtx_unlock(&lora_mtx);
 
@@ -545,7 +529,7 @@ int lora_join_otaa() {
 retry:    
     syslog(LOG_DEBUG, "lora: mac join otaa");
     uart_writes(LORA_UART, "mac join otaa\r\n");    
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(NULL, portMAX_DELAY);
     if (resp & (LORA_ALL_CHANNELS_BUSY | LORA_DEVICE_DEVICE_IS_NOT_IDLE | LORA_DEVICE_IN_SILENT_STATE)) {
         if (resp & (LORA_ALL_CHANNELS_BUSY)) {
             syslog(LOG_DEBUG, "lora: all channels busy");
@@ -569,7 +553,7 @@ retry:
         return resp;
     }
 
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(NULL, portMAX_DELAY);
     if (resp & (LORA_JOIN_ACCEPTED)) {
         joined = 1;
         mtx_unlock(&lora_mtx);
@@ -607,13 +591,13 @@ int lora_tx(int cnf, int port, const char *data) {
 
     syslog(LOG_DEBUG, "lora: %s", buffer);
     uart_writes(LORA_UART, buffer);    
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(NULL, portMAX_DELAY);
     if (!(resp & (LORA_OK))) {  
         mtx_unlock(&lora_mtx);
         return resp;
     }
 
-    resp = lora_response(portMAX_DELAY);
+    resp = lora_response(NULL, portMAX_DELAY);
     if (resp & (LORA_OK)) {
         mtx_unlock(&lora_mtx);
         return LORA_OK;

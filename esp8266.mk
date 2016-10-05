@@ -32,14 +32,14 @@ CFLAGS += -DUSE_CONSOLE=1		       # Enable console
 CFLAGS += -DCONSOLE_BR=115200	       # Console baud rate
 CFLAGS += -DCONSOLE_UART=1		       # Console UART unit
 CFLAGS += -DCONSOLE_SWAP_UART=2	       # Console alternative UART unit (0 = don't use alternative UART)
-CFLAGS += -DCONSOLE_BUFFER_LEN=256     # Console buffer length in bytes
+CFLAGS += -DCONSOLE_BUFFER_LEN=255     # Console buffer length in bytes
 
 #
 # LoraWAN driver connfiguration for RN2483
 #
 CFLAGS += -DLORA_UART=3				   # RN2483 UART unit
 CFLAGS += -DLORA_UART_BR=57600         # RN2483 UART speed
-CFLAGS += -DLORA_UART_BUFF_SIZE=1024   # Buffer size for RX
+CFLAGS += -DLORA_UART_BUFF_SIZE=255    # Buffer size for RX
 CFLAGS += -DLORA_RST_PIN=14			   # RN2483 hardware reset pin
 
 #

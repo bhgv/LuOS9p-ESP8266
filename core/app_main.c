@@ -245,8 +245,6 @@ void IRAM sdk_user_start(void) {
 
 // .text+0x3a8
 void IRAM vApplicationStackOverflowHook(xTaskHandle task, char *task_name) {
-    taskDISABLE_INTERRUPTS();
-    
 	printf("\r\nrtos: stack overflow, task '%s'\r\n", task_name);
 
     for(;;);

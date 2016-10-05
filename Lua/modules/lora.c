@@ -87,6 +87,8 @@ static void lora_error(lua_State* L, int code) {
             luaL_error(L, "%d:lora is not setup, setup first", LORA_NOT_SETUP);break;
         case LORA_INVALID_PARAM:
             luaL_error(L, "%d:invalid argument", LORA_INVALID_ARGUMENT);break;
+        case LORA_NO_MEM:
+            luaL_error(L, "%d:not enough memory", LORA_NO_MEM);break;
     }
 }
 

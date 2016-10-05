@@ -195,12 +195,12 @@ void uart0_swap() {
 		return;
 	}
 	
-	uart_pin_config(2, NULL, NULL);
-	uart_update_params(0, 57600, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
-    IOSWAP |= (1 << IOSWAPU0);
-	
 	console_swap();	
-	
+
+	uart_pin_config(2, NULL, NULL);
+	uart_update_params(0, uart[2].brg, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
+    IOSWAP |= (1 << IOSWAPU0);
+		
 	uart0_swaped = 1;
 	
 	exit_critical_section();
@@ -214,11 +214,11 @@ void uart0_default() {
 		return;
 	}
 	
-	uart_pin_config(0, NULL, NULL);
-	uart_update_params(0, 115200, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
-    IOSWAP &= ~(1 << IOSWAPU0);
-
 	console_default();
+
+	uart_pin_config(0, NULL, NULL);
+	uart_update_params(0, uart[0].brg, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
+    IOSWAP &= ~(1 << IOSWAPU0);
 
 	uart0_swaped = 0;
 	
