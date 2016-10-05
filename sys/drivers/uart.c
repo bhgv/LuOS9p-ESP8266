@@ -106,7 +106,8 @@ struct uart uart[NUART] = {
     },
 };
 
-static int output_enabled = 0;
+// Is UART0 swaped?
+static int uart0_swaped = -1;
 
 void uart0_swap();
 void uart0_default();
@@ -187,27 +188,41 @@ void uart_pin_config(u8_t unit, u8_t *rx, u8_t *tx) {
 }
 
 void uart0_swap() {
-	if (output_enabled == UART_OUTPUT_ALTERNATE) return;
-
+	enter_critical_section();
+	
+	if (uart0_swaped == 1) {
+		exit_critical_section();
+		return;
+	}
+	
 	uart_pin_config(2, NULL, NULL);
 	uart_update_params(0, 57600, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
     IOSWAP |= (1 << IOSWAPU0);
 	
 	console_swap();	
 	
-	output_enabled = UART_OUTPUT_ALTERNATE;
+	uart0_swaped = 1;
+	
+	exit_critical_section();
 }
 
 void uart0_default() {
-	if (output_enabled == UART_OUTPUT_DEFAULT) return;
+	enter_critical_section();
+	
+	if (uart0_swaped == 0) {
+		exit_critical_section();
+		return;
+	}
 	
 	uart_pin_config(0, NULL, NULL);
 	uart_update_params(0, 115200, UART_WordLength_8b, USART_Parity_None, USART_StopBits_1);
     IOSWAP &= ~(1 << IOSWAPU0);
 
 	console_default();
+
+	uart0_swaped = 0;
 	
-	output_enabled = UART_OUTPUT_DEFAULT;
+	exit_critical_section();
 }
 
 void UART_IntrConfig(UART_Port uart_no,  UART_IntrConfTypeDef *pUARTIntrConf) {
@@ -271,7 +286,7 @@ static void uart_rx_intr_handler(void) {
 				byte = READ_PERI_REG(UART_FIFO(uart_no)) & 0xFF;
 				if (queue_byte(uart_no, byte, &signal)) {
 		            // Put byte to UART queue
-		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		              			
+		            xQueueSendFromISR(uart[(uart0_swaped==1?2:0)].q, &byte, &xHigherPriorityTaskWoken);		              			
 				} else {
 					_pthread_queue_signal(signal);
 				}
@@ -283,7 +298,7 @@ static void uart_rx_intr_handler(void) {
 				byte = READ_PERI_REG(UART_FIFO(uart_no)) & 0xFF;
 				if (queue_byte(uart_no, byte, &signal)) {
 		            // Put byte to UART queue
-		            xQueueSendFromISR(uart[uart_no].q, &byte, &xHigherPriorityTaskWoken);		              			
+		            xQueueSendFromISR(uart[(uart0_swaped==1?2:0)].q, &byte, &xHigherPriorityTaskWoken);		              			
 				} else {
 					_pthread_queue_signal(signal);
 				}
@@ -311,19 +326,17 @@ void uart_init(u8_t unit, u32_t brg, u32_t mode, u32_t qs) {
 	
 	// If requestes queue size is greater than current size, delete queue and create
 	// a new one
-    if (qs > uart[uart[unit].phys].qs) {
-		if (uart[uart[unit].phys].q) {
-			vQueueDelete(uart[uart[unit].phys].q);
+    if (qs > uart[unit].qs) {
+		if (uart[unit].q) {
+			vQueueDelete(uart[unit].q);
 		}
 		
-		uart[uart[unit].phys].q  = xQueueCreate(qs, sizeof(u8_t));
+		uart[unit].q  = xQueueCreate(qs, sizeof(u8_t));
 	}
-	
-	uart[unit].q  = uart[uart[unit].phys].q;
 	
 	uart_pin_config(uart[unit].phys, &rx, &tx);
 
-	if (output_enabled) {
+	if (!uart0_swaped) {
 		syslog(LOG_INFO, "%s: at pins rx=%s/tx=%s", names[unit], cpu_pin_name(rx), cpu_pin_name(tx));
 		syslog(LOG_INFO, "%s: speed %d bauds",names[unit], brg);  
 	}  

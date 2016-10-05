@@ -45,9 +45,12 @@
 
 void _console_init() {	
 	// Open UART's related to the console
+	
+	// Default UART
     uart_init(CONSOLE_UART, CONSOLE_BR, 0, CONSOLE_BUFFER_LEN);
     uart_init_interrupts(CONSOLE_UART);
 	
+	// Swap UART don't have RX, so no init interrupts
 	uart_init(CONSOLE_SWAP_UART, CONSOLE_BR, 0, CONSOLE_BUFFER_LEN);		
 	
 	uart0_default();	
@@ -72,7 +75,7 @@ void console_swap() {
 	close(STDERR_FILENO);
 
     // Open standard file descriptors, using device related to alternate console UART unit
-    open(CONSOLE_SWAP_TTY, O_RDONLY); // stdin
+    open(CONSOLE_TTY     , O_RDONLY); // stdin (in esp 8266 we not have UART1 RX, so read from UART0)
     open(CONSOLE_SWAP_TTY, O_WRONLY); // stdout
     open(CONSOLE_SWAP_TTY, O_WRONLY); // stderr				
 }
