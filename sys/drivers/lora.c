@@ -383,7 +383,7 @@ tdriver_error *lora_setup(int band, int rx_listener) {
 
 int lora_mac(const char *command, const char *value) {
     int resp;
-    char buffer[255];
+    char buffer[64];
 
     mtx_lock(&lora_mtx);
 
@@ -414,7 +414,7 @@ int lora_mac(const char *command, const char *value) {
 
 int lora_sys(const char *command, const char *value) {
     int resp;
-    char buffer[255];
+    char buffer[64];
 
     mtx_lock(&lora_mtx);
 
@@ -445,7 +445,7 @@ int lora_sys(const char *command, const char *value) {
 
 int lora_mac_set(const char *command, const char *value) {
     int resp;
-    char buffer[255];
+    char buffer[64];
 
     mtx_lock(&lora_mtx);
 
@@ -472,7 +472,7 @@ int lora_mac_set(const char *command, const char *value) {
 
 char *lora_mac_get(const char *command) {
     int resp;
-    char buffer[255];
+    char buffer[64];
     
     sprintf(buffer, "mac get %s\r\n", command);
     
@@ -501,7 +501,7 @@ char *lora_mac_get(const char *command) {
 
 char *lora_sys_get(const char *command) {
     int resp;
-    char buffer[255];
+    char buffer[64];
     
     sprintf(buffer, "sys get %s\r\n", command);
     

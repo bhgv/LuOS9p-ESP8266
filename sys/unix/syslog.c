@@ -51,6 +51,7 @@ static char sccsid[] = "@(#)syslog.c	8.5 (Berkeley) 4/29/95";
 #include <sys/syslog.h>
 #include <sys/uio.h>
 
+#include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <paths.h>
@@ -109,12 +110,13 @@ vsyslog(pri, fmt, ap)
 {
 	register int cnt;
 	register char *p;
+	char *tbuf;
+	
 	time_t now;
 	int fd;
         int has_cr_lf = 0;
         
         #define MAX_BUFF 128
-        char tbuf[MAX_BUFF + 20];
         register int size;
         
         cnt = strlen(fmt) - 1;
@@ -131,6 +133,10 @@ vsyslog(pri, fmt, ap)
 	if (!(LOG_MASK(LOG_PRI(pri)) & LogMask))
             return;
 
+	// Allocate space
+	tbuf = (char *)malloc(MAX_BUFF + 20);
+	if (!tbuf) return;
+	
 	/* Set default facility if none specified. */
 	if ((pri & LOG_FACMASK) == 0)
             pri |= LogFacility;
@@ -182,6 +188,8 @@ vsyslog(pri, fmt, ap)
             fwrite(p, cnt - (p - tbuf), 1, LogFile);
             fflush(LogFile);
         }
+        
+        free(tbuf);
 }
 
 void openlog(ident, logstat, logfac)
