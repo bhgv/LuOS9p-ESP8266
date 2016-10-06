@@ -29,9 +29,13 @@
 
 #include <sys/drivers/cpu.h>
 
+extern int lua_running;
+
 void __attribute__((__noreturn__)) _exit(int status) {    
-	cpu_reset();
+	lua_running = 0;
 	
+	cpu_reset();
+		
 	for(;;) {
 	}
 }

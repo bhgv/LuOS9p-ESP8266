@@ -110,14 +110,32 @@ static int luaB_try (lua_State *L) {
             // Push error message
             lua_pushstring(L, messageStart);
             
-            lua_pcall(L, 4, 0, 0);    
+            status = lua_pcall(L, 4, 0, 0);    
+			if (status != LUA_OK) {
+				const char *msg = lua_tostring(L, -1);
+
+			    if ( tryFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, tryFunc);
+			    if ( catchFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, catchFunc);
+			    if ( finallyFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, finallyFunc);
+				
+				luaL_error(L, msg);
+			}			
         }
     }
     
     if (finallyFunc != LUA_NOREF) {
        // Call finally
         lua_rawgeti(L, LUA_REGISTRYINDEX, finallyFunc);
-        lua_pcall(L, 0, 0, 0); 
+        status = lua_pcall(L, 0, 0, 0); 
+		if (status != LUA_OK) {
+			const char *msg = lua_tostring(L, -1);
+
+		    if ( tryFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, tryFunc);
+		    if ( catchFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, catchFunc);
+		    if ( finallyFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, finallyFunc);
+			
+			luaL_error(L, msg);
+		}			
     }
     
     if ( tryFunc!= LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, tryFunc);
