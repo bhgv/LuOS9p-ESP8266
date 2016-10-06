@@ -39,6 +39,7 @@ static int dofile (lua_State *L, const char *name);
 extern int threadInited;
 extern int lua_shell_on;
 extern int lua_running;
+extern int lua_interpreter;
 
 #if LUA_USE_LUA_LOCK
 pthread_mutex_t lua_mutex;
@@ -204,10 +205,10 @@ static int luaos_pmain (lua_State *L) {
   //createargtable(L, argv, argc, script);  /* create table 'arg' */
     
   print_version();
-  
-  luaos_boot_scripts(L);
 
   lua_running = 1;
+  luaos_boot_scripts(L);
+  lua_interpreter = 1;
 
   for(;;)
       doREPL(L);  /* do read-eval-print loop */

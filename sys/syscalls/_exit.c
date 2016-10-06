@@ -30,9 +30,11 @@
 #include <sys/drivers/cpu.h>
 
 extern int lua_running;
+extern int lua_interpreter;
 
 void __attribute__((__noreturn__)) _exit(int status) {    
 	lua_running = 0;
+	lua_interpreter = 0;
 	
 	cpu_reset();
 		

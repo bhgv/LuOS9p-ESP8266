@@ -394,6 +394,7 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "dmesg" ),      LFUNCVAL( os_dmesg ) },
   { LSTRKEY( "run" ),        LFUNCVAL( os_run ) },
   { LSTRKEY( "luarunning" ), LFUNCVAL( os_lua_running ) },
+  { LSTRKEY( "luainterpreter" ), LFUNCVAL( os_lua_interpreter ) },
 
 #if LUA_USE_EDITOR
   { LSTRKEY( "edit" ),       LFUNCVAL( os_edit ) },
