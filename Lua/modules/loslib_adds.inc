@@ -28,6 +28,7 @@
 #include <main/build.h>
 
 extern const char *__progname;
+extern int lua_running;
 
 char lua_history_on = HISTORY_DEFAULT_STATE;
 char lua_syslog_level = 0xff;
@@ -399,6 +400,12 @@ static int os_format(lua_State *L) {
     }
     
     return 0;
+}
+
+static int os_lua_running(lua_State *L) { 
+    lua_pushboolean(L, lua_running);
+
+    return 1;
 }
 
 static int os_history(lua_State *L) { 
