@@ -202,12 +202,12 @@ static int luaos_pmain (lua_State *L) {
   luaL_openlibs(L);  /* open standard libraries */
   debug_free_mem_end(luaL_openlibs, NULL);
   //createargtable(L, argv, argc, script);  /* create table 'arg' */
-  
-  lua_running = 1;
-  
+    
   print_version();
   
   luaos_boot_scripts(L);
+
+  lua_running = 1;
 
   for(;;)
       doREPL(L);  /* do read-eval-print loop */
