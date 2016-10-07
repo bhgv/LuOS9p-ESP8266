@@ -35,8 +35,9 @@
 
 #include <stdint.h>
 
-#define STATUS_LUA_RUNNING		0x0001
-#define STATUS_LUA_INTERPRETER  0x0002
+#define STATUS_LUA_RUNNING			   0x0000
+#define STATUS_LUA_INTERPRETER  	   0x0001
+#define STATUS_LUA_ABORT_BOOT_SCRIPTS  0x0002
 
 extern uint32_t LuaOS_status[];
 

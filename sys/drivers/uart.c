@@ -256,6 +256,10 @@ static int queue_byte(u8_t unit, u8_t byte, int *signal) {
             
             return 0;
         } else if (byte == 0x03) {
+        	if (!status_get(STATUS_LUA_RUNNING)) {
+        		status_set(STATUS_LUA_ABORT_BOOT_SCRIPTS);
+        	}
+        	
             *signal = SIGINT;
             if (_pthread_has_signal(*signal)) {
             	return 0;
