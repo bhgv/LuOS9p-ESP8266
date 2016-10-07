@@ -395,6 +395,7 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "run" ),        LFUNCVAL( os_run ) },
   { LSTRKEY( "luarunning" ), LFUNCVAL( os_lua_running ) },
   { LSTRKEY( "luainterpreter" ), LFUNCVAL( os_lua_interpreter ) },
+  { LSTRKEY( "resetreason" ), LFUNCVAL( os_reset_reason ) },
 
 #if LUA_USE_EDITOR
   { LSTRKEY( "edit" ),       LFUNCVAL( os_edit ) },

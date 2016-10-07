@@ -54,6 +54,8 @@ uint8_t sdk_rtc_get_reset_reason(void) {
     uint8_t reason;
 
     reason = FIELD2VAL(RTC_RESET_REASON1_CODE, RTC.RESET_REASON1);
+	printf("1 %d\r\n",reason);
+	printf("2 %d\r\n",FIELD2VAL(RTC_RESET_REASON2_CODE, RTC.RESET_REASON2) );
     if (reason == 5) {
         if (FIELD2VAL(RTC_RESET_REASON2_CODE, RTC.RESET_REASON2) == 1) {
             reason = 6;

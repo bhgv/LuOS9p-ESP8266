@@ -83,6 +83,14 @@ static int os_sleep(lua_State *L) {
 	return 0;
 }
 
+static int os_reset_reason(lua_State *L) {
+	int reason = cpu_reset_reason();
+
+	lua_pushinteger(L, reason); 
+	
+	return 1;
+}
+
 static int os_loglevel(lua_State *L) {   
     int total = lua_gettop(L);
     int mask = 0;

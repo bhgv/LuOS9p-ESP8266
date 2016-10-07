@@ -89,6 +89,7 @@ static const char *pin_names[] = {
 };
 
 extern void sdk_system_restart_in_nmi(void);
+extern uint8_t sdk_rtc_get_reset_reason(void);
 
 /*
 
@@ -337,6 +338,25 @@ void cpu_reset() {
 	cpu_sleep(1);
 }
 
+struct bootflags
+{
+    unsigned char raw_rst_cause : 4;
+    unsigned char raw_bootdevice : 4;
+    unsigned char raw_bootmode : 4;
+
+    unsigned char rst_normal_boot : 1;
+    unsigned char rst_reset_pin : 1;
+    unsigned char rst_watchdog : 1;
+
+    unsigned char bootdevice_ram : 1;
+    unsigned char bootdevice_flash : 1;
+};
+
+
+int cpu_reset_reason() {
+	return sdk_rtc_get_reset_reason();
+}					
+	
 /*
 unsigned int cpu_pins() {
     return pins;
