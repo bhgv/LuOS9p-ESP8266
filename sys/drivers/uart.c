@@ -65,8 +65,8 @@
 #include <sys/drivers/console.h>
 #include <sys/drivers/cpu.h>
 #include <sys/syslog.h>
+#include <sys/status.h>
 
-extern int lua_running;
 extern QueueHandle_t signal_q;
 
 // Flags for determine some UART states
@@ -248,7 +248,7 @@ void UART_IntrConfig(UART_Port uart_no,  UART_IntrConfTypeDef *pUARTIntrConf) {
 static int queue_byte(u8_t unit, u8_t byte, int *signal) {
     if (unit == CONSOLE_UART - 1) {
         if (byte == 0x04) {
-            if (!lua_running) {
+            if (!status_get(STATUS_LUA_RUNNING)) {
                 uart_writes(CONSOLE_UART, "LuaOS-booting\r\n");                   
             } else {
                 uart_writes(CONSOLE_UART, "LuaOS-running\r\n");

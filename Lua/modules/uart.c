@@ -38,6 +38,7 @@
 #include "lua.h"
 #include "lauxlib.h"
 
+#include <sys/statust.h>
 #include <drivers/uart/uart.h>
 
 static int luart_pins( lua_State* L ) {

@@ -66,9 +66,6 @@
 
 extern const char *__progname;
 
-int lua_running = 0;
-int lua_interpreter = 0;
-
 // #include "math.h"
 
 int luaos_main (void);

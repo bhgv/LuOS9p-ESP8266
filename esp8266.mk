@@ -47,7 +47,7 @@ CFLAGS += -DLORA_RST_PIN=14			   # RN2483 hardware reset pin
 #
 CFLAGS += -DDEBUG_FREE_MEM=1           # Enable LUA free mem debug utility (only for debug purposes)
 CFLAGS += -DLUA_USE_LUA_LOCK=0		   # Enable if Lua must use real lua_lock / lua_unlock implementation
-CFLAGS += -DLUA_USE_SAFE_SIGNAL=0      # Enable use of LuaOS safe signal (experimental)
+CFLAGS += -DLUA_USE_SAFE_SIGNAL=1      # Enable use of LuaOS safe signal (experimental)
 CFLAGS += -DSTRCACHE_N=1
 CFLAGS += -DSTRCACHE_M=1
 CFLAGS += -DMINSTRTABSIZE=32

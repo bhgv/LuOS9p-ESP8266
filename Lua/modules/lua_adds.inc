@@ -33,13 +33,12 @@
 #include <sys/syscalls/mount.h>
 
 #include <sys/param.h>
+#include <sys/status.h>
 
 static int dofile (lua_State *L, const char *name);
 
 extern int threadInited;
 extern int lua_shell_on;
-extern int lua_running;
-extern int lua_interpreter;
 
 #if LUA_USE_LUA_LOCK
 pthread_mutex_t lua_mutex;
@@ -196,19 +195,17 @@ static void luaos_boot_scripts(lua_State *L) {
 // * Run system.lua before executing the interpreter (in same state)
 // * Run autorun.lua before executing the interpreter (in same state)
 static int luaos_pmain (lua_State *L) {
-  //int argc = (int)lua_tointeger(L, 1);
-  //char **argv = (char **)lua_touserdata(L, 2);
+  status_set(STATUS_LUA_RUNNING);
 
   debug_free_mem_begin(luaL_openlibs);
   luaL_openlibs(L);  /* open standard libraries */
   debug_free_mem_end(luaL_openlibs, NULL);
-  //createargtable(L, argv, argc, script);  /* create table 'arg' */
     
   print_version();
 
-  lua_running = 1;
   luaos_boot_scripts(L);
-  lua_interpreter = 1;
+
+  status_set(STATUS_LUA_INTERPRETER);
 
   for(;;)
       doREPL(L);  /* do read-eval-print loop */

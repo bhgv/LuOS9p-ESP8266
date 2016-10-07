@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include <sys/syslog.h>
+#include <sys/status.h>
 
 #include <sys/drivers/console.h>
 #include <sys/drivers/cpu.h>
@@ -28,8 +29,6 @@
 #include <main/build.h>
 
 extern const char *__progname;
-extern int lua_running;
-extern int lua_interpreter;
 
 char lua_history_on = HISTORY_DEFAULT_STATE;
 char lua_syslog_level = 0xff;
@@ -404,13 +403,13 @@ static int os_format(lua_State *L) {
 }
 
 static int os_lua_running(lua_State *L) { 
-    lua_pushboolean(L, lua_running);
+    lua_pushboolean(L, status_get(STATUS_LUA_RUNNING));
 
     return 1;
 }
 
 static int os_lua_interpreter(lua_State *L) { 
-    lua_pushboolean(L, lua_interpreter);
+    lua_pushboolean(L, status_get(STATUS_LUA_INTERPRETER));
 
     return 1;
 }

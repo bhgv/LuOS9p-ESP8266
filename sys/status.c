@@ -1,5 +1,5 @@
 /*
- * Whitecat, exit syscall
+ * Whitecat, LuaOS status management
  *
  * Copyright (C) 2015 - 2016
  * IBEROXARXA SERVICIOS INTEGRALES, S.L. & CSS IBÉRICA, S.L.
@@ -28,14 +28,5 @@
  */
 
 #include <sys/status.h>
-#include <sys/drivers/cpu.h>
 
-void __attribute__((__noreturn__)) _exit(int status) {  
-	status_clear(STATUS_LUA_RUNNING);  
-	status_clear(STATUS_LUA_INTERPRETER);  
-	
-	cpu_reset();
-		
-	for(;;) {
-	}
-}
+uint32_t LuaOS_status[] = {0};
