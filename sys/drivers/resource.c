@@ -35,6 +35,8 @@
 #include <sys/drivers/cpu.h>
 #include <sys/drivers/resource.h>
 
+#if 0
+
 static struct mtx resource_mtx;
 
 typedef struct {
@@ -145,13 +147,14 @@ void resource_unlock(tresource_type type, int unit) {
     
     mtx_unlock(&resource_mtx);    
 }
+#endif
 
 const char *resource_name(tresource_type type) {
     switch (type) {
         case RES_GPIO:  return "pin";
         case RES_TIMER: return "timer";
-        case RES_LORA: return "lora";
-		default: return "";
+        case RES_LORA:  return "lora";
+		default:        return "";
     }
 }
 
@@ -159,7 +162,7 @@ const char *resource_unit_name(tresource_type type, int unit) {
     switch (type) {
         case RES_GPIO:  return cpu_pin_name(unit);
         case RES_TIMER: return "timer";
-		default: return "";
+		default:        return "";
     }
 }
 
@@ -167,11 +170,11 @@ const char *owner_name(tresource_owner owner) {
     switch (owner) {
         case RES_SYSTEM:  return "LuaOS";
         case RES_STEPPER: return "stepper";
-        case RES_PWM: return "pwm";
-        case RES_UART: return "uart";
-        case RES_SPI: return "spi";
-        case RES_I2C: return "i2c";
-		default: return "";
+        case RES_PWM:     return "pwm";
+        case RES_UART:    return "uart";
+        case RES_SPI:     return "spi";
+        case RES_I2C:     return "i2c";
+		default:          return "";
     }
 }
 
