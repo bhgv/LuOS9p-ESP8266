@@ -284,8 +284,6 @@ static int new_thread(lua_State* L, int run) {
     thread->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
     thread->status = LTHREAD_STATUS_SUSPENDED;
     
-    uxSetLuaState(thread->L);
-
     lua_rawgeti(L, LUA_REGISTRYINDEX, thread->function_ref);                
     lua_xmove(L, thread->L, 1);
 

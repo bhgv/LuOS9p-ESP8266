@@ -363,17 +363,23 @@ void pthreadTask(void *taskArgs) {
     struct pthread_join *join;   // Current join
     struct pthread_clean *clean; // Current clean
     struct pthread *thread;      // Current thread
+	
     char c = '1';
     int index;
         
     args = (struct pthreadTaskArg *)taskArgs;
-
+	
     // Get thread
     list_get(&thread_list, args->id, (void **)&thread);
 
     // Set thread id
     uxSetThreadId(args->id);
 
+	if (args->args) {
+		// Set Lua context into TCB
+		uxSetLuaState(((struct lthread *)args->args)->L);
+	}
+	
     mtx_unlock(&thread->init_mtx);
     
     if (args->initial_state == PTHREAD_INITIAL_STATE_SUSPEND) {
