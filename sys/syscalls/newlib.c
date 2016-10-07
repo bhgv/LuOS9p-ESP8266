@@ -5,11 +5,11 @@
 #include <sys/reent.h>
 #include <sys/types.h>
 #include <sys/times.h>
+#include <sys/status.h>
 
 #include <sys/drivers/clock.h>
 #include <sys/drivers/uart.h>
 
-extern int _syscalls_inited;
 extern int __rename(const char *old_filename, const char *new_filename);
 extern pid_t getpid(void);
 extern void luaC_fullgc (lua_State *L, int isemergency);
@@ -161,7 +161,7 @@ off_t _lseek_r(struct _reent *r, int fd, off_t offset, int whence) {
 }
 
 int _write_r(struct _reent *r, int fd, const void *buf, size_t nbyte) {
-	if (_syscalls_inited) {
+	if (status_get(STATUS_SYSCALLS_INITED)) {
 		return write(fd, buf, nbyte);		
 	} else {
 		int i = 0;
@@ -177,7 +177,7 @@ int _write_r(struct _reent *r, int fd, const void *buf, size_t nbyte) {
 }
 
 int _read_r(struct _reent *r, int fd, void *buf, size_t nbyte) {
-	if (_syscalls_inited) {
+	if (status_get(STATUS_SYSCALLS_INITED)) {
 		return read(fd, buf, nbyte);		
 	}
 	
