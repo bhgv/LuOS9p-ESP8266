@@ -8,6 +8,8 @@
 -include $(ROOT)local.mk
 -include local.mk
 
+PLATFORM=esp8266
+
 # Flash size in megabits
 # Valid values are same as for esptool.py - 2,4,8,16,32
 FLASH_SIZE ?= 32
@@ -20,8 +22,8 @@ FLASH_SPEED ?= 40
 
 # Output directories to store intermediate compiled files
 # relative to the program directory
-BUILD_DIR ?= $(PROGRAM_DIR)build/
-FIRMWARE_DIR ?= $(PROGRAM_DIR)firmware/
+BUILD_DIR ?= $(ROOT)build/platform/$(PLATFORM)/
+FIRMWARE_DIR ?= $(ROOT)firmware/platform/$(PLATFORM)/
 
 # esptool.py from https://github.com/themadinventor/esptool
 ESPTOOL ?= esptool.py
@@ -60,7 +62,7 @@ OBJDUMP = $(CROSS)objdump
 
 # Source components to compile and link. Each of these are subdirectories
 # of the root, with a 'component.mk' file.
-COMPONENTS     ?= $(EXTRA_COMPONENTS) FreeRTOS lwip core sys pthread Lua open_esplibs
+COMPONENTS     ?= $(EXTRA_COMPONENTS) FreeRTOS platform/$(PLATFORM)/lwip platform/$(PLATFORM)/core sys pthread Lua platform/$(PLATFORM)/open_esplibs
 
 # binary esp-iot-rtos SDK libraries to link. These are pre-processed prior to linking.
 SDK_LIBS		?= main net80211 phy pp wpa
@@ -99,7 +101,7 @@ include $(ROOT)esp8266.mk
 EXTRA_LDFLAGS   = -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=free
 LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
 CFLAGS      += -DUSE_CUSTOM_HEAP=0
-LINKER_SCRIPTS += $(ROOT)ld/program.ld $(ROOT)ld/rom.ld
+LINKER_SCRIPTS += $(ROOT)platform/$(PLATFORM)/ld/program.ld $(ROOT)platform/$(PLATFORM)/ld/rom.ld
 
 ifeq ($(WARNINGS_AS_ERRORS),1)
     C_CXX_FLAGS += -Werror
@@ -132,9 +134,9 @@ endif
 CPPFLAGS += -DGITSHORTREV=$(GITSHORTREV)
 
 # rboot firmware binary paths for flashing
-RBOOT_BIN = $(ROOT)bootloader/firmware/rboot.bin
-RBOOT_PREBUILT_BIN = $(ROOT)bootloader/firmware_prebuilt/rboot.bin
-RBOOT_CONF = $(ROOT)bootloader/firmware_prebuilt/blank_config.bin
+RBOOT_BIN = $(ROOT)platform/$(PLATFORM)/bootloader/firmware/rboot.bin
+RBOOT_PREBUILT_BIN = $(ROOT)platform/$(PLATFORM)/bootloader/firmware_prebuilt/rboot.bin
+RBOOT_CONF = $(ROOT)platform/$(PLATFORM)/bootloader/firmware_prebuilt/blank_config.bin
 
 # if a custom bootloader hasn't been compiled, use the
 # prebuilt binary from the source tree

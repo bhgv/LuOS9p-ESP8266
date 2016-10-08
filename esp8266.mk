@@ -1,4 +1,5 @@
 CFLAGS += -DRBOOT_GPIO_ENABLED=0
+CFLAGS += -DPLATFORM_ESP8266
 
 #
 # LuaOS configuration

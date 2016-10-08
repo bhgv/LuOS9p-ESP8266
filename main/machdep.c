@@ -1,8 +1,7 @@
 #include "FreeRTOS.h"
 #include "whitecat.h"
 
-#include "esp/uart.h"
-
+extern void mach_dev();
 extern void _clock_init();
 extern void _syscalls_init();
 extern void _pthread_init();
@@ -24,5 +23,5 @@ void mach_init() {
     _lora_init();
     #endif
     
-    //mach_dev();
+    mach_dev();
 }
