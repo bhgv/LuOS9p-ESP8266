@@ -211,24 +211,24 @@ $(FW_FILE): $(PROGRAM_OUT) $(FIRMWARE_DIR)
 	$(Q) $(ESPTOOL) elf2image --version=2 $(ESPTOOL_ARGS) $< -o $(FW_FILE)
 
 flash: all
-	$(ESPTOOL) -p $(ESPPORT) --baud $(ESPBAUD) write_flash $(ESPTOOL_ARGS) \
+	$(ESPTOOL) -p $(UARTPORT) --baud $(ESPBAUD) write_flash $(ESPTOOL_ARGS) \
 		0x0 $(RBOOT_BIN) 0x1000 $(RBOOT_CONF) 0x2000 $(FW_FILE)
-	picocom --baud $(ESPBAUD) $(ESPPORT)
+	picocom --baud $(ESPBAUD) $(UARTPORT)
 
 flashall: all
 	$(ROOT)mkspiffs/mkspiffs -c  $(ROOT)spiffs_image -b 8192 -p 256 -s 0x80000 $(BUILD_DIR)spiffs_image.img
-	$(ESPTOOL) -p $(ESPPORT) --baud $(ESPBAUD) write_flash $(ESPTOOL_ARGS) \
+	$(ESPTOOL) -p $(UARTPORT) --baud $(ESPBAUD) write_flash $(ESPTOOL_ARGS) \
                 0x0 $(RBOOT_BIN) 0x1000 $(RBOOT_CONF) 0x2000 $(FW_FILE) $(SPIFFS_ESPTOOL_ARGS)
-	picocom --baud $(ESPBAUD) $(ESPPORT)
+	picocom --baud $(ESPBAUD) $(UARTPORT)
 
 erase_flash:
-	$(ESPTOOL) -p $(ESPPORT) --baud $(ESPBAUD) erase_flash
+	$(ESPTOOL) -p $(UARTPORT) --baud $(ESPBAUD) erase_flash
 
 size: $(PROGRAM_OUT)
 	$(Q) $(CROSS)size --format=sysv $(PROGRAM_OUT)
 
 test: flash
-	$(FILTEROUTPUT) --port $(ESPPORT) --baud 115200 --elf $(PROGRAM_OUT)
+	$(FILTEROUTPUT) --port $(UARTPORT) --baud 115200 --elf $(PROGRAM_OUT)
 
 # the rebuild target is written like this so it can be run in a parallel build
 # environment without causing weird side effects
@@ -259,7 +259,7 @@ help:
 	@echo "Build everything fresh from scratch."
 	@echo ""
 	@echo "flash"
-	@echo "Build then upload firmware to MCU. Set ESPPORT & ESPBAUD to override port/baud rate."
+	@echo "Build then upload firmware to MCU. Set UARTPORT & ESPBAUD to override port/baud rate."
 	@echo ""
 	@echo "test"
 	@echo "'flash', then start a GNU Screen session on the same serial port to see serial output."
@@ -269,10 +269,10 @@ help:
 	@echo ""
 	@echo "TIPS:"
 	@echo "* You can use -jN for parallel builds. Much faster! Use 'make rebuild' instead of 'make clean all' for parallel builds."
-	@echo "* You can create a local.mk file to create local overrides of variables like ESPPORT & ESPBAUD."
+	@echo "* You can create a local.mk file to create local overrides of variables like UARTPORT & ESPBAUD."
 	@echo ""
 	@echo "SAMPLE COMMAND LINE:"
-	@echo "make -j2 test ESPPORT=/dev/ttyUSB0"
+	@echo "make -j2 test UARTPORT=/dev/ttyUSB0"
 	@echo ""
 
 

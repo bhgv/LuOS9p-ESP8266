@@ -1,29 +1,29 @@
-../build/platform/esp8266/core//esp_spi.o: \
+../../../build/platform/esp8266/core//esp_spi.o: \
  /Users/jaumeolivepetrus/Lua-OSESP8266/platform/esp8266/core/esp_spi.c \
- ../platform/esp8266/core/include/esp/spi.h \
- ../libc/platform/esp8266/include/stdint.h \
- ../libc/platform/esp8266/include/machine/_default_types.h \
- ../libc/platform/esp8266/include/sys/features.h \
- ../libc/platform/esp8266/include/sys/_intsup.h \
- ../platform/esp8266/core/include/esp/spi_regs.h \
- ../platform/esp8266/core/include/esp/types.h \
- ../platform/esp8266/core/include/common_macros.h \
- ../libc/platform/esp8266/include/sys/cdefs.h \
- ../platform/esp8266/core/include/esp/clocks.h \
- ../platform/esp8266/core/include/esp/iomux.h \
- ../platform/esp8266/core/include/esp/iomux_regs.h \
- ../platform/esp8266/core/include/esp/gpio.h \
- ../platform/esp8266/core/include/esp/gpio_regs.h \
- ../platform/esp8266/core/include/esp/interrupts.h \
- ../FreeRTOS/Source/portable/esp8266/xtruntime.h \
- ../libc/platform/esp8266/include/string.h \
- ../libc/platform/esp8266/include/_ansi.h \
- ../libc/platform/esp8266/include/newlib.h \
- ../libc/platform/esp8266/include/sys/config.h \
- ../libc/platform/esp8266/include/machine/ieeefp.h \
- ../libc/platform/esp8266/include/sys/reent.h \
- ../libc/platform/esp8266/include/_ansi.h \
- ../libc/platform/esp8266/include/sys/_types.h \
- ../libc/platform/esp8266/include/machine/_types.h \
- ../libc/platform/esp8266/include/sys/lock.h \
- ../libc/platform/esp8266/include/sys/string.h
+ ../../../platform/esp8266/core/include/esp/spi.h \
+ ../../../libc/platform/esp8266/include/stdint.h \
+ ../../../libc/platform/esp8266/include/machine/_default_types.h \
+ ../../../libc/platform/esp8266/include/sys/features.h \
+ ../../../libc/platform/esp8266/include/sys/_intsup.h \
+ ../../../platform/esp8266/core/include/esp/spi_regs.h \
+ ../../../platform/esp8266/core/include/esp/types.h \
+ ../../../platform/esp8266/core/include/common_macros.h \
+ ../../../libc/platform/esp8266/include/sys/cdefs.h \
+ ../../../platform/esp8266/core/include/esp/clocks.h \
+ ../../../platform/esp8266/core/include/esp/iomux.h \
+ ../../../platform/esp8266/core/include/esp/iomux_regs.h \
+ ../../../platform/esp8266/core/include/esp/gpio.h \
+ ../../../platform/esp8266/core/include/esp/gpio_regs.h \
+ ../../../platform/esp8266/core/include/esp/interrupts.h \
+ ../../../FreeRTOS/Source/portable/esp8266/xtruntime.h \
+ ../../../libc/platform/esp8266/include/string.h \
+ ../../../libc/platform/esp8266/include/_ansi.h \
+ ../../../libc/platform/esp8266/include/newlib.h \
+ ../../../libc/platform/esp8266/include/sys/config.h \
+ ../../../libc/platform/esp8266/include/machine/ieeefp.h \
+ ../../../libc/platform/esp8266/include/sys/reent.h \
+ ../../../libc/platform/esp8266/include/_ansi.h \
+ ../../../libc/platform/esp8266/include/sys/_types.h \
+ ../../../libc/platform/esp8266/include/machine/_types.h \
+ ../../../libc/platform/esp8266/include/sys/lock.h \
+ ../../../libc/platform/esp8266/include/sys/string.h

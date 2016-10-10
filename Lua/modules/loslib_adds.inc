@@ -26,7 +26,7 @@
 #include <sys/syscalls/device.h>
 #include <sys/drivers/uart.h>
 
-#include <main/build.h>
+#include <build.h>
 
 extern const char *__progname;
 
