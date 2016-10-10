@@ -22,8 +22,8 @@ FLASH_SPEED ?= 40
 
 # Output directories to store intermediate compiled files
 # relative to the program directory
-BUILD_DIR ?= $(ROOT)build/platform/$(PLATFORM)/
-FIRMWARE_DIR ?= $(ROOT)firmware/platform/$(PLATFORM)/
+BUILD_DIR ?= $(ROOT)platform/$(PLATFORM)/build/
+FIRMWARE_DIR ?= $(ROOT)platform/$(PLATFORM)/firmware/
 
 # esptool.py from https://github.com/themadinventor/esptool
 ESPTOOL ?= esptool.py
@@ -97,7 +97,7 @@ CXXFLAGS	?= $(C_CXX_FLAGS) -fno-exceptions -fno-rtti $(EXTRA_CXXFLAGS)
 # these aren't all technically preprocesor args, but used by all 3 of C, C++, assembler
 CPPFLAGS	+= -mlongcalls -mtext-section-literals
 
-include $(ROOT)esp8266.mk
+include $(ROOT)platform/$(PLATFORM)/config.mk
 EXTRA_LDFLAGS   = -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=free
 LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
 CFLAGS      += -DUSE_CUSTOM_HEAP=0

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+platforms=(esp8266\ pic32mz)
+
+if [[ " ${platforms[@]} " =~ " $1 " ]]; then
+  source ./platform/$1/env
+  make $2 -j4 -C platform/$PLATFORM/main UARTPORT=/dev/tty.SLAB_USBtoUART
+else
+  echo "Unsupported platform"
+fi
