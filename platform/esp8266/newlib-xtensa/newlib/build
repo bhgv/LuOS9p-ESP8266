@@ -10,6 +10,6 @@ export PATH=/usr/local/xtensa-lx106-elf/bin:$PATH
 
 make clean
 make
-cp -f -r *.a ./../../whitecat-esp8266/libc/xtensa-lx106-elf/lib
-cp -f -r crt0.o ./../../whitecat-esp8266/libc/xtensa-lx106-elf/lib
-cd /Users/jaumeolivepetrus/whitecat-esp8266
+# cp -f -r *.a ./../../whitecat-esp8266/libc/xtensa-lx106-elf/lib
+# cp -f -r crt0.o ./../../whitecat-esp8266/libc/xtensa-lx106-elf/lib
+# cd /Users/jaumeolivepetrus/whitecat-esp8266
