@@ -38,7 +38,8 @@ PROGRAM_DIR := $(dir $(firstword $(MAKEFILE_LIST)))
 
 # derive various parts of compiler/linker arguments
 SDK_LIB_ARGS  = $(addprefix -l,$(SDK_LIBS))
-LIB_ARGS      = $(addprefix -l,$(LIBS))
+LIB_ARGS      = $(addprefix -L,platform/$(PLATFORM)/)
+LIB_ARGS     += $(addprefix -l,$(LIBS))
 PROGRAM_OUT   = $(BUILD_DIR)$(PROGRAM).out
 LDFLAGS      += $(addprefix -T,$(LINKER_SCRIPTS))
 
@@ -158,21 +159,21 @@ SDK_PROCESSED_LIBS = $(addsuffix .a,$(addprefix $(BUILD_DIR)sdklib/lib,$(SDK_LIB
 # Make rules for preprocessing each SDK library
 
 # hacky, but prevents confusing error messages if one of these files disappears
-$(ROOT)lib/%.remove:
+$(ROOT)lib/platform/$(PLATFORM)/%.remove:
 	touch $@
 
 # Remove comment lines from <libname>.remove files
-$(BUILD_DIR)sdklib/%.remove: $(ROOT)lib/%.remove | $(BUILD_DIR)sdklib
+$(BUILD_DIR)sdklib/%.remove: $(ROOT)lib/platform/$(PLATFORM)/%.remove | $(BUILD_DIR)sdklib
 	$(Q) grep -v "^#" $< | cat > $@
 
 # Stage 1: remove unwanted object files listed in <libname>.remove alongside each library
-$(BUILD_DIR)sdklib/%_stage1.a: $(ROOT)lib/%.a $(BUILD_DIR)sdklib/%.remove | $(BUILD_DIR)sdklib
+$(BUILD_DIR)sdklib/%_stage1.a: $(ROOT)lib/platform/$(PLATFORM)/%.a $(BUILD_DIR)sdklib/%.remove | $(BUILD_DIR)sdklib
 	@echo "SDK processing stage 1: Removing unwanted objects from $<"
 	$(Q) cat $< > $@
 	$(Q) $(AR) d $@ @$(word 2,$^)
 
 # Stage 2: Redefine all SDK symbols as sdk_, weaken all symbols.
-$(BUILD_DIR)sdklib/%.a: $(BUILD_DIR)sdklib/%_stage1.a $(ROOT)lib/allsymbols.rename
+$(BUILD_DIR)sdklib/%.a: $(BUILD_DIR)sdklib/%_stage1.a $(ROOT)lib/platform/$(PLATFORM)/allsymbols.rename
 	@echo "SDK processing stage 2: Renaming symbols in SDK library $< -> $@"
 	$(Q) $(OBJCOPY) --redefine-syms $(word 2,$^) --weaken $< $@
 
