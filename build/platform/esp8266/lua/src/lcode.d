@@ -1,33 +1,33 @@
 ../build/platform/esp8266/lua//src/lcode.o: \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/src/lcode.c \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/src/lprefix.h \
- ../libc/xtensa-lx106-elf/include/math.h \
- ../libc/xtensa-lx106-elf/include/sys/reent.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/newlib.h \
- ../libc/xtensa-lx106-elf/include/sys/config.h \
- ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
- ../libc/xtensa-lx106-elf/include/sys/features.h \
- ../libc/xtensa-lx106-elf/include/xtensa/config/core-isa.h \
- ../libc/xtensa-lx106-elf/include/sys/_types.h \
- ../libc/xtensa-lx106-elf/include/machine/_types.h \
- ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
- ../libc/xtensa-lx106-elf/include/sys/lock.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/stdlib.h \
- ../libc/xtensa-lx106-elf/include/sys/cdefs.h \
- ../libc/xtensa-lx106-elf/include/machine/stdlib.h \
- ../libc/xtensa-lx106-elf/include/alloca.h \
+ ../libc/platform/esp8266/include/math.h \
+ ../libc/platform/esp8266/include/sys/reent.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/newlib.h \
+ ../libc/platform/esp8266/include/sys/config.h \
+ ../libc/platform/esp8266/include/machine/ieeefp.h \
+ ../libc/platform/esp8266/include/sys/features.h \
+ ../libc/platform/esp8266/include/xtensa/config/core-isa.h \
+ ../libc/platform/esp8266/include/sys/_types.h \
+ ../libc/platform/esp8266/include/machine/_types.h \
+ ../libc/platform/esp8266/include/machine/_default_types.h \
+ ../libc/platform/esp8266/include/sys/lock.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/stdlib.h \
+ ../libc/platform/esp8266/include/sys/cdefs.h \
+ ../libc/platform/esp8266/include/machine/stdlib.h \
+ ../libc/platform/esp8266/include/alloca.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/src/lua.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/src/luaconf.h \
- ../libc/xtensa-lx106-elf/include/limits.h \
- ../libc/xtensa-lx106-elf/include/stdint.h \
- ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
+ ../libc/platform/esp8266/include/limits.h \
+ ../libc/platform/esp8266/include/stdint.h \
+ ../libc/platform/esp8266/include/sys/_intsup.h \
  ../sys/../Lua/adds/luaconf.h whitecat.h ../Lua/modules/auxmods.h \
- ../Lua/src/lua.h ../libc/xtensa-lx106-elf/include/unistd.h \
- ../libc/xtensa-lx106-elf/include/sys/unistd.h \
- ../libc/xtensa-lx106-elf/include/sys/types.h \
- ../libc/xtensa-lx106-elf/include/machine/types.h \
+ ../Lua/src/lua.h ../libc/platform/esp8266/include/unistd.h \
+ ../libc/platform/esp8266/include/sys/unistd.h \
+ ../libc/platform/esp8266/include/sys/types.h \
+ ../libc/platform/esp8266/include/machine/types.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/src/lcode.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/src/llex.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/src/lobject.h \

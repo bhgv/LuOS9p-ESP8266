@@ -1,32 +1,32 @@
 ../build/platform/esp8266/lua//modules/thread.o: \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/modules/thread.c whitecat.h \
  ../Lua/src/lua.h ../Lua/src/luaconf.h \
- ../libc/xtensa-lx106-elf/include/limits.h \
- ../libc/xtensa-lx106-elf/include/newlib.h \
- ../libc/xtensa-lx106-elf/include/stdint.h \
- ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
- ../libc/xtensa-lx106-elf/include/sys/features.h \
- ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
+ ../libc/platform/esp8266/include/limits.h \
+ ../libc/platform/esp8266/include/newlib.h \
+ ../libc/platform/esp8266/include/stdint.h \
+ ../libc/platform/esp8266/include/machine/_default_types.h \
+ ../libc/platform/esp8266/include/sys/features.h \
+ ../libc/platform/esp8266/include/sys/_intsup.h \
  ../sys/../Lua/adds/luaconf.h ../Lua/modules/auxmods.h \
- ../libc/xtensa-lx106-elf/include/unistd.h \
- ../libc/xtensa-lx106-elf/include/sys/unistd.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/sys/config.h \
- ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
- ../libc/xtensa-lx106-elf/include/xtensa/config/core-isa.h \
- ../libc/xtensa-lx106-elf/include/sys/cdefs.h \
- ../libc/xtensa-lx106-elf/include/sys/types.h \
- ../libc/xtensa-lx106-elf/include/machine/_types.h \
- ../libc/xtensa-lx106-elf/include/sys/_types.h \
- ../libc/xtensa-lx106-elf/include/sys/lock.h \
- ../libc/xtensa-lx106-elf/include/machine/types.h ../Lua/src/lapi.h \
+ ../libc/platform/esp8266/include/unistd.h \
+ ../libc/platform/esp8266/include/sys/unistd.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/sys/config.h \
+ ../libc/platform/esp8266/include/machine/ieeefp.h \
+ ../libc/platform/esp8266/include/xtensa/config/core-isa.h \
+ ../libc/platform/esp8266/include/sys/cdefs.h \
+ ../libc/platform/esp8266/include/sys/types.h \
+ ../libc/platform/esp8266/include/machine/_types.h \
+ ../libc/platform/esp8266/include/sys/_types.h \
+ ../libc/platform/esp8266/include/sys/lock.h \
+ ../libc/platform/esp8266/include/machine/types.h ../Lua/src/lapi.h \
  ../Lua/src/llimits.h ../Lua/src/lua.h ../Lua/src/lstate.h \
  ../Lua/src/lobject.h ../Lua/src/ltm.h ../Lua/src/lzio.h \
  ../Lua/src/lmem.h ../Lua/src/lauxlib.h \
- ../libc/xtensa-lx106-elf/include/stdio.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/sys/reent.h \
- ../libc/xtensa-lx106-elf/include/sys/stdio.h ../Lua/src/lgc.h \
+ ../libc/platform/esp8266/include/stdio.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/sys/reent.h \
+ ../libc/platform/esp8266/include/sys/stdio.h ../Lua/src/lgc.h \
  ../Lua/src/lmem.h ../Lua/src/ldo.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/modules/thread.h \
  ../Lua/src/lstate.h ../include/pthread.h \
@@ -59,11 +59,11 @@
  ../platform/esp8266/core/include/esp/iomux.h \
  ../platform/esp8266/core/include/esp/interrupts.h \
  ../platform/esp8266/core/include/esp/timer.h \
- ../libc/xtensa-lx106-elf/include/errno.h \
- ../libc/xtensa-lx106-elf/include/sys/errno.h \
+ ../libc/platform/esp8266/include/errno.h \
+ ../libc/platform/esp8266/include/sys/errno.h \
  ../include/espressif/esp8266/ets_sys.h \
- ../libc/xtensa-lx106-elf/include/string.h \
- ../libc/xtensa-lx106-elf/include/sys/string.h \
+ ../libc/platform/esp8266/include/string.h \
+ ../libc/platform/esp8266/include/sys/string.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
@@ -71,12 +71,12 @@
  ../FreeRTOS/Source/include/task.h ../FreeRTOS/Source/include/list.h \
  ../FreeRTOS/Source/include/queue.h ../FreeRTOS/Source/include/semphr.h \
  ../FreeRTOS/Source/include/queue.h ../sys/../sys/mutex.h \
- ../sys/../sys/list/list.h ../libc/xtensa-lx106-elf/include/sys/time.h \
- ../libc/xtensa-lx106-elf/include/signal.h \
- ../libc/xtensa-lx106-elf/include/sys/signal.h \
- ../libc/xtensa-lx106-elf/include/stdlib.h \
- ../libc/xtensa-lx106-elf/include/machine/stdlib.h \
- ../libc/xtensa-lx106-elf/include/alloca.h \
- ../libc/xtensa-lx106-elf/include/assert.h ../Lua/adds/modules.h \
+ ../sys/../sys/list/list.h ../libc/platform/esp8266/include/sys/time.h \
+ ../libc/platform/esp8266/include/signal.h \
+ ../libc/platform/esp8266/include/sys/signal.h \
+ ../libc/platform/esp8266/include/stdlib.h \
+ ../libc/platform/esp8266/include/machine/stdlib.h \
+ ../libc/platform/esp8266/include/alloca.h \
+ ../libc/platform/esp8266/include/assert.h ../Lua/adds/modules.h \
  ../Lua/adds/lrodefs.h ../Lua/adds/lrotable.h ../Lua/src/llimits.h \
  ../Lua/src/lobject.h ../Lua/adds/luaconf.h

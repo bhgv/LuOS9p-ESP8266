@@ -1,10 +1,10 @@
 ../build/platform/esp8266/sys//syscalls/mutex.o: \
  /Users/jaumeolivepetrus/Lua-OSESP8266/sys/syscalls/mutex.c \
  ../FreeRTOS/Source/include/FreeRTOS.h \
- ../libc/xtensa-lx106-elf/include/stdint.h \
- ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
- ../libc/xtensa-lx106-elf/include/sys/features.h \
- ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
+ ../libc/platform/esp8266/include/stdint.h \
+ ../libc/platform/esp8266/include/machine/_default_types.h \
+ ../libc/platform/esp8266/include/sys/features.h \
+ ../libc/platform/esp8266/include/sys/_intsup.h \
  ../FreeRTOS/Source/include/FreeRTOSConfig.h \
  ../FreeRTOS/Source/include/projdefs.h \
  ../FreeRTOS/Source/include/portable.h \
@@ -12,7 +12,7 @@
  ../FreeRTOS/Source/portable/esp8266/portmacro.h \
  ../platform/esp8266/core/include/esp8266.h \
  ../platform/esp8266/core/include/common_macros.h \
- ../libc/xtensa-lx106-elf/include/sys/cdefs.h \
+ ../libc/platform/esp8266/include/sys/cdefs.h \
  ../platform/esp8266/core/include/esp/registers.h \
  ../platform/esp8266/core/include/common_macros.h \
  ../platform/esp8266/core/include/esp/types.h \
@@ -34,20 +34,20 @@
  ../platform/esp8266/core/include/esp/iomux.h \
  ../platform/esp8266/core/include/esp/interrupts.h \
  ../platform/esp8266/core/include/esp/timer.h \
- ../libc/xtensa-lx106-elf/include/errno.h \
- ../libc/xtensa-lx106-elf/include/sys/errno.h \
- ../libc/xtensa-lx106-elf/include/sys/reent.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/newlib.h \
- ../libc/xtensa-lx106-elf/include/sys/config.h \
- ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
- ../libc/xtensa-lx106-elf/include/sys/_types.h \
- ../libc/xtensa-lx106-elf/include/machine/_types.h \
- ../libc/xtensa-lx106-elf/include/sys/lock.h \
+ ../libc/platform/esp8266/include/errno.h \
+ ../libc/platform/esp8266/include/sys/errno.h \
+ ../libc/platform/esp8266/include/sys/reent.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/newlib.h \
+ ../libc/platform/esp8266/include/sys/config.h \
+ ../libc/platform/esp8266/include/machine/ieeefp.h \
+ ../libc/platform/esp8266/include/sys/_types.h \
+ ../libc/platform/esp8266/include/machine/_types.h \
+ ../libc/platform/esp8266/include/sys/lock.h \
  ../include/espressif/esp8266/ets_sys.h \
- ../libc/xtensa-lx106-elf/include/string.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/sys/string.h \
+ ../libc/platform/esp8266/include/string.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/sys/string.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \

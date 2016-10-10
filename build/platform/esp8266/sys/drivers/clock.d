@@ -3,10 +3,10 @@
  build.h ../sys/../sys/drivers/gpio.h \
  ../sys/../sys/drivers/platform/esp8266/gpio.h \
  ../include/espressif/esp_common.h \
- ../libc/xtensa-lx106-elf/include/stdint.h \
- ../libc/xtensa-lx106-elf/include/machine/_default_types.h \
- ../libc/xtensa-lx106-elf/include/sys/features.h \
- ../libc/xtensa-lx106-elf/include/sys/_intsup.h \
+ ../libc/platform/esp8266/include/stdint.h \
+ ../libc/platform/esp8266/include/machine/_default_types.h \
+ ../libc/platform/esp8266/include/sys/features.h \
+ ../libc/platform/esp8266/include/sys/_intsup.h \
  ../include/espressif/esp_misc.h \
  ../platform/esp8266/lwip/lwip/src/include/ipv4/lwip/ip_addr.h \
  ../platform/esp8266/lwip/lwip/src/include/lwip/opt.h \
@@ -15,26 +15,26 @@
  ../platform/esp8266/lwip/lwip/src/include/lwip/arch.h \
  ../platform/esp8266/lwip/include/arch/cc.h \
  ../include/espressif/sdk_private.h \
- ../libc/xtensa-lx106-elf/include/stdio.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/newlib.h \
- ../libc/xtensa-lx106-elf/include/sys/config.h \
- ../libc/xtensa-lx106-elf/include/machine/ieeefp.h \
- ../libc/xtensa-lx106-elf/include/xtensa/config/core-isa.h \
- ../libc/xtensa-lx106-elf/include/sys/cdefs.h \
- ../libc/xtensa-lx106-elf/include/sys/reent.h \
- ../libc/xtensa-lx106-elf/include/_ansi.h \
- ../libc/xtensa-lx106-elf/include/sys/_types.h \
- ../libc/xtensa-lx106-elf/include/machine/_types.h \
- ../libc/xtensa-lx106-elf/include/sys/lock.h \
- ../libc/xtensa-lx106-elf/include/sys/types.h \
- ../libc/xtensa-lx106-elf/include/machine/types.h \
- ../libc/xtensa-lx106-elf/include/sys/stdio.h \
- ../libc/xtensa-lx106-elf/include/stdlib.h \
- ../libc/xtensa-lx106-elf/include/machine/stdlib.h \
- ../libc/xtensa-lx106-elf/include/alloca.h \
- ../libc/xtensa-lx106-elf/include/sys/time.h \
- ../libc/xtensa-lx106-elf/include/sys/errno.h \
+ ../libc/platform/esp8266/include/stdio.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/newlib.h \
+ ../libc/platform/esp8266/include/sys/config.h \
+ ../libc/platform/esp8266/include/machine/ieeefp.h \
+ ../libc/platform/esp8266/include/xtensa/config/core-isa.h \
+ ../libc/platform/esp8266/include/sys/cdefs.h \
+ ../libc/platform/esp8266/include/sys/reent.h \
+ ../libc/platform/esp8266/include/_ansi.h \
+ ../libc/platform/esp8266/include/sys/_types.h \
+ ../libc/platform/esp8266/include/machine/_types.h \
+ ../libc/platform/esp8266/include/sys/lock.h \
+ ../libc/platform/esp8266/include/sys/types.h \
+ ../libc/platform/esp8266/include/machine/types.h \
+ ../libc/platform/esp8266/include/sys/stdio.h \
+ ../libc/platform/esp8266/include/stdlib.h \
+ ../libc/platform/esp8266/include/machine/stdlib.h \
+ ../libc/platform/esp8266/include/alloca.h \
+ ../libc/platform/esp8266/include/sys/time.h \
+ ../libc/platform/esp8266/include/sys/errno.h \
  ../platform/esp8266/lwip/lwip/src/include/lwip/def.h \
  ../include/espressif/esp_wifi.h ../include/espressif/esp_softap.h \
  ../include/espressif/esp_sta.h ../include/espressif/queue.h \
@@ -72,7 +72,7 @@
  ../platform/esp8266/core/include/esp/iomux.h \
  ../platform/esp8266/core/include/esp/interrupts.h \
  ../platform/esp8266/core/include/esp/timer.h \
- ../libc/xtensa-lx106-elf/include/errno.h ../sys/../sys/mutex.h \
+ ../libc/platform/esp8266/include/errno.h ../sys/../sys/mutex.h \
  ../FreeRTOS/Source/include/FreeRTOS.h \
  ../FreeRTOS/Source/include/FreeRTOSConfig.h \
  ../FreeRTOS/Source/include/projdefs.h \
@@ -80,8 +80,8 @@
  ../FreeRTOS/Source/include/deprecated_definitions.h \
  ../FreeRTOS/Source/portable/esp8266/portmacro.h \
  ../include/espressif/esp8266/ets_sys.h \
- ../libc/xtensa-lx106-elf/include/string.h \
- ../libc/xtensa-lx106-elf/include/sys/string.h \
+ ../libc/platform/esp8266/include/string.h \
+ ../libc/platform/esp8266/include/sys/string.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \

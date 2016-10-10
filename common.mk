@@ -54,8 +54,8 @@ FW_FILE = $(addprefix $(FIRMWARE_DIR),$(PROGRAM).bin)
 INC_DIRS      = $(PROGRAM_DIR) $(PROGRAM_DIR)include $(ROOT)include
 
 ifeq ($(OWN_LIBC),1)
-    INC_DIRS += $(ROOT)libc/xtensa-lx106-elf/include
-    LDFLAGS += -L$(ROOT)libc/xtensa-lx106-elf/lib
+    INC_DIRS += $(ROOT)libc/platform/$(PLATFORM)/include
+    LDFLAGS += -L$(ROOT)libc/platform/$(PLATFORM)/lib
    ifeq ($(PRINTF_SCANF_FLOAT_SUPPORT),1)
      LDFLAGS += -u _printf_float -u _scanf_float
    endif
