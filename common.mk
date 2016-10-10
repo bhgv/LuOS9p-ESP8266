@@ -51,7 +51,7 @@ FW_FILE = $(addprefix $(FIRMWARE_DIR),$(PROGRAM).bin)
 # Placing $(PROGRAM_DIR) and $(PROGRAM_DIR)include first allows
 # programs to have their own copies of header config files for components
 # , which is useful for overriding things.
-INC_DIRS      = $(PROGRAM_DIR) $(PROGRAM_DIR)include $(ROOT)include
+INC_DIRS = $(PROGRAM_DIR) $(PROGRAM_DIR)include $(ROOT)include/platform/$(PLATFORM)
 
 ifeq ($(OWN_LIBC),1)
     INC_DIRS += $(ROOT)libc/platform/$(PLATFORM)/include

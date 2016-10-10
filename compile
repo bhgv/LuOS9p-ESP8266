@@ -1,2 +1,4 @@
+#!/bin/bash
 source ./env
-make flash -j4 -C platform/$PLATFORM/main UARTPORT=/dev/tty.SLAB_USBtoUART
+
+make $1 -j4 -C platform/$PLATFORM/main UARTPORT=/dev/tty.SLAB_USBtoUART

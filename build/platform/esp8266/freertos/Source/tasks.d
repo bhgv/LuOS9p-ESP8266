@@ -53,7 +53,7 @@
  ../../../platform/esp8266/core/include/esp/timer.h \
  ../../../libc/platform/esp8266/include/errno.h \
  ../../../libc/platform/esp8266/include/sys/errno.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \

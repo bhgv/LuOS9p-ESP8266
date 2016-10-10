@@ -32,7 +32,7 @@
  ../../../libc/platform/esp8266/include/stdint.h \
  ../../../libc/platform/esp8266/include/sys/_intsup.h \
  ../../../libc/platform/esp8266/include/ctype.h \
- ../../../include/espressif/spi_flash.h \
+ ../../../include/platform/esp8266/espressif/spi_flash.h \
  ../../../platform/esp8266/core/include/flashchip.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/sys/spiffs/esp_spiffs_flash.h \
  ../../../platform/esp8266/core/include/common_macros.h

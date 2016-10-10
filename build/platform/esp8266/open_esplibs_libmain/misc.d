@@ -1,14 +1,14 @@
 ../../../build/platform/esp8266/open_esplibs_libmain//misc.o: \
  /Users/jaumeolivepetrus/Lua-OSESP8266/platform/esp8266/open_esplibs/libmain/misc.c \
  ../../../platform/esp8266/open_esplibs/include/open_esplibs.h \
- ../../../include/espressif/esp_misc.h \
+ ../../../include/platform/esp8266/espressif/esp_misc.h \
  ../../../platform/esp8266/lwip/lwip/src/include/ipv4/lwip/ip_addr.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/opt.h \
  ../../../platform/esp8266/lwip/include/lwipopts.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/debug.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/arch.h \
  ../../../platform/esp8266/lwip/include/arch/cc.h \
- ../../../include/espressif/sdk_private.h \
+ ../../../include/platform/esp8266/espressif/sdk_private.h \
  ../../../libc/platform/esp8266/include/stdint.h \
  ../../../libc/platform/esp8266/include/machine/_default_types.h \
  ../../../libc/platform/esp8266/include/sys/features.h \
@@ -39,10 +39,11 @@
  ../../../platform/esp8266/core/include/common_macros.h \
  ../../../platform/esp8266/core/include/esp/rtc_regs.h \
  ../../../platform/esp8266/core/include/sdk_internal.h \
- ../../../include/espressif/esp_wifi.h \
- ../../../include/espressif/spi_flash.h \
+ ../../../include/platform/esp8266/espressif/esp_wifi.h \
+ ../../../include/platform/esp8266/espressif/spi_flash.h \
  ../../../platform/esp8266/core/include/flashchip.h \
- ../../../include/espressif/phy_info.h ../../../include/etstimer.h \
+ ../../../include/platform/esp8266/espressif/phy_info.h \
+ ../../../include/platform/esp8266/etstimer.h \
  ../../../FreeRTOS/Source/include/FreeRTOS.h \
  ../../../FreeRTOS/Source/include/FreeRTOSConfig.h \
  ../../../FreeRTOS/Source/include/projdefs.h \
@@ -69,7 +70,7 @@
  ../../../platform/esp8266/core/include/esp/interrupts.h \
  ../../../platform/esp8266/core/include/esp/timer.h \
  ../../../libc/platform/esp8266/include/errno.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../libc/platform/esp8266/include/string.h \
  ../../../libc/platform/esp8266/include/sys/string.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \

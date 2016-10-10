@@ -31,7 +31,7 @@
  ../../../libc/platform/esp8266/include/sys/stdio.h \
  ../../../Lua/src/lgc.h ../../../Lua/src/lmem.h ../../../Lua/src/ldo.h \
  /Users/jaumeolivepetrus/Lua-OSESP8266/Lua/modules/thread.h \
- ../../../Lua/src/lstate.h ../../../include/pthread.h \
+ ../../../Lua/src/lstate.h ../../../include/platform/esp8266/pthread.h \
  ../../../FreeRTOS/Source/include/FreeRTOS.h \
  ../../../FreeRTOS/Source/include/FreeRTOSConfig.h \
  ../../../FreeRTOS/Source/include/projdefs.h \
@@ -63,7 +63,7 @@
  ../../../platform/esp8266/core/include/esp/timer.h \
  ../../../libc/platform/esp8266/include/errno.h \
  ../../../libc/platform/esp8266/include/sys/errno.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../libc/platform/esp8266/include/string.h \
  ../../../libc/platform/esp8266/include/sys/string.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \

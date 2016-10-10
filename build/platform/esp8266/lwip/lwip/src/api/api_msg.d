@@ -5,7 +5,7 @@
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/debug.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/arch.h \
  ../../../platform/esp8266/lwip/include/arch/cc.h \
- ../../../include/espressif/sdk_private.h \
+ ../../../include/platform/esp8266/espressif/sdk_private.h \
  ../../../libc/platform/esp8266/include/stdint.h \
  ../../../libc/platform/esp8266/include/machine/_default_types.h \
  ../../../libc/platform/esp8266/include/sys/features.h \
@@ -66,7 +66,7 @@
  ../../../platform/esp8266/core/include/esp/interrupts.h \
  ../../../platform/esp8266/core/include/esp/timer.h \
  ../../../libc/platform/esp8266/include/errno.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../libc/platform/esp8266/include/string.h \
  ../../../libc/platform/esp8266/include/sys/string.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \

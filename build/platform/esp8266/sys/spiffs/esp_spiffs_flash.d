@@ -8,7 +8,7 @@
  ../../../platform/esp8266/core/include/common_macros.h \
  ../../../libc/platform/esp8266/include/sys/cdefs.h \
  ../../../platform/esp8266/core/include/flashchip.h \
- ../../../include/espressif/spi_flash.h \
+ ../../../include/platform/esp8266/espressif/spi_flash.h \
  ../../../FreeRTOS/Source/include/FreeRTOS.h \
  ../../../FreeRTOS/Source/include/FreeRTOSConfig.h \
  ../../../FreeRTOS/Source/include/projdefs.h \
@@ -47,7 +47,7 @@
  ../../../libc/platform/esp8266/include/sys/_types.h \
  ../../../libc/platform/esp8266/include/machine/_types.h \
  ../../../libc/platform/esp8266/include/sys/lock.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../libc/platform/esp8266/include/string.h \
  ../../../libc/platform/esp8266/include/_ansi.h \
  ../../../libc/platform/esp8266/include/sys/string.h \

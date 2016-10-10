@@ -14,7 +14,7 @@
  ../../../libc/platform/esp8266/include/sys/types.h \
  ../../../libc/platform/esp8266/include/machine/types.h \
  ../../../libc/platform/esp8266/include/sys/errno.h \
- ../../../include/espressif/sdk_private.h \
+ ../../../include/platform/esp8266/espressif/sdk_private.h \
  ../../../libc/platform/esp8266/include/stdint.h \
  ../../../libc/platform/esp8266/include/sys/_intsup.h \
  ../../../platform/esp8266/core/include/common_macros.h \

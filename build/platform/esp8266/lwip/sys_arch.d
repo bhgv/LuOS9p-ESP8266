@@ -45,7 +45,7 @@
  ../../../libc/platform/esp8266/include/sys/_types.h \
  ../../../libc/platform/esp8266/include/machine/_types.h \
  ../../../libc/platform/esp8266/include/sys/lock.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../libc/platform/esp8266/include/string.h \
  ../../../libc/platform/esp8266/include/_ansi.h \
  ../../../libc/platform/esp8266/include/sys/string.h \
@@ -71,7 +71,7 @@
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/debug.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/arch.h \
  ../../../platform/esp8266/lwip/include/arch/cc.h \
- ../../../include/espressif/sdk_private.h \
+ ../../../include/platform/esp8266/espressif/sdk_private.h \
  ../../../libc/platform/esp8266/include/stdio.h \
  ../../../libc/platform/esp8266/include/sys/stdio.h \
  ../../../libc/platform/esp8266/include/stdlib.h \

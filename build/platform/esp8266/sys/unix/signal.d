@@ -15,7 +15,7 @@
  ../../../libc/platform/esp8266/include/sys/_types.h \
  ../../../libc/platform/esp8266/include/sys/lock.h \
  ../../../libc/platform/esp8266/include/machine/types.h \
- ../../../include/pthread.h whitecat.h \
+ ../../../include/platform/esp8266/pthread.h whitecat.h \
  ../../../FreeRTOS/Source/include/FreeRTOS.h \
  ../../../libc/platform/esp8266/include/stdint.h \
  ../../../libc/platform/esp8266/include/sys/_intsup.h \
@@ -51,7 +51,7 @@
  ../../../libc/platform/esp8266/include/errno.h \
  ../../../libc/platform/esp8266/include/sys/errno.h \
  ../../../libc/platform/esp8266/include/sys/reent.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../libc/platform/esp8266/include/string.h \
  ../../../libc/platform/esp8266/include/sys/string.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \

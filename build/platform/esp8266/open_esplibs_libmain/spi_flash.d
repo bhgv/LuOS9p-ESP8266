@@ -45,7 +45,7 @@
  ../../../libc/platform/esp8266/include/sys/_types.h \
  ../../../libc/platform/esp8266/include/machine/_types.h \
  ../../../libc/platform/esp8266/include/sys/lock.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../libc/platform/esp8266/include/string.h \
  ../../../libc/platform/esp8266/include/_ansi.h \
  ../../../libc/platform/esp8266/include/sys/string.h \
@@ -56,14 +56,14 @@
  ../../../platform/esp8266/core/include/esp/rom.h \
  ../../../platform/esp8266/core/include/flashchip.h \
  ../../../platform/esp8266/core/include/sdk_internal.h \
- ../../../include/espressif/esp_wifi.h \
+ ../../../include/platform/esp8266/espressif/esp_wifi.h \
  ../../../platform/esp8266/lwip/lwip/src/include/ipv4/lwip/ip_addr.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/opt.h \
  ../../../platform/esp8266/lwip/include/lwipopts.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/debug.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/arch.h \
  ../../../platform/esp8266/lwip/include/arch/cc.h \
- ../../../include/espressif/sdk_private.h \
+ ../../../include/platform/esp8266/espressif/sdk_private.h \
  ../../../libc/platform/esp8266/include/stdio.h \
  ../../../libc/platform/esp8266/include/sys/types.h \
  ../../../libc/platform/esp8266/include/machine/types.h \
@@ -73,8 +73,9 @@
  ../../../libc/platform/esp8266/include/alloca.h \
  ../../../libc/platform/esp8266/include/sys/time.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/def.h \
- ../../../include/espressif/spi_flash.h \
- ../../../include/espressif/phy_info.h ../../../include/etstimer.h \
+ ../../../include/platform/esp8266/espressif/spi_flash.h \
+ ../../../include/platform/esp8266/espressif/phy_info.h \
+ ../../../include/platform/esp8266/etstimer.h \
  ../../../FreeRTOS/Source/include/timers.h \
  ../../../FreeRTOS/Source/include/task.h \
  ../../../FreeRTOS/Source/include/list.h ../../../Lua/src/lua.h \

@@ -26,7 +26,7 @@
  ../../../platform/esp8266/core/include/esp/types.h \
  ../../../libc/platform/esp8266/include/stdint.h \
  ../../../libc/platform/esp8266/include/sys/_intsup.h \
- ../../../include/espressif/spi_flash.h \
+ ../../../include/platform/esp8266/espressif/spi_flash.h \
  ../../../platform/esp8266/core/include/flashchip.h \
  ../../../platform/esp8266/core/include/common_macros.h \
  ../../../FreeRTOS/Source/include/FreeRTOS.h \
@@ -58,7 +58,7 @@
  ../../../platform/esp8266/core/include/esp/timer.h \
  ../../../libc/platform/esp8266/include/errno.h \
  ../../../libc/platform/esp8266/include/sys/errno.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \

@@ -72,7 +72,7 @@
  ../../../platform/esp8266/core/include/esp/iomux.h \
  ../../../platform/esp8266/core/include/esp/interrupts.h \
  ../../../platform/esp8266/core/include/esp/timer.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \

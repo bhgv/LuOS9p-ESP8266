@@ -52,7 +52,7 @@
  ../../../platform/esp8266/core/include/esp/timer.h \
  ../../../libc/platform/esp8266/include/errno.h \
  ../../../libc/platform/esp8266/include/sys/errno.h \
- ../../../include/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_rtos.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_context.h \
  ../../../FreeRTOS/Source/portable/esp8266/xtensa_timer.h \
@@ -73,39 +73,41 @@
  ../../../platform/esp8266/core/include/flashchip.h \
  ../../../platform/esp8266/core/include/esp/uart.h \
  ../../../platform/esp8266/core/include/esp/clocks.h \
- ../../../include/espressif/esp_common.h \
- ../../../include/espressif/esp_misc.h \
+ ../../../include/platform/esp8266/espressif/esp_common.h \
+ ../../../include/platform/esp8266/espressif/esp_misc.h \
  ../../../platform/esp8266/lwip/lwip/src/include/ipv4/lwip/ip_addr.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/opt.h \
  ../../../platform/esp8266/lwip/include/lwipopts.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/debug.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/arch.h \
  ../../../platform/esp8266/lwip/include/arch/cc.h \
- ../../../include/espressif/sdk_private.h \
+ ../../../include/platform/esp8266/espressif/sdk_private.h \
  ../../../libc/platform/esp8266/include/stdlib.h \
  ../../../libc/platform/esp8266/include/machine/stdlib.h \
  ../../../libc/platform/esp8266/include/alloca.h \
  ../../../libc/platform/esp8266/include/sys/time.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/def.h \
- ../../../include/espressif/esp_wifi.h \
- ../../../include/espressif/esp_softap.h \
- ../../../include/espressif/esp_sta.h ../../../include/espressif/queue.h \
- ../../../include/espressif/esp_system.h \
- ../../../include/espressif/esp_timer.h \
- ../../../include/espressif/esp8266/esp8266.h \
- ../../../include/espressif/esp8266/ets_sys.h \
- ../../../include/espressif/esp8266/eagle_soc.h \
- ../../../include/espressif/esp8266/gpio_register.h \
- ../../../include/espressif/esp8266/pin_mux_register.h \
- ../../../include/espressif/esp8266/spi_register.h \
- ../../../include/espressif/esp8266/timer_register.h \
- ../../../include/espressif/esp8266/uart_register.h \
- ../../../include/espressif/spi_flash.h \
+ ../../../include/platform/esp8266/espressif/esp_wifi.h \
+ ../../../include/platform/esp8266/espressif/esp_softap.h \
+ ../../../include/platform/esp8266/espressif/esp_sta.h \
+ ../../../include/platform/esp8266/espressif/queue.h \
+ ../../../include/platform/esp8266/espressif/esp_system.h \
+ ../../../include/platform/esp8266/espressif/esp_timer.h \
+ ../../../include/platform/esp8266/espressif/esp8266/esp8266.h \
+ ../../../include/platform/esp8266/espressif/esp8266/ets_sys.h \
+ ../../../include/platform/esp8266/espressif/esp8266/eagle_soc.h \
+ ../../../include/platform/esp8266/espressif/esp8266/gpio_register.h \
+ ../../../include/platform/esp8266/espressif/esp8266/pin_mux_register.h \
+ ../../../include/platform/esp8266/espressif/esp8266/spi_register.h \
+ ../../../include/platform/esp8266/espressif/esp8266/timer_register.h \
+ ../../../include/platform/esp8266/espressif/esp8266/uart_register.h \
+ ../../../include/platform/esp8266/espressif/spi_flash.h \
  ../../../platform/esp8266/open_esplibs/include/esplibs/libmain.h \
  ../../../platform/esp8266/core/include/sdk_internal.h \
- ../../../include/espressif/esp_wifi.h \
- ../../../include/espressif/spi_flash.h \
- ../../../include/espressif/phy_info.h ../../../include/etstimer.h \
+ ../../../include/platform/esp8266/espressif/esp_wifi.h \
+ ../../../include/platform/esp8266/espressif/spi_flash.h \
+ ../../../include/platform/esp8266/espressif/phy_info.h \
+ ../../../include/platform/esp8266/etstimer.h \
  ../../../FreeRTOS/Source/include/timers.h \
  ../../../FreeRTOS/Source/include/task.h \
  ../../../platform/esp8266/lwip/lwip/src/include/lwip/netif.h \
