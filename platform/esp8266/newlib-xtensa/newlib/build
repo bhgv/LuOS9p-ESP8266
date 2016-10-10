@@ -1,0 +1,15 @@
+export PATH=/usr/local/xtensa-lx106-elf/bin:$PATH
+
+./configure --host=xtensa-lx106-elf --exec-prefix=/usr/local/xtensa-lx106-elf \
+--with-newlib --enable-multilib \
+--disable-newlib-io-c99-formats --enable-newlib-supplied-syscalls \
+--enable-target-optspace \
+--program-transform-name="s&^&xtensa-lx106-elf-&" \
+--disable-option-checking \
+--enable-newlib-nano-malloc --enable-newlib-nano-formatted-io --enable-newlib-reent-small
+
+make clean
+make
+cp -f -r *.a ./../../whitecat-esp8266/libc/xtensa-lx106-elf/lib
+cp -f -r crt0.o ./../../whitecat-esp8266/libc/xtensa-lx106-elf/lib
+cd /Users/jaumeolivepetrus/whitecat-esp8266

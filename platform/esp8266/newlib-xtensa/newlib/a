@@ -1,0 +1,90 @@
+ChangeLog:	(_realloc_r): Likewise.
+ChangeLog:	_malloc_r, _realloc_r, and free_r call the corresponding
+ChangeLog:	* libc/stdio/ungetc.c (__submore): Use _malloc_r,_realloc_r
+libc/a:include/malloc.h:#undef _realloc_r
+libc/a:include/malloc.h:#define _realloc_r(r, p, s) realloc (p, s)
+libc/a:include/malloc.h:extern _PTR _realloc_r _PARAMS ((struct _reent *, _PTR, size_t));
+libc/a:include/stdlib.h:_PTR	_EXFUN_NOTHROW(_realloc_r,(struct _reent *, _PTR, size_t));
+libc/a:machine/powerpc/machine/malloc.h:_PTR    _EXFUN(_vec_realloc_r,(struct _reent *, _PTR __r, size_t __size));
+libc/a:machine/powerpc/machine/stdlib.h:_PTR    _EXFUN(_vec_realloc_r,(struct _reent *, _PTR __r, size_t __size));
+libc/a:machine/powerpc/vec_malloc.c:	_vec_realloc_r
+libc/a:machine/powerpc/vec_malloc.c:	void *_vec_realloc_r(void *<[reent]>, 
+libc/a:machine/powerpc/vec_malloc.c:	char *_vec_realloc_r(<[reent]>, <[aptr]>, <[nbytes]>)
+libc/a:machine/powerpc/vec_malloc.c:The alternate functions <<_vec_malloc_r>>, <<_vec_realloc_r>>, <<_vec_free_r>>,
+libc/a:machine/powerpc/vec_mallocr.c:#define vECREALLOc	_vec_realloc_r
+libc/a:machine/powerpc/vec_realloc.c:/* vec_realloc.c -- a wrapper for _vec_realloc_r.  */
+libc/a:machine/powerpc/vec_realloc.c:  return _vec_realloc_r (_REENT, ap, nbytes);
+libc/a:machine/xstormy16/mallocr.c:_realloc_r (struct _reent *r, _PTR x, size_t sz)
+libc/a:reent/reent.tex:_malloc_stats_r _realloc_r      _wctomb_r
+libc/a:stdio/fvwrite.c:		      str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+libc/a:stdio/nano-vfprintf.c:	  str = (unsigned char *)_realloc_r (ptr, fp->_bf._base, newsize);
+libc/a:stdio/nano-vfprintf.c:	      str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+libc/a:stdio/open_memstream.c:      cbuf = _realloc_r (ptr, cbuf, newsize);
+libc/a:stdio/open_memstream.c:  buf = _realloc_r (ptr, *c->pbuf,
+libc/a:stdio/ungetc.c:  p = (unsigned char *) _realloc_r (rptr, (_PTR) (fp->_ub._base), i << 1);
+libc/a:stdio/vfprintf.c:			str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+libc/a:stdio/vfprintf.c:				str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+libc/a:stdlib/ecvtbuf.c:	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
+libc/a:stdlib/ecvtbuf.c:	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
+libc/a:stdlib/malloc.c:	_realloc_r
+libc/a:stdlib/malloc.c:	void *_realloc_r(void *<[reent]>, 
+libc/a:stdlib/malloc.c:	char *_realloc_r(<[reent]>, <[aptr]>, <[nbytes]>)
+libc/a:stdlib/malloc.c:The alternate functions <<_malloc_r>>, <<_realloc_r>>, <<_reallocf_r>>, 
+libc/a:stdlib/mallocr.c:#define rEALLOc		_realloc_r
+libc/a:stdlib/nano-mallocr.c:#define nano_realloc		_realloc_r
+libc/a:stdlib/realloc.c:  return _realloc_r (_REENT, ap, nbytes);
+libc/a:stdlib/reallocf.c:	nptr = _realloc_r(reentptr, ptr, size);
+libc/a:stdlib/setenv_r.c:	  *p_environ = (char **) _realloc_r (reent_ptr, (char *) environ,
+libc/a:sys/linux/include/malloc.h:extern __malloc_ptr_t _realloc_r __MALLOC_P ((struct _reent * __r,
+libc/a:sys/linux/reallocr.c:_realloc_r (struct _reent *ptr, void *old, size_t newlen)
+libc/a:sys/rtems/crt0.c:RTEMS_STUB(_PTR, _realloc_r(struct _reent *r, _PTR p, size_t s), { return 0; })
+libc/include/malloc.h:#undef _realloc_r
+libc/include/malloc.h:#define _realloc_r(r, p, s) realloc (p, s)
+libc/include/malloc.h:extern _PTR _realloc_r _PARAMS ((struct _reent *, _PTR, size_t));
+libc/include/stdlib.h:_PTR	_EXFUN_NOTHROW(_realloc_r,(struct _reent *, _PTR, size_t));
+Binary file libc/libc.a matches
+libc/machine/powerpc/machine/malloc.h:_PTR    _EXFUN(_vec_realloc_r,(struct _reent *, _PTR __r, size_t __size));
+libc/machine/powerpc/machine/stdlib.h:_PTR    _EXFUN(_vec_realloc_r,(struct _reent *, _PTR __r, size_t __size));
+libc/machine/powerpc/vec_malloc.c:	_vec_realloc_r
+libc/machine/powerpc/vec_malloc.c:	void *_vec_realloc_r(void *<[reent]>, 
+libc/machine/powerpc/vec_malloc.c:	char *_vec_realloc_r(<[reent]>, <[aptr]>, <[nbytes]>)
+libc/machine/powerpc/vec_malloc.c:The alternate functions <<_vec_malloc_r>>, <<_vec_realloc_r>>, <<_vec_free_r>>,
+libc/machine/powerpc/vec_mallocr.c:#define vECREALLOc	_vec_realloc_r
+libc/machine/powerpc/vec_realloc.c:/* vec_realloc.c -- a wrapper for _vec_realloc_r.  */
+libc/machine/powerpc/vec_realloc.c:  return _vec_realloc_r (_REENT, ap, nbytes);
+libc/machine/xstormy16/mallocr.c:_realloc_r (struct _reent *r, _PTR x, size_t sz)
+libc/reent/reent.tex:_malloc_stats_r _realloc_r      _wctomb_r
+libc/stdio/fvwrite.c:		      str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+Binary file libc/stdio/lib.a matches
+Binary file libc/stdio/lib_a-fvwrite.o matches
+Binary file libc/stdio/lib_a-nano-svfprintf.o matches
+Binary file libc/stdio/lib_a-open_memstream.o matches
+Binary file libc/stdio/lib_a-ungetc.o matches
+libc/stdio/nano-vfprintf.c:	  str = (unsigned char *)_realloc_r (ptr, fp->_bf._base, newsize);
+libc/stdio/nano-vfprintf.c:	      str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+libc/stdio/open_memstream.c:      cbuf = _realloc_r (ptr, cbuf, newsize);
+libc/stdio/open_memstream.c:  buf = _realloc_r (ptr, *c->pbuf,
+libc/stdio/ungetc.c:  p = (unsigned char *) _realloc_r (rptr, (_PTR) (fp->_ub._base), i << 1);
+libc/stdio/vfprintf.c:			str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+libc/stdio/vfprintf.c:				str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+libc/stdlib/ecvtbuf.c:	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
+libc/stdlib/ecvtbuf.c:	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
+Binary file libc/stdlib/lib.a matches
+Binary file libc/stdlib/lib_a-ecvtbuf.o matches
+Binary file libc/stdlib/lib_a-nano-reallocr.o matches
+Binary file libc/stdlib/lib_a-realloc.o matches
+Binary file libc/stdlib/lib_a-reallocf.o matches
+Binary file libc/stdlib/lib_a-setenv_r.o matches
+libc/stdlib/malloc.c:	_realloc_r
+libc/stdlib/malloc.c:	void *_realloc_r(void *<[reent]>, 
+libc/stdlib/malloc.c:	char *_realloc_r(<[reent]>, <[aptr]>, <[nbytes]>)
+libc/stdlib/malloc.c:The alternate functions <<_malloc_r>>, <<_realloc_r>>, <<_reallocf_r>>, 
+libc/stdlib/mallocr.c:#define rEALLOc		_realloc_r
+libc/stdlib/nano-mallocr.c:#define nano_realloc		_realloc_r
+libc/stdlib/realloc.c:  return _realloc_r (_REENT, ap, nbytes);
+libc/stdlib/reallocf.c:	nptr = _realloc_r(reentptr, ptr, size);
+libc/stdlib/setenv_r.c:	  *p_environ = (char **) _realloc_r (reent_ptr, (char *) environ,
+libc/sys/linux/include/malloc.h:extern __malloc_ptr_t _realloc_r __MALLOC_P ((struct _reent * __r,
+libc/sys/linux/reallocr.c:_realloc_r (struct _reent *ptr, void *old, size_t newlen)
+libc/sys/rtems/crt0.c:RTEMS_STUB(_PTR, _realloc_r(struct _reent *r, _PTR p, size_t s), { return 0; })
+Binary file libc.a matches
