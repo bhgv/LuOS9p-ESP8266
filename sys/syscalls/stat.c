@@ -40,11 +40,19 @@ extern struct filedesc *p_fd;
 int fstat(int fd, struct stat *sb) {
     register struct file *fp;
     register struct filedesc *fdp = p_fd;
-    int res;
+    int res=1;
     
+    if(!fd_mtx_set){
+        errno = EBADF;
+        return -1;
+    }
+
     mtx_lock(&fd_mtx);
-    if ((u_int)fd >= fdp->fd_nfiles ||
-        (fp = fdp->fd_ofiles[fd]) == NULL) {
+    if (
+	fdp == NULL ||
+	(u_int)fd >= fdp->fd_nfiles ||
+        (fp = fdp->fd_ofiles[fd]) == NULL
+    ) {
         mtx_unlock(&fd_mtx);
         errno = EBADF;
         return -1;

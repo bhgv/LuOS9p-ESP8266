@@ -48,6 +48,9 @@
 #include <sys/panic.h>
 #include <sys/status.h>
 
+struct mtx fd_mtx;
+char fd_mtx_set = 0;
+
 /*
  * File descriptor structure
  */
@@ -119,8 +122,9 @@ void _syscalls_init() {
     
     // Create file descriptor mutex
     mtx_init(&fd_mtx, NULL, NULL, 0);
-	
-	status_set(STATUS_SYSCALLS_INITED);
+    fd_mtx_set = 1;
+
+    status_set(STATUS_SYSCALLS_INITED);
 }
 
 // Get number of open files (thread-safe)

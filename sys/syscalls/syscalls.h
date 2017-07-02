@@ -4,7 +4,6 @@
  *
  * Created on 11 / octubre / 2015, 20:11
  */
-
 #ifndef SYSCALLS_H
 #define	SYSCALLS_H
 
@@ -127,7 +126,8 @@ typedef int32_t register_t;
 #define FREE(addr, type) free(addr)
 
 // File descriptor mutex
-struct mtx fd_mtx;
+extern struct mtx fd_mtx;
+extern char fd_mtx_set;
 
 int tty_open(struct file *fp, int flags);
 int tty_close(struct file *fp);

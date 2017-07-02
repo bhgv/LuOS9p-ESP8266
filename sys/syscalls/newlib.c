@@ -148,9 +148,11 @@ int _unlink_r(struct _reent *r, const char *path) {
 	return unlink(path);
 }
 
+//#if 0
 int _fstat_r(struct _reent *r, int fd, void *buf) {
 	return fstat(fd, buf);
-}	
+}
+//#endif	
 
 int _stat_r(struct _reent *r, const char *pathname, void *buf) {
 	return stat(pathname, buf);
