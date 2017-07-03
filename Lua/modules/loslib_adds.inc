@@ -35,7 +35,7 @@ char lua_syslog_level = 0xff;
 
 void luaC_fullgc (lua_State *L, int isemergency) ;
 
-#if 0
+#if 1 //{*}0
 
 int lua_shell_on = SHELL_DEFAULT_STATE;
 

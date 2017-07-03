@@ -38,8 +38,10 @@
 #include "lua.h"
 #include "lauxlib.h"
 
-#include <sys/statust.h>
-#include <drivers/uart/uart.h>
+#include <lwip/err.h>
+
+#include <sys/status.h>
+#include <sys/drivers/platform/esp8266/uart.h>   //<drivers/uart/uart.h>
 
 static int luart_pins( lua_State* L ) {
     return platform_uart_pins();

@@ -64,7 +64,9 @@ LIB_INIT(STRING, string, luaopen_string);
 LIB_INIT(COROUTINE, coroutine, luaopen_coroutine);
 LIB_INIT(DEBUG, debug, luaopen_debug);
 
+#if LUA_USE_LORA
 LIB_INIT(LORA, lora, luaopen_lora);
+#endif
 LIB_INIT(PACK, pack, luaopen_pack);
 LIB_INIT(TMR, tmr, luaopen_tmr);
 LIB_INIT(PIO, pio, luaopen_pio);

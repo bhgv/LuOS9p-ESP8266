@@ -7,7 +7,7 @@ CFLAGS += -DPLATFORM_ESP8266
 CFLAGS += -DCPU_HZ=80000000L                 # CPU frequency in hertz
 CFLAGS += -DCORE_TIMER_HZ=CPU_HZ             # CPU core timer frequency
 CFLAGS += -D_CLOCKS_PER_SEC_=100             # Number of interrupt ticks for reach 1 second
-CFLAGS += -DUSE_NETWORKING=0                 # Networking is used (1 = yes, 0 = not)
+CFLAGS += -DUSE_NETWORKING=1                 # Networking is used (1 = yes, 0 = not)
 CFLAGS += -DMTX_USE_EVENTS=0                 # Use event groups in mtx implementation (experimental)
 
 CFLAGS += -DluaTaskStack=192*5               # Stck size assigned to lua thread
@@ -70,7 +70,7 @@ CFLAGS += -DLUA_USE_DEBUG=1			   # debug
 #
 CFLAGS += -DLUA_USE_TMR=1		       # timer
 CFLAGS += -DLUA_USE_PIO=1		       # gpio
-CFLAGS += -DLUA_USE_LORA=1		       # lora
+CFLAGS += -DLUA_USE_LORA=0		       # lora
 CFLAGS += -DLUA_USE_PACK=1		       # pack
-CFLAGS += -DLUA_USE_THREAD=1		   # thread
-CFLAGS += -DLUA_USE_EDITOR=0	       # editor
+CFLAGS += -DLUA_USE_THREAD=1			# thread
+CFLAGS += -DLUA_USE_EDITOR=1		       # editor

@@ -51,13 +51,15 @@
 #define USE_LORA             0
 #define USE_RTC              0
 #define USE_ETHERNET         0
-#define USE_WIFI             0
+#define USE_WIFI             1
 #define USE_GPRS             0
 #define USE_GPS              0
 #define USE_SD               0
 #define USE_DISPLAY          0
 #define USE_CAN              0
 #define USE_STEPPER          0
+#define USE_MQTT             0
+#define USE_CONSOLE          1
 
 // ---------------------------------------------------------------------------
 // Leds
@@ -286,7 +288,7 @@
 // ---------------------------------------------------------------------------
 #define HISTORY_DEFAULT_STATE 0
 
-#define SHELL_DEFAULT_STATE   0 // Initial LuaOS shell status (1 = on, 0 = off)
+#define SHELL_DEFAULT_STATE   1 // Initial LuaOS shell status (1 = on, 0 = off)
 
 // ---------------------------------------------------------------------------
 // Lua modules
@@ -295,7 +297,7 @@
 #define LUA_USE_NET         (1 && (USE_ETHERNET || USE_WIFI || USE_GPRS))
 #define LUA_USE_ADC         0
 #define LUA_USE_SPI         0
-#define LUA_USE_MQTT        (1 && (USE_ETHERNET || USE_WIFI || USE_GPRS))
+#define LUA_USE_MQTT        (1 && USE_MQTT && (USE_ETHERNET || USE_WIFI || USE_GPRS))
 #define LUA_USE_SCREEN      (1 && USE_DISPLAY)
 #define LUA_USE_UART        0
 #define LUA_USE_PWM         0

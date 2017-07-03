@@ -40,11 +40,19 @@
 #include <string.h>
 #include <stddef.h>
 
+#include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
 #include "lwip/inet.h"
 #include "lwip/netdb.h"
 #include "lwip/opt.h"
+
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+typedef int32_t s32;
+typedef int16_t s16;
+typedef int8_t s8;
 
 int platform_net_exists(const char *interface);
 void platform_net_stat_iface(const char *interface);
