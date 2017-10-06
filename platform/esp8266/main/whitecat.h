@@ -290,6 +290,33 @@
 
 #define SHELL_DEFAULT_STATE   1 // Initial LuaOS shell status (1 = on, 0 = off)
 
+
+//
+// Standard Lua modules to include
+//
+#define LUA_USE__G 1			   // base
+#define LUA_USE_OS 1			   // os
+#define LUA_USE_MATH 1		       // math
+#define LUA_USE_TABLE 1		       // table
+#define LUA_USE_IO 1		       // io
+#define LUA_USE_STRING 1		   // string
+#define LUA_USE_COROUTINE 1		   // coroutine
+#define LUA_USE_DEBUG 1			   // debug
+#define LUA_USE_PACKAGE 1			   // package
+
+//
+// LuaOS Lua modules to include
+//
+#define LUA_USE_OS 1		       // os
+#define LUA_USE_TMR 1		       // timer
+#define LUA_USE_PIO 1		       // gpio
+#define LUA_USE_LORA 0		       // lora
+#define LUA_USE_PACK 1		       // pack
+#define LUA_USE_THREAD 1		   // thread
+#define LUA_USE_EDITOR 0	       // editor
+#define LUA_USE_I2C 1	       // i2c
+
+
 // ---------------------------------------------------------------------------
 // Lua modules
 // ---------------------------------------------------------------------------
@@ -304,7 +331,7 @@
 #define LUA_USE_GPS         (1 && USE_GPS)
 #define LUA_USE_HTTP        (1 && (USE_ETHERNET || USE_WIFI || USE_GPRS))
 #define LUA_USE_STEPPER     (1 && USE_STEPPER)
-#define LUA_USE_I2C         0
+#define LUA_USE_I2C         1
 #define LUA_USE_SHELL       0
 #define LUA_USE_HISTORY	    0
 #endif	/* CONFIG_H */

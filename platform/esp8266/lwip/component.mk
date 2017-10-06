@@ -1,7 +1,14 @@
 # Component makefile for LWIP
 
 LWIP_DIR = $(lwip_ROOT)lwip/src/
-INC_DIRS += $(LWIP_DIR)include $(ROOT)lwip/include $(lwip_ROOT)include $(LWIP_DIR)include/posix $(LWIP_DIR)include/ipv4 $(LWIP_DIR)include/ipv4/lwip $(LWIP_DIR)include/lwip
+INC_DIRS += $(LWIP_DIR)include \
+	$(ROOT)lwip/include \
+	$(lwip_ROOT)include \
+	$(LWIP_DIR)include/posix \
+	$(LWIP_DIR)include/ipv4 \
+	$(LWIP_DIR)include/ipv4/lwip \
+	$(LWIP_DIR)include/lwip \
+	$(LWIP_ROOT)lwip/espressif/include
 
 # args for passing into compile rule generation
 lwip_INC_DIR =  # all in INC_DIRS, needed for normal operation

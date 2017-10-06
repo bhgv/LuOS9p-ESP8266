@@ -1,38 +1,74 @@
-#include "whitecat.h"
+#include "luartos.h"
+
+#include "lua.h"
 #include "lauxlib.h"
 
-#include <dirent.h>
+#include <sys/dirent.h>
 #include <sys/stat.h>
 #include <unistd.h> 
 #include <limits.h>
 #include <stdio.h>
-#include <sys/syslog.h>
+#include <errno.h>
+#include <string.h>
 
-#include <sys/drivers/uart.h>
+#include <sys/stat.h>
+#include <sys/syslog.h>
+#include <drivers/uart.h>
 
 #define l_getc(f)		getc(f)
 #define l_lockfile(f)   ((void)0)
 #define l_unlockfile(f)	((void)0)
 
-void tty_lock();
-void tty_unlock();
+int ioctl(int fd, unsigned long request, ...);
+
+static int f_attributes(lua_State *L) {
+    const char *path = luaL_checkstring(L, 1);
+    char type[10];
+
+    struct stat s;
+
+    if (stat(path, &s) < 0) {
+    	lua_pushnil(L);
+
+    	return 1;
+    }
+
+	if (s.st_mode == S_IFDIR) {
+		strcpy(type, "directory");
+	} else if (s.st_mode == S_IFREG) {
+		strcpy(type, "file");
+	}
+
+	lua_createtable(L, 0, 2);
+
+	lua_pushstring(L, "type");
+	lua_pushstring(L, type);
+	lua_settable(L, -3);
+
+	lua_pushstring(L, "size");
+	lua_pushinteger(L, s.st_size);
+	lua_settable(L, -3);
+
+	return 1;
+}
 
 static int read_line (lua_State *L, FILE *f, int chop) {
   luaL_Buffer b;
-  int c = '\0';
+  char c = '\0';
+
   luaL_buffinit(L, &b);
   
-  int nl = '\n';
+  char nl = '\n';
   
   if (f == stdin) {
       nl = '\r';
   }
   
-  while (c != EOF && c != nl) {  /* repeat until end of line */
+  while ((c != (char)EOF) && (c != nl)) {  /* repeat until end of line */
     char *buff = luaL_prepbuffer(&b);  /* pre-allocate buffer */
     int i = 0;
     l_lockfile(f);  /* no memory errors can happen inside the lock */
-    while (i < LUAL_BUFFERSIZE && (c = l_getc(f)) != EOF && c != nl) {
+    while ((i < LUAL_BUFFERSIZE) && ((c = l_getc(f)) != (char)EOF) && (c != nl)) {
       buff[i++] = c;
     
       if (f == stdin) {
@@ -54,21 +90,29 @@ static int f_receive (lua_State *L) {
     const char *filename = luaL_optstring(L, 1, "");
     unsigned int i;
     int done;
+    int bytes = 0;
 
-    char chunk[255];
-    char *cchunk;
-    char chunk_size;
-  
+    unsigned char chunk[255];
+    unsigned char *cchunk;
+    unsigned char chunk_size;
+
+    int buff_size = 10240;
+
     if (strlen(filename) == 0) return 0;
 
     FILE *f= fopen(filename, "w");
     if (f) {
-        // Lock tty, avoid other threads to write to console
-        tty_lock();
+    	// Try to allocate a great buffer for output stream
+    	while (setvbuf(f , NULL, _IOFBF, buff_size) != 0) {
+    		buff_size = buff_size - 1024;
+    	}
+
+        uart_ll_lock(CONSOLE_UART);
+        uart_ll_set_raw(1);
         
         // Clear received buffer
         uart_consume(CONSOLE_UART);
-        
+
         // Send 'C' for start
         uart_write(CONSOLE_UART, 'C');
         uart_write(CONSOLE_UART, '\n');
@@ -77,7 +121,7 @@ static int f_receive (lua_State *L) {
 
         for(;;) {
             // Wait for chunk size
-            if (!uart_read(CONSOLE_UART, &chunk_size, 1000)) {
+            if (!uart_read(CONSOLE_UART, (char *)&chunk_size, 2000)) {
                 break;
             }
 
@@ -90,9 +134,10 @@ static int f_receive (lua_State *L) {
             // Read chunk
             cchunk = chunk;
             for(i=0; i < chunk_size; i++) {
-                if (!uart_read(CONSOLE_UART, cchunk++, 1000)) {
+                if (!uart_read(CONSOLE_UART, (char *)cchunk++, 2000)) {
                     break;
                 }
+                bytes++;
             }
 
             // Wrhite chunk to disk
@@ -102,22 +147,22 @@ static int f_receive (lua_State *L) {
             uart_write(CONSOLE_UART, 'C');
             uart_write(CONSOLE_UART, '\n');
         }
-                
+
         fclose(f);
         
         if (!done) {
-            // Unlock tty, permit other threads to write to console
-            tty_unlock();
+            uart_ll_set_raw(0);
+            uart_ll_unlock(CONSOLE_UART);
             
             return luaL_error(L, "timeout");
         }
 
-        // Unlock tty, permit other threads to write to console
-        tty_unlock();
+        uart_ll_set_raw(0);
+        uart_ll_unlock(CONSOLE_UART);
     } else {
         return luaL_error(L, strerror(errno));
     }
-    
+
     lua_pushboolean(L, 1);
     return 1;
 }
@@ -126,6 +171,7 @@ static int f_send (lua_State *L) {
     const char *filename = luaL_optstring(L, 1, "");
     int i;
     int done;
+    int error;
     char c;
 
     unsigned char chunk[255];
@@ -136,10 +182,11 @@ static int f_send (lua_State *L) {
 
     FILE *f= fopen(filename, "r");
     if (f) {
-        // Lock tty, avoid other threads to write to console
-        tty_lock();
-       
+    	uart_ll_lock(CONSOLE_UART);
+    	uart_ll_set_raw(1);
+
         done = 1;
+        error = 0;
         while (!feof(f)) {
             // Read next chunk
             chunk_size = 0;
@@ -151,11 +198,11 @@ static int f_send (lua_State *L) {
             }
             
             // Wait for C\n
-            if (!uart_read(CONSOLE_UART, &c, 1000)) {done = 0; break;}
-            if (c != 'C') {done = 0; break;}
+            if (!uart_read(CONSOLE_UART, &c, 2000)) {done = 0; break;}
+            if (c != 'C') {done = 0; error = 1; break;}
             
-            if (!uart_read(CONSOLE_UART, &c, 1000)) {done = 0; break;}           
-            if (c != '\n') {done = 0; break;}
+            if (!uart_read(CONSOLE_UART, &c, 2000)) {done = 0; break;}
+            if (c != '\n') {done = 0; error = 1; break;}
             
             // Send chunk size
             uart_write(CONSOLE_UART, chunk_size);
@@ -173,26 +220,51 @@ static int f_send (lua_State *L) {
             // Send last chunk with size 0
 
             // Wait for C\n
-            if (!uart_read(CONSOLE_UART, &c, 1000)) {tty_unlock();return luaL_error(L, "timeout1");}
-            if (c != 'C') {tty_unlock();return luaL_error(L, "timeout1");}
+            if (!uart_read(CONSOLE_UART, &c, 2000)) {
+            	uart_ll_set_raw(0);
+            	uart_ll_unlock(CONSOLE_UART);
+            	return luaL_error(L, "timeout");
+            }
+
+            if (c != 'C') {
+            	uart_ll_set_raw(0);
+            	uart_ll_unlock(CONSOLE_UART);
+            	return luaL_error(L, "unnexpected input");
+            }
+
+            if (!uart_read(CONSOLE_UART, &c, 2000)) {
+            	uart_ll_set_raw(0);
+            	uart_ll_unlock(CONSOLE_UART);
+            	return luaL_error(L, "timeout");
+            }
             
-            if (!uart_read(CONSOLE_UART, &c, 1000)) {tty_unlock();return luaL_error(L, "timeout1");}    
-            if (c != '\n') {tty_unlock();return luaL_error(L, "timeout1");}
+            if (c != '\n') {
+            	uart_ll_set_raw(0);
+            	uart_ll_unlock(CONSOLE_UART);
+            	return luaL_error(L, "unnexpected input");
+            }
             
             // Send chunk size
             chunk_size = '\0';
             uart_write(CONSOLE_UART, chunk_size);
         } else {
-            tty_unlock();
-            return luaL_error(L, "timeout2");
+        	uart_ll_set_raw(0);
+            uart_ll_unlock(CONSOLE_UART);
+
+            if (error) {
+            	return luaL_error(L, "unnexpected input");
+            } else {
+            	return luaL_error(L, "timeout");
+            }
         }
-                
-        // Unlock tty, permit other threads to write to console
-        tty_unlock();
+
+        uart_ll_set_raw(0);
+        uart_ll_unlock(CONSOLE_UART);
+
     } else {
         return luaL_error(L, strerror(errno));
     }
-    
+
     return 0;
 }
 

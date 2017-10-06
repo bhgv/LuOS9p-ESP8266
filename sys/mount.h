@@ -38,6 +38,8 @@
 //#include <net/radix.h>
 //#include <sys/socket.h>     /* XXX for AF_MAX */
 
+typedef signed int int32_t;
+
 typedef struct { int32_t val[2]; } fsid_t;  /* file system id type */
 
 /*

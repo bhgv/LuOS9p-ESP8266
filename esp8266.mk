@@ -13,6 +13,10 @@ CFLAGS += -DMTX_USE_EVENTS=0                 # Use event groups in mtx implement
 CFLAGS += -DluaTaskStack=192*5               # Stck size assigned to lua thread
 CFLAGS += -DtskDEF_PRIORITY=0				 # Default task priority
 CFLAGS += -DdefaultThreadStack=192*5
+CFLAGS += -DCONFIG_LUA_RTOS_LUA_THREAD_STACK_SIZE=192*5
+CFLAGS += -DCONFIG_LUA_RTOS_LUA_TASK_PRIORITY=0
+#CFLAGS += -D
+#CFLAGS += -D
 
 #
 # File system configuration
@@ -73,4 +77,5 @@ CFLAGS += -DLUA_USE_PIO=1		       # gpio
 CFLAGS += -DLUA_USE_LORA=0		       # lora
 CFLAGS += -DLUA_USE_PACK=1		       # pack
 CFLAGS += -DLUA_USE_THREAD=1		   # thread
-CFLAGS += -DLUA_USE_EDITOR=1	       # editor
+CFLAGS += -DLUA_USE_EDITOR=0	       # editor
+CFLAGS += -DLUA_USE_I2C=1	       # i2c

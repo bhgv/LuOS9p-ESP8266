@@ -34,47 +34,60 @@
 #include "lua.h"
 #include "lauxlib.h"
 
-#include <drivers/cpu/error.h>
-#include <drivers/i2c/i2c.h>
+#include "c_types.h"
+
+#include <drivers/error.h>
+#include <i2c/i2c.h>
+#include <platform.h>
+
+#include "modules.h"
+
 
 static int li2c_setup( lua_State* L ) {
-    tdriver_error *error;
+//    tdriver_error *error;
+    int error;
 
     int total = lua_gettop(L);
-    int id = luaL_checkinteger(L, 1);
-    int speed = luaL_checkinteger(L, 2);
+    int id = 0; //luaL_checkinteger(L, 1);
+    int speed = 100; //luaL_checkinteger(L, 2);
     int sda;
     int scl;
 
     // Some integrity checks
-    if (!platform_i2c_exists(id)) {
-        return luaL_error(L, "I2C%d does not exist", id);
-    }
+//    if (!platform_i2c_exists(id)) {
+//        return luaL_error(L, "I2C%d does not exist", id);
+//    }
 
-    if ((speed <= 0) || (speed > 1000)) {
-        return luaL_error(L, "Invalid speed");        
-    }
+//    if ((speed <= 0) || (speed > 1000)) {
+//        return luaL_error(L, "Invalid speed");        
+//    }
     
-    if (id > NI2CHW) {
+//    if (id > NI2CHW) {
         // SDA and SCL is needed
-        if (total != 4) {
+        if (total != 2) {
             return luaL_error(L, "Missing SDA / SCL arguments");                    
         }
         
-        sda = luaL_checkinteger(L, 3);
-        scl = luaL_checkinteger(L, 4);
+        sda = luaL_checkinteger(L, 1);
+        scl = luaL_checkinteger(L, 2);
         
         if (sda == scl) {
             return luaL_error(L, "SDA / SCL must be different");      
         }
-    }
+//    }
     
+//    printf("sda=%d, scl=%d\n", sda, scl);
     // Setup
-    if ((error = i2c_setup(id, speed, sda, scl))) {
-        return luaL_driver_error(L, "I2C can't setup", error);
-    }
+//    if ((error = i2c_setup(id, speed, sda, scl))) {
+    //if (!( 
+    error = platform_i2c_setup(id, (uint8_t)sda, (uint8_t)scl, speed);
+    // )) {
+//		lua_pushstring(L, "I2C can't setup");
+		lua_pushinteger(L, error);
+        return 1; //luaL_driver_error(L, "I2C can't setup", error);
+//    }
 
-    return 0;
+//    return 0;
 }
 
 static int li2c_start( lua_State* L ) {
@@ -85,7 +98,7 @@ static int li2c_start( lua_State* L ) {
         return luaL_error(L, "I2C%d does not exist", id);
     }
     
-    i2c_start(id);
+    platform_i2c_send_start(id);
 
     return 0;
 }
@@ -98,7 +111,7 @@ static int li2c_stop( lua_State* L ) {
         return luaL_error(L, "I2C%d does not exist", id);
     }
 
-    i2c_stop(id);
+    platform_i2c_send_stop(id);
     
     return 0;
 }
@@ -121,7 +134,7 @@ static int li2c_address( lua_State* L ) {
         return luaL_error(L, "Ivalid direction");
     }
 
-    lua_pushboolean(L, i2c_write_address(id, address, direction));
+    lua_pushboolean(L, platform_i2c_send_address(id, address, direction));
     
     return 1;
 }
@@ -135,7 +148,7 @@ static int li2c_read( lua_State* L ) {
         return luaL_error(L, "I2C%d does not exist", id);
     }
 
-    data = i2c_read(id);
+    data = platform_i2c_recv_byte(id, 1);
     
     lua_pushinteger(L, data & 0x000000ff);
    
@@ -151,12 +164,13 @@ static int li2c_write(lua_State* L) {
         return luaL_error(L, "I2C%d does not exist", id);
     }
 
-    lua_pushboolean(L, i2c_write(id, (char)(data & 0x000000ff)));
+    lua_pushboolean(L, platform_i2c_send_byte(id, (char)(data & 0x000000ff)));
 
     return 1;
 }
 
-static const luaL_Reg li2c[] = {
+static const /*luaL_Reg*/ LUA_REG_TYPE li2c[] = {
+/*
     {"setup", li2c_setup},
     {"start", li2c_start},
     {"stop", li2c_stop},
@@ -164,25 +178,41 @@ static const luaL_Reg li2c[] = {
     {"read", li2c_read},
     {"write", li2c_write},
     {NULL, NULL}
+*/
+//  { LSTRKEY( "fb_rle" ),  LFUNCVAL( lu8g_fb_rle ) },
+
+    {LSTRKEY( "setup" ), LFUNCVAL( li2c_setup )},
+    {LSTRKEY( "start" ), LFUNCVAL( li2c_start )},
+    {LSTRKEY( "stop" ), LFUNCVAL( li2c_stop )},
+    {LSTRKEY( "address" ), LFUNCVAL( li2c_address )},
+    {LSTRKEY( "read" ), LFUNCVAL( li2c_read )},
+    {LSTRKEY( "write" ), LFUNCVAL( li2c_write )},
+    {LNILKEY, LNILVAL}
 };
 
 int luaopen_i2c(lua_State* L) {
+//	int sda = 2;
+//	int scl = 14;
+//	int speed = 100;
+//	platform_i2c_setup(0, sda, scl, speed);
+	
+/*
     luaL_newlib(L, li2c);
 
-    int i;
-    char buff[7];
+//    int i;
+//    char buff[7];
 
-    for(i=1;i<=NI2CHW;i++) {
-        sprintf(buff,"I2C%d",i);
-        lua_pushinteger(L, i);
-        lua_setfield(L, -2, buff);
-    }
+//    for(i=1;i<=NI2CHW;i++) {
+//        sprintf(buff,"I2C%d",i);
+//        lua_pushinteger(L, i);
+//        lua_setfield(L, -2, buff);
+//    }
 
-    for(i=1;i<=NI2CBB;i++) {
-        sprintf(buff,"I2CBB%d",i);
-        lua_pushinteger(L, i + NI2CHW);
-        lua_setfield(L, -2, buff);
-    }
+//    for(i=1;i<=NI2CBB;i++) {
+//        sprintf(buff,"I2CBB%d",i);
+//        lua_pushinteger(L, i + NI2CHW);
+//        lua_setfield(L, -2, buff);
+//    }
 
     lua_pushinteger(L, 0);
     lua_setfield(L, -2, "WRITE");
@@ -191,6 +221,10 @@ int luaopen_i2c(lua_State* L) {
     lua_setfield(L, -2, "READ");
 
     return 1;
+*/
+    return 0;
 }
+
+MODULE_REGISTER_MAPPED(I2C, i2c, li2c, luaopen_i2c)
 
 #endif

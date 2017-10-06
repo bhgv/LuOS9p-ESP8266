@@ -67,22 +67,34 @@
 
 struct pthread_mutex_attr {
     int type;
+    bool is_initialized; //{*}
 };
 
 typedef struct pthread_mutex_attr pthread_mutexattr_t;
 
 
+#if 1 //{*}
 struct pthread_mutex {
     SemaphoreHandle_t sem;
     int owner;
     int type;
 };
+#endif
 
 typedef unsigned int pthread_mutex_t;
 typedef unsigned int pthread_condattr_t;
 typedef int pthread_t;
 typedef int pthread_key_t;
 
+
+//typedef struct pthread_once pthread_once_t;
+//typedef struct pthread_cond pthread_cond_t;
+//typedef int cpu_set_t;
+
+#define tskNO_AFFINITY INT_MAX
+#define portNUM_PROCESSORS 1
+
+#if 1   // {*}
 struct pthread_cond {
     struct mtx mutex;
 };
@@ -122,13 +134,31 @@ struct pthread {
     pthread_t thread;
     xTaskHandle task;
 };
+#endif // {*}
 
-struct pthread_attr {
-    int stack_size;
-    int initial_state;
+struct sched_param {
+	int sched_priority;
+//	cpu_set_t *affinityset;
+//	int initial_state;
 };
 
-typedef struct pthread_attr pthread_attr_t;
+struct _pthread_attr {
+    int stack_size;
+    int initial_state;
+  
+// VV from esp32 to test 
+//  int is_initialized;
+//  void *stackaddr;
+//  int stacksize;
+//  int contentionscope;
+//  int inheritsched;
+//  int schedpolicy;
+//  struct sched_param schedparam;
+// AA from esp32 to test 
+
+};
+
+typedef struct _pthread_attr pthread_attr_t;
 
 #define PTHREAD_INITIAL_STATE_RUN 1
 #define PTHREAD_INITIAL_STATE_SUSPEND 2
@@ -136,6 +166,7 @@ typedef struct pthread_attr pthread_attr_t;
 #define PTHREAD_CREATE_DETACHED 1
 #define PTHREAD_CREATE_JOINABLE 2
 
+#if 1 //{*}
 void _pthread_init();
 int _pthread_create(pthread_t *id, int stacksize, int initial_state, void *(*start_routine)(void *), void *args);
 int _pthread_join(pthread_t id);
@@ -185,6 +216,7 @@ int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
 int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime);
 
 void pthread_cleanup_push(void (*routine)(void *), void *arg);
+#endif //{*}
 
 // Mutex types
 #define PTHREAD_MUTEX_NORMAL        1

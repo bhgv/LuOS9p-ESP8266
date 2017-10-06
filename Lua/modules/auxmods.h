@@ -61,6 +61,12 @@ LUALIB_API int (luaopen_i2c) (lua_State* L);
 #define AUXLIB_LORA "lora"
 LUALIB_API int (luaopen_lora) (lua_State* L);
 
+//#define AUXLIB_SSD1306 "ssd1306"
+//LUALIB_API int (luaopen_ssd1306) (lua_State* L);
+
+#define AUXLIB_U8G "u8g"
+LUALIB_API int (luaopen_u8g) (lua_State* L);
+
 #define AUXLIB_PACK "pack"
 LUALIB_API int (luaopen_pack) (lua_State* L);
 

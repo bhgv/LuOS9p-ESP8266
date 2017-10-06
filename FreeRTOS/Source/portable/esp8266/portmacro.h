@@ -70,6 +70,8 @@
 extern "C" {
 #endif
 
+#define __attributed __attribute__
+
 #include "esp8266.h"
 #include "espressif/esp8266/ets_sys.h"
 #include <stdint.h>

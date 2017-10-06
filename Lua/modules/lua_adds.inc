@@ -1,7 +1,7 @@
 /*
- * Whitecat, adds to lua.c
+ * Lua RTOS, adds to lua.c
  *
- * Copyright (C) 2015 - 2016
+ * Copyright (C) 2015 - 2017
  * IBEROXARXA SERVICIOS INTEGRALES, S.L. & CSS IBÉRICA, S.L.
  * 
  * Author: Jaume Olivé (jolive@iberoxarxa.com / jolive@whitecatboard.org)
@@ -29,18 +29,23 @@
 
 #include "pthread.h"
 #include "linenoise.h"
-#include <sys/debug.h>
-#include <sys/syscalls/mount.h>
+//#include "shell.h"
+#include "cache.h"
+#include "luaconf.h"
 
-#include <sys/param.h>
+#include <limits.h>
+
+#include <unistd.h>
 #include <sys/status.h>
+#include <sys/debug.h>
 
 static int dofile (lua_State *L, const char *name);
 
 extern int threadInited;
-extern int lua_shell_on;
 
 #if LUA_USE_LUA_LOCK
+#include <pthread.h>
+
 pthread_mutex_t lua_mutex;
 
 inline void LuaLockInit(lua_State *L) {
@@ -71,37 +76,38 @@ static void get_prompt (lua_State *L, int firstline, char *path) {
 
   if (p == NULL) {
       if (firstline) {
-          if (getcwd(path, MAXPATHLEN + 10)) {
-              path = strcat(path, " ");
-              path = strcat(path, LUA_PROMPT);
+          if (getcwd(path, PATH_MAX + 10)) {
+              path = strncat(path, " ", PATH_MAX + 10);
+              path = strncat(path, LUA_PROMPT, PATH_MAX + 10);
           }
       } else {
 		  
-		  strcpy(path, LUA_PROMPT2);
+		  strncpy(path, LUA_PROMPT2, PATH_MAX + 10);
       }
   } else {
-      strcpy(path, p);
+      strncpy(path, p, PATH_MAX + 10);
   }
 }
 
+
+
 static int luaos_pushline (lua_State *L, int firstline) {
   char buffer[LUA_MAXINPUT];
-  char prmt[MAXPATHLEN + 20];
+  char prmt[PATH_MAX + 21];
   
   char *b = buffer;
   size_t l;
-    
+
   get_prompt(L, firstline, prmt);
+
   int readstatus = lua_readline(L, b, prmt);
   if (readstatus == 0)
     return 0;  /* no input (prompt will be popped by caller) */
   
-#if LUA_USE_SHELL
-  if (lua_shell_on) {
-      lua_shell(buffer);
-  }
-#endif
-  
+//  if (status_get(STATUS_LUA_SHELL)) {
+//	  lua_shell(L, buffer);
+//  }
+
   lua_pop(L, 1);  /* remove prompt */
   l = strlen(b);
   if (l > 0 && b[l-1] == '\n')  /* line ends with newline? */
@@ -125,28 +131,17 @@ static void luaos_boot_scripts(lua_State *L) {
     const char *system_order[2];
     const char *autorun_order[2];
 
-    if (!mount_is_mounted("sd") && !mount_is_mounted("cfi")) {
-        // No filesystem is mounted, exit
-        return;
-    } else if (!mount_is_mounted("sd") &&  mount_is_mounted("cfi")) {
-        system_order[0] = "/system.lua";
-        system_order[1] = NULL;
+    system_order[0] = "/system.lua";
+    system_order[1] = NULL;
 
-        autorun_order[0] = "/autorun.lua";
-        autorun_order[1] = NULL;
-    } else if (mount_is_mounted("sd") && !mount_is_mounted("cfi")) {
-        system_order[0] = "/system.lua";
-        system_order[1] = NULL;
+#ifdef RUN_LUA_TESTS
+    chdir("/tests");
+    autorun_order[0] = "/tests/test.lua";
+#else
+    autorun_order[0] = "/autorun.lua";
+#endif
 
-        autorun_order[0] = "/autorun.lua";
-        autorun_order[1] = NULL;
-    } else if (mount_is_mounted("sd") &&  mount_is_mounted("cfi")) {
-        system_order[0] = "/sd/system.lua";
-        system_order[1] = NULL;
-
-        autorun_order[0] = "/sd/autorun.lua";
-        autorun_order[1] = NULL;
-    }
+    autorun_order[1] = NULL;
 
     printf("\n");
 
@@ -197,16 +192,25 @@ static void luaos_boot_scripts(lua_State *L) {
 static int luaos_pmain (lua_State *L) {
   status_set(STATUS_LUA_RUNNING);
 
+#if LUA_USE_ROTABLE && CONFIG_LUA_RTOS_LUA_USE_ROTABLE_CACHE
+    rotable_cache_init();
+#endif
+
   debug_free_mem_begin(luaL_openlibs);
   luaL_openlibs(L);  /* open standard libraries */
   debug_free_mem_end(luaL_openlibs, NULL);
-    
+
+//  luaL_requiref(L, "i2c", luaopen_i2c, 1);
+//  lua_pop(L, 1);
+//  luaL_requiref(L, "oled", luaopen_u8g, 1);
+//  lua_pop(L, 1);
+
   print_version();
 
   if (!status_get(STATUS_LUA_ABORT_BOOT_SCRIPTS)) {
 	  luaos_boot_scripts(L);
   } else {
-	  printf("LuaOS-boot-scripts-aborted\r\n");
+	  printf("Lua RTOS-boot-scripts-aborted\r\n");
   }
   
   status_set(STATUS_LUA_INTERPRETER);

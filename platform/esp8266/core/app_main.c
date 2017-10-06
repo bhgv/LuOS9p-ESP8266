@@ -357,6 +357,7 @@ static void init_g_ic(void) {
 // .irom0.text+0x398
 void sdk_wdt_init(void) {
     WDT.CTRL &= ~WDT_CTRL_ENABLE;
+//    DPORT.INT_ENABLE &= ~DPORT_INT_ENABLE_WDT;
     DPORT.INT_ENABLE |= DPORT_INT_ENABLE_WDT;
     WDT.REG1 = 0x0000000b;
     WDT.REG2 = 0x0000000c;
@@ -364,6 +365,11 @@ void sdk_wdt_init(void) {
     WDT.CTRL = SET_FIELD(WDT.CTRL, WDT_CTRL_FIELD0, 0);
     WDT.CTRL |= WDT_CTRL_ENABLE;
     sdk_pp_soft_wdt_init();
+}
+
+void sdk_wdt_feed() {
+    WDT.FEED = WDT_FEED_MAGIC;
+    sdk_pp_soft_wdt_feed();
 }
 
 // .irom0.text+0x474
@@ -478,7 +484,7 @@ static __attribute__((noinline)) void user_start_phase2(void) {
     tcpip_init(NULL, NULL);
     sdk_wdt_init();
 #endif
-		
+	
 	debug_free_mem_end(rtos_sdk_phase2, NULL);
 
     xTaskCreate(sdk_user_init_task, "uiT", 1024, 0, 14, &sdk_xUserTaskHandle);

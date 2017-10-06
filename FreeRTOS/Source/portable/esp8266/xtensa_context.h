@@ -257,13 +257,13 @@ expansions are implemented as assembler macros.
 #ifdef __XTENSA_CALL0_ABI__
   /* Call0 */
   #define ENTRY(sz)     entry1  sz
-    .macro  entry1 size=0x10
+    .macro  entry1 size=0x30
     addi    sp, sp, -\size
     s32i    a0, sp, 0
     .endm
   #define ENTRY0      
   #define RET(sz)       ret1    sz
-    .macro  ret1 size=0x10
+    .macro  ret1 size=0x30
     l32i    a0, sp, 0
     addi    sp, sp, \size
     ret
@@ -272,7 +272,7 @@ expansions are implemented as assembler macros.
 #else
   /* Windowed */
   #define ENTRY(sz)     entry   sp, sz
-  #define ENTRY0        entry   sp, 0x10
+  #define ENTRY0        entry   sp, 0x30
   #define RET(sz)       retw
   #define RET0          retw
 #endif

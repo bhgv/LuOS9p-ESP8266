@@ -110,6 +110,6 @@ LUALIB_API int luaopen_tmr( lua_State *L ) {
 #endif
 }
 
-LUA_OS_MODULE(TMR, tmr, tmr_map);
+MODULE_REGISTER_MAPPED(TMR, tmr, tmr_map, luaopen_tmr);
 
 #endif

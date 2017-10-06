@@ -22,8 +22,10 @@ FLASH_SPEED ?= 40
 
 # Output directories to store intermediate compiled files
 # relative to the program directory
-BUILD_DIR ?= $(ROOT)platform/$(PLATFORM)/build/
-FIRMWARE_DIR ?= $(ROOT)platform/$(PLATFORM)/firmware/
+#BUILD_DIR ?= $(ROOT)platform/$(PLATFORM)/build/
+#FIRMWARE_DIR ?= $(ROOT)platform/$(PLATFORM)/firmware/
+BUILD_DIR ?= $(ROOT)bld/
+FIRMWARE_DIR ?= $(ROOT)bld/firmware/
 
 # esptool.py from https://github.com/themadinventor/esptool
 ESPTOOL ?= esptool.py
@@ -62,7 +64,31 @@ OBJDUMP = $(CROSS)objdump
 
 # Source components to compile and link. Each of these are subdirectories
 # of the root, with a 'component.mk' file.
-COMPONENTS     ?= $(EXTRA_COMPONENTS) FreeRTOS platform/$(PLATFORM)/lwip platform/$(PLATFORM)/core sys pthread Lua platform/$(PLATFORM)/open_esplibs
+COMPONENTS     ?= $(EXTRA_COMPONENTS) \
+		    FreeRTOS \
+		    sys pthread Lua \
+		    platform/$(PLATFORM)/core \
+		    platform/$(PLATFORM)/lwip \
+		    platform/$(PLATFORM)/open_esplibs \
+		    platform/$(PLATFORM)/i2c \
+		    platform/$(PLATFORM)/ssd1306 \
+		    platform/$(PLATFORM)/platform \
+
+#		    platform/$(PLATFORM)/u8g2/cppsrc \
+#		    platform/$(PLATFORM)/arduino \
+#		    $(HOME)/esp-open-rtos/extras/ssd1306 \
+#		    $(HOME)/esp-open-rtos/extras/i2c \
+
+#		    $(HOME)/esp-open-rtos/open_esplibs \
+#		    $(HOME)/esp-open-rtos/lwip \
+#		    $(HOME)/esp-open-rtos/core \
+
+
+#		    platform/$(PLATFORM)/open_esplibs \
+#		    platform/$(PLATFORM)/lwip \
+#		    platform/$(PLATFORM)/core \
+#		    platform/$(PLATFORM)//u8g2/csrc \
+
 
 # binary esp-iot-rtos SDK libraries to link. These are pre-processed prior to linking.
 SDK_LIBS		?= main net80211 phy pp wpa
@@ -97,10 +123,20 @@ CXXFLAGS	?= $(C_CXX_FLAGS) -fno-exceptions -fno-rtti $(EXTRA_CXXFLAGS)
 # these aren't all technically preprocesor args, but used by all 3 of C, C++, assembler
 CPPFLAGS	+= -mlongcalls -mtext-section-literals
 
-include $(ROOT)platform/$(PLATFORM)/config.mk
-EXTRA_LDFLAGS   = -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=free
-LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
-CFLAGS      += -DUSE_CUSTOM_HEAP=0
+include $(ROOT)config/config.mk
+#include $(ROOT)platform/$(PLATFORM)/config.mk
+EXTRA_LDFLAGS   = 
+#-Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=free
+LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections \
+	    -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
+
+CFLAGS      += -DUSE_CUSTOM_HEAP=0 -I$(ROOT)Lua/src -I$(ROOT)FreeRTOS/Source/include \
+	    -I$(ROOT)include/platform/esp8266/espressif -I$(ROOT)include/platform/esp8266/espressif/esp8266 \
+	    -I$(ROOT)platform/esp8266/lwip/lwip/espressif/include \
+	    -I$(ROOT)platform/esp8266/core/include/esp \
+	    -I$(ROOT)platform/esp8266/core/include \
+	    -I$(ROOT)sys 
+
 LINKER_SCRIPTS += $(ROOT)platform/$(PLATFORM)/ld/program.ld $(ROOT)platform/$(PLATFORM)/ld/rom.ld
 
 ifeq ($(WARNINGS_AS_ERRORS),1)

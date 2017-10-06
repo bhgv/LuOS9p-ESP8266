@@ -52,6 +52,42 @@
 // List of threads
 static struct list lthread_list;
 
+lua_State* thread_get_lua_State() {
+//	int idx;
+	int res;
+	pthread_t self_id = pthread_self();
+    struct lthread *thread;
+
+    // Get thread
+    res = list_get(&lthread_list, self_id, (void **)&thread);
+    if (res) {
+//        errno = res;
+        return 0;
+    }
+    return thread->L;
+
+/*
+        idx = list_first(&lthread_list);
+        while (idx >= 0) {
+            list_get(&lthread_list, idx, (void **)&thread);
+
+            // Get status
+            switch (thread->status) {
+                case LTHREAD_STATUS_RUNNING: strcpy(status,"run "); break;
+                case LTHREAD_STATUS_SUSPENDED: strcpy(status,"susp"); break;
+                default:
+                    strcpy(status,"----");
+
+            }
+
+            printf("%d\t%s\t\t%s\t%d\n", idx, "", status, 0);
+
+            idx = list_next(&lthread_list, idx);
+        }        
+    }
+*/
+}
+
 void thread_terminated(void *args) {
     struct lthread *thread;
 
@@ -442,6 +478,6 @@ int luaopen_thread(lua_State* L) {
 #endif
 } 
  
-LUA_OS_MODULE(THREAD, thread, thread);
+MODULE_REGISTER_MAPPED(THREAD, thread, thread, luaopen_thread);
 
 #endif

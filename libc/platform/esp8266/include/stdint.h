@@ -41,8 +41,10 @@ typedef __uint_least16_t uint_least16_t;
 #endif
 
 #ifdef ___int32_t_defined
-typedef __int32_t int32_t ;
-typedef __uint32_t uint32_t ;
+//typedef __int32_t int32_t ;
+typedef signed int int32_t ;
+//typedef __uint32_t uint32_t ;
+typedef unsigned int uint32_t ;
 #define __int32_t_defined 1
 #endif
 
@@ -506,6 +508,7 @@ typedef __uintptr_t uintptr_t;
 // WHITECAT BEGIN
 typedef signed int s32_t;
 typedef unsigned int u32_t;
+//typedef unsigned long u32_t;
 typedef signed short s16_t;
 typedef unsigned short u16_t;
 typedef signed char s8_t;

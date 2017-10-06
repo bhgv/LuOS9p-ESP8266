@@ -22,8 +22,8 @@ MEMORY
 pvPortMalloc = malloc;
 vPortFree = free;
 
-clock = _clock_;
-_remove_r = __remove_r;
+clock = ticks /*_clock_*/;
+/*_remove_r = __remove_r;*/
 _read_core_timer = xthal_get_ccount;
 
 
@@ -77,6 +77,39 @@ PROVIDE(_memmap_cacheattr_reset = _memmap_cacheattr_wb_trapnull);
 
 SECTIONS
 {
+/* //ex from esp32
+  .flash.rodata : ALIGN(4)
+  {
+    _lua_rtos_rodata_start = ABSOLUTE(.);
+
+    /* This is the array for Lua libraries to load at startup * /
+    . = ALIGN(4);
+    lua_libs1 = ABSOLUTE(.);
+    KEEP (*(.lua_libs1))
+    LONG(0) LONG(0)
+
+    /* This is the array for readonly Lua tables * /
+    lua_rotable = ABSOLUTE(.);
+    KEEP(*(.lua_rotable1))
+    LONG(0) LONG(0)
+
+    /* This is the array for drivers available in Lua RTOS build * /
+    drivers = ABSOLUTE(.);
+    KEEP(*(.drivers))
+    LONG(0) LONG(0)
+
+    KEEP(*(.driver_error))
+    KEEP(*(.driver_error_map))
+
+    /* This is the array for sensors available in Lua RTOS build * /
+    sensors = ABSOLUTE(.);
+    KEEP(*(.sensors))
+    LONG(0) LONG(0)
+
+    _lua_rtos_rodata_end = ABSOLUTE(.);
+  } >drom0_0_seg
+*/
+
 
   .dport0.rodata : ALIGN(4)
   {
@@ -243,17 +276,26 @@ SECTIONS
     /* Anything explicitly marked as "irom" or "irom0" should go here */
     *(.irom.* .irom.*.* .irom0.*)
 
+/*    _lua_rtos_rodata_start = ABSOLUTE(.); */
+
     . = ALIGN(4);
     /* Lua enabled modules. KEEP ensures that will not be removed */
     lua_libs1 = ABSOLUTE(.);
 	KEEP (*(.lua_libs1))
     LONG(0) LONG(0) /* Null-terminate the array */
 
+    /* This is the array for readonly Lua tables */
     lua_rotable = ABSOLUTE(.);
     KEEP(*(.lua_rotable1))
     LONG(0) LONG(0) /* Null-terminate the array */
-	
-	_irom0_text_end = ABSOLUTE(.);
+
+
+/*    _lua_rtos_rodata_end = ABSOLUTE(.); */
+
+	boot_count = ABSOLUTE(.);
+    LONG(0)
+    
+    _irom0_text_end = ABSOLUTE(.);
 
     /**************************************************************
       C++ constructor and destructor tables, properly ordered:

@@ -2,7 +2,7 @@
  * Copyright (c) 1983, 1988, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
- * Copyright (C) 2015 - 2016
+ * Copyright (C) 2015 - 2017
  * IBEROXARXA SERVICIOS INTEGRALES, S.L. & CSS IBÉRICA, S.L.
  * 
  * Author: Jaume Olivé (jolive@iberoxarxa.com / jolive@whitecatboard.org)
@@ -41,7 +41,7 @@
  * SUCH DAMAGE.
  */
 
-#include "whitecat.h"
+#include "luartos.h"
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)syslog.c	8.5 (Berkeley) 4/29/95";
@@ -49,7 +49,7 @@ static char sccsid[] = "@(#)syslog.c	8.5 (Berkeley) 4/29/95";
 
 #include <sys/types.h>
 #include <sys/syslog.h>
-#include <sys/uio.h>
+#include <sys/mount.h>
 
 #include <stdlib.h>
 #include <errno.h>
@@ -59,7 +59,6 @@ static char sccsid[] = "@(#)syslog.c	8.5 (Berkeley) 4/29/95";
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/syscalls/mount.h>
 
 #if __STDC__
 #include <stdarg.h>
@@ -72,7 +71,7 @@ static int 	 connected;		/* have done connect */
 static int	 LogStat = 0;		/* status bits, set by openlog() */
 static const char *LogTag = NULL;	/* string to tag the entry with */
 static int	LogFacility = LOG_USER;	/* default facility code */
-static int	LogMask = 0xff;		/* mask of priorities to be logged */
+static int	LogMask = 0b11111111;		/* mask of priorities to be logged */
 extern char	*__progname;		/* Program name, from crt0. */
 
 void vsyslog(int pri, register const char *fmt, va_list app);
@@ -91,6 +90,8 @@ syslog(pri, fmt, va_alist)
 	va_dcl
 #endif
 {
+	if (!fmt) return;
+
 	va_list ap;
 
 #if __STDC__
@@ -111,7 +112,9 @@ vsyslog(pri, fmt, ap)
 	register int cnt;
 	register char *p;
 	char *tbuf;
-	
+
+	if (!fmt) return;
+
 	time_t now;
 	int fd;
         int has_cr_lf = 0;
@@ -159,7 +162,7 @@ vsyslog(pri, fmt, ap)
 	cnt = p - tbuf;
         
 	if (LogStat & LOG_CONS) {
-            fd = STDOUT_FILENO;     
+            fd = fileno(_GLOBAL_REENT->_stdout);
             if (!has_cr_lf) {
                 (void)strcat(tbuf, "\r\n");
                 cnt += 2;
@@ -209,8 +212,12 @@ void openlog(ident, logstat, logfac)
     
     LogFile = NULL;
 
-    if (mount_is_mounted("sd")) {
-        LogFile = fopen("/sd/log/messages.log","a+");
+    if (mount_is_mounted("fat")) {
+    	if (mount_is_mounted("spiffs")) {
+        	LogFile = fopen("/sd/log/messages.log","a+");
+    	} else {
+        	LogFile = fopen("/log/messages.log","a+");
+    	}
     }
     
     connected = (LogFile != NULL);	
@@ -236,4 +243,12 @@ int setlogmask(int pmask) {
         LogMask = pmask;
     
     return (omask);
+}
+
+int getlogmask() {
+	return LogMask;
+}
+
+int getlogstat() {
+	return LogStat;
 }

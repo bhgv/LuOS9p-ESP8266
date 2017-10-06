@@ -102,9 +102,11 @@ typedef LUAI_UACINT l_uacInt;
 
 
 /* macro to avoid warnings about unused variables */
-#if !defined(UNUSED)
-#define UNUSED(x)	((void)(x))
+#if defined(UNUSED)
+#undef UNUSED
 #endif
+#define UNUSED(x)	((void)(x))
+//#endif
 
 
 /* type casts (a macro highlights casts in the code) */

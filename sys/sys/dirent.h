@@ -58,6 +58,7 @@ struct dirent {
 #define MAXNAMLEN   255
     char    d_name[MAXNAMLEN + 1];  /* name must be no longer than this */
 #endif
+    u_int32_t d_fsize;
 };
 
 /*
@@ -78,5 +79,16 @@ struct dirent {
  */
 #define IFTODT(mode)    (((mode) & 0170000) >> 12)
 #define DTTOIF(dirtype) ((dirtype) << 12)
+
+
+/*
+DIR* opendir(const char* name);
+struct dirent* readdir(DIR* pdir);
+long telldir(DIR* pdir);
+void seekdir(DIR* pdir, long loc);
+void rewinddir(DIR* pdir);
+int closedir(DIR* pdir);
+int readdir_r(DIR* pdir, struct dirent* entry, struct dirent** out_dirent);
+*/
 
 #endif

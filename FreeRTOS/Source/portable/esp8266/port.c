@@ -288,3 +288,22 @@ void vPortUpdateTCBForProcessSignals(StackType_t *pxTopOfStack) {
 	*(pxTopOfStack + (XT_STK_A2 >> 2)) = (StackType_t)pxTopOfStack;
 }
 // WHITECAT END
+
+/*
+ * Returns true if the current core is in ISR context; low prio ISR, med prio ISR or timer tick ISR. High prio ISRs
+ * aren't detected here, but they normally cannot call C code, so that should not be an issue anyway.
+ */
+BaseType_t xPortInIsrContext()
+{
+	unsigned int irqStatus;
+	BaseType_t ret=false;
+/*
+	irqStatus=portENTER_CRITICAL_NESTED();
+	ret=(port_interruptNesting[xPortGetCoreID()] != 0);
+	portEXIT_CRITICAL_NESTED(irqStatus);
+*/
+	return ret;
+}
+
+void _frxt_setup_switch(){}
+

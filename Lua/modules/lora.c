@@ -599,6 +599,7 @@ int luaopen_lora(lua_State* L) {
 #endif		   
 }
 
-LUA_OS_MODULE(LORA, lora, lora_map);
+//LUA_OS_MODULE(LORA, lora, lora_map);
+//MODULE_REGISTER_MAPPED
 
 #endif

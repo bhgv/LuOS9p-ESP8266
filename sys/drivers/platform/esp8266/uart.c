@@ -573,3 +573,10 @@ int uart_inited(int unit) {
     unit--;
     return ((uart[unit].flags & UART_FLAG_INIT) && (uart[unit].flags & UART_FLAG_IRQ_INIT));
 }
+
+
+//my{*}
+
+void uart_ll_lock(int a){}
+void uart_ll_unlock(int a){}
+void uart_ll_set_raw(int a){}

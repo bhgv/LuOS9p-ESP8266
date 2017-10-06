@@ -21,71 +21,49 @@ else
 		ifneq ($(filter %86,$(UNAME_P)),)
 			DIST_SUFFIX := linux32
 		endif
+		CC=gcc
+		CXX=g++
+		TARGET_CFLAGS   = -std=gnu99 -Os -Wall -Itclap -Ispiffs -I. -D$(TARGET_OS) -DVERSION=\"$(VERSION)\" -D__NO_INLINE__
+		TARGET_CXXFLAGS = -std=gnu++11 -Os -Wall -Itclap -Ispiffs -I. -D$(TARGET_OS) -DVERSION=\"$(VERSION)\" -D__NO_INLINE__
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		TARGET_OS := OSX
 		DIST_SUFFIX := osx
 		CC=clang
 		CXX=clang++
-		TARGET_CFLAGS   = -mmacosx-version-min=10.7 -arch i386 -arch x86_64
-		TARGET_CXXFLAGS = -mmacosx-version-min=10.7 -arch i386 -arch x86_64 -stdlib=libc++
-		TARGET_LDFLAGS  = -arch i386 -arch x86_64 -stdlib=libc++
+		TARGET_CFLAGS   = -std=gnu99 -Os -Wall -Itclap -Ispiffs -I. -D$(TARGET_OS) -DVERSION=\"$(VERSION)\" -D__NO_INLINE__ -mmacosx-version-min=10.7 -arch x86_64
+		TARGET_CXXFLAGS = -std=gnu++11 -Os -Wall -Itclap -Ispiffs -I. -D$(TARGET_OS) -DVERSION=\"$(VERSION)\" -D__NO_INLINE__ -mmacosx-version-min=10.7 -arch x86_64 -stdlib=libc++
+		TARGET_LDFLAGS  = -arch x86_64 -stdlib=libc++
 	endif
 	ARCHIVE_CMD := tar czf
 	ARCHIVE_EXTENSION := tar.gz
 	TARGET := mkspiffs
 endif
 
+OBJ             := main.o \
+                   spiffs/spiffs_cache.o \
+                   spiffs/spiffs_check.o \
+                   spiffs/spiffs_gc.o \
+                   spiffs/spiffs_hydrogen.o \
+                   spiffs/spiffs_nucleus.o \
+				   
 VERSION ?= $(shell git describe --always)
 
-OBJ		:= main.o \
-		   spiffs/spiffs_cache.o \
-		   spiffs/spiffs_check.o \
-		   spiffs/spiffs_gc.o \
-		   spiffs/spiffs_hydrogen.o \
-		   spiffs/spiffs_nucleus.o \
-
-INCLUDES := -Itclap -Ispiffs -I.
-
-CFLAGS   += $(TARGET_CFLAGS)
-CXXFLAGS += $(TARGET_CXXFLAGS)
-LDFLAGS  += $(TARGET_LDFLAGS)
-
-CPPFLAGS += $(INCLUDES) -D$(TARGET_OS) -DVERSION=\"$(VERSION)\" -D__NO_INLINE__
-
-DIST_NAME := mkspiffs-$(VERSION)-$(DIST_SUFFIX)
-DIST_DIR := $(DIST_NAME)
-DIST_ARCHIVE := $(DIST_NAME).$(ARCHIVE_EXTENSION)
-
-.PHONY: all clean dist
+.PHONY: all clean
 
 all: $(TARGET)
 
-dist: $(DIST_ARCHIVE)
-
-$(DIST_ARCHIVE): $(TARGET) $(DIST_DIR)
-
-$(TARGET): $(OBJ)
-	$(CXX) $^ -o $@ $(LDFLAGS)
-	strip $(TARGET)
-
-$(DIST_DIR):
-	@mkdir -p $@
-
+$(TARGET):
+	@echo "Building mkspiffs ..."
+	$(CC) $(TARGET_CFLAGS) -c spiffs/spiffs_cache.c -o spiffs/spiffs_cache.o
+	$(CC) $(TARGET_CFLAGS) -c spiffs/spiffs_check.c -o spiffs/spiffs_check.o
+	$(CC) $(TARGET_CFLAGS) -c spiffs/spiffs_gc.c -o spiffs/spiffs_gc.o
+	$(CC) $(TARGET_CFLAGS) -c spiffs/spiffs_hydrogen.c -o spiffs/spiffs_hydrogen.o
+	$(CC) $(TARGET_CFLAGS) -c spiffs/spiffs_nucleus.c -o spiffs/spiffs_nucleus.o
+	$(CXX) $(TARGET_CXXFLAGS) -c main.cpp -o main.o
+	$(CXX) $(TARGET_CFLAGS) -o $(TARGET) $(OBJ) $(TARGET_LDFLAGS)
+	
 clean:
 	@rm -f *.o
 	@rm -f spiffs/*.o
 	@rm -f $(TARGET)
-
-SPIFFS_TEST_FS_CONFIG := -s 0x100000 -p 512 -b 0x2000
-
-test: $(TARGET)
-	ls -1 spiffs > out.list0
-	./mkspiffs -c spiffs $(SPIFFS_TEST_FS_CONFIG) out.spiffs | sort | sed s/^\\/// > out.list1
-	./mkspiffs -u spiffs_u $(SPIFFS_TEST_FS_CONFIG) out.spiffs | sort | sed s/^\\/// > out.list_u
-	./mkspiffs -l $(SPIFFS_TEST_FS_CONFIG) out.spiffs | cut -f 2 | sort | sed s/^\\/// > out.list2
-	diff --strip-trailing-cr out.list0 out.list1
-	diff --strip-trailing-cr out.list0 out.list2
-	diff spiffs spiffs_u
-	rm -f out.{list0,list1,list2,list_u,spiffs}
-	rm -R spiffs_u

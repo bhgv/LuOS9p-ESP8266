@@ -1,15 +1,15 @@
 /*
-** $Id: loslib.c,v 1.60 2015/11/19 19:16:22 roberto Exp $
+** $Id: loslib.c,v 1.65 2016/07/18 17:58:58 roberto Exp $
 ** Standard Operating System library
 ** See Copyright Notice in lua.h
 */
-  
+
 #define loslib_c
 #define LUA_LIB
-   
-#include "lprefix.h"      
 
- 
+#include "lprefix.h"
+
+
 #include <errno.h>
 #include <locale.h>
 #include <stdlib.h>
@@ -20,22 +20,33 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-    
+
 
 /*
 ** {==================================================================
-** list of valid conversion specifiers for the 'strftime' function
+** List of valid conversion specifiers for the 'strftime' function;
+** options are grouped by length; group of length 2 start with '||'.
 ** ===================================================================
 */
 #if !defined(LUA_STRFTIMEOPTIONS)	/* { */
 
-#if defined(LUA_USE_C89)
-#define LUA_STRFTIMEOPTIONS	{ "aAbBcdHIjmMpSUwWxXyYz%", "" }
+/* options for ANSI C 89 (only 1-char options) */
+#define L_STRFTIMEC89		"aAbBcdHIjmMpSUwWxXyYZ%"
+
+/* options for ISO C 99 and POSIX */
+#define L_STRFTIMEC99 "aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYzZ%" \
+    "||" "EcECExEXEyEY" "OdOeOHOIOmOMOSOuOUOVOwOWOy"  /* two-char options */
+
+/* options for Windows */
+#define L_STRFTIMEWIN "aAbBcdHIjmMpSUwWxXyYzZ%" \
+    "||" "#c#x#d#H#I#j#m#M#S#U#w#W#y#Y"  /* two-char options */
+
+#if defined(LUA_USE_WINDOWS)
+#define LUA_STRFTIMEOPTIONS	L_STRFTIMEWIN
+#elif defined(LUA_USE_C89)
+#define LUA_STRFTIMEOPTIONS	L_STRFTIMEC89
 #else  /* C99 specification */
-#define LUA_STRFTIMEOPTIONS \
-	{ "aAbBcCdDeFgGhHIjmMnprRStTuUVwWxXyYzZ%", "", \
-	  "E", "cCxXyY",  \
-	  "O", "deHImMSuUVwWy" }
+#define LUA_STRFTIMEOPTIONS	L_STRFTIMEC99
 #endif
 
 #endif					/* } */
@@ -128,6 +139,8 @@ static time_t l_checktime (lua_State *L, int arg) {
 
 
 static int os_execute (lua_State *L) {
+// LUA RTOS BEGIN
+#if 0
   const char *cmd = luaL_optstring(L, 1, NULL);
   int stat = system(cmd);
   if (cmd != NULL)
@@ -136,12 +149,33 @@ static int os_execute (lua_State *L) {
     lua_pushboolean(L, stat);  /* true if there is a shell */
     return 1;
   }
+#else
+  return 0;
+#endif
+// LUA RTOS END
 }
 
 
 static int os_remove (lua_State *L) {
+  // LUA RTOS BEGIN
+#if 0
   const char *filename = luaL_checkstring(L, 1);
   return luaL_fileresult(L, remove(filename) == 0, filename);
+#else
+  struct stat statbuf;
+  const char *filename = luaL_checkstring(L, 1);
+
+  if (stat(filename, &statbuf) != 0) {
+	  return luaL_fileresult(L, 0, filename);
+  }
+
+  if (S_ISDIR(statbuf.st_mode)) {
+	  return luaL_fileresult(L, rmdir(filename) == 0, filename);
+  } else {
+	  return luaL_fileresult(L, remove(filename) == 0, filename);
+  }
+#endif
+  // LUA RTOS END
 }
 
 
@@ -164,7 +198,18 @@ static int os_tmpname (lua_State *L) {
 
 
 static int os_getenv (lua_State *L) {
-  lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
+  const char *env;
+
+  // LUA RTOS BEGIN
+  env = luaL_checkstring(L, 1);
+  if (!strcmp(env, "PATH")) {
+	  lua_pushstring(L, "/");
+  } else {
+	  lua_pushnil(L);
+  }
+
+  //lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
+  // LUA RTOS END
   return 1;
 }
 
@@ -195,6 +240,23 @@ static void setboolfield (lua_State *L, const char *key, int value) {
   lua_setfield(L, -2, key);
 }
 
+
+/*
+** Set all fields from structure 'tm' in the table on top of the stack
+*/
+static void setallfields (lua_State *L, struct tm *stm) {
+  setfield(L, "sec", stm->tm_sec);
+  setfield(L, "min", stm->tm_min);
+  setfield(L, "hour", stm->tm_hour);
+  setfield(L, "day", stm->tm_mday);
+  setfield(L, "month", stm->tm_mon + 1);
+  setfield(L, "year", stm->tm_year + 1900);
+  setfield(L, "wday", stm->tm_wday + 1);
+  setfield(L, "yday", stm->tm_yday + 1);
+  setboolfield(L, "isdst", stm->tm_isdst);
+}
+
+
 static int getboolfield (lua_State *L, const char *key) {
   int res;
   res = (lua_getfield(L, -1, key) == LUA_TNIL) ? -1 : lua_toboolean(L, -1);
@@ -210,18 +272,18 @@ static int getboolfield (lua_State *L, const char *key) {
 
 static int getfield (lua_State *L, const char *key, int d, int delta) {
   int isnum;
-  int t = lua_getfield(L, -1, key);
+  int t = lua_getfield(L, -1, key);  /* get field and its type */
   lua_Integer res = lua_tointegerx(L, -1, &isnum);
-  if (!isnum) {  /* field is not a number? */
+  if (!isnum) {  /* field is not an integer? */
     if (t != LUA_TNIL)  /* some other value? */
-      return luaL_error(L, "field '%s' not an integer", key);
+      return luaL_error(L, "field '%s' is not an integer", key);
     else if (d < 0)  /* absent field; no default? */
       return luaL_error(L, "field '%s' missing in date table", key);
     res = d;
   }
   else {
     if (!(-L_MAXDATEFIELD <= res && res <= L_MAXDATEFIELD))
-      return luaL_error(L, "field '%s' out-of-bounds", key);
+      return luaL_error(L, "field '%s' is out-of-bound", key);
     res -= delta;
   }
   lua_pop(L, 1);
@@ -229,22 +291,17 @@ static int getfield (lua_State *L, const char *key, int d, int delta) {
 }
 
 
-static const char *checkoption (lua_State *L, const char *conv, char *buff) {
-  static const char *const options[] = LUA_STRFTIMEOPTIONS;
-  unsigned int i;
-  for (i = 0; i < sizeof(options)/sizeof(options[0]); i += 2) {
-    if (*conv != '\0' && strchr(options[i], *conv) != NULL) {
-      buff[1] = *conv;
-      if (*options[i + 1] == '\0') {  /* one-char conversion specifier? */
-        buff[2] = '\0';  /* end buffer */
-        return conv + 1;
-      }
-      else if (*(conv + 1) != '\0' &&
-               strchr(options[i + 1], *(conv + 1)) != NULL) {
-        buff[2] = *(conv + 1);  /* valid two-char conversion specifier */
-        buff[3] = '\0';  /* end buffer */
-        return conv + 2;
-      }
+static const char *checkoption (lua_State *L, const char *conv,
+                                ptrdiff_t convlen, char *buff) {
+  const char *option = LUA_STRFTIMEOPTIONS;
+  int oplen = 1;  /* length of options being checked */
+  for (; *option != '\0' && oplen <= convlen; option += oplen) {
+    if (*option == '|')  /* next block? */
+      oplen++;  /* will check options with next length (+1) */
+    else if (memcmp(conv, option, oplen) == 0) {  /* match? */
+      memcpy(buff, conv, oplen);  /* copy valid option to buffer */
+      buff[oplen] = '\0';
+      return conv + oplen;  /* return next item */
     }
   }
   luaL_argerror(L, 1,
@@ -258,8 +315,10 @@ static const char *checkoption (lua_State *L, const char *conv, char *buff) {
 
 
 static int os_date (lua_State *L) {
-  const char *s = luaL_optstring(L, 1, "%c");
+  size_t slen;
+  const char *s = luaL_optlstring(L, 1, "%c", &slen);
   time_t t = luaL_opt(L, l_checktime, 2, time(NULL));
+  const char *se = s + slen;  /* 's' end */
   struct tm tmr, *stm;
   if (*s == '!') {  /* UTC? */
     stm = l_gmtime(&t, &tmr);
@@ -271,28 +330,21 @@ static int os_date (lua_State *L) {
     luaL_error(L, "time result cannot be represented in this installation");
   if (strcmp(s, "*t") == 0) {
     lua_createtable(L, 0, 9);  /* 9 = number of fields */
-    setfield(L, "sec", stm->tm_sec);
-    setfield(L, "min", stm->tm_min);
-    setfield(L, "hour", stm->tm_hour);
-    setfield(L, "day", stm->tm_mday);
-    setfield(L, "month", stm->tm_mon+1);
-    setfield(L, "year", stm->tm_year+1900);
-    setfield(L, "wday", stm->tm_wday+1);
-    setfield(L, "yday", stm->tm_yday+1);
-    setboolfield(L, "isdst", stm->tm_isdst);
+    setallfields(L, stm);
   }
   else {
-    char cc[4];
+    char cc[4];  /* buffer for individual conversion specifiers */
     luaL_Buffer b;
     cc[0] = '%';
     luaL_buffinit(L, &b);
-    while (*s) {
+    while (s < se) {
       if (*s != '%')  /* not a conversion specifier? */
         luaL_addchar(&b, *s++);
       else {
         size_t reslen;
         char *buff = luaL_prepbuffsize(&b, SIZETIMEFMT);
-        s = checkoption(L, s + 1, cc);
+        s++;  /* skip '%' */
+        s = checkoption(L, s, se - s, cc + 1);  /* copy specifier to 'cc' */
         reslen = strftime(buff, SIZETIMEFMT, cc, stm);
         luaL_addsize(&b, reslen);
       }
@@ -319,6 +371,7 @@ static int os_time (lua_State *L) {
     ts.tm_year = getfield(L, "year", -1, 1900);
     ts.tm_isdst = getboolfield(L, "isdst");
     t = mktime(&ts);
+    setallfields(L, &ts);  /* update fields with normalized values */
   }
   if (t != (time_t)(l_timet)t || t == (time_t)(-1))
     luaL_error(L, "time result cannot be represented in this installation");
@@ -361,11 +414,12 @@ static int os_exit (lua_State *L) {
   return 0;
 }
 
+
 #include "modules.h"
 
-static const LUA_REG_TYPE syslib[] = 
+const LUA_REG_TYPE syslib[] =
 {
-//  { LSTRKEY( "date" ),       LFUNCVAL( os_date ) },
+  { LSTRKEY( "date" ),       LFUNCVAL( os_date ) },
   { LSTRKEY( "difftime" ),   LFUNCVAL( os_difftime ) },
   { LSTRKEY( "clock" ),      LFUNCVAL( os_clock ) },
   { LSTRKEY( "remove" ),     LFUNCVAL( os_remove ) },
@@ -374,9 +428,15 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "tmpname" ),    LFUNCVAL( os_tmpname ) },
   { LSTRKEY( "exit" ),       LFUNCVAL( os_exit ) },
   { LSTRKEY( "execute" ),    LFUNCVAL( os_execute ) },
+  { LSTRKEY( "setlocale" ),  LFUNCVAL( os_setlocale ) },
+  { LSTRKEY( "getenv" ),  	 LFUNCVAL( os_getenv ) },
 
+//  { LSTRKEY( "locks" ),  	 LFUNCVAL( os_locks ) },
+  { LSTRKEY( "exists" ),  	 LFUNCVAL( os_exists ) },
+  { LSTRKEY( "stdout" ),     LFUNCVAL( os_stdout ) },
   { LSTRKEY( "clear" ),      LFUNCVAL( os_clear ) },
   { LSTRKEY( "cpu" ),        LFUNCVAL( os_cpu ) },
+  { LSTRKEY( "board" ),      LFUNCVAL( os_board ) },
   { LSTRKEY( "sleep" ),      LFUNCVAL( os_sleep ) },
   { LSTRKEY( "version" ),    LFUNCVAL( os_version ) },
   { LSTRKEY( "ls" ),         LFUNCVAL( os_ls ) },
@@ -388,6 +448,7 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "stats" ),      LFUNCVAL( os_stats ) },
   { LSTRKEY( "format" ),     LFUNCVAL( os_format ) },
   { LSTRKEY( "history" ),    LFUNCVAL( os_history ) },
+  { LSTRKEY( "shell" ),      LFUNCVAL( os_shell ) },
   { LSTRKEY( "cp" ),         LFUNCVAL( os_cp ) },
   { LSTRKEY( "cat" ),        LFUNCVAL( os_cat ) },
   { LSTRKEY( "more" ),       LFUNCVAL( os_more ) },
@@ -396,10 +457,10 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "luarunning" ), LFUNCVAL( os_lua_running ) },
   { LSTRKEY( "luainterpreter" ), LFUNCVAL( os_lua_interpreter ) },
   { LSTRKEY( "resetreason" ), LFUNCVAL( os_reset_reason ) },
-
-#if LUA_USE_EDITOR
+  { LSTRKEY( "bootcount" ),  LFUNCVAL( os_bootcount ) },
+  { LSTRKEY( "flashEUI" ),   LFUNCVAL( os_flash_unique_id ) },
   { LSTRKEY( "edit" ),       LFUNCVAL( os_edit ) },
-#endif
+  { LSTRKEY( "LOG_INFO" ),   LINTVAL( LOG_INFO ) },
   { LSTRKEY( "LOG_EMERG" ),  LINTVAL( LOG_EMERG ) },
   { LSTRKEY( "LOG_ALERT" ),  LINTVAL( LOG_ALERT ) },
   { LSTRKEY( "LOG_CRIT" ),   LINTVAL( LOG_CRIT ) },
@@ -407,31 +468,16 @@ static const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "LOG_WARNING" ),LINTVAL( LOG_WARNING ) },
   { LSTRKEY( "LOG_NOTICE" ), LINTVAL( LOG_NOTICE ) },
   { LSTRKEY( "LOG_DEBUG" ),  LINTVAL( LOG_DEBUG ) },
-  { LSTRKEY( "LOG_ALL" ),    LINTVAL( 0xff ) },
-
+  { LSTRKEY( "LOG_ALL" ),    LINTVAL( 0b11111111 ) },
   { LNILKEY, LNILVAL }
 };
 
-
-#if 0
-//static const luaL_Reg syslib[] = {
-//  {"getenv",    os_getenv},
-//  {"setlocale", os_setlocale},
-//  LOSLIB_REG_ADDS
-//  {NULL, NULL}
-//};
-#endif
- 
 /* }====================================================== */
 
 
-int luaopen_os(lua_State *L) {
-	#if !LUA_USE_ROTABLE
-	luaL_newlib(L, syslib);
-	return 1;
-	#else
-	return 0;
-	#endif		   
+
+LUAMOD_API int luaopen_os (lua_State *L) {
+  return 0;
 }
 
-LUA_OS_MODULE(OS, os, syslib);
+MODULE_REGISTER_MAPPED(OS, os, syslib, luaopen_os);

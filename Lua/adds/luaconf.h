@@ -5,25 +5,23 @@
 #ifndef WLUA_CONF
 #define WLUA_CONF
 
-#include "whitecat.h"
+#include <limits.h>
+#include <stdint.h>
 
-
+#define LUA_OS_VER "beta 0.1"
+	
 #if LUA_USE_LUA_LOCK
 	void LuaLock(lua_State *L);
 	void LuaUnlock(lua_State *L);
-	
+
 	#define lua_lock(L)          LuaLock(L)
 	#define lua_unlock(L)        LuaUnlock(L)
 	#define luai_threadyield(L) {lua_unlock(L); lua_lock(L);}
 #else
-	#define lua_lock(L)          
+	#define lua_lock(L)
 	#define lua_unlock(L)        
 	#define luai_threadyield(L) 
 #endif
-
-#include "auxmods.h"
-
-#include <unistd.h>
 
 #undef  LUA_PROMPT
 #define LUA_PROMPT		"> "
@@ -44,7 +42,7 @@
 #define LUA_CDIR	LUA_ROOT "lib/lua/"
 
 #undef  LUA_COPYRIGHT
-#define LUA_COPYRIGHT	"LuaOS " LUA_OS_VER " powered by " LUA_RELEASE 
+#define LUA_COPYRIGHT	"Lua RTOS " LUA_OS_VER " powered by " LUA_RELEASE 
 
 #undef  LUAI_THROW
 #define LUAI_THROW(L,c)	longjmp((c)->b, 1)
@@ -86,13 +84,7 @@
         
 #define LBASELIB_OPEN_ADDS 
 
-#if LUA_USE_PIO
-    #define LINIT_REG_PIO {AUXLIB_PIO, luaopen_pio},
-#else
-    #define LINIT_REG_PIO
-#endif
-
-#if LUA_USE_TMR
+#if CONFIG_LUA_RTOS_LUA_USE_TMR
     #define LINIT_REG_TMR {AUXLIB_TMR, luaopen_tmr},
 #else
     #define LINIT_REG_TMR
@@ -104,49 +96,55 @@
     #define LINIT_REG_CAN
 #endif
 
-#if LUA_USE_NET
+#if CONFIG_LUA_RTOS_LUA_USE_NET
     #define LINIT_REG_NET {AUXLIB_NET, luaopen_net},
 #else
     #define LINIT_REG_NET
 #endif
 
-#if LUA_USE_ADC
+#if CONFIG_LUA_RTOS_LUA_USE_ADC
     #define LINIT_REG_ADC {AUXLIB_ADC, luaopen_adc},
 #else
     #define LINIT_REG_ADC
 #endif
 
-#if LUA_USE_SPI
+#if CONFIG_LUA_RTOS_LUA_USE_SPI
     #define LINIT_REG_SPI {AUXLIB_SPI, luaopen_spi},
 #else
     #define LINIT_REG_SPI
 #endif
 
-#if LUA_USE_MQTT
+#if CONFIG_LUA_RTOS_LUA_USE_MQTT
     #define LINIT_REG_MQTT {AUXLIB_MQTT, luaopen_mqtt},
 #else
     #define LINIT_REG_MQTT
 #endif
 
-#if LUA_USE_THREAD
+#if CONFIG_LUA_RTOS_LUA_USE_THREAD
     #define LINIT_REG_THREAD {AUXLIB_THREAD, luaopen_thread },
 #else
     #define LINIT_REG_THREAD
 #endif
 
-#if LUA_USE_SCREEN
+#if CONFIG_LUA_RTOS_LUA_USE_SCREEN
     #define LINIT_REG_SCREEN {AUXLIB_SCREEN, luaopen_screen},
 #else
     #define LINIT_REG_SCREEN
 #endif
 
-#if LUA_USE_UART
+#if CONFIG_LUA_RTOS_LUA_USE_SSD1306
+    #define LINIT_REG_OSCREEN {AUXLIB_SSD1306, luaopen_ssd1306},
+#else
+    #define LINIT_REG_OSCREEN
+#endif
+
+#if CONFIG_LUA_RTOS_LUA_USE_UART
     #define LINIT_REG_UART {AUXLIB_UART, luaopen_uart},
 #else
     #define LINIT_REG_UART
 #endif
 
-#if LUA_USE_PWM
+#if CONFIG_LUA_RTOS_LUA_USE_PWM
     #define LINIT_REG_PWM {AUXLIB_PWM, luaopen_pwm},
 #else
     #define LINIT_REG_PWM
@@ -158,25 +156,19 @@
     #define LINIT_REG_GPS
 #endif
 
-#if LUA_USE_HTTP
-    #define LINIT_REG_HTTP {AUXLIB_HTTP, luaopen_http},
-#else
-    #define LINIT_REG_HTTP
-#endif
-
 #if LUA_USE_STEPPER
     #define LINIT_REG_STEPPER {AUXLIB_STEPPER, luaopen_stepper},
 #else
     #define LINIT_REG_STEPPER
 #endif
 
-#if LUA_USE_I2C
-    #define LINIT_REG_I2C {AUXLIB_I2C, luaopen_i2c},
+#if CONFIG_LUA_RTOS_LUA_USE_I2C
+   // #define LINIT_REG_I2C {AUXLIB_I2C, luaopen_i2c},
 #else
     #define LINIT_REG_I2C
 #endif
 
-#if LUA_USE_LORA
+#if CONFIG_LUA_RTOS_LUA_USE_LORA
     #define LINIT_REG_LORA {AUXLIB_LORA, luaopen_lora},
 #else
     #define LINIT_REG_LORA
@@ -192,10 +184,10 @@
   LINIT_REG_MQTT \
   LINIT_REG_THREAD \
   LINIT_REG_SCREEN \
+  LINIT_REG_OSCREEN \
   LINIT_REG_UART \
   LINIT_REG_PWM \
   LINIT_REG_GPS \
-  LINIT_REG_HTTP \
   LINIT_REG_STEPPER \
   LINIT_REG_I2C \
   LINIT_REG_LORA \
@@ -206,17 +198,8 @@
 #define LIOLIB_REG_ADDS {"receive", f_receive}, {"send", f_send},
 #define LIOLIB_OPEN_ADDS
 
-#if LUA_USE_SHELL
-    #define LOSLIB_REG_SHELL {"shell",     os_shell},
-#else
-    #define LOSLIB_REG_SHELL
-#endif
-
-#if LUA_USE_EDITOR
-    #define LOSLIB_REG_EDITOR {"edit",      os_edit},
-#else
-    #define LOSLIB_REG_EDITOR
-#endif
+#define LOSLIB_REG_SHELL {"shell",     os_shell},
+#define LOSLIB_REG_EDITOR {"edit",      os_edit},
 
 #if 0
 #define LOSLIB_REG_ADDS \
@@ -251,15 +234,10 @@
   #define LOSLIB_OPEN_ADDS
 #endif
 
-#ifdef lbaselib_c
-#undef lbaselib_c
-#include <Lua/modules/lbaselib_adds.inc>
-#endif
-
 #ifdef liolib_c
 #undef liolib_c
 #include <Lua/modules/liolib_adds.inc>
-#include <sys/syscalls/mount.h>
+	  //#include <sys/syscalls/mount.h>
 #endif
 
 #ifdef loslib_c
