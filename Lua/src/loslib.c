@@ -169,11 +169,34 @@ static int os_remove (lua_State *L) {
 	  return luaL_fileresult(L, 0, filename);
   }
 
-  if (S_ISDIR(statbuf.st_mode)) {
-	  return luaL_fileresult(L, rmdir(filename) == 0, filename);
-  } else {
+  if (!S_ISDIR(statbuf.st_mode)) {
+//	  return luaL_fileresult(L, rmdir(filename) == 0, filename);
+//  } else {
 	  return luaL_fileresult(L, remove(filename) == 0, filename);
   }
+#endif
+  // LUA RTOS END
+}
+
+
+static int os_rmdir (lua_State *L) {
+  // LUA RTOS BEGIN
+#if 0
+  const char *filename = luaL_checkstring(L, 1);
+  return luaL_fileresult(L, remove(filename) == 0, filename);
+#else
+//  struct stat statbuf;
+  const char *filename = luaL_checkstring(L, 1);
+
+//  if (stat(filename, &statbuf) != 0) {
+//	  return luaL_fileresult(L, 0, filename);
+//  }
+
+//  if (S_ISDIR(statbuf.st_mode)) {
+	  return luaL_fileresult(L, rmdir(filename) == 0, filename);
+//  } else {
+//	  return luaL_fileresult(L, remove(filename) == 0, filename);
+//  }
 #endif
   // LUA RTOS END
 }
@@ -422,8 +445,9 @@ const LUA_REG_TYPE syslib[] =
   { LSTRKEY( "date" ),       LFUNCVAL( os_date ) },
   { LSTRKEY( "difftime" ),   LFUNCVAL( os_difftime ) },
   { LSTRKEY( "clock" ),      LFUNCVAL( os_clock ) },
-  { LSTRKEY( "remove" ),     LFUNCVAL( os_remove ) },
-  { LSTRKEY( "rename" ),     LFUNCVAL( os_rename ) },
+  { LSTRKEY( "rm" ),     LFUNCVAL( os_remove ) },
+  { LSTRKEY( "rmdir" ),     LFUNCVAL( os_rmdir ) },
+  { LSTRKEY( "mv" ),     LFUNCVAL( os_rename ) },
   { LSTRKEY( "time" ),       LFUNCVAL( os_time ) },
   { LSTRKEY( "tmpname" ),    LFUNCVAL( os_tmpname ) },
   { LSTRKEY( "exit" ),       LFUNCVAL( os_exit ) },

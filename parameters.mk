@@ -70,10 +70,10 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    platform/$(PLATFORM)/core \
 		    platform/$(PLATFORM)/lwip \
 		    platform/$(PLATFORM)/open_esplibs \
-		    platform/$(PLATFORM)/i2c \
-		    platform/$(PLATFORM)/ssd1306 \
-		    platform/$(PLATFORM)/platform \
+		    modules/ssd1306 \
 
+#		    platform/$(PLATFORM)/platform \
+#		    platform/$(PLATFORM)/i2c \
 #		    platform/$(PLATFORM)/u8g2/cppsrc \
 #		    platform/$(PLATFORM)/arduino \
 #		    $(HOME)/esp-open-rtos/extras/ssd1306 \

@@ -65,14 +65,14 @@ const struct device devs[] = {
     {
         "tty",
         {tty_open, tty_read, tty_write, NULL, NULL, tty_stat, tty_close, NULL, 
-         NULL, NULL, NULL, NULL, NULL, NULL}
+         NULL, NULL, NULL, NULL, NULL, NULL, NULL}
     },
 #endif
 #if USE_SD
     {
         "sd",
         {fat_open, fat_read, fat_write, NULL, NULL, fat_stat, fat_close, 
-         fat_opendir, fat_readdir, fat_unlink, fat_seek, fat_rename, fat_mkdir,
+         fat_opendir, fat_readdir, fat_unlink, fat_seek, fat_rename, fat_mkdir, NULL,
          fat_format}
     },
 #endif
@@ -81,7 +81,7 @@ const struct device devs[] = {
         "cfi",
         {spiffs_open_op, spiffs_read_op, spiffs_write_op, NULL, NULL, 
          spiffs_stat_op, spiffs_close_op, spiffs_opendir_op, spiffs_readdir_op, 
-         spiffs_unlink_op, spiffs_seek_op, spiffs_rename_op, spiffs_mkdir_op,
+         spiffs_unlink_op, spiffs_seek_op, spiffs_rename_op, spiffs_mkdir_op, spiffs_rmdir_op,
          spiffs_format}
     },
 #endif
@@ -89,7 +89,7 @@ const struct device devs[] = {
     {
         "net",
         {net_open, net_read, net_write, net_ioctl, net_select, net_stat, 
-         net_close, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
+         net_close, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
     }    
 #endif
 };

@@ -98,7 +98,7 @@ int scandir __P((const char *, struct dirent ***,
     int (*)(struct dirent *), int (*)(const void *, const void *)));
 int alphasort __P((const void *, const void *));
 int getdirentries __P((int, char *, int, long *));
-#endif /* not POSIX * /
+#endif / * not POSIX * /
 __END_DECLS
 */
 

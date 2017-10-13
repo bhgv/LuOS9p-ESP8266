@@ -1,7 +1,7 @@
 #ifndef __I2C_MASTER_H__
 #define __I2C_MASTER_H__
 
-#include "drivers/platform/esp8266/gpio.h"
+#include "drivers/gpio.h"
 #include "drivers/cpu.h"
 #include "drivers/gpio.h"
 

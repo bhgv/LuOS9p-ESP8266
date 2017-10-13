@@ -1,21 +1,20 @@
 // Platform-dependent functions and includes
 
-#include "platform.h"
+#include "i2c-platform.h"
 //#include "common.h"
 //#include "c_stdio.h"
 //#include "c_string.h"
 //#include "c_stdlib.h"
 //#include "llimits.h"
-#include "gpio.h"
-//#include "gpio16.h"
-#include "i2c_master.h"
+//#include "drivers/gpio.h"
+#include "i2c.h"
 #include "eagle_soc.h"
 //#include "driver/sigma_delta.h"
-#include "pin_map.h"
+//#include "pin_map.h"
 
 #include "sys/drivers/cpu.h"
 #include "sys/drivers/gpio.h"
-#include "sys/drivers/platform/esp8266/gpio.h"
+//#include "sys/drivers/platform/esp8266/gpio.h"
 
 
 #define NODE_DBG(m, ...) 

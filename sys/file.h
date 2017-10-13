@@ -80,6 +80,7 @@ struct file {
         off_t (*fo_seek) __P((struct file *fp, off_t offset, int where));
         int (*fo_rename) __P((const char *old_filename, const char *new_filename));
         int (*fo_mkdir) __P((const char *pathname));
+        int (*fo_rmdir) __P((const char *pathname));
         int (*fo_format) ();
     } *f_ops;
     off_t   f_offset;

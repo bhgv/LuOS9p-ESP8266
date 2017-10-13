@@ -47,15 +47,197 @@
 #include <sys/spiffs/spiffs_nucleus.h>
 #include <sys/spiffs/esp_spiffs.h>
 
-#if USE_SPIFFS
+#if 1 //USE_SPIFFS
 
 #define	EACCESS	5 // Permission denied
+
+#if !defined(max)
+#define max(A,B) ( (A) > (B) ? (A):(B))
+#endif
+
+#if !defined(min)
+#define min(A,B) ( (A) < (B) ? (A):(B))
+#endif
+
 
 spiffs fs;
 
 static u8_t *my_spiffs_work_buf;
 static u8_t *my_spiffs_fds;
 static u8_t *my_spiffs_cache;
+
+
+static void dir_path(char *npath, uint8_t base) {
+	int len = strlen(npath);
+
+	if (base) {
+		char *c;
+
+		c = &npath[len - 1];
+		while (c >= npath) {
+			if (*c == '/') {
+				break;
+			}
+
+			len--;
+			c--;
+		}
+	}
+
+    if (len > 1) {
+    	if (npath[len - 1] == '.') {
+    		npath[len - 1] = '\0';
+
+        	if (npath[len - 2] == '/') {
+        		npath[len - 2] = '\0';
+        	}
+    	} else {
+        	if (npath[len - 1] == '/') {
+        		npath[len - 1] = '\0';
+        	}
+    	}
+    } else {
+    	if ((npath[len - 1] == '/') ||  (npath[len - 1] == '.')) {
+    		npath[len - 1] = '\0';
+    	}
+    }
+
+	if(base != 2) {
+		strlcat(npath,"/.", PATH_MAX);
+	}
+}
+
+static void check_path(const char *path, uint8_t *base_is_dir, uint8_t *full_is_dir, uint8_t *is_file, int *files) {
+    char bpath[PATH_MAX + 1]; // Base path
+    char fpath[PATH_MAX + 1]; // Full path
+    struct spiffs_dirent e;
+    spiffs_DIR d;
+    int file_num = 0;
+
+    *files = 0;
+    *base_is_dir = 0;
+    *full_is_dir = 0;
+    *is_file = 0;
+
+    // Get base directory name
+    strlcpy(bpath, path, PATH_MAX);
+    dir_path(bpath, 1);
+
+    // Get full directory name
+    strlcpy(fpath, path, PATH_MAX);
+    dir_path(fpath, 0);
+
+    SPIFFS_opendir(&fs, "/", &d);
+	while (SPIFFS_readdir(&d, &e)) {
+		if (!strcmp(bpath, (const char *)e.name)) {
+			*base_is_dir = 1;
+		}
+
+		if (!strcmp(fpath, (const char *)e.name)) {
+			*full_is_dir = 1;
+		}
+
+		if (!strcmp(path, (const char *)e.name)) {
+			*is_file = 1;
+		}
+
+		if (!strncmp(fpath, (const char *)e.name, min(strlen((char *)e.name), strlen(fpath) - 1))) {
+			if (strcmp(fpath, (const char *)e.name)) {
+				file_num++;
+			}
+		}
+	}
+	SPIFFS_closedir(&d);
+
+	*files = file_num;
+}
+
+/*
+ * This function translate error codes from SPIFFS to errno error codes
+ *
+static int spiffs_result(int res) {
+    switch (res) {
+        case SPIFFS_OK:
+        case SPIFFS_ERR_END_OF_OBJECT:
+            return 0;
+
+        case SPIFFS_ERR_NOT_FOUND:
+        case SPIFFS_ERR_CONFLICTING_NAME:
+            return ENOENT;
+
+        case SPIFFS_ERR_NOT_WRITABLE:
+        case SPIFFS_ERR_NOT_READABLE:
+            return EACCES;
+
+        case SPIFFS_ERR_FILE_EXISTS:
+            return EEXIST;
+
+        default:
+            return res;
+    }
+}
+ */
+
+
+int spiffs_rmdir_op(const char* name) {
+    char npath[PATH_MAX + 1];
+//	vfs_spiffs_dir_t *dir = calloc(1, sizeof(vfs_spiffs_dir_t));
+
+//	if (!dir) {
+//		errno = ENOMEM;
+//		return NULL;
+//	}
+
+    // Check path, must be an existing directory
+	// files in directory
+    uint8_t base_is_dir = 0;
+    uint8_t full_is_dir = 0;
+    uint8_t is_file = 0;
+    int file_num = 0;
+
+    check_path(name, &base_is_dir, &full_is_dir, &is_file, &file_num);
+printf("spiffs_rmdir_op0 %s, %d %d %d %d\n", name, base_is_dir, full_is_dir, is_file, file_num);
+    if (full_is_dir) {
+    	if (file_num > 0) {
+    		errno = ENOTEMPTY;
+printf("spiffs_rmdir_op1\n");
+    		return -1;
+    	} else {
+    	    strlcpy(npath, name, PATH_MAX);
+    	    dir_path(npath, 0);
+
+printf("spiffs_rmdir_op2 %s\n", npath);
+	        // Open SPIFFS file
+	    	spiffs_file FP = SPIFFS_open(&fs, npath, SPIFFS_RDWR, 0);
+	        if (FP < 0) {
+	        	errno = spiffs_result(fs.err_code);
+printf("spiffs_rmdir_op3 %d\n", errno);
+	        	return -1;
+	        }
+
+printf("spiffs_rmdir_op4\n");
+	        // Remove SPIFSS file
+	        if (SPIFFS_fremove(&fs, FP) < 0) {
+	            errno = spiffs_result(fs.err_code);
+printf("spiffs_rmdir_op5 %d\n", errno);
+	        	SPIFFS_close(&fs, FP);
+	        	return -1;
+	        }
+
+printf("spiffs_rmdir_op6\n");
+	    	SPIFFS_close(&fs, FP);
+printf("spiffs_rmdir_op7\n");
+
+        	return 0;
+    	}
+    } else {
+       	errno = ENOENT;
+		return -1;
+    }
+}
+
+
+
 
 // Determine if path correspond to a directory entry
 int is_dir(const char *path) {
@@ -261,6 +443,7 @@ off_t spiffs_seek_op(struct file *fp, off_t offset, int where) {
     return res;
 }
 
+/*
 int spiffs_rename_op(const char *old_filename, const char *new_filename) {  
     int res = SPIFFS_rename(&fs, old_filename, new_filename);
     if (res < 0) {
@@ -269,6 +452,88 @@ int spiffs_rename_op(const char *old_filename, const char *new_filename) {
     
     return res;
 }
+*/
+
+int spiffs_rename_op(const char *src, const char *dst) {
+    char dpath[PATH_MAX + 1];
+    char *csrc;
+    char *cname;
+
+    // Check paths
+    uint8_t src_base_is_dir = 0;
+    uint8_t src_full_is_dir = 0;
+    uint8_t src_is_file = 0;
+    int src_files = 0;
+
+    uint8_t dst_base_is_dir = 0;
+    uint8_t dst_full_is_dir = 0;
+    uint8_t dst_is_file = 0;
+    int dst_files = 0;
+
+    check_path(src, &src_base_is_dir, &src_full_is_dir, &src_is_file, &src_files);
+    check_path(dst, &dst_base_is_dir, &dst_full_is_dir, &dst_is_file, &dst_files);
+
+    // Sanity checks
+    if (src_is_file && dst_full_is_dir) {
+    	errno = EISDIR;
+    	return -1;
+    }
+
+    if (src_full_is_dir && dst_is_file) {
+    	errno = ENOTDIR;
+    	return -1;
+    }
+
+    if (src_full_is_dir) {
+    	// We need to rename all tree
+        struct spiffs_dirent e;
+        spiffs_DIR d;
+
+//		char npath[PATH_MAX + 1];
+//		strlcpy(npath, src, PATH_MAX);
+//		dir_path(npath, 2);
+
+    	SPIFFS_opendir(&fs, "/", &d);
+    	while (SPIFFS_readdir(&d, &e)) {
+printf("rename 1 %s %s\n", src, (const char *)e.name);
+//    		if (!strncmp(src, (const char *)e.name, PATH_MAX /*min(strlen((char *)e.name), strlen(src))*/ ) ) {
+    		if ( !strncmp(src, (const char *)e.name, strlen(src) ) && e.name[strlen(src)] == '/' ) {
+    			strlcpy(dpath, dst, PATH_MAX);
+    			csrc = (char *)src;
+    			cname = (char *)e.name;
+
+printf("rename 2 %s\n", (const char *)e.name);
+    			while (*csrc && *cname && (*csrc == *cname)) {
+    				++csrc;
+    				++cname;
+    			}
+
+printf("rename 3 %s\n", cname);
+				strlcat(dpath, cname, PATH_MAX);
+printf("rename 4 %s\n", dpath);
+
+    	    	if (SPIFFS_rename(&fs, (char *)e.name, dpath) < 0) {
+    	        	errno = spiffs_result(fs.err_code);
+    	        	return -1;
+    	        }
+    		}
+    	}
+    	SPIFFS_closedir(&d);
+    } else {
+    	if (SPIFFS_rename(&fs, src, dst) < 0) {
+        	errno = spiffs_result(fs.err_code);
+        	return -1;
+        }
+    }
+
+	return 0;
+}
+
+
+
+
+
+
 
 
 int spiffs_unlink_op(struct file *fp) {

@@ -2,10 +2,7 @@ INC_DIRS += $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)src
 
 Lua_INC_DIR = $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)src \
 	$(ROOT)sys \
-	$(HOME)/esp-open-rtos/extras \
-	$(ROOT)platform/esp8266/ssd1306 \
-	$(ROOT)platform/esp8266/i2c \
-	$(ROOT)platform/esp8266/platform \
+	$(ROOT)modules/ssd1306 \
 	$(HOME)/esp-open-rtos/include/espressif \
 	$(HOME)/esp-open-rtos/include \
 	$(ROOT)platform/esp8266/core/include \
@@ -14,6 +11,8 @@ Lua_INC_DIR = $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)sr
 	$(ROOT)FreeRTOS/Source/include \
 	$(ROOT)include \
 	$(ROOT)config/lua \
+
+#	$(HOME)/esp-open-rtos/extras \
 
 
 #	$(HOME)/esp-open-rtos/core/include

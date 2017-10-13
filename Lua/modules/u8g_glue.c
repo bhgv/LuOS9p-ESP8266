@@ -7,8 +7,8 @@
 #include "lauxlib.h"
 #include "c_types.h"
 //#include "stdint.h"
-#include "gpio.h"
-#include "platform.h"
+#include "drivers/gpio.h"
+#include "drivers/i2c-platform.h"
 
 //#include "c_stdlib.h"
 

@@ -2,6 +2,9 @@
 
 p=print
 
+for k in pairs(os) do _G[k]=os[k] end
+
+
 d=u8g.disp()
 
 f = function(d,i)

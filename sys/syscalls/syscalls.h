@@ -169,6 +169,7 @@ int spiffs_rename_op(const char *old_filename, const char *new_filename);
 int spiffs_unlink_op(struct file *fp);
 int spiffs_opendir_op(struct file *fp);
 int spiffs_mkdir_op(const char *path);
+int spiffs_rmdir_op(const char *path);
 int spiffs_readdir_op(struct file *fp, struct dirent *ent);
 int spiffs_format();
 

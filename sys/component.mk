@@ -42,13 +42,13 @@ sys_SRC_DIR = $(sys_ROOT) \
     $(sys_ROOT)syscalls \
     $(sys_ROOT)list \
     $(sys_ROOT)drivers \
-    $(sys_ROOT)drivers/platform/$(PLATFORM) \
+    $(sys_ROOT)drivers/$(PLATFORM) \
     $(sys_ROOT)unix \
     $(sys_ROOT)spiffs \
-    $(sys_ROOT)vfs \
     $(sys_ROOT)freertos \
     $(sys_ROOT)sys \
 
+#    $(sys_ROOT)vfs \
 #    $(sys_ROOT)lwip \
 
 sys_INC_DIR = $(ROOT)include $(sys_ROOT)spiffs 

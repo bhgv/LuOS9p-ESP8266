@@ -1,11 +1,9 @@
 # Component makefile for extras/ssd1306
 
 # expected anyone using ssd1306 driver includes it as 'ssd1306/ssd1306.h'
-ssd1306_INC_DIR = $(ssd1306_ROOT) $(ssd1306_ROOT).. \
-	    $(ssd1306_ROOT)../core/include \
-	    $(ssd1306_ROOT)../lwip/lwip/espressif/include \
-	    $(ssd1306_ROOT)../i2c \
-	    $(ssd1306_ROOT)../platform \
+ssd1306_INC_DIR = $(ssd1306_ROOT) $(ROOT) \
+	    $(ROOT)platform/esp8266/core/include \
+	    $(ROOT)platform/esp8266/lwip/lwip/espressif/include \
 	    $(ROOT)include/platform/esp8266/espressif/esp8266 \
 
 

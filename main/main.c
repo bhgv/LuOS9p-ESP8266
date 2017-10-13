@@ -72,6 +72,7 @@ int luaos_main (void);
 
 void *lua_start(void *arg) {
 	for(;;) {
+printf("lua_start\n");
 		luaos_main();
     }
 

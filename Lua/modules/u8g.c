@@ -9,7 +9,7 @@
 
 #include "u8g_config.h"
 
-#include <platform.h>
+#include <drivers/i2c-platform.h>
 
 #include <wdt_regs.h>
 
@@ -808,8 +808,8 @@ static int lu8g_close_display( lua_State *L )
 #define U8G_DISPLAY_TABLE_ENTRY(device)                                 \
     static int lu8g_ ## device( lua_State *L )                          \
     {                                                                   \
-        uint8_t sda = 2;                                                    \
-        uint8_t scl = 14;                                                   \
+        uint8_t sda = 4;                                                    \
+        uint8_t scl = 5;                                                   \
         uint32_t speed = 100;                                                \
         int spd = platform_i2c_setup(0, sda, scl, speed);                         \
         delay(700);         \

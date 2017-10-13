@@ -13,15 +13,14 @@
 #include "osapi.h"
 #include "c_types.h"
 #include "eagle_soc.h"
-#include "drivers/platform/esp8266/gpio.h"
+#include "drivers/gpio.h"
 #include "gpio.h"
 #include "gpio_register.h"
 
 #include "task.h"
 
-#include "i2c_master.h"
+#include "i2c.h"
 
-//#include "pin_map.h"
 
 LOCAL uint8 m_nLastSDA;
 LOCAL uint8 m_nLastSCL;

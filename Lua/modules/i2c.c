@@ -37,8 +37,8 @@
 #include "c_types.h"
 
 #include <drivers/error.h>
-#include <i2c/i2c.h>
-#include <platform.h>
+#include <drivers/i2c.h>
+#include <drivers/i2c-platform.h>
 
 #include "modules.h"
 

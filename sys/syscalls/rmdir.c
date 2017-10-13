@@ -42,7 +42,7 @@ int rmdir(const char *path) {
         return -1;
     }
     
-    if(!is_dir(path)) return -1;
+//    if(!is_dir(path)) return -1;
     
     if ((fd = open(path, O_WRONLY)) == -1)
         return -1;
@@ -52,7 +52,7 @@ int rmdir(const char *path) {
         return -1;
     }
 
-    res = (*fp->f_ops->fo_unlink)(fp);
+    res = (*fp->f_ops->fo_rmdir)(npath);
   
     close(fd);
     

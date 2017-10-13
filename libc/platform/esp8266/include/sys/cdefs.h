@@ -245,9 +245,15 @@
 #if __GNUC_PREREQ__(2, 7)
 #define	__dead2		__attribute__((__noreturn__))
 #define	__pure2		__attribute__((__const__))
+#ifndef __unused
 #define	__unused	__attribute__((__unused__))
+#endif
+#ifdef __used
 #define	__used		__attribute__((__used__))
+#endif
+#ifndef __packed
 #define	__packed	__attribute__((__packed__))
+#endif
 #define	__aligned(x)	__attribute__((__aligned__(x)))
 #define	__section(x)	__attribute__((__section__(x)))
 #endif
