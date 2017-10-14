@@ -187,6 +187,8 @@ static const /*luaL_Reg*/ LUA_REG_TYPE li2c[] = {
     {LSTRKEY( "address" ), LFUNCVAL( li2c_address )},
     {LSTRKEY( "read" ), LFUNCVAL( li2c_read )},
     {LSTRKEY( "write" ), LFUNCVAL( li2c_write )},
+    {LSTRKEY( "TRANSMITTER" ), LINTVAL( 0 )},
+    {LSTRKEY( "RECEIVER" ), LINTVAL( 1 )},
     {LNILKEY, LNILVAL}
 };
 

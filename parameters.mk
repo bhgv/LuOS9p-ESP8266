@@ -71,6 +71,12 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    platform/$(PLATFORM)/lwip \
 		    platform/$(PLATFORM)/open_esplibs \
 		    modules/ssd1306 \
+		    modules/pca9685 \
+
+#		    modules/pcf8574 \
+#		    modules/pcf8591 \
+#		    modules/i2c2 \
+
 
 #		    platform/$(PLATFORM)/platform \
 #		    platform/$(PLATFORM)/i2c \
