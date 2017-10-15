@@ -34,10 +34,10 @@ void pcf8591_init(void); //FIXME : library incomplete ?
  *            3 - AIN3
  * @return analog value
  */
-//uint8_t pcf8591_read(i2c_dev_t* dev, uint8_t analog_pin);
-uint8_t pcf8591_read(i2c_dev_t* dev, uint8_t *adc0, uint8_t *adc1, uint8_t *adc2, uint8_t *adc3);
+uint8_t pcf8591_read(unsigned char addr, uint8_t analog_pin);
+//uint8_t pcf8591_read(unsigned char addr, uint8_t *adc0, uint8_t *adc1, uint8_t *adc2, uint8_t *adc3);
 
-uint8_t pcf8591_write(i2c_dev_t* dev, uint8_t data);
+uint8_t pcf8591_write(unsigned char addr, uint8_t data);
 
 
 

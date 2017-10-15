@@ -30,7 +30,7 @@
 #include "lua.h"
 #include "lauxlib.h"
 
-#include <common/i2c-def.h>
+//#include <common/i2c-def.h>
 #include <pcf8591/pcf8591.h>
 
 
@@ -43,132 +43,91 @@
 #define PWM_FREQ 500
 
 
-i2c_dev_t* adcd=NULL;
+//i2c_dev_t* adcd=NULL;
 
-static int ladc_setup(lua_State* L) {
-    if(adcd == NULL) adcd = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
+static int leadc_setup(lua_State* L) {
+//    if(adcd == NULL) adcd = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
     
 //    i2c_init(I2C_BUS, SCL_PIN, SDA_PIN, I2C_FREQ_100K);
-    adcd->addr = ADDR;
-    adcd->bus = I2C_BUS;
-
-    //pca9685_init(dev);
-
-    //pca9685_set_pwm_frequency(dev, PWM_FREQ);
-    //printf("Freq 1000Hz, real %d\n", pca9685_get_pwm_frequency(&dev));
-
+//    adcd->addr = ADDR;
+//    adcd->bus = I2C_BUS;
     return 0;
 }
 
-/*
-static int lpwm_setfreq( lua_State* L ) {
-	int f = luaL_checkinteger(L, 1);
-	pca9685_set_pwm_frequency(dev, f);
-    return 0;
-}
-
-static int lpwm_getfreq( lua_State* L ) {
-	lua_pushinteger(L, pca9685_get_pwm_frequency(dev) );
-    return 1;
-}
-
-static int lpwm_restart( lua_State* L ) {
-    pca9685_restart(dev);
-    return 0;
-}
-
-static int lpwm_is_sleeping( lua_State* L ) {
-    lua_pushboolean(L, pca9685_is_sleeping(dev) );
-    return 1;
-}
-
-static int lpwm_sleep( lua_State* L ) {
-	int b = lua_toboolean(L, 1);
-    pca9685_sleep(dev, b);
-    return 0;
-}
-
-static int lpwm_is_inverted( lua_State* L ) {
-    lua_pushboolean(L, pca9685_is_output_inverted(dev) );
-    return 1;
-}
-
-static int lpwm_invert( lua_State* L ) {
-	int b = lua_toboolean(L, 1);
-    pca9685_set_output_inverted(dev, b);
-    return 0;
-}
-
-static int lpwm_is_o_drain( lua_State* L ) {
-    lua_pushboolean(L, pca9685_get_output_open_drain(dev) );
-    return 1;
-}
-
-static int lpwm_o_drain( lua_State* L ) {
-	int b = lua_toboolean(L, 1);
-    pca9685_set_output_open_drain(dev, b);
-    return 0;
-}
-
-static int lpwm_set_val( lua_State* L ) {
-	int n = lua_gettop(L);
-	int ch = luaL_checkinteger(L, 1);
-	int v = luaL_checkinteger(L, 2);
-
-	int max = 4096;
-	if(n > 2) max = luaL_checkinteger(L, 3);
-	
-	if(ch < 0 || ch > 15) return 0;
-	
-	if(max <= 0) max = 1;
-	else if(max > 4096) max = 4096;
-
-	if(v < 0) v = 0;
-	else if(v > max) v = max;
-	
-	v = v * 4096 / max;
-    pca9685_set_pwm_value(dev, ch, v);
-    
-    lua_pushboolean(L, 1);
-    return 1;
-}
-*/
-
-
-static int ladc_adc( lua_State* L ) {
+static int leadc_adc( lua_State* L ) {
 //    int n = lua_gettop(L);
-//    int ch = luaL_checkinteger(L, 1);
-    int res;
-    unsigned char a0, a1, a2, a3;
+    uint8_t ch = luaL_checkinteger(L, 1);
+    uint8_t res;
+//    unsigned char a0, a1, a2, a3;
 
-//    if(ch < 0 || ch >3) return 0;
+    if(ch < 0 || ch >3) return 0;
 
-    res = pcf8591_read(adcd, &a0, &a1, &a2, &a3);
+    res = pcf8591_read(ADDR, ch); // &a0, &a1, &a2, &a3);
     
-    lua_pushinteger(L, a0);
-    lua_pushinteger(L, a1);
-    lua_pushinteger(L, a2);
-    lua_pushinteger(L, a3);
-    return 4;
+    lua_pushinteger(L, res);
+//    lua_pushinteger(L, a0);
+//    lua_pushinteger(L, a1);
+//    lua_pushinteger(L, a2);
+//    lua_pushinteger(L, a3);
+    return 1; //4;
 }
 
-static int ladc_dac( lua_State* L ) {
+static int leadc_dac( lua_State* L ) {
     int n = lua_gettop(L);
     int dat = luaL_checkinteger(L, 1);
 
-    pcf8591_write(adcd, dat);
+    pcf8591_write(ADDR, dat);
     return 0;
 }
+
+static int leadc_get_val_meta( lua_State* L ) {
+	int ch = luaL_checkinteger(L, 2);
+	if(ch < 0 || ch > 3) 
+		lua_pushnil(L);
+	else
+		lua_pushnumber(L, ( 100.0*(float)pcf8591_read(ADDR, (unsigned char)ch) )/255.0 );
+	return 1;
+}
+
+static int leadc_set_val_meta( lua_State* L ) {
+	unsigned char dac = 0;
+	char *s;
+	float v;
+	
+	if(lua_type(L, 2) != LUA_TSTRING) return 0;
+	s = lua_tostring(L, 2);
+	if( strcmp(s, "dac") ) return 0;
+	
+	v = luaL_checknumber(L, 3);
+	if(v < 0.0) v = 0.0;
+	else if(v > 100.0) v = 100.0;
+	
+	dac = (unsigned char)(255.0 * v / 100.0);
+	pcf8591_write(ADDR, dac);
+
+	return 0;
+}
+
 
 
 
 #include "modules.h"
 
+const LUA_REG_TYPE eadc_metatab[] =
+{
+  { LSTRKEY( "__newindex" ),       LFUNCVAL( leadc_set_val_meta ) },
+  { LSTRKEY( "__index" ),          LFUNCVAL( leadc_get_val_meta ) },
+  { LNILKEY, LNILVAL }
+};
+
+
 const LUA_REG_TYPE eadc_tab[] =
 {
-  { LSTRKEY( "init" ),		LFUNCVAL( ladc_setup ) },
-  { LSTRKEY( "adc" ),		LFUNCVAL( ladc_adc ) },
-  { LSTRKEY( "dac" ),		LFUNCVAL( ladc_dac ) },
+//  { LSTRKEY( "init" ),		LFUNCVAL( ladc_setup ) },
+  { LSTRKEY( "adc" ),		LFUNCVAL( leadc_adc ) },
+  { LSTRKEY( "dac" ),		LFUNCVAL( leadc_dac ) },
+  
+  { LSTRKEY( "__metatable" ), LROVAL( eadc_metatab ) },
   { LNILKEY, LNILVAL }
 };
 
@@ -177,7 +136,8 @@ const LUA_REG_TYPE eadc_tab[] =
 
 
 LUAMOD_API int luaopen_eadc (lua_State *L) {
+  leadc_setup(L);
   return 0;
 }
 
-MODULE_REGISTER_MAPPED(AD, ad, eadc_tab, luaopen_eadc);
+MODULE_REGISTER_MAPPED(AD, adc, eadc_tab, luaopen_eadc);

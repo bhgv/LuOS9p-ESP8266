@@ -91,6 +91,7 @@ static const IRAM TValue *luaR_auxfind(const luaR_entry *pentry, const char *k, 
 			i++;
 		}
 	} else {
+		/*
 		while (entry->key.id.strkey) {
 			if (i == nk) {
 				res = &entry->value;
@@ -99,6 +100,7 @@ static const IRAM TValue *luaR_auxfind(const luaR_entry *pentry, const char *k, 
 			entry++;
 			i++;
 		}
+		*/
 	}
 
 	if (res && ppos)

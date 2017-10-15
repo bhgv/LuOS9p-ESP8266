@@ -30,7 +30,7 @@
 #include "lua.h"
 #include "lauxlib.h"
 
-#include <common/i2c-def.h>
+//#include <common/i2c-def.h>
 #include <pca9685/pca9685.h>
 
 
@@ -43,19 +43,19 @@
 #define PWM_FREQ 500
 
 
-i2c_dev_t* dev=NULL;
+//i2c_dev_t* dev=NULL;
 
 
 static int lpwm_setup(lua_State* L) {
-	if(dev == NULL) dev = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
+//	if(dev == NULL) dev = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
 	
 //    i2c_init(I2C_BUS, SCL_PIN, SDA_PIN, I2C_FREQ_100K);
-	dev->addr = ADDR;
-	dev->bus = I2C_BUS;
+//	dev->addr = ADDR;
+//	dev->bus = I2C_BUS;
 
-    pca9685_init(dev);
+    pca9685_init(ADDR);
 
-    pca9685_set_pwm_frequency(dev, PWM_FREQ);
+    pca9685_set_pwm_frequency(ADDR, PWM_FREQ);
     //printf("Freq 1000Hz, real %d\n", pca9685_get_pwm_frequency(&dev));
 
     return 0;
@@ -63,50 +63,50 @@ static int lpwm_setup(lua_State* L) {
 
 static int lpwm_setfreq( lua_State* L ) {
 	int f = luaL_checkinteger(L, 1);
-	pca9685_set_pwm_frequency(dev, f);
+	pca9685_set_pwm_frequency(ADDR, f);
     return 0;
 }
 
 static int lpwm_getfreq( lua_State* L ) {
-	lua_pushinteger(L, pca9685_get_pwm_frequency(dev) );
+	lua_pushinteger(L, pca9685_get_pwm_frequency(ADDR) );
     return 1;
 }
 
 static int lpwm_restart( lua_State* L ) {
-    pca9685_restart(dev);
+    pca9685_restart(ADDR);
     return 0;
 }
 
 static int lpwm_is_sleeping( lua_State* L ) {
-    lua_pushboolean(L, pca9685_is_sleeping(dev) );
+    lua_pushboolean(L, pca9685_is_sleeping(ADDR) );
     return 1;
 }
 
 static int lpwm_sleep( lua_State* L ) {
 	int b = lua_toboolean(L, 1);
-    pca9685_sleep(dev, b);
+    pca9685_sleep(ADDR, b);
     return 0;
 }
 
 static int lpwm_is_inverted( lua_State* L ) {
-    lua_pushboolean(L, pca9685_is_output_inverted(dev) );
+    lua_pushboolean(L, pca9685_is_output_inverted(ADDR) );
     return 1;
 }
 
 static int lpwm_invert( lua_State* L ) {
 	int b = lua_toboolean(L, 1);
-    pca9685_set_output_inverted(dev, b);
+    pca9685_set_output_inverted(ADDR, b);
     return 0;
 }
 
 static int lpwm_is_o_drain( lua_State* L ) {
-    lua_pushboolean(L, pca9685_get_output_open_drain(dev) );
+    lua_pushboolean(L, pca9685_get_output_open_drain(ADDR) );
     return 1;
 }
 
 static int lpwm_o_drain( lua_State* L ) {
 	int b = lua_toboolean(L, 1);
-    pca9685_set_output_open_drain(dev, b);
+    pca9685_set_output_open_drain(ADDR, b);
     return 0;
 }
 
@@ -127,29 +127,49 @@ static int lpwm_set_val( lua_State* L ) {
 	else if(v > max) v = max;
 	
 	v = v * 4096 / max;
-    pca9685_set_pwm_value(dev, ch, v);
+    pca9685_set_pwm_value(ADDR, ch, v);
     
     lua_pushboolean(L, 1);
     return 1;
+}
+
+static int lpwm_set_val_meta( lua_State* L ) {
+	int ch=-1;
+	int pwm = 0;
+	float v;
+		
+	v = luaL_checknumber(L, 3);
+	if(v < 0.0 || v > 100.0) return 0;
+	
+	if(lua_type(L, 2) == LUA_TNUMBER) ch = lua_tointeger(L, 2);
+	else if(lua_type(L, 2) == LUA_TSTRING) {
+		if(lua_getmetatable(L, 1)){
+			lua_pushvalue(L,2);
+			lua_rawget(L, -2);
+			if(lua_type(L, -1) == LUA_TNUMBER) ch = lua_tointeger(L, -1);
+			lua_pop(L, 2);
+		}
+	}
+	
+	if(ch < 0 || ch > 15) return 0;
+	
+	if(ch == 5 || ch == 6) v = 100.0 - v; //inv for SGN0 & SGN1
+	pwm = (int)(4095.0 * v / 100.0);
+	
+	pca9685_set_pwm_value(ADDR, ch, pwm);
+
+	return 0;
 }
 
 
 
 #include "modules.h"
 
-const LUA_REG_TYPE pwm_tab[] =
+const LUA_REG_TYPE pwm_metatab[] =
 {
-  { LSTRKEY( "init" ),       LFUNCVAL( lpwm_setup ) },
-  { LSTRKEY( "set_freq" ),   LFUNCVAL( lpwm_setfreq ) },
-  { LSTRKEY( "get_freq" ),      LFUNCVAL( lpwm_getfreq ) },
-  { LSTRKEY( "sleep" ),     LFUNCVAL( lpwm_sleep ) },
-  { LSTRKEY( "is_sleep" ),     LFUNCVAL( lpwm_is_sleeping ) },
-  { LSTRKEY( "open_drn" ),     LFUNCVAL( lpwm_o_drain ) },
-  { LSTRKEY( "is_open_drn" ),       LFUNCVAL( lpwm_is_o_drain ) },
-  { LSTRKEY( "invert" ),    LFUNCVAL( lpwm_invert ) },
-  { LSTRKEY( "is_invert" ),       LFUNCVAL( lpwm_is_inverted ) },
-  { LSTRKEY( "restart" ),    LFUNCVAL( lpwm_restart ) },
-  { LSTRKEY( "ch_val" ),  LFUNCVAL( lpwm_set_val ) },
+  { LSTRKEY( "__newindex" ),       LFUNCVAL( lpwm_set_val_meta ) },
+  { LSTRKEY( "__index" ),          LROVAL( pwm_metatab ) },
+  
   { LSTRKEY( "PWM0" ),  	 LINTVAL( 0 ) },
   { LSTRKEY( "PWM1" ),  	 LINTVAL( 1 ) },
   { LSTRKEY( "PWM2" ),  	 LINTVAL( 2 ) },
@@ -169,11 +189,31 @@ const LUA_REG_TYPE pwm_tab[] =
   { LNILKEY, LNILVAL }
 };
 
+
+const LUA_REG_TYPE pwm_tab[] =
+{
+  { LSTRKEY( "init" ),       LFUNCVAL( lpwm_setup ) },
+  { LSTRKEY( "set_freq" ),   LFUNCVAL( lpwm_setfreq ) },
+  { LSTRKEY( "get_freq" ),      LFUNCVAL( lpwm_getfreq ) },
+  { LSTRKEY( "sleep" ),     LFUNCVAL( lpwm_sleep ) },
+  { LSTRKEY( "is_sleep" ),     LFUNCVAL( lpwm_is_sleeping ) },
+  { LSTRKEY( "open_drn" ),     LFUNCVAL( lpwm_o_drain ) },
+  { LSTRKEY( "is_open_drn" ),       LFUNCVAL( lpwm_is_o_drain ) },
+  { LSTRKEY( "invert" ),    LFUNCVAL( lpwm_invert ) },
+  { LSTRKEY( "is_invert" ),       LFUNCVAL( lpwm_is_inverted ) },
+  { LSTRKEY( "restart" ),    LFUNCVAL( lpwm_restart ) },
+  { LSTRKEY( "ch_val" ),  LFUNCVAL( lpwm_set_val ) },
+  
+  { LSTRKEY( "__metatable" ), LROVAL( pwm_metatab ) },
+  { LNILKEY, LNILVAL }
+};
+
 /* }====================================================== */
 
 
 
 LUAMOD_API int luaopen_pwm (lua_State *L) {
+  lpwm_setup(L);
   return 0;
 }
 
