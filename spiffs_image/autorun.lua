@@ -22,3 +22,12 @@ end
 end
 
 --gr()
+
+pwm.init()
+ad.init()
+
+while 1 do
+  for i = 0,1000 do
+    pwm.ch_val(pwm.LED2, i, 2000)
+  end
+end

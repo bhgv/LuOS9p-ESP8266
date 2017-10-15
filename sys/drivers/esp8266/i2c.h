@@ -51,22 +51,22 @@
 #endif
 
 #define I2C_MASTER_SDA_HIGH_SCL_HIGH()  \
-	gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO); \
+	/*gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO);*/ \
 	gpio_pin_set(I2C_MASTER_SDA_GPIO); gpio_pin_set(I2C_MASTER_SCL_GPIO)
 //    gpio_output_set(1<<I2C_MASTER_SDA_GPIO | 1<<I2C_MASTER_SCL_GPIO, 0, 1<<I2C_MASTER_SDA_GPIO | 1<<I2C_MASTER_SCL_GPIO, 0)
 
 #define I2C_MASTER_SDA_HIGH_SCL_LOW()  \
-	gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO); \
+	/*gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO);*/ \
 	gpio_pin_set(I2C_MASTER_SDA_GPIO); gpio_pin_clr(I2C_MASTER_SCL_GPIO)
 //    gpio_output_set(1<<I2C_MASTER_SDA_GPIO, 1<<I2C_MASTER_SCL_GPIO, 1<<I2C_MASTER_SDA_GPIO | 1<<I2C_MASTER_SCL_GPIO, 0)
 
 #define I2C_MASTER_SDA_LOW_SCL_HIGH()  \
-	gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO); \
+	/*gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO);*/ \
 	gpio_pin_clr(I2C_MASTER_SDA_GPIO); gpio_pin_set(I2C_MASTER_SCL_GPIO)
 //    gpio_output_set(1<<I2C_MASTER_SCL_GPIO, 1<<I2C_MASTER_SDA_GPIO, 1<<I2C_MASTER_SDA_GPIO | 1<<I2C_MASTER_SCL_GPIO, 0)
 
 #define I2C_MASTER_SDA_LOW_SCL_LOW()  \
-	gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO); \
+	/*gpio_pin_output(I2C_MASTER_SDA_GPIO); gpio_pin_output(I2C_MASTER_SCL_GPIO);*/ \
 	gpio_pin_clr(I2C_MASTER_SDA_GPIO); gpio_pin_clr(I2C_MASTER_SCL_GPIO)
 //    gpio_output_set(0, 1<<I2C_MASTER_SDA_GPIO | 1<<I2C_MASTER_SCL_GPIO, 1<<I2C_MASTER_SDA_GPIO | 1<<I2C_MASTER_SCL_GPIO, 0)
 

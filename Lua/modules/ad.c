@@ -1,5 +1,5 @@
 /*
- * bhgv, pca9685-pwm Lua module
+ * bhgv, pcf8591-adc-dac Lua module
  *
  * Copyright (C) 2017
  * 
@@ -31,10 +31,10 @@
 #include "lauxlib.h"
 
 #include <common/i2c-def.h>
-#include <pca9685/pca9685.h>
+#include <pcf8591/pcf8591.h>
 
 
-#define ADDR PCA9685_ADDR_BASE
+#define ADDR PCF8591_DEFAULT_ADDRESS
 
 #define I2C_BUS 0
 #define SCL_PIN 5
@@ -43,24 +43,24 @@
 #define PWM_FREQ 500
 
 
-i2c_dev_t* dev=NULL;
+i2c_dev_t* adcd=NULL;
 
-
-static int lpwm_setup(lua_State* L) {
-	if(dev == NULL) dev = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
-	
+static int ladc_setup(lua_State* L) {
+    if(adcd == NULL) adcd = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
+    
 //    i2c_init(I2C_BUS, SCL_PIN, SDA_PIN, I2C_FREQ_100K);
-	dev->addr = ADDR;
-	dev->bus = I2C_BUS;
+    adcd->addr = ADDR;
+    adcd->bus = I2C_BUS;
 
-    pca9685_init(dev);
+    //pca9685_init(dev);
 
-    pca9685_set_pwm_frequency(dev, PWM_FREQ);
+    //pca9685_set_pwm_frequency(dev, PWM_FREQ);
     //printf("Freq 1000Hz, real %d\n", pca9685_get_pwm_frequency(&dev));
 
     return 0;
 }
 
+/*
 static int lpwm_setfreq( lua_State* L ) {
 	int f = luaL_checkinteger(L, 1);
 	pca9685_set_pwm_frequency(dev, f);
@@ -132,40 +132,43 @@ static int lpwm_set_val( lua_State* L ) {
     lua_pushboolean(L, 1);
     return 1;
 }
+*/
+
+
+static int ladc_adc( lua_State* L ) {
+//    int n = lua_gettop(L);
+//    int ch = luaL_checkinteger(L, 1);
+    int res;
+    unsigned char a0, a1, a2, a3;
+
+//    if(ch < 0 || ch >3) return 0;
+
+    res = pcf8591_read(adcd, &a0, &a1, &a2, &a3);
+    
+    lua_pushinteger(L, a0);
+    lua_pushinteger(L, a1);
+    lua_pushinteger(L, a2);
+    lua_pushinteger(L, a3);
+    return 4;
+}
+
+static int ladc_dac( lua_State* L ) {
+    int n = lua_gettop(L);
+    int dat = luaL_checkinteger(L, 1);
+
+    pcf8591_write(adcd, dat);
+    return 0;
+}
 
 
 
 #include "modules.h"
 
-const LUA_REG_TYPE pwm_tab[] =
+const LUA_REG_TYPE eadc_tab[] =
 {
-  { LSTRKEY( "init" ),       LFUNCVAL( lpwm_setup ) },
-  { LSTRKEY( "set_freq" ),   LFUNCVAL( lpwm_setfreq ) },
-  { LSTRKEY( "get_freq" ),      LFUNCVAL( lpwm_getfreq ) },
-  { LSTRKEY( "sleep" ),     LFUNCVAL( lpwm_sleep ) },
-  { LSTRKEY( "is_sleep" ),     LFUNCVAL( lpwm_is_sleeping ) },
-  { LSTRKEY( "open_drn" ),     LFUNCVAL( lpwm_o_drain ) },
-  { LSTRKEY( "is_open_drn" ),       LFUNCVAL( lpwm_is_o_drain ) },
-  { LSTRKEY( "invert" ),    LFUNCVAL( lpwm_invert ) },
-  { LSTRKEY( "is_invert" ),       LFUNCVAL( lpwm_is_inverted ) },
-  { LSTRKEY( "restart" ),    LFUNCVAL( lpwm_restart ) },
-  { LSTRKEY( "ch_val" ),  LFUNCVAL( lpwm_set_val ) },
-  { LSTRKEY( "PWM0" ),  	 LINTVAL( 0 ) },
-  { LSTRKEY( "PWM1" ),  	 LINTVAL( 1 ) },
-  { LSTRKEY( "PWM2" ),  	 LINTVAL( 2 ) },
-  { LSTRKEY( "PWM3" ),  	 LINTVAL( 3 ) },
-  { LSTRKEY( "PWM4" ),  	 LINTVAL( 4 ) },
-  { LSTRKEY( "SGN1" ),  	 LINTVAL( 5 ) },
-  { LSTRKEY( "SGN0" ),  	 LINTVAL( 6 ) },
-  { LSTRKEY( "OUT3" ),  	 LINTVAL( 7 ) },
-  { LSTRKEY( "OUT2" ),  	 LINTVAL( 8 ) },
-  { LSTRKEY( "OUT1" ),  	 LINTVAL( 9 ) },
-  { LSTRKEY( "LED1" ),  	 LINTVAL( 10 ) },
-  { LSTRKEY( "LED2" ),  	 LINTVAL( 11 ) },
-  { LSTRKEY( "LED3" ),  	 LINTVAL( 12 ) },
-  { LSTRKEY( "LED4" ),  	 LINTVAL( 13 ) },
-  { LSTRKEY( "LED5" ),  	 LINTVAL( 14 ) },
-  { LSTRKEY( "LED6" ),  	 LINTVAL( 15 ) },
+  { LSTRKEY( "init" ),		LFUNCVAL( ladc_setup ) },
+  { LSTRKEY( "adc" ),		LFUNCVAL( ladc_adc ) },
+  { LSTRKEY( "dac" ),		LFUNCVAL( ladc_dac ) },
   { LNILKEY, LNILVAL }
 };
 
@@ -173,8 +176,8 @@ const LUA_REG_TYPE pwm_tab[] =
 
 
 
-LUAMOD_API int luaopen_pwm (lua_State *L) {
+LUAMOD_API int luaopen_eadc (lua_State *L) {
   return 0;
 }
 
-MODULE_REGISTER_MAPPED(PWM, pwm, pwm_tab, luaopen_pwm);
+MODULE_REGISTER_MAPPED(AD, ad, eadc_tab, luaopen_eadc);

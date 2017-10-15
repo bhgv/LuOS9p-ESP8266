@@ -72,9 +72,9 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    platform/$(PLATFORM)/open_esplibs \
 		    modules/ssd1306 \
 		    modules/pca9685 \
+		    modules/pcf8591 \
 
 #		    modules/pcf8574 \
-#		    modules/pcf8591 \
 #		    modules/i2c2 \
 
 
