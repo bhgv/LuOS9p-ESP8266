@@ -186,6 +186,7 @@ portBASE_TYPE xPortStartScheduler( void )
 {
     _xt_isr_attach(INUM_SOFT, SV_ISR);
     _xt_isr_unmask(BIT(INUM_SOFT));
+	
 
     /* Initialize system tick timer interrupt and schedule the first tick. */
     _xt_isr_attach(INUM_TICK, sdk__xt_timer_int);

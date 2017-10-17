@@ -43,21 +43,10 @@
 #define PWM_FREQ 500
 
 
-//i2c_dev_t* dev=NULL;
-
-
 static int lpwm_setup(lua_State* L) {
-//	if(dev == NULL) dev = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
-	
-//    i2c_init(I2C_BUS, SCL_PIN, SDA_PIN, I2C_FREQ_100K);
-//	dev->addr = ADDR;
-//	dev->bus = I2C_BUS;
-
     pca9685_init(ADDR);
-
     pca9685_set_pwm_frequency(ADDR, PWM_FREQ);
-    //printf("Freq 1000Hz, real %d\n", pca9685_get_pwm_frequency(&dev));
-
+	pca9685_set_output_open_drain(ADDR, 1);
     return 0;
 }
 
@@ -177,9 +166,9 @@ const LUA_REG_TYPE pwm_metatab[] =
   { LSTRKEY( "PWM4" ),  	 LINTVAL( 4 ) },
   { LSTRKEY( "SGN1" ),  	 LINTVAL( 5 ) },
   { LSTRKEY( "SGN0" ),  	 LINTVAL( 6 ) },
-  { LSTRKEY( "OUT3" ),  	 LINTVAL( 7 ) },
-  { LSTRKEY( "OUT2" ),  	 LINTVAL( 8 ) },
-  { LSTRKEY( "OUT1" ),  	 LINTVAL( 9 ) },
+  { LSTRKEY( "DC3" ),  	 LINTVAL( 7 ) },
+  { LSTRKEY( "DC2" ),  	 LINTVAL( 8 ) },
+  { LSTRKEY( "DC1" ),  	 LINTVAL( 9 ) },
   { LSTRKEY( "LED1" ),  	 LINTVAL( 10 ) },
   { LSTRKEY( "LED2" ),  	 LINTVAL( 11 ) },
   { LSTRKEY( "LED3" ),  	 LINTVAL( 12 ) },
@@ -192,7 +181,7 @@ const LUA_REG_TYPE pwm_metatab[] =
 
 const LUA_REG_TYPE pwm_tab[] =
 {
-  { LSTRKEY( "init" ),       LFUNCVAL( lpwm_setup ) },
+//  { LSTRKEY( "init" ),       LFUNCVAL( lpwm_setup ) },
   { LSTRKEY( "set_freq" ),   LFUNCVAL( lpwm_setfreq ) },
   { LSTRKEY( "get_freq" ),      LFUNCVAL( lpwm_getfreq ) },
   { LSTRKEY( "sleep" ),     LFUNCVAL( lpwm_sleep ) },

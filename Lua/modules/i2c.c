@@ -29,7 +29,7 @@
 
 #include "whitecat.h"
 
-#if LUA_USE_I2C
+//#if LUA_USE_I2C
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -181,7 +181,7 @@ static const /*luaL_Reg*/ LUA_REG_TYPE li2c[] = {
 */
 //  { LSTRKEY( "fb_rle" ),  LFUNCVAL( lu8g_fb_rle ) },
 
-    {LSTRKEY( "setup" ), LFUNCVAL( li2c_setup )},
+//    {LSTRKEY( "init" ), LFUNCVAL( li2c_setup )},
     {LSTRKEY( "start" ), LFUNCVAL( li2c_start )},
     {LSTRKEY( "stop" ), LFUNCVAL( li2c_stop )},
     {LSTRKEY( "address" ), LFUNCVAL( li2c_address )},
@@ -193,40 +193,13 @@ static const /*luaL_Reg*/ LUA_REG_TYPE li2c[] = {
 };
 
 int luaopen_i2c(lua_State* L) {
-//	int sda = 2;
-//	int scl = 14;
-//	int speed = 100;
-//	platform_i2c_setup(0, sda, scl, speed);
-	
-/*
-    luaL_newlib(L, li2c);
-
-//    int i;
-//    char buff[7];
-
-//    for(i=1;i<=NI2CHW;i++) {
-//        sprintf(buff,"I2C%d",i);
-//        lua_pushinteger(L, i);
-//        lua_setfield(L, -2, buff);
-//    }
-
-//    for(i=1;i<=NI2CBB;i++) {
-//        sprintf(buff,"I2CBB%d",i);
-//        lua_pushinteger(L, i + NI2CHW);
-//        lua_setfield(L, -2, buff);
-//    }
-
-    lua_pushinteger(L, 0);
-    lua_setfield(L, -2, "WRITE");
-    
-    lua_pushinteger(L, 1);
-    lua_setfield(L, -2, "READ");
-
-    return 1;
-*/
+//	uint8_t sda = 4;
+//	uint8_t scl = 5;
+//	
+//	platform_i2c_setup(0, sda, scl, 100);
     return 0;
 }
 
 MODULE_REGISTER_MAPPED(I2C, i2c, li2c, luaopen_i2c)
 
-#endif
+//#endif

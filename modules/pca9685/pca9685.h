@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <common/i2c-def.h>
+//#include <common/i2c-def.h>
 #include <drivers/i2c-platform.h>
 
 #ifdef __cplusplus

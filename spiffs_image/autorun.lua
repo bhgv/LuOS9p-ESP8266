@@ -23,11 +23,19 @@ end
 
 --gr()
 
-pwm.init()
-ad.init()
+--pwm.init()
+--gpio.init()
+
+--pwm.open_drn(true)
+p("is OD", pwm.is_open_drn())
 
 while 1 do
-  for i = 0,1000 do
-    pwm.ch_val(pwm.LED2, i, 2000)
-  end
+    for i=0,1000 do
+	pwm.DC1=i/10.0
+	pwm.DC2=i/10.0
+	pwm.DC3=i/10.0
+	pwm.SGN0=i/10.0
+	pwm.SGN1=100.0-(i/10.0)
+	--print(i)
+    end
 end

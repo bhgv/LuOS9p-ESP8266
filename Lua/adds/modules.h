@@ -17,23 +17,23 @@
 //#define LIB_USED(fname) LIB_CONCAT(CONFIG_LUA_RTOS_LUA_USE_,fname)
 //#define LIB_USED(fname) LIB_CONCAT(LUA_USE_,fname)
 #define LIB_USED(fname) 1
-#define LIB_INIT_DUMMY_FOO(fname)  LIB_CONCAT(fname,_init_dummy_foo)()
+#define LIB_INIT_DUMMY_FOO(fname)  LIB_CONCAT(fname,_init_dummy_foo)
 #define LIB_SECTION(fname, section) LIB_CONCAT(section,1) //LIB_USED(fname))
 
 #if LUA_USE_ROTABLE
 
 #define MODULE_REGISTER_UNMAPPED(fname, lname, func) \
-extern void LIB_INIT_DUMMY_FOO(fname){ \
+extern void LIB_INIT_DUMMY_FOO(fname)(lua_State *L){ \
 volatile static const PUT_IN_SECTION(LIB_TOSTRING(LIB_SECTION(fname,.lua_libs))) luaL_Reg LIB_CONCAT(lua_libs,LIB_CONCAT(_,LIB_CONCAT(lname,LIB_USED(fname)))) = {LIB_TOSTRING(lname), func}; \
 } 
 
 #define MODULE_REGISTER_MAPPED(fname, lname, map, func) \
-extern void LIB_INIT_DUMMY_FOO(fname){ \
+extern void LIB_INIT_DUMMY_FOO(fname)(lua_State *L){ \
 volatile static const PUT_IN_SECTION(LIB_TOSTRING(LIB_SECTION(fname,.lua_libs))) luaL_Reg LIB_CONCAT(lua_libs,LIB_CONCAT(_,LIB_CONCAT(lname,LIB_USED(fname)))) = {LIB_TOSTRING(lname), func}; \
 volatile static const PUT_IN_SECTION(LIB_TOSTRING(LIB_SECTION(fname,.lua_rotable))) luaR_entry LIB_CONCAT(lua_rotable,LIB_CONCAT(_,LIB_CONCAT(lname,LIB_USED(fname)))) = {LSTRKEY(LIB_TOSTRING(lname)), LROVAL(map)}; \
 } 
 
-#define USE_LIB(fname) LIB_INIT_DUMMY_FOO(fname);
+#define USE_LIB(fname) LIB_INIT_DUMMY_FOO(fname)(L);
 
 #else
 #define MODULE_REGISTER(fname, lname, map)

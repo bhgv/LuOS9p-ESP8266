@@ -34,6 +34,13 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "drivers/i2c-platform.h"
+
+
+#define DEF_SDA 4
+#define DEF_SCL 5
+
+
 #if !LUA_USE_ROTABLE
 /*
 ** these libs are loaded by lua.c and are readily available to any Lua
@@ -85,6 +92,12 @@ LUALIB_API void luaL_openlibs (lua_State *L) {
   for (; lib->name; lib++) {
     if (lib->func) {
   		debug_free_mem_begin(luaL_openlibs);
+
+		
+		uint8_t sda = DEF_SDA;
+		uint8_t scl = DEF_SCL;
+		
+		platform_i2c_setup(0, sda, scl, 100);
 
 		#include "user_modules.inc"
 		

@@ -726,7 +726,7 @@ static const luaL_Reg pk_funcs[] = {
 #endif
   /* placeholders */
   {"preload", NULL},
-  {"cpath", NULL},
+//  {"cpath", NULL},
   {"path", NULL},
   {"searchers", NULL},
   {"loaded", NULL},
@@ -783,7 +783,7 @@ LUAMOD_API int luaopen_package (lua_State *L) {
   createsearcherstable(L);
   /* set paths */
   setpath(L, "path", LUA_PATH_VAR, LUA_PATH_DEFAULT);
-  setpath(L, "cpath", LUA_CPATH_VAR, LUA_CPATH_DEFAULT);
+//  setpath(L, "cpath", LUA_CPATH_VAR, LUA_CPATH_DEFAULT);
   /* store config information */
   lua_pushliteral(L, LUA_DIRSEP "\n" LUA_PATH_SEP "\n" LUA_PATH_MARK "\n"
                      LUA_EXEC_DIR "\n" LUA_IGMARK "\n");

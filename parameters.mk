@@ -73,8 +73,8 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    modules/ssd1306 \
 		    modules/pca9685 \
 		    modules/pcf8591 \
+		    modules/pcf8574 \
 
-#		    modules/pcf8574 \
 #		    modules/i2c2 \
 
 
