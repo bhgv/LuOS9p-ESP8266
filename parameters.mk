@@ -70,13 +70,13 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    platform/$(PLATFORM)/core \
 		    platform/$(PLATFORM)/lwip \
 		    platform/$(PLATFORM)/open_esplibs \
-		    modules/ssd1306 \
 		    modules/ssd1306_2 \
 		    modules/fonts \
 		    modules/pca9685 \
 		    modules/pcf8591 \
 		    modules/pcf8574 \
 
+#		    modules/ssd1306 \
 #		    modules/i2c2 \
 
 

@@ -30,7 +30,6 @@
 #include "lua.h"
 #include "lauxlib.h"
 
-//#include <common/i2c-def.h>
 #include <pcf8591/pcf8591.h>
 
 
@@ -43,7 +42,7 @@
 #define PWM_FREQ 500
 
 
-//i2c_dev_t* adcd=NULL;
+unsigned char dac = 0;
 
 static int leadc_setup(lua_State* L) {
 //    if(adcd == NULL) adcd = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
@@ -88,13 +87,15 @@ static int get_adc_num(lua_State* L){
 			lua_pop(L, 2);
 		}
 	}
-	if(ch < 0 || ch > 15) ch = -1;
 	return ch;
 }
 
+
 static int leadc_get_val_meta( lua_State* L ) {
 	int ch = get_adc_num(L);
-	if(ch < 0 || ch > 3) 
+	if(ch == -2) 
+		lua_pushnumber(L, ( 100.0*(float)dac )/255.0 );
+	else if(ch < 0 || ch > 3) 
 		lua_pushnil(L);
 	else
 		lua_pushnumber(L, ( 100.0*(float)pcf8591_read(ADDR, (unsigned char)ch) )/255.0 );
@@ -102,7 +103,7 @@ static int leadc_get_val_meta( lua_State* L ) {
 }
 
 static int leadc_set_val_meta( lua_State* L ) {
-	unsigned char dac = 0;
+	//unsigned char dac = 0;
 	int ch;
 	float v;
 	
@@ -128,7 +129,7 @@ const LUA_REG_TYPE eadc_metatab[] =
   { LSTRKEY( "__newindex" ),       LFUNCVAL( leadc_set_val_meta ) },
   { LSTRKEY( "__index" ),          LFUNCVAL( leadc_get_val_meta ) },
 
-  { LSTRKEY( "Light" ),			LFUNCVAL( 2 ) },
+  { LSTRKEY( "Light" ),			LINTVAL( 2 ) },
   { LSTRKEY( "DAC" ),			LINTVAL( -2 ) },
   { LNILKEY, LNILVAL }
 };

@@ -11,12 +11,20 @@ local draw_menu = function(d)
     local i, yc;
     local y = 2; --m_str_step;
     local ln;
-    for i = 1,#menu_cur do
+    local bg = 1
+    if #menu_cur > 6 and m_cur_pos >= 6/2 then
+	if m_cur_pos > #menu_cur - 6/2 then
+	    bg = #menu_cur - 6 + 1
+	else
+	    bg = m_cur_pos - 6/2 + 1
+	end
+    end
+    for i = bg,#menu_cur do
 		ln = menu_cur[i];
-		yc = math.ceil(y+(m_str_step/2));
+--		yc = math.ceil(y+(m_str_step/2));
 		if i == m_cur_pos then
 --			d.frame(0, y, 128, m_str_step)
-			d.hline(5, y, 128-10)
+			d.hline(5, y+m_str_step, 128-10)
 			d.box(2, y+3, 4, 4);
 --		else
 --			d.frame(2, y+3, 4, 4);

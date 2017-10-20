@@ -1,7 +1,11 @@
+local stf=dofile "gstuff/pwm.lua"
+
 local menu_dc={
-	{name="DC 1", act=acts_pwm, par=9},
-	{name="DC 2", act=acts_pwm, par=8},
-	{name="DC 3", act=acts_pwm, par=7},
+	{name="DC 1", act=stf.acts, par=9, ind_t=stf.ind },
+	{name="DC 2", act=stf.acts, par=8, ind_t=stf.ind },
+	{name="DC 3", act=stf.acts, par=7, ind_t=stf.ind },
 	{name="..to main menu"}
 }
+stf=nil
+
 return menu_dc
