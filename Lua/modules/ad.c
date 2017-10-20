@@ -65,11 +65,7 @@ static int leadc_adc( lua_State* L ) {
     res = pcf8591_read(ADDR, ch); // &a0, &a1, &a2, &a3);
     
     lua_pushinteger(L, res);
-//    lua_pushinteger(L, a0);
-//    lua_pushinteger(L, a1);
-//    lua_pushinteger(L, a2);
-//    lua_pushinteger(L, a3);
-    return 1; //4;
+    return 1; 
 }
 
 static int leadc_dac( lua_State* L ) {
@@ -80,8 +76,24 @@ static int leadc_dac( lua_State* L ) {
     return 0;
 }
 
+
+static int get_adc_num(lua_State* L){
+	int ch = -1;
+	if(lua_type(L, 2) == LUA_TNUMBER) ch = lua_tointeger(L, 2);
+	else if(lua_type(L, 2) == LUA_TSTRING) {
+		if(lua_getmetatable(L, 1)){
+			lua_pushvalue(L,2);
+			lua_rawget(L, -2);
+			if(lua_type(L, -1) == LUA_TNUMBER) ch = lua_tointeger(L, -1);
+			lua_pop(L, 2);
+		}
+	}
+	if(ch < 0 || ch > 15) ch = -1;
+	return ch;
+}
+
 static int leadc_get_val_meta( lua_State* L ) {
-	int ch = luaL_checkinteger(L, 2);
+	int ch = get_adc_num(L);
 	if(ch < 0 || ch > 3) 
 		lua_pushnil(L);
 	else
@@ -91,12 +103,10 @@ static int leadc_get_val_meta( lua_State* L ) {
 
 static int leadc_set_val_meta( lua_State* L ) {
 	unsigned char dac = 0;
-	char *s;
+	int ch;
 	float v;
 	
-	if(lua_type(L, 2) != LUA_TSTRING) return 0;
-	s = lua_tostring(L, 2);
-	if( strcmp(s, "dac") ) return 0;
+	if(get_adc_num(L) != -2) return 0;
 	
 	v = luaL_checknumber(L, 3);
 	if(v < 0.0) v = 0.0;
@@ -117,6 +127,9 @@ const LUA_REG_TYPE eadc_metatab[] =
 {
   { LSTRKEY( "__newindex" ),       LFUNCVAL( leadc_set_val_meta ) },
   { LSTRKEY( "__index" ),          LFUNCVAL( leadc_get_val_meta ) },
+
+  { LSTRKEY( "Light" ),			LFUNCVAL( 2 ) },
+  { LSTRKEY( "DAC" ),			LINTVAL( -2 ) },
   { LNILKEY, LNILVAL }
 };
 

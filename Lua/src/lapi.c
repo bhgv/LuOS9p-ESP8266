@@ -127,7 +127,7 @@ LUA_API void lua_xmove (lua_State *from, lua_State *to, int n) {
   lua_lock(to);
   api_checknelems(from, n);
   api_check(from, G(from) == G(to), "moving among independent states");
-  api_check(from, to->ci->top - to->top >= n, "stack overflow");
+  api_check(from, to->ci->top - to->top >= n, "lstack 1 overflow");
   from->top -= n;
   for (i = 0; i < n; i++) {
     setobj2s(to, to->top, from->top + i);

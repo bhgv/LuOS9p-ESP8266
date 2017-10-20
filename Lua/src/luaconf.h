@@ -212,11 +212,14 @@
 		LUA_ROOT"?.lua;"  LUA_ROOT"?/init.lua;" \
 		"./?.lua;" "./?/init.lua"
 
-//LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
-//LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" \
-
-//#define LUA_CPATH_DEFAULT \
-//		LUA_CDIR"?.so;" LUA_CDIR"loadall.so;" "./?.so"
+/*
+LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
+LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" \
+*/
+/*
+#define LUA_CPATH_DEFAULT \
+		LUA_CDIR"?.so;" LUA_CDIR"loadall.so;" "./?.so"
+*/
 #endif			/* } */
 
 

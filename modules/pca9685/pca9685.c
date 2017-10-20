@@ -55,6 +55,10 @@
 #define debug(fmt, ...) 
 #endif
 
+
+uint16_t pwm_vals[16];
+
+
 inline static uint32_t round_div(uint32_t x, uint32_t y)
 {
     return (x + y / 2) / y;
@@ -107,6 +111,10 @@ void pca9685_init(unsigned char addr)
 //    update_reg(dev, REG_MODE1, MODE1_AI, 0 /*MODE1_AI*/);
     write_reg(addr, REG_MODE1, MODE1_AI | 0x21);
     write_reg(addr, REG_MODE2, 0 /*MODE1_AI*/ | 0x4);
+
+	int i;
+	for(i=0; i<15; i++)
+		pca9685_set_pwm_value(addr, i, 0);
 }
 
 bool pca9685_set_subaddr(unsigned char addr, uint8_t num, uint8_t subaddr, bool enable)
@@ -242,6 +250,13 @@ void pca9685_set_pwm_value(unsigned char addr, uint8_t channel, uint16_t val)
 //        // Full on
 //        write_reg(dev, reg + OFFS_REG_LED_ON, LED_FULL_ON_OFF);
 //    }
+	pwm_vals[channel] = val;
+}
+
+uint16_t pca9685_get_pwm_value(unsigned char addr, uint8_t channel )
+{
+	if(channel<0 || channel>15) return 0;
+	return pwm_vals[channel];
 }
 
 bool pca9685_set_pwm_values(unsigned char addr, uint8_t first_ch, uint8_t channels, const uint16_t *values)

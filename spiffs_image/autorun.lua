@@ -4,7 +4,9 @@ p=print
 
 for k in pairs(os) do _G[k]=os[k] end
 
+g=gpio
 
+--[[
 d=u8g.disp()
 
 f = function(d,i)
@@ -20,6 +22,8 @@ while true do
     end 
 end
 end
+]]
+
 
 --gr()
 
@@ -27,6 +31,7 @@ end
 --gpio.init()
 
 --pwm.open_drn(true)
+--[[
 p("is OD", pwm.is_open_drn())
 
 while 1 do
@@ -39,3 +44,19 @@ while 1 do
 	--print(i)
     end
 end
+]]
+
+gui=dofile("gui/init.lua")
+--gui=require "gui"
+
+dac=0
+acts_pwm={lft=function(k) pwm[k]=pwm[k]-1 end, rgt=function(k) pwm[k]=pwm[k]+1 end, lpg=function(k) pwm[k]=pwm[k]-10 end, rpg=function(k) pwm[k]=pwm[k]+10 end, }
+ind_pwm=function(d, y, k) d.print(100, y, string.format("%d%%", math.ceil(pwm[k]) ) ); end
+ind_menu=function(d, y, k) d.triangle(118, y, 118, y+7, 125, y+4); end
+--acts_dac={lft=function() adc.DAC=pwm[k]-1 end, rgt=function(k) pwm[k]=pwm[k]+1 end, lpg=function(k) pwm[k]=pwm[k]-10 end, rpg=function(k) pwm[k]=pwm[k]+10 end, }
+
+gui.new_menu("menu/main")
+
+-- [[
+gui.menu_loop()
+--]]

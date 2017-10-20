@@ -54,9 +54,10 @@ void gpio15_interrupt_handler();
 static int legpio_setup(lua_State* L) {
 	pcf8575_init(ADDR);
 
+//	gpio_pin_output(INT_PIN);
+	gpio_pin_opendrain(INT_PIN);
 	gpio_pin_set(INT_PIN);
-	gpio_pin_input(INT_PIN);
-	//gpio_pin_opendrain(INT_PIN);
+//	gpio_pin_input(INT_PIN);
 	gpio_pin_pullup(INT_PIN);	
 	gpio_set_interrupt(INT_PIN, GPIO_INTTYPE_EDGE_NEG);
     return 0;
@@ -169,7 +170,9 @@ static int get_gpio_num(lua_State* L){
 
 static int legpio_get_val_meta( lua_State* L ) {
 	int ch = get_gpio_num(L);
-	if(ch < 0 || ch > 15) 
+	if(ch == -1)
+		lua_pushinteger(L, pcf8575_port_read(ADDR) );
+	else if(ch < 0 || ch > 15) 
 		lua_pushnil(L);
 	else
 		lua_pushboolean(L, (int)(
@@ -181,9 +184,11 @@ static int legpio_get_val_meta( lua_State* L ) {
 
 static int legpio_set_val_meta( lua_State* L ) {
 	unsigned char v;
-	
 	int ch = get_gpio_num(L);
-	if(ch >= 0 && ch <= 15) {
+	
+	if(ch == -1)
+		pcf8575_port_write(ADDR, (uint16_t)luaL_optinteger( L, 3, 0) );
+	else if(ch >= 0 && ch <= 15) {
 		v = lua_toboolean(L, 3);
 		pcf8575_gpio_write(ADDR, (char)ch, v);
 	}
@@ -215,7 +220,9 @@ const LUA_REG_TYPE egpio_metatab[] =
 	{ LSTRKEY( "bDWN" ), 			LINTVAL( 12 ) },
 	{ LSTRKEY( "bLPg" ), 			LINTVAL( 13 ) },
 	{ LSTRKEY( "bRPg" ), 			LINTVAL( 14 ) },
-	{ LSTRKEY( "bExtK" ), 			LINTVAL( 15 ) },
+	{ LSTRKEY( "bExtKey" ), 		LINTVAL( 15 ) },
+
+	{ LSTRKEY( "pins" ), 			LINTVAL( -1 ) },
 
  	{ LNILKEY, LNILVAL }
 };

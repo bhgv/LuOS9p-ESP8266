@@ -39,6 +39,7 @@
 // WHITECAT BEGIN
 extern void mach_init();
 extern void newTick(void);
+extern void runCallbacks(void);
 // WHITECAT END
 
 /* This is not declared in any header file (but arguably should be) */
@@ -256,6 +257,7 @@ void IRAM vApplicationIdleHook(void) {
 // .text+0x404
 void IRAM vApplicationTickHook(void) {
 	newTick();
+	runCallbacks();
 }
 
 void vAssertCalled( const char * pcFile, unsigned long ulLine ) {

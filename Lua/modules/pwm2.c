@@ -122,14 +122,9 @@ static int lpwm_set_val( lua_State* L ) {
     return 1;
 }
 
-static int lpwm_set_val_meta( lua_State* L ) {
-	int ch=-1;
-	int pwm = 0;
-	float v;
-		
-	v = luaL_checknumber(L, 3);
-	if(v < 0.0 || v > 100.0) return 0;
-	
+
+static int get_pwm_num(lua_State* L){
+	int ch = -1;
 	if(lua_type(L, 2) == LUA_TNUMBER) ch = lua_tointeger(L, 2);
 	else if(lua_type(L, 2) == LUA_TSTRING) {
 		if(lua_getmetatable(L, 1)){
@@ -139,7 +134,19 @@ static int lpwm_set_val_meta( lua_State* L ) {
 			lua_pop(L, 2);
 		}
 	}
-	
+	if(ch < 0 || ch > 15) ch = -1;
+	return ch;
+}
+
+static int lpwm_set_val_meta( lua_State* L ) {
+	int ch=-1;
+	int pwm = 0;
+	float v;
+		
+	v = luaL_checknumber(L, 3);
+	if(v < 0.0 || v > 100.0) return 0;
+
+	ch = get_pwm_num(L);
 	if(ch < 0 || ch > 15) return 0;
 	
 	if(ch == 5 || ch == 6) v = 100.0 - v; //inv for SGN0 & SGN1
@@ -150,14 +157,30 @@ static int lpwm_set_val_meta( lua_State* L ) {
 	return 0;
 }
 
+static int lpwm_get_val_meta( lua_State* L ) {
+	int ch=-1;
+	int pwm = 0;
+	float v;
+	
+	ch = get_pwm_num(L);
+	if(ch < 0 || ch > 15) lua_pushnil( L);
+	else{
+		v = 100.0*( (float)pca9685_get_pwm_value(ADDR, ch) / 4095.0);
+		if(ch == 5 || ch == 6) v = 100.0 - v; //inv for SGN0 & SGN1
+		lua_pushnumber( L, v);
+	}
+	return 1;
+}
+
 
 
 #include "modules.h"
 
 const LUA_REG_TYPE pwm_metatab[] =
 {
-  { LSTRKEY( "__newindex" ),       LFUNCVAL( lpwm_set_val_meta ) },
-  { LSTRKEY( "__index" ),          LROVAL( pwm_metatab ) },
+  { LSTRKEY( "__newindex" ),	LFUNCVAL( lpwm_set_val_meta ) },
+  //{ LSTRKEY( "__index" ),          LROVAL( pwm_metatab ) },
+  { LSTRKEY( "__index" ),		LFUNCVAL( lpwm_get_val_meta ) },
   
   { LSTRKEY( "PWM0" ),  	 LINTVAL( 0 ) },
   { LSTRKEY( "PWM1" ),  	 LINTVAL( 1 ) },
@@ -182,16 +205,16 @@ const LUA_REG_TYPE pwm_metatab[] =
 const LUA_REG_TYPE pwm_tab[] =
 {
 //  { LSTRKEY( "init" ),       LFUNCVAL( lpwm_setup ) },
-  { LSTRKEY( "set_freq" ),   LFUNCVAL( lpwm_setfreq ) },
+  { LSTRKEY( "set_freq" ),		 LFUNCVAL( lpwm_setfreq ) },
   { LSTRKEY( "get_freq" ),      LFUNCVAL( lpwm_getfreq ) },
-  { LSTRKEY( "sleep" ),     LFUNCVAL( lpwm_sleep ) },
-  { LSTRKEY( "is_sleep" ),     LFUNCVAL( lpwm_is_sleeping ) },
-  { LSTRKEY( "open_drn" ),     LFUNCVAL( lpwm_o_drain ) },
-  { LSTRKEY( "is_open_drn" ),       LFUNCVAL( lpwm_is_o_drain ) },
-  { LSTRKEY( "invert" ),    LFUNCVAL( lpwm_invert ) },
-  { LSTRKEY( "is_invert" ),       LFUNCVAL( lpwm_is_inverted ) },
-  { LSTRKEY( "restart" ),    LFUNCVAL( lpwm_restart ) },
-  { LSTRKEY( "ch_val" ),  LFUNCVAL( lpwm_set_val ) },
+  { LSTRKEY( "sleep" ),			LFUNCVAL( lpwm_sleep ) },
+  { LSTRKEY( "is_sleep" ),		LFUNCVAL( lpwm_is_sleeping ) },
+  { LSTRKEY( "open_drn" ),		LFUNCVAL( lpwm_o_drain ) },
+  { LSTRKEY( "is_open_drn" ),	LFUNCVAL( lpwm_is_o_drain ) },
+  { LSTRKEY( "invert" ),		LFUNCVAL( lpwm_invert ) },
+  { LSTRKEY( "is_invert" ),		LFUNCVAL( lpwm_is_inverted ) },
+  { LSTRKEY( "restart" ),		LFUNCVAL( lpwm_restart ) },
+  { LSTRKEY( "ch_val" ),		LFUNCVAL( lpwm_set_val ) },
   
   { LSTRKEY( "__metatable" ), LROVAL( pwm_metatab ) },
   { LNILKEY, LNILVAL }

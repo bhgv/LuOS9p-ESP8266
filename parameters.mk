@@ -71,6 +71,8 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    platform/$(PLATFORM)/lwip \
 		    platform/$(PLATFORM)/open_esplibs \
 		    modules/ssd1306 \
+		    modules/ssd1306_2 \
+		    modules/fonts \
 		    modules/pca9685 \
 		    modules/pcf8591 \
 		    modules/pcf8574 \
@@ -176,7 +178,7 @@ endif
 CPPFLAGS += -DGITSHORTREV=$(GITSHORTREV)
 
 # rboot firmware binary paths for flashing
-RBOOT_BIN = $(ROOT)platform/$(PLATFORM)/bootloader/firmware/rboot.bin
+RBOOT_BIN = $(FIRMWARE_DIR)/rboot.bin
 RBOOT_PREBUILT_BIN = $(ROOT)platform/$(PLATFORM)/bootloader/firmware_prebuilt/rboot.bin
 RBOOT_CONF = $(ROOT)platform/$(PLATFORM)/bootloader/firmware_prebuilt/blank_config.bin
 
@@ -184,4 +186,7 @@ RBOOT_CONF = $(ROOT)platform/$(PLATFORM)/bootloader/firmware_prebuilt/blank_conf
 # prebuilt binary from the source tree
 ifeq (,$(wildcard $(RBOOT_BIN)))
 RBOOT_BIN=$(RBOOT_PREBUILT_BIN)
+#echo "use prebuild bootloader"
+else
+#echo "use custom bootloader"
 endif

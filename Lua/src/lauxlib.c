@@ -381,9 +381,9 @@ LUALIB_API int luaL_checkoption (lua_State *L, int arg, const char *def,
 LUALIB_API void luaL_checkstack (lua_State *L, int space, const char *msg) {
   if (!lua_checkstack(L, space)) {
     if (msg)
-      luaL_error(L, "stack overflow (%s)", msg);
+      luaL_error(L, "lstack 3 overflow (%s)", msg);
     else
-      luaL_error(L, "stack overflow");
+      luaL_error(L, "lstack 4 overflow");
   }
 }
 

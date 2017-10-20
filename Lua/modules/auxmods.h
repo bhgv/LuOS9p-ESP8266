@@ -7,6 +7,8 @@
 
 #include "lua.h"
 
+/*
+
 #define AUXLIB_PIO      "pio"
 LUALIB_API int ( luaopen_pio )( lua_State *L );
 
@@ -78,6 +80,8 @@ LUALIB_API int (luaopen_pack) (lua_State* L);
 #define MOD_REG_INTEGER( L, name, val )\
   lua_pushinteger( L, val );\
   lua_setfield( L, -2, name )
+
+*/
 
 #endif
 

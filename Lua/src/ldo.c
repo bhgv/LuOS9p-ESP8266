@@ -199,7 +199,7 @@ void luaD_growstack (lua_State *L, int n) {
     if (newsize < needed) newsize = needed;
     if (newsize > LUAI_MAXSTACK) {  /* stack overflow? */
       luaD_reallocstack(L, ERRORSTACKSIZE);
-      luaG_runerror(L, "stack overflow");
+      luaG_runerror(L, "lstack 5 overflow");
     }
     else
       luaD_reallocstack(L, newsize);

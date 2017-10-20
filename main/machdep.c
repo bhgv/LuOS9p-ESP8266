@@ -3,6 +3,7 @@
 
 extern void mach_dev();
 extern void _clock_init();
+extern void _cb_init();
 extern void _syscalls_init();
 extern void _pthread_init();
 extern void _console_init();
@@ -15,6 +16,7 @@ void mach_init() {
     _mtx_init();
     _pthread_init();
     _clock_init();
+    _cb_init();
     _syscalls_init();
 	_console_init();
     _signal_init();

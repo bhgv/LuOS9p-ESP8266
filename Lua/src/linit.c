@@ -82,7 +82,7 @@ extern const luaL_Reg lua_libs1[];
 
 MODULE_REGISTER_UNMAPPED(_G, _G, luaopen_base);
 MODULE_REGISTER_UNMAPPED(IO, io, luaopen_io);
-MODULE_REGISTER_UNMAPPED(PACKAGE, package, luaopen_package);
+//MODULE_REGISTER_UNMAPPED(PACKAGE, package, luaopen_package);
 
 
 LUALIB_API void luaL_openlibs (lua_State *L) {
@@ -97,7 +97,7 @@ LUALIB_API void luaL_openlibs (lua_State *L) {
 		uint8_t sda = DEF_SDA;
 		uint8_t scl = DEF_SCL;
 		
-		platform_i2c_setup(0, sda, scl, 100);
+		platform_i2c_setup(0, sda, scl, 100);		
 
 		#include "user_modules.inc"
 		
