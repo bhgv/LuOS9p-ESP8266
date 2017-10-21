@@ -89,10 +89,12 @@
 #define swap(x, y) do { typeof(x) temp##x##y = x; x = y; y = temp##x##y; } while (0)
 
 
-#if (SSD1306_I2C_SUPPORT)
+//#if (SSD1306_I2C_SUPPORT)
 static int inline i2c_send(uint8_t addr, uint8_t reg, uint8_t* data, uint8_t len)
 {
 //	int i;
+	uint8_t ot = i2c_master_set_delay_us(0);
+
 	platform_i2c_send_start(0);
 	platform_i2c_send_address(0, addr, 0);
 	platform_i2c_send_byte(0, reg);
@@ -106,9 +108,11 @@ static int inline i2c_send(uint8_t addr, uint8_t reg, uint8_t* data, uint8_t len
 	platform_i2c_send_stop(0);
 	udelay(2);
 
+	i2c_master_set_delay_us(ot);
+	
     return 0; //i2c_slave_write(dev->i2c_dev.bus, dev->i2c_dev.addr , &reg, data, len);
 }
-#endif
+//#endif
 
 /* Issue a command to SSD1306 device
  * I2C proto format:

@@ -45,11 +45,6 @@
 unsigned char dac = 0;
 
 static int leadc_setup(lua_State* L) {
-//    if(adcd == NULL) adcd = (i2c_dev_t*)malloc(sizeof(i2c_dev_t));
-    
-//    i2c_init(I2C_BUS, SCL_PIN, SDA_PIN, I2C_FREQ_100K);
-//    adcd->addr = ADDR;
-//    adcd->bus = I2C_BUS;
     return 0;
 }
 
@@ -69,9 +64,13 @@ static int leadc_adc( lua_State* L ) {
 
 static int leadc_dac( lua_State* L ) {
     int n = lua_gettop(L);
-    int dat = luaL_checkinteger(L, 1);
+	if(n==0){
+		lua_pushinteger(L, dac);
+		return 1;
+	}
+    dac = luaL_checkinteger(L, 1);
 
-    pcf8591_write(ADDR, dat);
+    pcf8591_write(ADDR, dac);
     return 0;
 }
 
@@ -104,7 +103,7 @@ static int leadc_get_val_meta( lua_State* L ) {
 
 static int leadc_set_val_meta( lua_State* L ) {
 	//unsigned char dac = 0;
-	int ch;
+	//int ch;
 	float v;
 	
 	if(get_adc_num(L) != -2) return 0;

@@ -66,16 +66,17 @@ inline static uint32_t round_div(uint32_t x, uint32_t y)
 
 inline static void write_reg(unsigned char addr, uint8_t reg, uint8_t val)
 {
+	uint8_t ot = i2c_master_set_delay_us(1);
+
 	platform_i2c_send_start(0);
 	platform_i2c_send_address(0, addr, 0);
 	platform_i2c_send_byte(0, reg);
-//	platform_i2c_send_stop(0);
 
-//    platform_i2c_send_start(0);
-//	platform_i2c_send_address(0, dev->addr, 0);
 	platform_i2c_send_byte(0, val);
 	platform_i2c_send_stop(0);
 	udelay(2);
+	
+	i2c_master_set_delay_us(ot);
  //   if (i2c_slave_write(dev->bus, dev->addr, &reg, &val, 1))
  //       debug("Could not write 0x%02x to 0x%02x, bus %u, addr = 0x%02x", reg, val, dev->bus, dev->addr);
 }
@@ -84,6 +85,8 @@ inline static uint8_t read_reg(unsigned char addr, uint8_t reg)
 {
     uint8_t res = 0;
     
+	uint8_t ot = i2c_master_set_delay_us(1);
+
     platform_i2c_send_start(0);
 	platform_i2c_send_address(0, addr, 0);
 	platform_i2c_send_byte(0, reg);
@@ -94,7 +97,8 @@ inline static uint8_t read_reg(unsigned char addr, uint8_t reg)
 	res = platform_i2c_recv_byte(0, 1);
 	platform_i2c_send_stop(0);
 	udelay(2);
-
+	
+	i2c_master_set_delay_us(ot);
 //    if (i2c_slave_read(dev->bus, dev->addr, &reg, &res, 1))
 //        debug("Could not read from 0x%02x, bus %u, addr = 0x%02x", reg, dev->bus, dev->addr);
     return res;

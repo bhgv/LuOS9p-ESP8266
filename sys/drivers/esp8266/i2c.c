@@ -22,7 +22,9 @@
 #include "i2c.h"
 
 
-#define I2C_DEF_DELAY 5
+LOCAL uint8 _dly_us=2;
+
+#define I2C_DEF_DELAY _dly_us  //3 //5
 
 
 LOCAL uint8 m_nLastSDA;
@@ -30,6 +32,13 @@ LOCAL uint8 m_nLastSCL;
 
 LOCAL uint8 pinSDA = 5;
 LOCAL uint8 pinSCL = 4; //15;
+
+
+uint8 i2c_master_set_delay_us(uint8 us){
+	uint8 ous = I2C_DEF_DELAY;
+	I2C_DEF_DELAY = us;
+	return ous;
+}
 
 /******************************************************************************
  * FunctionName : i2c_master_setDC
