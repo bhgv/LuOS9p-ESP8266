@@ -78,6 +78,7 @@ static void _cb_task (lua_State *L, int n, int cnt ) {
 				if(v > 0) { 
 					lua_pushvalue(L, n);
 					lua_call(L, 0, 0);
+					lua_gc(L, LUA_GCCOLLECT, 0);
 				}
 			}
 			mtx_unlock(&tloop_mtx);

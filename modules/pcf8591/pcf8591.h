@@ -9,7 +9,7 @@
 #ifndef _EXTRAS_PCF8591_H_
 #define _EXTRAS_PCF8591_H_
 
-#include <common/i2c-def.h>
+//#include <common/i2c-def.h>
 
 #ifdef __cplusplus
 extern "C"

@@ -4,7 +4,7 @@ local menu_pio={
 	{name="PIO 2", },
 	{name="PIO 3", },
 	{name="PIO 4", },
-	{name="..to main menu"}
+	{name=" ..main menu"}
 }
 
 return menu_pio

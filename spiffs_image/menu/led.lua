@@ -7,7 +7,7 @@ local menu_led={
 	{name="Led 4", ind_t=stf.ind, act=stf.acts, par=13},
 	{name="Led 5", ind_t=stf.ind, act=stf.acts, par=14},
 	{name="Led 6", ind_t=stf.ind, act=stf.acts, par=15},
-	{name="..to main menu"}
+	{name=" ..main menu"}
 }
 stf=nil
 

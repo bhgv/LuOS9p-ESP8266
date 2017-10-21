@@ -6,7 +6,7 @@ local menu_pwm={
 	{name="PWM 2", act=stf.acts, par=2, ind_t=stf.ind },
 	{name="PWM 3", act=stf.acts, par=3, ind_t=stf.ind },
 	{name="PWM 4", act=stf.acts, par=4, ind_t=stf.ind },
-	{name="..to main menu"}
+	{name=" ..main menu"}
 }
 stf=nil
 

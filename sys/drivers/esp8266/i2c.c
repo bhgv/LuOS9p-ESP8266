@@ -22,7 +22,7 @@
 #include "i2c.h"
 
 
-#define I2C_DEF_DELAY 7
+#define I2C_DEF_DELAY 5
 
 
 LOCAL uint8 m_nLastSDA;

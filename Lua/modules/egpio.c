@@ -59,7 +59,7 @@ static int legpio_setup(lua_State* L) {
 	gpio_pin_set(INT_PIN);
 //	gpio_pin_input(INT_PIN);
 	gpio_pin_pullup(INT_PIN);	
-	gpio_set_interrupt(INT_PIN, GPIO_INTTYPE_EDGE_NEG);
+//	gpio_set_interrupt(INT_PIN, GPIO_INTTYPE_EDGE_NEG);
     return 0;
 }
 
@@ -102,46 +102,11 @@ static int legpio_write( lua_State* L ) {
 }
 
 
-
+#if 0
 void IRAM gpio15_interrupt_handler(){ 
-//	uint32 j=0;
-//	uint32 gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
-//	  uint32 now = system_get_time();
-/*
-#ifdef GPIO_INTERRUPT_HOOK_ENABLE
-	  if (gpio_status & platform_gpio_hook.all_bits) {
-		for (j = 0; j < platform_gpio_hook.count; j++) {
-		   if (gpio_status & platform_gpio_hook.entry[j].bits)
-			 gpio_status = (platform_gpio_hook.entry[j].func)(gpio_status);
-		}
-	  }
-#endif
-*/
-	/*
-	 * gpio_status is a bit map where bit 0 is set if unmapped gpio pin 0 (pin3) has
-	 * triggered the ISR. bit 1 if unmapped gpio pin 1 (pin10=U0TXD), etc.  Since this
-	 * is the ISR, it makes sense to optimize this by doing a fast scan of the status
-	 * and reverse mapping any set bits.
-	*/
-/*
-	for (j = 0; gpio_status>0; j++, gpio_status >>= 1) {
-		if (gpio_status&1) {
-//			int i = pin_num_inv[j];
-//			if (pin_int_type[i]) {
-				//disable interrupt
-//				gpio_pin_intr_state_set(GPIO_ID_PIN(j), GPIO_PIN_INTR_DISABLE);
-				//clear interrupt status
-				GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, BIT(j));
-				uint32 level = gpio_pin_get(GPIO_ID_PIN(j));
-
-//				task_post_high (gpio_task_handle, (now << 8) + (i<<1) + level);
-				// We re-enable the interrupt when we execute the callback
-//			}
-		}
-	}
-*/
 	printf("gpio 15  intr\n");
 }
+#endif
 
 
 static int get_gpio_isr_stat(lua_State* L){

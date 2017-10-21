@@ -144,7 +144,9 @@ static int lpwm_set_val_meta( lua_State* L ) {
 	float v;
 		
 	v = luaL_checknumber(L, 3);
-	if(v < 0.0 || v > 100.0) return 0;
+//	if(v < 0.0 || v > 100.0) return 0;
+	if(v < 0.0) v = 0.0;
+	else if( v > 100.0) v = 100.0;
 
 	ch = get_pwm_num(L);
 	if(ch < 0 || ch > 15) return 0;
@@ -153,7 +155,6 @@ static int lpwm_set_val_meta( lua_State* L ) {
 	pwm = (int)(4095.0 * v / 100.0);
 	
 	pca9685_set_pwm_value(ADDR, ch, pwm);
-
 	return 0;
 }
 

@@ -60,6 +60,20 @@ local new_menu=function(m)
 	draw(draw_menu);
 end
 
+local sub_menu=function(m)
+    menu_cur=nil;
+    cur_ln=nil;
+    act=nil;
+    --collectgarbage("collect");
+    new_cur_m(m);
+	m_cur_pos = 1;
+	draw(draw_menu);
+end
+
+function top_menu()
+	new_menu(menu)
+end
+
 local menu_up=function()
 	m_cur_pos=m_cur_pos-1
 	if m_cur_pos<1 then 
@@ -110,13 +124,7 @@ local gui_controller = function()
     if i == #menu_cur then
       new_menu(menu);
     elseif m ~= nil then
-      menu_cur=nil;
-      cur_ln=nil;
-      act=nil;
-      --collectgarbage("collect");
-      new_cur_m(m);
-	  m_cur_pos = 1;
-	  draw(draw_menu);
+		sub_menu(m);
     elseif act ~= nil and act.ok ~= nil then
 	    act.ok(par);
     end
@@ -125,12 +133,16 @@ local gui_controller = function()
     if act ~= nil and act.lft ~= nil then
 	  act.lft(par);
 	  draw(draw_menu);
+    elseif m ~= nil then
+		sub_menu(m);
     end
   end
   if(b & rgt) == 0 then
     if act ~= nil and act.rgt ~= nil then
 	  act.rgt(par);
 	  draw(draw_menu);
+    elseif m ~= nil then
+		sub_menu(m);
     end
   end
   if(b & up) == 0 then
@@ -143,12 +155,16 @@ local gui_controller = function()
     if act ~= nil and act.lpg ~= nil then
 	  act.lpg(par);
 	  draw(draw_menu);
+    elseif m ~= nil then
+		sub_menu(m);
     end
   end
   if(b & rpg) == 0 then
     if act ~= nil and act.rpg ~= nil then
 	  act.rpg(par);
 	  draw(draw_menu);
+    elseif m ~= nil then
+		sub_menu(m);
     end
   end
   if(b & ekey) == 0 then

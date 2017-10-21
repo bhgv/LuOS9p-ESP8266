@@ -37,8 +37,8 @@ uint8_t pcf8591_read(unsigned char addr, uint8_t *adc0, uint8_t *adc1, uint8_t *
 
 uint8_t pcf8591_read(unsigned char addr, uint8_t ch)
 {
-    uint8_t res = 0;
-    uint8_t reg = (PCF8591_CTRL_REG_READ & ch);
+    uint8_t res[4]; // = 0;
+    uint8_t reg = 4; //(PCF8591_CTRL_REG_READ & ch);
 
     platform_i2c_send_start(0);
     platform_i2c_send_address(0, addr, 0);
@@ -47,16 +47,20 @@ uint8_t pcf8591_read(unsigned char addr, uint8_t ch)
 
     platform_i2c_send_start(0);
     platform_i2c_send_address(0, addr, 1);
-    res = platform_i2c_recv_byte(0, 1);
-    res = platform_i2c_recv_byte(0, 1);
+	
+    platform_i2c_recv_byte(0, 1);
+    res[0] = platform_i2c_recv_byte(0, 1);
+	res[1] = platform_i2c_recv_byte(0, 1);
+    res[2] = platform_i2c_recv_byte(0, 1);
+	res[3] = platform_i2c_recv_byte(0, 1);
 //    *adc1 = platform_i2c_recv_byte(0, 1);
 //    *adc2 = platform_i2c_recv_byte(0, 1);
 //    *adc3 = platform_i2c_recv_byte(0, 1);
     platform_i2c_send_stop(0);
-    udelay(20);
+    udelay(2);
 //    i2c_slave_read(dev->bus, dev->addr, &control_reg, &res, 1);
 
-    return res;
+    return res[PCF8591_CTRL_REG_READ & ch];
 }
 
 uint8_t pcf8591_write(unsigned char addr, uint8_t data)
