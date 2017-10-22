@@ -1,4 +1,4 @@
-// Module for U8glib
+// Module for ssd1306 oled
 
 #include "modules.h"
 #include "lauxlib.h"
@@ -32,7 +32,7 @@ static ssd1306_color_t background = OLED_COLOR_BLACK;
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 64
 
-static uint8_t buffer[DISPLAY_WIDTH * DISPLAY_HEIGHT / 8];
+uint8_t ssd1306_buffer[DISPLAY_WIDTH * DISPLAY_HEIGHT / 8];
 
 
 
@@ -74,20 +74,11 @@ static int ldisp_mode( lua_State *L )
 }
 
 
-// Lua: u8g.begin( self )
 static int ldisp_cls( lua_State *L )
 {
-	/*
-    lu8g_userdata_t *lud;
-
-    if ((lud = get_lud( L )) == NULL)
-        return 0;
-
-    u8g_Begin( LU8G );
-	*/
 	int i;
 	for(i=0; i<(DISPLAY_WIDTH * DISPLAY_HEIGHT/8); i++)
-		buffer[i] = 0;
+		ssd1306_buffer[i] = 0;
 	ssd1306_set_whole_display_lighting(ADDR, false);
 //	ssd1306_clear_screen(ADDR);
 
@@ -392,7 +383,7 @@ static int ldisp_drawStr( lua_State *L )
 
 //    return lu8g_generic_drawStr( L, 0 );
 	
-	ssd1306_draw_string(ADDR, buffer, font, 
+	ssd1306_draw_string(ADDR, ssd1306_buffer, font, 
 						args[0], args[1], s, 
 						luaL_optinteger( L, 4, foreground), 
 						luaL_optinteger( L, 5, background)
@@ -431,7 +422,7 @@ static int ldisp_drawLine( lua_State *L )
     ldisp_get_int_args( L, 1, 4, args );
 
 //    u8g_DrawLine( LU8G, args[0], args[1], args[2], args[3] );
-	ssd1306_draw_line(ADDR, buffer, args[0], args[1], args[2], args[3], 
+	ssd1306_draw_line(ADDR, ssd1306_buffer, args[0], args[1], args[2], args[3], 
 							luaL_optinteger( L, 5, foreground)
 	);
 
@@ -450,7 +441,7 @@ static int ldisp_drawTriangle( lua_State *L )
     ldisp_get_int_args( L, 1, 6, args );
 
 //    u8g_DrawTriangle( LU8G, args[0], args[1], args[2], args[3], args[4], args[5] );
-	ssd1306_draw_triangle(ADDR, buffer, 
+	ssd1306_draw_triangle(ADDR, ssd1306_buffer, 
 				args[0], args[1], args[2], args[3], args[4], args[5], 
 				luaL_optinteger( L, 7, foreground)
 				);
@@ -470,7 +461,7 @@ static int ldisp_drawBox( lua_State *L )
     ldisp_get_int_args( L, 1, 4, args );
 
 //    u8g_DrawBox( LU8G, args[0], args[1], args[2], args[3] );
-	ssd1306_fill_rectangle(ADDR, buffer, args[0], args[1], args[2], args[3], 
+	ssd1306_fill_rectangle(ADDR, ssd1306_buffer, args[0], args[1], args[2], args[3], 
 									luaL_optinteger( L, 5, foreground)
 	);
 
@@ -490,7 +481,7 @@ static int ldisp_drawRBox( lua_State *L )
     ldisp_get_int_args( L, 1, 5, args );
 
 //    u8g_DrawRBox( LU8G, args[0], args[1], args[2], args[3], args[4] );
-	ssd1306_fill_rectangle(ADDR, buffer, args[0], args[1], args[2], args[3], foreground);
+	ssd1306_fill_rectangle(ADDR, ssd1306_buffer, args[0], args[1], args[2], args[3], foreground);
 
     return 0;
 }
@@ -508,7 +499,7 @@ static int ldisp_drawFrame( lua_State *L )
     ldisp_get_int_args( L, 1, 4, args );
 
 //    u8g_DrawFrame( LU8G, args[0], args[1], args[2], args[3] );
-	ssd1306_draw_rectangle(ADDR, buffer, args[0], args[1], args[2], args[3], 
+	ssd1306_draw_rectangle(ADDR, ssd1306_buffer, args[0], args[1], args[2], args[3], 
 									luaL_optinteger( L, 5, foreground)
 	);
 
@@ -528,7 +519,7 @@ static int ldisp_drawRFrame( lua_State *L )
     ldisp_get_int_args( L, 1, 5, args );
 
 //    u8g_DrawRFrame( LU8G, args[0], args[1], args[2], args[3], args[4] );
-	ssd1306_draw_rectangle(ADDR, buffer, args[0], args[1], args[2], args[3], foreground);
+	ssd1306_draw_rectangle(ADDR, ssd1306_buffer, args[0], args[1], args[2], args[3], foreground);
 
     return 0;
 }
@@ -548,7 +539,7 @@ static int ldisp_drawDisc( lua_State *L )
 //    u8g_uint_t opt = luaL_optinteger( L, (1+3) + 1, U8G_DRAW_ALL );
 
 //    u8g_DrawDisc( LU8G, args[0], args[1], args[2], opt );
-	ssd1306_fill_circle(ADDR, buffer, args[0], args[1], args[2], 
+	ssd1306_fill_circle(ADDR, ssd1306_buffer, args[0], args[1], args[2], 
 								luaL_optinteger( L, 4, foreground)
 	);
 
@@ -569,7 +560,7 @@ static int ldisp_drawCircle( lua_State *L )
 //    u8g_uint_t opt = luaL_optinteger( L, (1+3) + 1, U8G_DRAW_ALL );
 
 //    u8g_DrawCircle( LU8G, args[0], args[1], args[2], opt );
-	ssd1306_draw_circle(ADDR, buffer, args[0], args[1], args[2], 
+	ssd1306_draw_circle(ADDR, ssd1306_buffer, args[0], args[1], args[2], 
 								luaL_optinteger( L, 4, foreground)
 	);
 
@@ -626,7 +617,7 @@ static int ldisp_drawPixel( lua_State *L )
     ldisp_get_int_args( L, 1, 2, args );
 
 //    u8g_DrawPixel( LU8G, args[0], args[1] );
-	ssd1306_draw_pixel(ADDR, buffer, args[0], args[1], 
+	ssd1306_draw_pixel(ADDR, ssd1306_buffer, args[0], args[1], 
 								luaL_optinteger( L, 3, foreground)
 	);
 
@@ -645,7 +636,7 @@ static int ldisp_drawHLine( lua_State *L )
     ldisp_get_int_args( L, 1, 3, args );
 
 //    u8g_DrawHLine( LU8G, args[0], args[1], args[2] );
-	ssd1306_draw_hline(ADDR, buffer, args[0], args[1], args[2], 
+	ssd1306_draw_hline(ADDR, ssd1306_buffer, args[0], args[1], args[2], 
 								luaL_optinteger( L, 4, foreground)
 	);
 
@@ -664,7 +655,7 @@ static int ldisp_drawVLine( lua_State *L )
     ldisp_get_int_args( L, 1, 3, args );
 
 //    u8g_DrawVLine( LU8G, args[0], args[1], args[2] );
-	ssd1306_draw_vline(ADDR, buffer, args[0], args[1], args[2], 
+	ssd1306_draw_vline(ADDR, ssd1306_buffer, args[0], args[1], args[2], 
 								luaL_optinteger( L, 4, foreground)
 	);
 
@@ -687,7 +678,7 @@ static int ldisp_drawXBM( lua_State *L )
         return 0;
 
 //    u8g_DrawXBM( LU8G, args[0], args[1], args[2], args[3], (const uint8_t *)xbm_data );
-    ssd1306_load_xbm(ADDR, (const uint8_t *)xbm_data, buffer);
+    ssd1306_load_xbm(ADDR, (const uint8_t *)xbm_data, ssd1306_buffer);
 
     return 0;
 }
@@ -708,7 +699,7 @@ static int ldisp_drawBitmap( lua_State *L )
         return 0;
 
 //    u8g_DrawBitmap( LU8G, args[0], args[1], args[2], args[3], (const uint8_t *)bm_data );
-    ssd1306_load_xbm(ADDR, (const uint8_t *)bm_data, buffer);
+    ssd1306_load_xbm(ADDR, (const uint8_t *)bm_data, ssd1306_buffer);
 
     return 0;
 }
@@ -1061,7 +1052,7 @@ static int lu8g_fb_rle( lua_State *L ) {
 static int ldisp_show( lua_State *L ) {
 	lua_gc(L, LUA_GCCOLLECT, 0);
 
-	ssd1306_load_frame_buffer(ADDR, buffer);
+	ssd1306_load_frame_buffer(ADDR, ssd1306_buffer);
 	return 0;
 }
 
@@ -1170,7 +1161,7 @@ int luaopen_disp( lua_State *L ) {
 
   int i;
   for(i=0; i<(DISPLAY_WIDTH * DISPLAY_HEIGHT/8); i++)
-	  buffer[i] = 0;
+	  ssd1306_buffer[i] = 0;
   ssd1306_clear_screen(ADDR);
   ssd1306_set_whole_display_lighting(ADDR, false);
   

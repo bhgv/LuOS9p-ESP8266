@@ -183,8 +183,11 @@ self = {
 
     menu_pos=menu_pos,
     
-    menu_loop=function()
-		tloop.run(gui_controller)
+    main_loop=function(m)
+	    if m then
+		new_menu(m);
+	    end
+	    tloop.run(gui_controller);
 	end,
 };
 

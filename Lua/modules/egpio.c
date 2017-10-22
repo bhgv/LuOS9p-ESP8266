@@ -34,7 +34,6 @@
 #include <drivers/cpu.h>
 #include <drivers/gpio.h>
 
-//#include <common/i2c-def.h>
 #include <pcf8574/pcf8575.h>
 
 
@@ -108,12 +107,12 @@ void IRAM gpio15_interrupt_handler(){
 }
 #endif
 
-
+/*
 static int get_gpio_isr_stat(lua_State* L){
 	lua_pushboolean( L, gpio_pin_get(15));
 	return 1;
 }
-
+*/
 
 
 
@@ -128,19 +127,18 @@ static int get_gpio_num(lua_State* L){
 			lua_pop(L, 2);
 		}
 	}
-	if(ch < 0 || ch > 15) ch = -1;
 	return ch;
 }
 
 
 static int legpio_get_val_meta( lua_State* L ) {
 	int ch = get_gpio_num(L);
-	if(ch == -1)
+	if(ch == -2)
 		lua_pushinteger(L, pcf8575_port_read(ADDR) );
 	else if(ch < 0 || ch > 15) 
 		lua_pushnil(L);
 	else
-		lua_pushboolean(L, (int)(
+		lua_pushboolean(L, (
 				pcf8575_gpio_read(ADDR, (unsigned char)ch) != 0
 				)
 		);
@@ -151,7 +149,7 @@ static int legpio_set_val_meta( lua_State* L ) {
 	unsigned char v;
 	int ch = get_gpio_num(L);
 	
-	if(ch == -1)
+	if(ch == -2)
 		pcf8575_port_write(ADDR, (uint16_t)luaL_optinteger( L, 3, 0) );
 	else if(ch >= 0 && ch <= 15) {
 		v = lua_toboolean(L, 3);
@@ -187,7 +185,7 @@ const LUA_REG_TYPE egpio_metatab[] =
 	{ LSTRKEY( "bRPg" ), 			LINTVAL( 14 ) },
 	{ LSTRKEY( "bExtKey" ), 		LINTVAL( 15 ) },
 
-	{ LSTRKEY( "pins" ), 			LINTVAL( -1 ) },
+	{ LSTRKEY( "pins" ), 			LINTVAL( -2 ) },
 
  	{ LNILKEY, LNILVAL }
 };
@@ -199,7 +197,7 @@ const LUA_REG_TYPE egpio_tab[] =
   { LSTRKEY( "get" ),		LFUNCVAL( legpio_read ) },
   { LSTRKEY( "set" ),		LFUNCVAL( legpio_write ) },
 
-	{ LSTRKEY( "isr" ), 	  LFUNCVAL( get_gpio_isr_stat ) },
+//	{ LSTRKEY( "isr" ), 	  LFUNCVAL( get_gpio_isr_stat ) },
   
   { LSTRKEY( "__metatable" ), LROVAL( egpio_metatab ) },
   { LNILKEY, LNILVAL }

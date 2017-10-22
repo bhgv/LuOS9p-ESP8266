@@ -9,6 +9,5 @@ g=gpio
 gui=dofile "gui/init.lua"
 --gui=require "gui"
 
-gui.new_menu "menu/main"
 
-gui.menu_loop()
+gui.menu_loop "menu/main"

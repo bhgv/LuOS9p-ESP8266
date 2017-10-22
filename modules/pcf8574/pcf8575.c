@@ -1,12 +1,15 @@
 
 #include "pcf8575.h"
 
+#define I2C_DEF_DELAY 25
 
 uint16_t old_val;
 
 uint16_t pcf8575_port_read(unsigned char addr)
 {
     uint16_t res = 0;
+
+	uint8_t od = i2c_master_set_delay_us(I2C_DEF_DELAY);
 //    platform_i2c_send_start(0);
 //	platform_i2c_send_address(0, addr, 0);
 //	platform_i2c_send_byte(0, reg);
@@ -17,7 +20,10 @@ uint16_t pcf8575_port_read(unsigned char addr)
 	res = platform_i2c_recv_byte(0, 1);
 	res |= platform_i2c_recv_byte(0, 1) << 8;
 	platform_i2c_send_stop(0);
-	udelay(2);
+
+	i2c_master_set_delay_us(od);
+	
+	udelay(500);
 //    if (i2c_slave_read(dev->bus, dev->addr, NULL, &res, 1))
 //            return 0;
     return res;
@@ -26,7 +32,8 @@ uint16_t pcf8575_port_read(unsigned char addr)
 void pcf8575_port_write(const unsigned char addr, uint16_t val)
 {
 	old_val = val;
-	
+
+	uint8_t od = i2c_master_set_delay_us(I2C_DEF_DELAY);
 //	platform_i2c_send_start(0);
 //	platform_i2c_send_address(0, addr, 0);
 //	platform_i2c_send_byte(0, reg);
@@ -34,17 +41,25 @@ void pcf8575_port_write(const unsigned char addr, uint16_t val)
 	
 	platform_i2c_send_start(0);
 	platform_i2c_send_address(0, addr, 0);
+	
 	platform_i2c_send_byte(0, val);	
 	platform_i2c_send_byte(0, val >> 8);
+	
+	platform_i2c_send_byte(0, val);	
+	platform_i2c_send_byte(0, val >> 8);
+	
 	platform_i2c_send_stop(0);
-	udelay(2);
+
+	i2c_master_set_delay_us(od);
+
+	udelay(500);
 //    i2c_slave_write(dev->bus, dev->addr, NULL, &value, 1);
 }
 
 bool pcf8575_gpio_read(unsigned char addr, uint8_t num)
 {
 	if(num < 0 || num > 15) return 0;
-    return (bool)((pcf8575_port_read(addr) >> num) & 1);
+    return (bool)(pcf8575_port_read(addr) & (1<< num) );
 }
 
 void pcf8575_gpio_write(unsigned char addr, uint8_t num, uint16_t value)

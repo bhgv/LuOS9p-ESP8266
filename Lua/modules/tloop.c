@@ -67,6 +67,11 @@ void runCallbacks(void) {
 }
 
 
+void tloop_cb_noop(){}
+
+void tloop_cb1() __attribute__((weak, alias("tloop_cb_noop")));
+void tloop_cb2() __attribute__((weak, alias("tloop_cb_noop")));
+
 static void _cb_task (lua_State *L, int n, int cnt ) { 
 	uint32_t v;
 	int i = cnt;
@@ -76,6 +81,9 @@ static void _cb_task (lua_State *L, int n, int cnt ) {
 			mtx_lock(&tloop_mtx);
 			if(xQueueReceive(cbqueue, &v, 1024)) {
 				if(v > 0) { 
+					tloop_cb1();
+					tloop_cb2();
+					
 					lua_pushvalue(L, n);
 					lua_call(L, 0, 0);
 					lua_gc(L, LUA_GCCOLLECT, 0);
