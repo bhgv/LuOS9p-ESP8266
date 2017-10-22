@@ -1176,5 +1176,5 @@ int luaopen_disp( lua_State *L ) {
   return 0; //1;
 }
 
-MODULE_REGISTER_MAPPED(SSD1306, disp, ldisplay_map, luaopen_disp );
+MODULE_REGISTER_MAPPED(SSD1306, oled, ldisplay_map, luaopen_disp );
 
