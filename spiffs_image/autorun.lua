@@ -9,7 +9,7 @@ g=gpio
 --gui=dofile "gui/init.lua"
 --gui=require "gui"
 
-
+gui.setFont(6)
 gui.run "menu/main.lua"
 
 oled.cls()

@@ -43,10 +43,9 @@
 #define _ekey 1<<15
 
 
-#define m_str_step 10
-
 extern uint8_t ssd1306_buffer[]; 
-extern const font_info_t *font;
+extern font_info_t *font;
+extern font_face_t font_face;
 
 extern QueueHandle_t cbqueue;
 
@@ -60,20 +59,36 @@ static int no_sleep = 0;
 
 static char msg=NO_MSG;
 
+static char gui_fnt=0;
+#define GUI_FNT gui_fnt
 
 static void draw_menu( lua_State *L, int menu_cur){
+	font_info_t *fnt_bk=font;
+	font = font_builtin_fonts[GUI_FNT];
+//printf("draw_menu fnt %x\n", font);
+    int m_str_step = (font->height + 4);
+//#define m_scr_lns (int)(64/m_str_step)
     int i, yc;
-    int y = 2; 
+    int y = 0; 
     int bg = 1;
 //	menu_cur_len = lua_rawlen(L, menu_cur);
 	char* s;
 	int n = lua_gettop( L);
 
+/*
     if(menu_cur_len > 6 && m_cur_pos >= 6/2){
 		if( m_cur_pos >menu_cur_len - 6/2 ){
 		    bg = menu_cur_len - 6 + 1;
 		}else{
 		    bg = m_cur_pos - 6/2 + 1;
+		}
+    }
+*/
+    if(menu_cur_len*m_str_step > 64-m_str_step && m_cur_pos*m_str_step >= (64/2)/*-m_str_step*/){
+		if( m_cur_pos*m_str_step >menu_cur_len*m_str_step - 64/2 ){
+		    bg = (int)((menu_cur_len*m_str_step - 64)/m_str_step) +1;
+		}else{
+		    bg =(int)(( m_cur_pos*m_str_step - 64/2)/m_str_step) + 1;
 		}
     }
     for( i = bg; i<=menu_cur_len; i++ ){
@@ -101,10 +116,11 @@ static void draw_menu( lua_State *L, int menu_cur){
 			lua_pop(L, 1);
 		
 		y = y + m_str_step;
-		if( y >= 64-m_str_step)
+		if( y >= 64 /*-m_str_step*/)
 			break;
     }
 
+	font=fnt_bk;
 	lua_settop( L, n);
 }
 
@@ -148,6 +164,11 @@ static int top_menu( lua_State *L){
 
 static int exit_menu( lua_State *L){
 	msg=MSG_EXIT;
+	return 0;
+}
+
+static int set_gui_fnt( lua_State *L){
+	gui_fnt=luaL_checkinteger( L, 1);
 	return 0;
 }
 
@@ -402,6 +423,7 @@ static int main_loop( lua_State *L ){
 
 static const LUA_REG_TYPE lgui_map[] = {
   { LSTRKEY( "run" ), 		LFUNCVAL( main_loop) },
+  { LSTRKEY( "setFont" ), 	LFUNCVAL( set_gui_fnt) },
   { LSTRKEY( "gotop" ),		LFUNCVAL( top_menu) },
   { LSTRKEY( "exit" ), 		LFUNCVAL(exit_menu) },
   { LNILKEY, LNILVAL }

@@ -23,8 +23,8 @@ typedef int8_t u8g_int_t;
 #define DEFAULT_FONT FONT_FACE_TERMINUS_6X12_ISO8859_1
 
 
-const font_info_t *font = NULL; // current font
-const font_face_t font_face = 0;
+font_info_t *font = NULL; // current font
+font_face_t font_face = 0;
 
 static ssd1306_color_t foreground = OLED_COLOR_WHITE;
 static ssd1306_color_t background = OLED_COLOR_BLACK;
@@ -85,22 +85,43 @@ static int ldisp_cls( lua_State *L )
     return 0;
 }
 
-// Lua: u8g.setFont( self, font )
+// Lua: oled.setFont( font_num )
 static int ldisp_setFont( lua_State *L )
 {
+	int i = luaL_checkinteger( L, 1);
+	if(i >= 0 && i < font_builtin_fonts_count){
+		font = font_builtin_fonts[i];
+		font_face = i;
+		lua_pushinteger(L, i);
+	}else{
+		lua_pushinteger(L, font_builtin_fonts_count);
+	}
+		
+    return 1;
+}
+
+static int ldisp_getFontInfo( lua_State *L )
+{
 /*
-    lu8g_userdata_t *lud;
-
-    if ((lud = get_lud( L )) == NULL)
-        return 0;
-
-    u8g_fntpgm_uint8_t *font = (u8g_fntpgm_uint8_t *)lua_touserdata( L, 2 );
-    if (font != NULL)
-        u8g_SetFont( LU8G, font );
-    else
-        luaL_argerror(L, 2, "font data expected");
+	int i = luaL_checkinteger( L, 1);
+	if(i >= 0 && i < font_builtin_fonts_count){
+		font = font_builtin_fonts[i];
+		font_face = i;
+		lua_pushinteger(L, i);
+	}else{
+		lua_pushinteger(L, font_builtin_fonts_count);
+	}
 */
-    return 0;
+	if(lua_gettop( L)==0){
+		lua_pushinteger(L, font_face);
+		lua_pushinteger(L, font->height);
+	}else{
+		int i = luaL_checkinteger( L, 1);
+		lua_pushinteger(L, i);
+		lua_pushinteger(L, font_builtin_fonts[i]->height);
+	}
+
+    return 2;
 }
 
 #if 0
@@ -1086,7 +1107,7 @@ static const LUA_REG_TYPE ldisplay_map[] = {
 //  { LSTRKEY( "drawStr270" ),                   LFUNCVAL( ldisp_drawStr270 ) },
   { LSTRKEY( "triangle" ),                 LFUNCVAL( ldisp_drawTriangle ) },
   { LSTRKEY( "vline" ),                    LFUNCVAL( ldisp_drawVLine ) },
-  { LSTRKEY( "XBM" ),                      LFUNCVAL( ldisp_drawXBM ) },
+  { LSTRKEY( "XBM" ),						LFUNCVAL( ldisp_drawXBM ) },
 //  { LSTRKEY( "firstPage" ),                    LFUNCVAL( ldisp_firstPage ) },
 //  { LSTRKEY( "getColorIndex" ),                LFUNCVAL( ldisp_getColorIndex ) },
 //  { LSTRKEY( "getFontAscent" ),                LFUNCVAL( ldisp_getFontAscent ) },
@@ -1097,11 +1118,12 @@ static const LUA_REG_TYPE ldisplay_map[] = {
 //  { LSTRKEY( "getStrWidth" ),                  LFUNCVAL( ldisp_getStrWidth ) },
 //  { LSTRKEY( "getWidth" ),                     LFUNCVAL( ldisp_getWidth ) },
 //  { LSTRKEY( "nextPage" ),                     LFUNCVAL( ldisp_nextPage ) },
-  { LSTRKEY( "setContrast" ),                  LFUNCVAL( ldisp_setContrast ) },
-  { LSTRKEY( "setColorIndex" ),                LFUNCVAL( ldisp_setColorIndex ) },
-  { LSTRKEY( "setDefaultBackgroundColor" ),    LFUNCVAL( ldisp_setDefaultBackgroundColor ) },
-  { LSTRKEY( "setDefaultForegroundColor" ),    LFUNCVAL( ldisp_setDefaultForegroundColor ) },
-  { LSTRKEY( "setFont" ),                      LFUNCVAL( ldisp_setFont ) },
+  { LSTRKEY( "setContrast" ),				LFUNCVAL( ldisp_setContrast ) },
+  { LSTRKEY( "setColorIndex" ),				LFUNCVAL( ldisp_setColorIndex ) },
+  { LSTRKEY( "setDefBgClr" ), 				LFUNCVAL( ldisp_setDefaultBackgroundColor ) },
+  { LSTRKEY( "setDefFgClr" ),				LFUNCVAL( ldisp_setDefaultForegroundColor ) },
+  { LSTRKEY( "setFont" ),					LFUNCVAL( ldisp_setFont ) },
+  { LSTRKEY( "getFontInfo" ), 				LFUNCVAL( ldisp_getFontInfo ) },
 //  { LSTRKEY( "setFontLineSpacingFactor" ),     LFUNCVAL( ldisp_setFontLineSpacingFactor ) },
 //  { LSTRKEY( "setFontPosBaseline" ),           LFUNCVAL( lu8g_setFontPosBaseline ) },
 //  { LSTRKEY( "setFontPosBottom" ),             LFUNCVAL( lu8g_setFontPosBottom ) },
