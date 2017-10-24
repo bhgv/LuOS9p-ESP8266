@@ -30,6 +30,7 @@
 
 #define NO_MSG 		0
 #define MSG_GO_TOP 	1
+#define MSG_EXIT 	2
 
 
 #define _ok 1<<8
@@ -142,6 +143,11 @@ static int top_menu( lua_State *L){
 	msg=MSG_GO_TOP;
 	//new_menu(L, menu);
 	//lua_gc(L, LUA_GCCOLLECT, 0);
+	return 0;
+}
+
+static int exit_menu( lua_State *L){
+	msg=MSG_EXIT;
 	return 0;
 }
 
@@ -340,6 +346,11 @@ static void _cb_task (lua_State *L/*, int n, int cnt*/ ) {
 							msg=NO_MSG;
 							new_menu(L, menu);
 							break;
+						case MSG_EXIT:
+							msg=NO_MSG;
+							lua_gc(L, LUA_GCCOLLECT, 0);
+							return;
+							break;
 					}
 					lua_gc(L, LUA_GCCOLLECT, 0);
 
@@ -392,6 +403,7 @@ static int main_loop( lua_State *L ){
 static const LUA_REG_TYPE lgui_map[] = {
   { LSTRKEY( "run" ), 		LFUNCVAL( main_loop) },
   { LSTRKEY( "gotop" ),		LFUNCVAL( top_menu) },
+  { LSTRKEY( "exit" ), 		LFUNCVAL(exit_menu) },
   { LNILKEY, LNILVAL }
 };
 

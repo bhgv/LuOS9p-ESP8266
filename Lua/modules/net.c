@@ -33,6 +33,8 @@
 
 #if LUA_USE_NET
 
+#include "espressif/esp_common.h"
+
 #include "lualib.h"
 #include "lauxlib.h"
 
@@ -46,6 +48,10 @@
 #include "lwip/inet.h"
 #include "lwip/netdb.h"
 #include "lwip/opt.h"
+
+#include "lwip/sys.h"
+
+//#include "ssid_config.h"
 
 typedef uint32_t u32;
 typedef uint16_t u16;
@@ -389,17 +395,33 @@ static int net_recv( lua_State *L ) {
     return 2;
 }
 
-// Lua: iptype = lookup( "name" )
+// Lua: iptype = lookup( "host name" )
 static int net_lookup(lua_State* L) {
   const char* name = luaL_checkstring( L, 1 );
+  const char* prt = luaL_optstring( L, 2, "80" );
     int port = 0;
  	struct sockaddr_in address;
 	int rc = 0;
 	sa_family_t family = AF_INET;
 	struct addrinfo *result = NULL;
-	struct addrinfo hints = {0, AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
-          
-	if ((rc = getaddrinfo(name, NULL, &hints, &result)) == 0) {
+//	struct addrinfo hints = {0, AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, NULL, NULL, NULL};
+	const struct addrinfo hints = {
+		.ai_family = AF_INET,
+		.ai_socktype = SOCK_STREAM,
+		.ai_protocol = IPPROTO_TCP,
+	};
+
+	rc = getaddrinfo(name, /*NULL*/prt, &hints, &result);
+	if(rc != 0 || result == NULL) {
+		printf("DNS lookup failed err=%d res=%p\r\n", rc, result);
+		if(result)
+			freeaddrinfo(result);
+		//vTaskDelay(1000 / portTICK_PERIOD_MS);
+		//failures++;
+		//continue;
+		return 0;
+	}
+//	if (rc == 0) {
 		struct addrinfo *res = result;
 		while (res) {
 			if (res->ai_family == AF_INET) {
@@ -418,37 +440,58 @@ static int net_lookup(lua_State* L) {
         }
         
         freeaddrinfo(result);
-	}
+//	}
     
-  if (rc == 0) {
+//  if (rc == 0) {
       lua_pushinteger( L, address.sin_addr.s_addr );
       return 1;
-  } else {
-      return 0;
-  }
+//  } else {
+//      return 0;
+//  }
 }
 
-static int net_setup(lua_State* L) {
-    const char *interface = luaL_checkstring( L, 1 );
 
+// net.setup( "your SSID", "your password")
+static int net_setup(lua_State* L) {
+//    const char *interface = "wf"; //luaL_checkstring( L, 1 );
+
+/*
     if (!platform_net_exists(interface)) {
         return luaL_error(L, "unknown interface");    
     }
 
-    if (strcmp(interface, "en") == 0) {
+    //if (strcmp(interface, "en") == 0) {
         
-    }
+    //}
     
-    if (strcmp(interface, "gprs") == 0) {
-        const char *apn = luaL_checkstring( L, 2 );
-        const char *pin = luaL_checkstring( L, 3 );
-        
-        platform_net_setup_gprs(apn, pin);
-    }
+//    if (strcmp(interface, "gprs") == 0) {
+//        const char *apn = luaL_checkstring( L, 2 );
+//        const char *pin = luaL_checkstring( L, 3 );
+//        
+//        platform_net_setup_gprs(apn, pin);
+//    }
+*/
+    
+//    if (strcmp(interface, "wf") == 0) {
+		const char *ssid=luaL_checkstring( L, 1); //2 );
+		const char *password=luaL_optstring( L, 2, ""); //3 , "");
+		
+		struct sdk_station_config config = {
+			.ssid =		"",
+			.password =	"",
+		};
+		strncpy(config.ssid, ssid, 32-1);
+		strncpy(config.password, password, 64-1);
+		
+		/* required to call wifi_set_opmode before station_set_config */
+		sdk_wifi_set_opmode(STATION_MODE);
+		sdk_wifi_station_set_config(&config);
+//    }
     
     return 0;
 }
 
+/*
 static int net_start(lua_State* L) {
     const char *interface = luaL_checkstring( L, 1 );
 
@@ -467,7 +510,9 @@ static int net_start(lua_State* L) {
     lua_pushboolean(L, 1);
     return 1;      
 }
+*/
 
+/*
 static int net_stop(lua_State* L) {
     const char *interface = luaL_checkstring( L, 1 );
     
@@ -486,14 +531,17 @@ static int net_stop(lua_State* L) {
     lua_pushboolean(L, 1);
     return 1;      
 }
+*/
 
+/*
 static int net_stat(lua_State* L) {
-    platform_net_stat_iface("en");printf("\n");
-    platform_net_stat_iface("gprs");printf("\n");
+//    platform_net_stat_iface("en");printf("\n");
+//    platform_net_stat_iface("gprs");printf("\n");
     platform_net_stat_iface("wf");printf("\n");
     
     return 0;    
 }   
+*/
 
 static int net_sntp(lua_State* L) {
     int res;
@@ -530,25 +578,29 @@ static int net_sntp(lua_State* L) {
     return 1;
 }
 
-const luaL_Reg net_map[] = {
-    {"setup", net_setup},
-    {"sntp", net_sntp},
-    {"start", net_start},
-    {"stop", net_stop},
-    {"stat", net_stat},
-    {"accept", net_accept},
-    {"packip", net_packip},
-    {"unpackip", net_unpackip},
-    {"connect", net_connect},
-    {"socket", net_socket},
-    {"close", net_close},
-    {"send", net_send},
-    {"recv", net_recv},
-    {"lookup", net_lookup},
-    {NULL, NULL}
+
+#include "modules.h"
+
+const LUA_REG_TYPE net_map[] = {
+    { LSTRKEY( "setup" ),		LFUNCVAL( net_setup ) },
+    { LSTRKEY( "sntp" ),		LFUNCVAL( net_sntp )},
+//    { LSTRKEY( "start" ),		LFUNCVAL( net_start )},
+//    { LSTRKEY( "stop" ),		LFUNCVAL( net_stop )},
+//    { LSTRKEY( "stat" ),		LFUNCVAL( net_stat )},
+    { LSTRKEY( "accept" ),		LFUNCVAL( net_accept )},
+    { LSTRKEY( "packip" ),		LFUNCVAL( net_packip )},
+    { LSTRKEY( "unpackip" ),	LFUNCVAL( net_unpackip )},
+    { LSTRKEY( "connect" ),		LFUNCVAL( net_connect )},
+    { LSTRKEY( "socket" ),		LFUNCVAL( net_socket )},
+    { LSTRKEY( "close" ),		LFUNCVAL( net_close )},
+    { LSTRKEY( "send" ),		LFUNCVAL( net_send )},
+    { LSTRKEY( "recv" ),		LFUNCVAL( net_recv )},
+    { LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},
+	{ LNILKEY, LNILVAL }
 };
 
 int luaopen_net( lua_State *L ) {
+#if 0
     luaL_newlib(L, net_map);
 
     // Module constants
@@ -586,6 +638,13 @@ int luaopen_net( lua_State *L ) {
     lua_setfield(L, -2, "NO_TIMEOUT");
 
     return 1;
+#else
+	return 0;
+#endif
 }
+
+
+
+MODULE_REGISTER_MAPPED(NET, net, net_map, luaopen_net);
 
 #endif

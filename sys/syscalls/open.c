@@ -218,7 +218,7 @@ fs:
 
 find:
     // store device name
-    fp->f_devname = (char *)malloc(sizeof(char) * strlen(namebuf));
+    fp->f_devname = (char *)malloc(sizeof(char) * (strlen(namebuf)+1));
     if (!fp->f_devname) {
         return ENOMEM;
     }
@@ -234,7 +234,7 @@ find:
     }
     
   
-    return (ENXIO);        
+    return (ENXIO);
 }
     
 /*

@@ -1,4 +1,4 @@
-INC_DIRS += $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)src
+INC_DIRS += $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)src $(Lua_ROOT)platform
 
 Lua_INC_DIR = $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)src \
 	$(ROOT)sys \
@@ -18,13 +18,15 @@ Lua_INC_DIR = $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)sr
 #	$(HOME)/esp-open-rtos/core/include
 
 CFLAGS += -DKERNEL -DLUA_USE_CTYPE -DLUA_32BITS -DLUA_USE_ROTABLE=1 -DDEBUG_FREE_MEM=1 \
-	-DLUA_USE_PACKAGE=1 -DLUA_USE_OS=1 \
+	-DLUA_USE_OS=1 \
 	-DLUA_USE_UTF8=1 \
-	-DLUA_USE_I2C=1 -DLUA_USE_U8G=1 \
+	-DLUA_USE_I2C=1 \
 
+#-DLUA_USE_U8G=1 \
+#	-DLUA_USE_PACKAGE=1 
 #	-DLUA_USE_PIO=0 
 
-Lua_SRC_DIR = $(Lua_ROOT)src $(Lua_ROOT)modules $(Lua_ROOT)common 
+Lua_SRC_DIR = $(Lua_ROOT)src $(Lua_ROOT)modules $(Lua_ROOT)common $(Lua_ROOT)platform
 
 EXTRA_COMPONENTS = extras/ssd1306 extras/i2c
 

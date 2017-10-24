@@ -85,10 +85,10 @@ const struct device devs[] = {
          spiffs_format}
     },
 #endif
-#if (USE_ETHERNET || USE_GPRS || USER_WIFI)
+#if (USE_ETHERNET || USE_GPRS || USE_WIFI)
     {
         "net",
-        {net_open, net_read, net_write, net_ioctl, net_select, net_stat, 
+        {net_open, net_read, net_write, /*net_ioctl*/NULL, /*net_select*/NULL, /*net_stat*/NULL, 
          net_close, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
     }    
 #endif

@@ -87,7 +87,7 @@ int tty_write(struct file *fp, struct uio *uio, struct ucred *cred) {
     char dbuf[2];    
     dbuf[1] = '\0';
 #endif
-	
+
     if (!tty_mutex) {
         pthread_mutexattr_t attr;
 

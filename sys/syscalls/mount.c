@@ -51,6 +51,8 @@ static const struct mountp mountps[] = {
     {"/", "sd", "/sd", "cfi", "sd"},
 #endif
 #endif
+    {"/", "tty", "/tty", "cfi", "tty"},
+    {"/", "net", "/net", "cfi", "net"},
     {NULL, NULL, NULL, NULL}
 };
 
@@ -61,6 +63,8 @@ struct mountd mountds[] = {
 #if USE_SD
     {"sd", 0},
 #endif
+    {"tty", 0},
+    {"net", 0},
     {NULL, 0}
 };
 

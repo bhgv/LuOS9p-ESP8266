@@ -38,13 +38,13 @@
 #include "lwip/netif.h"
 #include "lwip/init.h"
 #include "lwip/stats.h"
-#include "netif/ethernetif.h"
+//#include "netif/ethernetif.h"
 #include "netif/etharp.h"
 #include "lwip/ip_addr.h"
-#include "netif/ppp/ppp.h"
+//#include "netif/ppp/ppp.h"
 #include "lwip/tcpip.h"
 
-#include <drivers/network/network.h>
+//#include <drivers/network/network.h>
 
 extern struct netif eth_netif;
 extern struct netif gprs_netif;
@@ -55,21 +55,23 @@ extern ip_addr_t  dns2;
 int platform_net_exists(const char *interface) {
     int exists;
     
-    exists  = (strcmp(interface,"en") == 0);
-    exists |= (strcmp(interface,"gprs") == 0);
+    //exists  = (strcmp(interface,"en") == 0);
+    //exists |= (strcmp(interface,"gprs") == 0);
     
-    //exists |= strcmp(interface,"wf");
+    exists = (strcmp(interface,"wf")==0);
     
     return exists;
 }
 
+#if 0
 void platform_net_stat_iface(const char *interface) {
     struct netif *netif;
     
     if (!platform_net_exists(interface)) {
         return;
     }
-    
+
+/*
     if (strcmp(interface,"en") == 0) {
         netif = &eth_netif;
     }
@@ -77,7 +79,7 @@ void platform_net_stat_iface(const char *interface) {
     if (strcmp(interface,"gprs") == 0) {
         netif = &gprs_netif;
     }
-
+*/
     if (strcmp(interface,"wf") == 0) {
         netif = &wifi_netif;
     }
@@ -126,25 +128,27 @@ void platform_net_stat_iface(const char *interface) {
             ip4_addr4_16(&dns2)
     );
 }
+#endif
 
 const char *platform_net_error(int code) {
-    return netStrError(code);
+//    return netStrError(code);
 }
 
 int platform_net_start(const char *interface) {
-    return netStart(interface);
+//    return netStart(interface);
 }
 
 int platform_net_stop(const char *interface) {
-    return netStop(interface);
+//    return netStop(interface);
 }
 
 int platform_net_sntp_start() {
-    return netSntpStart();
+//    return netSntpStart();
 }
 
+/*
 void platform_net_setup_gprs(const char *apn, const char *pin) {
     netSetupGprs(apn, pin);
 }
-
+*/
 #endif

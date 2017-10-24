@@ -303,7 +303,7 @@ static int ldisp_setContrast( lua_State *L )
 //        return 0;
 
 //    u8g_SetContrast( LU8G, luaL_checkinteger( L, 2 ) );
-    ssd1306_set_contrast( ADDR, luaL_checkinteger( L, 2 ) );
+    ssd1306_set_contrast( ADDR, luaL_checkinteger( L, 1 ) );
 
     return 0;
 }
