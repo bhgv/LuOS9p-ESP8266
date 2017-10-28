@@ -29,7 +29,7 @@
 
 #include "whitecat.h"
 
-#if LUA_USE_THREAD
+//#if LUA_USE_THREAD
 
 #include "lua.h"
 #include "lapi.h"
@@ -297,7 +297,7 @@ static int thread_list(lua_State *L) {
     return 0;
 }
 
-static int new_thread(lua_State* L, int run) {
+int new_thread(lua_State* L, int run) {
     struct lthread *thread;
     pthread_attr_t attr;
     int res, idx;
@@ -480,4 +480,4 @@ int luaopen_thread(lua_State* L) {
  
 MODULE_REGISTER_MAPPED(THREAD, thread, thread, luaopen_thread);
 
-#endif
+//#endif

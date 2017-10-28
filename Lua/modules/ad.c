@@ -94,6 +94,8 @@ static int leadc_get_val_meta( lua_State* L ) {
 	int ch = get_adc_num(L);
 	if(ch == -2) 
 		lua_pushnumber(L, ( 100.0*(float)dac )/255.0 );
+	else if(ch == -3) 
+		lua_pushnumber(L, ( 100.0*(float)sdk_system_adc_read() )/1023.0 );
 	else if(ch < 0 || ch > 3) 
 		lua_pushnil(L);
 	else
@@ -130,6 +132,7 @@ const LUA_REG_TYPE eadc_metatab[] =
 
   { LSTRKEY( "Light" ),			LINTVAL( 2 ) },
   { LSTRKEY( "DAC" ),			LINTVAL( -2 ) },
+  { LSTRKEY( "Int" ),			LINTVAL( -3 ) },
   { LNILKEY, LNILVAL }
 };
 

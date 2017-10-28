@@ -75,7 +75,13 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    modules/pca9685 \
 		    modules/pcf8591 \
 		    modules/pcf8574 \
+		    modules/mbedtls \
+		    modules/libesphttpd \
 
+#		    modules/rboot-ota \
+
+
+#		    modules/httpd \
 #		    modules/ssd1306 \
 #		    modules/i2c2 \
 

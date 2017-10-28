@@ -51,7 +51,10 @@
 
 #include "lwip/sys.h"
 
-//#include "ssid_config.h"
+#include <FreeRTOS.h>
+#include <task.h>
+#include <httpd/httpd.h>
+
 
 typedef uint32_t u32;
 typedef uint16_t u16;
@@ -579,24 +582,44 @@ static int net_sntp(lua_State* L) {
 }
 
 
+
+
+//#include "httpd.inc"
+
+static int net_httpd_start(lua_State* L) {
+    httpd_start(L);
+    return 0;
+}
+
+
 #include "modules.h"
 
-const LUA_REG_TYPE net_map[] = {
-    { LSTRKEY( "setup" ),		LFUNCVAL( net_setup ) },
-    { LSTRKEY( "sntp" ),		LFUNCVAL( net_sntp )},
+const LUA_REG_TYPE sock_map[] = {
+//	{ LSTRKEY( "setup" ),		LFUNCVAL( net_setup ) },
+//    { LSTRKEY( "sntp" ),		LFUNCVAL( net_sntp )},
 //    { LSTRKEY( "start" ),		LFUNCVAL( net_start )},
 //    { LSTRKEY( "stop" ),		LFUNCVAL( net_stop )},
 //    { LSTRKEY( "stat" ),		LFUNCVAL( net_stat )},
     { LSTRKEY( "accept" ),		LFUNCVAL( net_accept )},
-    { LSTRKEY( "packip" ),		LFUNCVAL( net_packip )},
-    { LSTRKEY( "unpackip" ),	LFUNCVAL( net_unpackip )},
+//    { LSTRKEY( "packip" ),		LFUNCVAL( net_packip )},
+//    { LSTRKEY( "unpackip" ),	LFUNCVAL( net_unpackip )},
     { LSTRKEY( "connect" ),		LFUNCVAL( net_connect )},
     { LSTRKEY( "socket" ),		LFUNCVAL( net_socket )},
     { LSTRKEY( "close" ),		LFUNCVAL( net_close )},
     { LSTRKEY( "send" ),		LFUNCVAL( net_send )},
     { LSTRKEY( "recv" ),		LFUNCVAL( net_recv )},
-    { LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},
+//    { LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},
 	{ LNILKEY, LNILVAL }
+};
+
+const LUA_REG_TYPE net_map[] = {
+		{ LSTRKEY( "setup" ),		LFUNCVAL( net_setup ) },
+		{ LSTRKEY( "httpd" ),		LFUNCVAL( net_httpd_start ) },
+		{ LSTRKEY( "sntp" ),		LFUNCVAL( net_sntp )},
+		{ LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},
+		{ LSTRKEY( "packip" ),		LFUNCVAL( net_packip )},
+		{ LSTRKEY( "unpackip" ),	LFUNCVAL( net_unpackip )},
+		{ LNILKEY, LNILVAL }
 };
 
 int luaopen_net( lua_State *L ) {
@@ -645,6 +668,7 @@ int luaopen_net( lua_State *L ) {
 
 
 
+MODULE_REGISTER_MAPPED(SOCK, sock, sock_map, luaopen_net);
 MODULE_REGISTER_MAPPED(NET, net, net_map, luaopen_net);
 
 #endif

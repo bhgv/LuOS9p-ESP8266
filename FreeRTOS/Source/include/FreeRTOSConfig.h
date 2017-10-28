@@ -155,4 +155,7 @@ interrupts. */
 	#define configASSERT( x ) if( ( x ) == 0  ) vAssertCalled( __FILE__, __LINE__ )
 #endif
     
+//#define configUSE_RECURSIVE_MUTEXES     1
+
+
 #endif /* FREERTOS_CONFIG_H */

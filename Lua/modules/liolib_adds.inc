@@ -198,10 +198,10 @@ static int f_send (lua_State *L) {
             }
             
             // Wait for C\n
-            if (!uart_read(CONSOLE_UART, &c, 2000)) {done = 0; break;}
+            if (!uart_read(CONSOLE_UART, &c, 3*20000)) {done = 0; break;}
             if (c != 'C') {done = 0; error = 1; break;}
             
-            if (!uart_read(CONSOLE_UART, &c, 2000)) {done = 0; break;}
+            if (!uart_read(CONSOLE_UART, &c, 20000)) {done = 0; break;}
             if (c != '\n') {done = 0; error = 1; break;}
             
             // Send chunk size
@@ -220,7 +220,7 @@ static int f_send (lua_State *L) {
             // Send last chunk with size 0
 
             // Wait for C\n
-            if (!uart_read(CONSOLE_UART, &c, 2000)) {
+            if (!uart_read(CONSOLE_UART, &c, 3*20000)) {
             	uart_ll_set_raw(0);
             	uart_ll_unlock(CONSOLE_UART);
             	return luaL_error(L, "timeout");
@@ -232,7 +232,7 @@ static int f_send (lua_State *L) {
             	return luaL_error(L, "unnexpected input");
             }
 
-            if (!uart_read(CONSOLE_UART, &c, 2000)) {
+            if (!uart_read(CONSOLE_UART, &c, 20000)) {
             	uart_ll_set_raw(0);
             	uart_ll_unlock(CONSOLE_UART);
             	return luaL_error(L, "timeout");
