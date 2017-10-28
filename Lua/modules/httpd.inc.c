@@ -108,8 +108,53 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
 
     const char html_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: text/html\r\n\r\n" 
+        "Content-type: text/html; charset=UTF-8\r\n\r\n" 
     };
+
+    const char jpg_hdr[] = {
+        "HTTP/1.1 200 OK\r\n" 
+        "Content-type: image/jpeg\r\n\r\n" 
+    };
+
+    const char png_hdr[] = {
+        "HTTP/1.1 200 OK\r\n" 
+        "Content-type: image/png\r\n\r\n" 
+    };
+
+    const char gif_hdr[] = {
+        "HTTP/1.1 200 OK\r\n" 
+        "Content-type: image/gif\r\n\r\n" 
+    };
+
+    const char css_hdr[] = {
+        "HTTP/1.1 200 OK\r\n" 
+        "Content-type: text/css\r\n\r\n" 
+    };
+
+    const char js_hdr[] = {
+        "HTTP/1.1 200 OK\r\n" 
+        "Content-type: application/javascript\r\n\r\n" 
+    };
+
+    const char lua_hdr[] = {
+        "HTTP/1.1 200 OK\r\n" 
+        "Content-type: application/lua\r\n\r\n" 
+    };
+
+	typedef struct {
+		const char* suf;
+		const char* hdr;
+	} suf_hdr;
+	
+	static suf_hdr suf_hdr_tab[] = {
+		{".jpg", jpg_hdr},
+		{".png", png_hdr},
+		{".gif", gif_hdr},
+		{".css", css_hdr},
+		{".js", js_hdr},
+		{".lua", lua_hdr},
+		{NULL, NULL}
+	};
 
     const char webpage[] = {
         "<html><head><title>HTTP Server</title>"
@@ -250,14 +295,24 @@ char* do_something(char *uri, int uri_len, int *out_len ){
 }
 
 
-static int get_uri(char* in, int in_len, char** uri/*, int* uri_len*/){
+static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len){
 	*uri = NULL;
 //	*uri_len = 0;
 
-	char *sp1, *sp2;
+	char *sp1, *sp2, *i, *sufp;
 	/* extract URI */
 	sp1 = in + 4;
-	sp2 = memchr(sp1, ' ', in_len);
+	//sp2 = memchr(sp1, ' ', in_len);
+	sufp=NULL;
+	for(i = sp2 = sp1; i < sp1 + in_len; i++){
+		if(*i == '.' ){
+			sufp = i;
+		}
+		if(*i == ' ' || *i == '?' ){
+			sp2 = i;
+			break;
+		}
+	}
 	int len = sp2 - sp1;
 	if(len > MAXPATHLEN || len <= 0) 
 		return 0;
@@ -266,9 +321,36 @@ static int get_uri(char* in, int in_len, char** uri/*, int* uri_len*/){
 	memcpy(*uri, sp1, len);
 	(*uri)[len] = '\0';
 	printf("uri: %s\n", *uri);
+
+	if(suf!=NULL && sufp!=NULL){
+		int l = sp2-sufp;
+		if(suf_len!=NULL) 
+			*suf_len = l;
+		*suf = malloc(l+1);
+		memcpy(*suf, sufp, l);
+		(*suf)[l] = '\0';
+		printf("suffix: %s\n", *suf);
+	}else if(suf!=NULL)
+		*suf = NULL;
 	
 	return len;
 }
+
+static char* suf_to_hdr(char* suf, int suf_len){
+	char* r = html_hdr; //NULL;
+	int i=0;
+	if(suf == NULL)
+		return html_hdr; //NULL;
+	while(suf_hdr_tab[i].suf != NULL){
+		if(!strcmp(suf_hdr_tab[i].suf, suf)){
+			r = suf_hdr_tab[i].hdr;
+			break;
+		}
+		i++;
+	}
+	return r;
+}
+
 
 
 
@@ -339,13 +421,20 @@ int httpd_task(lua_State* L) //void *pvParameters)
                 netbuf_data(nb, &data, &len);
                 /* check for a GET request */
                 if (!strncmp(data, "GET ", 4)) {
-                    char* uri;
-                    int uri_len = get_uri(data, len, &uri/*, &uri_len*/);
+                    char *uri, *suf, *hdr;
+					int suf_len;
+                    int uri_len = get_uri(data, len, &uri, &suf, &suf_len );
+
+					if(suf != NULL) hdr = suf_to_hdr(suf, suf_len);
+					else hdr = html_hdr;
+					
+					free(suf);
 
 					if(!strcmp(uri, "/ws") ){
+						free(uri);
+					
 						int r=websocket_connect(client, data, len);
 						printf("post websocket_connect %d\n", r );
-						
 					}else{
 	                    int f = uri_to_file(uri, uri_len);
 	                    
@@ -353,8 +442,8 @@ int httpd_task(lua_State* L) //void *pvParameters)
 							free(uri);
 							uri_len = 0;
 							
-							printf("pre hdr_net_wrt %x %d f=%d\n", html_hdr, strlen(html_hdr), f );
-							netconn_write(client, html_hdr, strlen(html_hdr), NETCONN_NOCOPY);
+							printf("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), f );
+							netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
 							
 							printf("pre malloc of %d\n", OUT_BUF_LEN+1 );
 							buf = malloc(OUT_BUF_LEN+1);
@@ -381,7 +470,7 @@ int httpd_task(lua_State* L) //void *pvParameters)
 							//printf("post do_smt %x %d\n", buf, buf_len);
 							
 							//printf("pre hdr_net_wrt %x %d\n", html_hdr, strlen(html_hdr) );
-							netconn_write(client, html_hdr, strlen(html_hdr), NETCONN_NOCOPY);
+							netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
 							
 							if(buf == NULL){
 								//printf("pre malloc %d\n", OUT_BUF_LEN+1);
