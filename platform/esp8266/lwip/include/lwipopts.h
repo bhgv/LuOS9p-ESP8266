@@ -39,6 +39,8 @@
 #define ESP_TIMEWAIT_THRESHOLD              10000
 #define LWIP_TIMEVAL_PRIVATE                0
 
+#define RECV_BUFSIZE_DEFAULT  512
+
 /*
    -----------------------------------------------
    ---------- Platform specific locking ----------
@@ -218,18 +220,18 @@
  *     LWIP_CALLBACK_API==1: The PCB callback function is called directly
  *         for the event. This is the default.
 */
-#define TCP_MSS                         1460
+#define TCP_MSS                         536 //1460
 
 /**
  * TCP_MAXRTX: Maximum number of retransmissions of data segments.
  */
-#define TCP_MAXRTX                      6
+#define TCP_MAXRTX                      4 //6
 
 
 /**
  * TCP_SYNMAXRTX: Maximum number of retransmissions of SYN segments.
  */
-#define TCP_SYNMAXRTX                   3
+#define TCP_SYNMAXRTX                   4 //3
 
 /*
    ----------------------------------
@@ -275,7 +277,7 @@
  * The stack size value itself is platform-dependent, but is passed to
  * sys_thread_new() when the thread is created.
  */
-#define TCPIP_THREAD_STACKSIZE          512			//not ok:384 
+#define TCPIP_THREAD_STACKSIZE          400 //512			//not ok:384 
 
 /**
  * TCPIP_THREAD_PRIO: The priority assigned to the main tcpip thread.
@@ -345,7 +347,7 @@
 /**
  * LWIP_SO_RCVBUF==1: Enable SO_RCVBUF processing.
  */
-#define LWIP_SO_RCVBUF                  0
+#define LWIP_SO_RCVBUF                  1 //0
 
 /**
  * SO_REUSE==1: Enable SO_REUSEADDR option.

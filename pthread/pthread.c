@@ -40,6 +40,14 @@
 #include "thread.h"
 #include "lauxlib.h"
 #include "task.h"
+
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
  
 struct list key_list;
 struct list mutex_list;
@@ -140,6 +148,7 @@ int _pthread_create(pthread_t *id, int stacksize, int initial_state,
             tskDEF_PRIORITY, &xCreatedTask
     );
    
+    DBG("_pthread_create 1 err=%d, st=%d, xcrTsk=%x\n", res, stacksize, xCreatedTask);
     if(res != pdPASS) {
         // Remove from thread list
         list_remove(&thread_list,*id);
@@ -147,9 +156,10 @@ int _pthread_create(pthread_t *id, int stacksize, int initial_state,
         free(thread);
 
         if (res == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY) {
+			DBG("_pthread_create 2 err=%d, st=%d, xcrTsk=%x\n", res, stacksize, xCreatedTask);
             errno = ENOMEM;
             return ENOMEM;
-        } else {
+        }else {
             errno = EAGAIN;
             return EAGAIN;
         }

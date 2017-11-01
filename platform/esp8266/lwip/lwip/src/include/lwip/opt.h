@@ -150,17 +150,17 @@
  *    MEMP_OVERFLOW_CHECK >= 2 checks each element in every pool every time
  *      memp_malloc() or memp_free() is called (useful but slow!)
  */
-#ifndef MEMP_OVERFLOW_CHECK
-#define MEMP_OVERFLOW_CHECK             0
-#endif
+//#ifndef MEMP_OVERFLOW_CHECK
+#define MEMP_OVERFLOW_CHECK             1 //0
+//#endif
 
 /**
  * MEMP_SANITY_CHECK==1: run a sanity check after each memp_free() to make
  * sure that there are no cycles in the linked lists.
  */
-#ifndef MEMP_SANITY_CHECK
-#define MEMP_SANITY_CHECK               0
-#endif
+//#ifndef MEMP_SANITY_CHECK
+#define MEMP_SANITY_CHECK               1 //0
+//#endif
 
 /**
  * MEM_USE_POOLS==1: Use an alternative to malloc() by allocating from a set
@@ -1457,7 +1457,7 @@
  * SO_SNDTIMEO processing.
  */
 #ifndef LWIP_SO_SNDTIMEO
-#define LWIP_SO_SNDTIMEO                0
+#define LWIP_SO_SNDTIMEO                1 //0
 #endif
 
 /**
@@ -1465,14 +1465,14 @@
  * SO_RCVTIMEO processing.
  */
 #ifndef LWIP_SO_RCVTIMEO
-#define LWIP_SO_RCVTIMEO                0
+#define LWIP_SO_RCVTIMEO                1 //0
 #endif
 
 /**
  * LWIP_SO_RCVBUF==1: Enable SO_RCVBUF processing.
  */
 #ifndef LWIP_SO_RCVBUF
-#define LWIP_SO_RCVBUF                  0
+#define LWIP_SO_RCVBUF                  1 //0
 #endif
 
 /**
@@ -1486,7 +1486,7 @@
  * SO_REUSE==1: Enable SO_REUSEADDR option.
  */
 #ifndef SO_REUSE
-#define SO_REUSE                        0
+#define SO_REUSE                        1 //0
 #endif
 
 /**

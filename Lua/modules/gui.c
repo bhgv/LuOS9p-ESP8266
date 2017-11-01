@@ -108,13 +108,16 @@ static void draw_menu( lua_State *L, int menu_cur){
 		lua_pushliteral(L,"ind_t");
 		lua_rawget( L, -2);
 		if( lua_isfunction(L, -1) ){
+			usleep(50);
 			lua_pushinteger( L, y);
 			lua_pushliteral(L,"par");
 			lua_rawget( L, -4);
 			lua_call(L, 2, 0);
-		} else
+		} else{
 			lua_pop(L, 1);
-		
+		}
+		luaC_fullgc(L, 1);
+		usleep(50);
 		y = y + m_str_step;
 		if( y >= 64 /*-m_str_step*/)
 			break;
@@ -122,6 +125,7 @@ static void draw_menu( lua_State *L, int menu_cur){
 
 	font=fnt_bk;
 	lua_settop( L, n);
+	luaC_fullgc(L, 1);
 }
 
 static void draw( lua_State *L){
@@ -136,6 +140,7 @@ static void draw( lua_State *L){
 static int new_cur_m( lua_State *L, int m ){
 	luaL_dofile(L, lua_tostring(L, m) );
 	menu_cur_len = lua_rawlen(L, -1);
+	luaC_fullgc(L, 1);
 	return lua_gettop(L);
 }
 
@@ -150,6 +155,7 @@ static int new_menu( lua_State *L, int m ){
 static int sub_menu( lua_State *L, int m ){
     int i=new_cur_m(L, m);
 	lua_replace(L,menu_cur);
+	luaC_fullgc(L, 1);
 
 	m_cur_pos = 1;
 	draw(L);
@@ -263,11 +269,14 @@ static void gui_controller( lua_State *L){
 		lua_pushliteral(L,"ok");
 		lua_rawget( L, act);
 		if(lua_isfunction(L, -1)){
+			usleep(50);
 			lua_pushvalue(L, par);
 			lua_call(L, 1, 0);
 		}else{
 			lua_pop(L, 1);
 		}
+		luaC_fullgc(L, 1);
+		usleep(50);
     }
   }
   else if((b & _lft) == 0 ){
@@ -277,11 +286,14 @@ static void gui_controller( lua_State *L){
 	  lua_pushliteral(L,"lft");
 	  lua_rawget( L, act);
 	  if(lua_isfunction(L, -1)){
+	  	usleep(50);
 		lua_pushvalue(L, par);
 		lua_call(L, 1, 0);
 	  }else{
 		lua_pop(L, 1);
 	  }
+	  luaC_fullgc(L, 1);
+	  usleep(50);
 	  draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
@@ -294,11 +306,14 @@ static void gui_controller( lua_State *L){
 	  lua_pushliteral(L,"rgt");
 	  lua_rawget( L, act);
 	  if(lua_isfunction(L, -1)){
+	  	usleep(50);
 		lua_pushvalue(L, par);
 		lua_call(L, 1, 0);
 	  }else{
 		lua_pop(L, 1);
 	  }
+	  luaC_fullgc(L, 1);
+	  usleep(50);
 	  draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
@@ -319,11 +334,14 @@ static void gui_controller( lua_State *L){
 	  lua_pushliteral(L,"lpg");
 	  lua_rawget( L, act);
 	  if(lua_isfunction(L, -1)){
+	  	usleep(50);
 		lua_pushvalue(L, par);
 		lua_call(L, 1, 0);
 	  }else{
 		lua_pop(L, 1);
 	  }
+	  luaC_fullgc(L, 1);
+	  usleep(50);
 	  draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
@@ -336,11 +354,14 @@ static void gui_controller( lua_State *L){
 	  lua_pushliteral(L,"rpg");
 	  lua_rawget( L, act);
 	  if(lua_isfunction(L, -1)){
+	  	usleep(50);
 		lua_pushvalue(L, par);
 		lua_call(L, 1, 0);
 	  }else{
 		lua_pop(L, 1);
 	  }
+	  luaC_fullgc(L, 1);
+	  usleep(50);
 	  draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
@@ -369,7 +390,8 @@ static void _cb_task (lua_State *L/*, int n, int cnt*/ ) {
 							break;
 						case MSG_EXIT:
 							msg=NO_MSG;
-							lua_gc(L, LUA_GCCOLLECT, 0);
+							//lua_gc(L, LUA_GCCOLLECT, 0);
+							luaC_fullgc(L, 1);
 							return;
 							break;
 					}

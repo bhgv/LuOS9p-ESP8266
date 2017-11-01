@@ -49,6 +49,12 @@
 #define LTHREAD_STATUS_RUNNING   1
 #define LTHREAD_STATUS_SUSPENDED 2
 
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
 // List of threads
 static struct list lthread_list;
 
@@ -200,6 +206,11 @@ static int thread_resume_pthreads(lua_State *L, int thid) {
 static int thread_stop_pthreads(lua_State *L, int thid) {
     struct lthread *thread;
     int res, idx;
+	
+	lua_lock(L);
+	luaC_fullgc(L, 1);
+	lua_unlock(L);
+	DBG("Free mem before: %d\n",xPortGetFreeHeapSize());        
     
     if (thid) {
         idx = thid;
@@ -220,9 +231,14 @@ static int thread_stop_pthreads(lua_State *L, int thid) {
 
             luaL_unref(L, LUA_REGISTRYINDEX, thread->function_ref);
             luaL_unref(L, LUA_REGISTRYINDEX, thread->thread_ref);
+			
+			//luaE_freethread(L, thread->L);
+			
+            //luaL_unref(L, LUA_REGISTRYINDEX, thread->L);
 
             list_remove(&lthread_list, idx);
         }
+		free(thread);
 
         if (!thid) {
             idx = list_next(&lthread_list, idx);
@@ -245,9 +261,11 @@ static int thread_stop_pthreads(lua_State *L, int thid) {
 	luaC_fullgc(L, 1);
 	lua_unlock(L);
 
+	DBG("Free mem after: %d\n",xPortGetFreeHeapSize());        
+    
 	// Delay a number of ticks for take the iddle
 	// task an opportunity for free allocated memory
-	vTaskDelay(10);	
+	vTaskDelay(10);
 	
     return 0;
 }
@@ -304,8 +322,10 @@ int new_thread(lua_State* L, int run) {
     pthread_t id;
     int retries;
     
+	DBG("nth 1 Free mem: %d\n",xPortGetFreeHeapSize());        
     // Allocate space for lthread info
     thread = (struct lthread *)malloc(sizeof(struct lthread));
+	DBG("nth 2 Free mem: %d %x\n",xPortGetFreeHeapSize(), thread);
     if (!thread) {
         return luaL_error(L, "not enough memory");
     }
@@ -317,6 +337,7 @@ int new_thread(lua_State* L, int run) {
     // Create a new state, move function to it and store thread reference
     thread->PL = L;
     thread->L = lua_newthread(L);
+	DBG("nth 3 Free mem: %d\n",xPortGetFreeHeapSize());        
     thread->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
     thread->status = LTHREAD_STATUS_SUSPENDED;
     
@@ -329,12 +350,13 @@ int new_thread(lua_State* L, int run) {
         free(thread);
         return luaL_error(L, "not enough memory");
     }
+	DBG("nth 4 Free mem: %d\n",xPortGetFreeHeapSize());        
 
     // Create pthread
     pthread_attr_init(&attr);
     pthread_attr_setstacksize(&attr, defaultThreadStack);
 
-    if (run)  {
+    if (run) {
         pthread_attr_setinitialstate(&attr, PTHREAD_INITIAL_STATE_RUN);
     } else {
         pthread_attr_setinitialstate(&attr, PTHREAD_INITIAL_STATE_SUSPEND);        
@@ -346,6 +368,7 @@ int new_thread(lua_State* L, int run) {
     
 retry:  
     res = pthread_create(&id, &attr, thread_start_task, thread);
+	DBG("nth 5 Free mem: %d %x\n",xPortGetFreeHeapSize(), res);		  
     if (res) {
         if ((res == ENOMEM) && (retries < 4)) {
             luaC_checkGC(L);  /* stack grow uses memory */
@@ -366,8 +389,11 @@ retry:
     // Store pthread id
     thread->thread = id;            
 
+	luaC_fullgc(L, 1);
+	
     // Return lthread id
     lua_pushinteger(L, idx);
+	DBG("nth 6 Free mem: %d\n",xPortGetFreeHeapSize());		  
     return 1;
 }
 

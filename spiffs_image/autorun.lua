@@ -6,21 +6,32 @@ for k in pairs(os) do _G[k]=os[k] end
 g=gpio
 
 
-
-
 net.setup("TP-LINK", "")
 
-net.httpd()
 
 gui.setFont(6)
+
+menus_loop=true
+while menus_loop do
+htd = thread.start( httpd.main )
+--net.httpd()
+gui.run "menu/httpd.lua"
+httpd.stop()
+
+oled.cls()
+oled.draw()
+
+thread.sleep(1)
+--thread.stop(htd)
+gui.setFont(6)
 gui.run "menu/main.lua"
+end
+
 
 oled.cls()
 oled.setFont(3)
 
 y=0
-
-
 -- [[
 ip = net.lookup "mult.ru"
 

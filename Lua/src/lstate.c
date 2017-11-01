@@ -27,6 +27,12 @@
 #include "ltable.h"
 #include "ltm.h"
 
+#if 1
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
 
 #if !defined(LUAI_GCPAUSE)
 #define LUAI_GCPAUSE	200  /* 200% */
@@ -283,12 +289,14 @@ LUA_API lua_State *lua_newthread (lua_State *L) {
 
 
 void luaE_freethread (lua_State *L, lua_State *L1) {
+  DBG("luaE_freethread 1 Free mem: %d\n",xPortGetFreeHeapSize());
   LX *l = fromstate(L1);
   luaF_close(L1, L1->stack);  /* close all upvalues for this thread */
   lua_assert(L1->openupval == NULL);
   luai_userstatefree(L, L1);
   freestack(L1);
   luaM_free(L, l);
+  DBG("luaE_freethread 2 Free mem: %d\n",xPortGetFreeHeapSize());		
 }
 
 

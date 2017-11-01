@@ -25,13 +25,20 @@
 #include <semphr.h>
 #include <queue.h>
 
-
 #include "lwip/api.h"
-
+//#include "ipv4/lwip/ip.h"
+#include "lwip/tcp.h"
+#include "lwip/tcp_impl.h"
 
 #include "mbedtls/sha1.h"
 #include "mbedtls/base64.h"
 
+
+#if 1
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
 
 
 #if 1 //LWIP_HTTPD_STRNSTR_PRIVATE
@@ -47,10 +54,10 @@ strnstr(const char* buffer, const char* token, size_t n)
   if (n == 0) {
     n = (int)strlen(buffer);
   }
-//printf("strnstr 1 %s %s %d\n", buffer, token, n);
+//DBG("strnstr 1 %s %s %d\n", buffer, token, n);
   for (p = buffer; *p && (p + tokenlen <= buffer + n); p++) {
     if ((*p == *token) && (strncmp(p, token, tokenlen) == 0)) {
-//printf("strnstr 2 %s\n", p);
+//DBG("strnstr 2 %s\n", p);
       return (char *)p;
     }
   }
@@ -81,11 +88,11 @@ enum{
 };
 
 #define IN_BUF_LEN  512
-#define OUT_BUF_LEN  311 
+#define OUT_BUF_LEN  312
 //512
 
 #undef MAXPATHLEN
-#define MAXPATHLEN  55 
+#define MAXPATHLEN  32 //55 
 //PATH_MAX
 
 
@@ -108,53 +115,66 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
 
     const char html_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: text/html; charset=UTF-8\r\n\r\n" 
+        "Content-type: text/html; charset=UTF-8\r\n" 
     };
 
     const char jpg_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: image/jpeg\r\n\r\n" 
+        "Content-type: image/jpeg\r\n" 
     };
 
     const char png_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: image/png\r\n\r\n" 
+        "Content-type: image/png\r\n" 
     };
 
     const char gif_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: image/gif\r\n\r\n" 
+        "Content-type: image/gif\r\n" 
     };
 
     const char css_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: text/css\r\n\r\n" 
+        "Content-type: text/css\r\n" 
     };
 
     const char js_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: application/javascript\r\n\r\n" 
+        "Content-type: application/javascript\r\n" 
     };
 
     const char lua_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
         "Content-type: application/lua\r\n\r\n" 
     };
+	
+	const char hdr_siz[] = "Content-Length: %d\r\n\r\n";
+	const char hdr_nosiz[] = "\r\n";
 
 	typedef struct {
 		const char* suf;
 		const char* hdr;
+		const char* siz;
 	} suf_hdr;
 	
 	static suf_hdr suf_hdr_tab[] = {
-		{".jpg", jpg_hdr},
-		{".png", png_hdr},
-		{".gif", gif_hdr},
-		{".css", css_hdr},
-		{".js", js_hdr},
-		{".lua", lua_hdr},
+		{".jpg", jpg_hdr, hdr_siz},
+		{".png", png_hdr, hdr_siz},
+		{".gif", gif_hdr, hdr_siz},
+		{".css", css_hdr, hdr_siz},
+		{".js", js_hdr, hdr_siz},
+		{".lua", lua_hdr, hdr_nosiz},
 		{NULL, NULL}
 	};
+
+char* def_files[]={
+	"index.htm",
+	"index.html",
+	"index.lua",
+	"index.cgi",
+	NULL
+};
+
 
     const char webpage[] = {
         "<html><head><title>HTTP Server</title>"
@@ -177,6 +197,7 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
     };
 
 
+int is_httpd_run = 1;
 
 void websocket_write(struct netconn *nc, const uint8_t *data, uint16_t len, uint8_t mode){
     if (len > 125)
@@ -208,7 +229,8 @@ static err_t websocket_parse(struct netconn *nc, unsigned char *data, u16_t data
                     for (int i = 0; i < data_len; i++)
                         data[i + 6] ^= data[2 + i % 4];
                     /* user callback */
-                    websocket_cb(nc, &data[6], data_len, opcode);
+					DBG("ws rcvd: %d %x %s\n", data_len, opcode, &data[6]);
+                    //websocket_cb(nc, &data[6], data_len, opcode);
                 }
                 break;
             case 0x08: // close
@@ -266,29 +288,36 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 						free(buf);
 	                    //return r; // ERR_OK;
 	                    //r = REQ_WS;
+						r = REQ_WSconn;
 	                }
-	            } else {
+	            }else {
 	                printf("Key overflow\n");
 	                return ERR_MEM;
 	            }
 			}
 	    }
 		#endif
-		r = REQ_WSconn;
-    } else {
-        printf("Malformed packet\n");
-        r= ERR_ARG;
+//    } else {
+//        printf("Malformed packet\n");
+//        r= ERR_ARG;
     }
 	return r;
 }
 
 
+void prep_something( ){
+
+		/* disable LED */
+	//	  gpio_enable(2, GPIO_OUTPUT);
+	//	  gpio_write(2, true);
+}
+
 char* do_something(char *uri, int uri_len, int *out_len ){
 
-	if (!strncmp(uri, "/on", uri_len))
-		gpio_write(2, false);
-	else if (!strncmp(uri, "/off", uri_len))
-		gpio_write(2, true);
+//	if (!strncmp(uri, "/on", uri_len))
+//		gpio_write(2, false);
+//	else if (!strncmp(uri, "/off", uri_len))
+//		gpio_write(2, true);
 
 	*out_len = 0;
 	return NULL;
@@ -336,14 +365,16 @@ static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len){
 	return len;
 }
 
-static char* suf_to_hdr(char* suf, int suf_len){
+static char* suf_to_hdr(char* suf, int suf_len, char** siz){
 	char* r = html_hdr; //NULL;
+	*siz = hdr_siz;
 	int i=0;
 	if(suf == NULL)
 		return html_hdr; //NULL;
 	while(suf_hdr_tab[i].suf != NULL){
 		if(!strcmp(suf_hdr_tab[i].suf, suf)){
 			r = suf_hdr_tab[i].hdr;
+			*siz = suf_hdr_tab[i].siz;
 			break;
 		}
 		i++;
@@ -361,11 +392,19 @@ static char* suf_to_hdr(char* suf, int suf_len){
 
 extern spiffs fs;
 
-static /*int*/spiffs_file uri_to_file(char* uri, int len){
+static /*int*/spiffs_file uri_to_file(char* uri, int len, int *flen){
+	*flen=0;
 //	int f;
-	struct stat sb;
+	spiffs_stat stat;
+	int res;
+//	struct stat sb;
 	spiffs_file r = -1;
-	char *p = malloc(len+10);
+
+	if(len + 5 > MAXPATHLEN){
+		printf("Too long path: %db, must be < %d\n", len, MAXPATHLEN-5);
+		return r;
+	}
+	char *p = malloc(len+12);
 	
 	if(p==NULL){
 		printf("No mem\n");
@@ -374,89 +413,298 @@ static /*int*/spiffs_file uri_to_file(char* uri, int len){
 	p[0]='/'; p[1]='h'; p[2]='t'; p[3]='m'; p[4]='l';
 	memcpy(&p[5], uri, len);
 	p[len+5] = '\0';
-	printf("path = %s %d\n", p, len);
 
-    if (is_dir(p)) {
-        return 0;
+    if (is_dir(p) || p[len+4] == '/') {
+		DBG("dir %s\n", p);
+		
+		char* tp = malloc(len+12+16);
+		if(tp==NULL){
+			printf("No mem\n");
+			free(p);
+			return 0; //ERR_MEM;
+		}
+		memcpy(tp, p, len+5);
+		tp[len+5] = '\0';
+		
+		char* bg = &tp[len+5];
+		if(p[len+4] != '/'){
+			*bg = '/';
+			bg++;
+		}
+		
+		int i=0;
+		while(def_files[i] != NULL ){
+			char* s = def_files[i];
+			memcpy(bg, s, strlen(s) + 1 );
+			DBG("test path = %s\n", tp);
+			r = SPIFFS_open(&fs, tp, SPIFFS_RDONLY, 0); 
+			if(r>0){
+				res = SPIFFS_fstat(&fs, r, &stat);
+				if (res == SPIFFS_OK && stat.size > 0) {
+					DBG("path = %s %d\n", tp, len);
+					*flen = stat.size;
+					break;
+				}else{
+					SPIFFS_close(&fs, r);
+				}
+			}
+			i++;
+		}
+		free(tp);
+		free(p);
+		
+        return r;
     }
+	DBG("path = %s %d\n", p, len);
+	
 	r = SPIFFS_open(&fs, p, SPIFFS_RDONLY, 0); 
+	if(r > 0){
+		DBG("pre fstat %s %d\n", p, r);
+		res = SPIFFS_fstat(&fs, r, &stat);
+		if (res == SPIFFS_OK) {
+			*flen = stat.size;
+//		} else {
+//			*flen = 0;
+		}
+	}
 //    if (r < 0) {
 //        r = spiffs_result(fs.err_code);
 //    }
 
 //	if (stat(p, &sb) == 0) {
-//		printf("pre open = %s\n", p);
+//		DBG("pre open = %s\n", p);
 //		r = open(p, O_RDONLY, 0);
 //	}
 	free(p);
 	
-	printf("uri_to_file exit %d\n", r);
+	DBG("uri_to_file exit %d\n", r);
 	return r;
 }
 
+
+#if 0
+/**
+ * Initialize the httpd with the specified local address.
+ */
+static void
+httpd_init_addr(const ip_addr_t *local_addr)
+{
+  struct tcp_pcb *pcb;
+  err_t err;
+
+  pcb = tcp_new();
+  LWIP_ASSERT("httpd_init: tcp_new failed", pcb != NULL);
+  tcp_setprio(pcb, HTTPD_TCP_PRIO);
+  /* set SOF_REUSEADDR here to explicitly bind httpd to multiple interfaces */
+  err = tcp_bind(pcb, local_addr, HTTPD_SERVER_PORT);
+  LWIP_ASSERT("httpd_init: tcp_bind failed", err == ERR_OK);
+  pcb = tcp_listen(pcb);
+  LWIP_ASSERT("httpd_init: tcp_listen failed", pcb != NULL);
+  /* initialize callback arg and accept callback */
+  tcp_arg(pcb, pcb);
+  tcp_accept(pcb, http_accept);
+}
+
+/**
+ * Initialize the httpd: set up a listening PCB and bind it to the defined port
+ */
+void
+httpd_init(void)
+{
+#if HTTPD_USE_MEM_POOL
+  LWIP_ASSERT("memp_sizes[MEMP_HTTPD_STATE] >= sizeof(http_state)",
+     memp_sizes[MEMP_HTTPD_STATE] >= sizeof(http_state));
+  LWIP_ASSERT("memp_sizes[MEMP_HTTPD_SSI_STATE] >= sizeof(http_ssi_state)",
+     memp_sizes[MEMP_HTTPD_SSI_STATE] >= sizeof(http_ssi_state));
+#endif
+  DBG ("httpd_init\n");
+
+  httpd_init_addr(IP_ADDR_ANY);
+}
+#endif
+
+
+
+struct netconn *ws_client = NULL;
+char* ws_uri = NULL;
+int ws_len = 0;
+
+void ws_task(){
+	err_t err;
+	//while(1){
+	if(is_httpd_run) {
+		struct netbuf *nb=NULL;
+		if (ws_client != NULL && (err = netconn_recv(ws_client, &nb)) == ERR_OK) {
+			void *data;
+			u16_t len;
+		
+			usleep(50);
+		
+			netbuf_data(nb, &data, &len);
+			if( websocket_parse(ws_client, data, len) == ERR_OK){
+				
+			} 
+		}
+		netbuf_delete(nb);
+		
+		usleep(50);
+	} else {
+		if(ws_client != NULL){
+			netconn_close(ws_client);
+			netconn_delete(ws_client);
+			ws_client = NULL;
+		}
+		
+		if(ws_uri != NULL){
+			free(ws_uri);
+			ws_uri = NULL;
+		}
+	}
+}
+
+
+#define DEF_RECV_TIMEOUT  100
+#define DEF_SEND_TIMEOUT  2*60000
+
+int recv_timeout = DEF_RECV_TIMEOUT;
+int send_timeout = DEF_SEND_TIMEOUT;
+
+struct netconn *client = NULL;
+struct netconn *nc = NULL; //netconn_new(NETCONN_TCP);
+
 int httpd_task(lua_State* L) //void *pvParameters)
 {
-    struct netconn *client = NULL;
-    struct netconn *nc = netconn_new(NETCONN_TCP);
+//	luaC_fullgc(L, 1);
+//	static TaskHandle_t xHandleWs = NULL;
+printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
+	
+    /*struct netconn * */client = NULL;
+    /*struct netconn * */nc = netconn_new(NETCONN_TCP);
     if (nc == NULL) {
         printf("Failed to allocate socket.\n");
         vTaskDelete(NULL);
     }
-    netconn_bind(nc, IP_ADDR_ANY, 80);
+	
+	nc->recv_timeout = recv_timeout;
+	nc->recv_bufsize = IN_BUF_LEN;
+
+	//ip_set_option(nc->pcb.tcp, SOF_REUSEADDR);
+	nc->pcb.tcp->so_options |= SOF_REUSEADDR;
+	
+	netconn_bind(nc, IP_ADDR_ANY, 80);
     netconn_listen(nc);
+	
     char* buf;
     int buf_len;
-    
-    /* disable LED */
-//    gpio_enable(2, GPIO_OUTPUT);
-//    gpio_write(2, true);
-    
-    while (1) {
+
+	prep_something();
+
+	is_httpd_run = 1;    
+    while (is_httpd_run) {
         err_t err = netconn_accept(nc, &client);
+		usleep(50);
         if (err == ERR_OK) {
-            struct netbuf *nb;
+            struct netbuf *nb=NULL;
+			client->send_timeout = send_timeout;
+			client->recv_timeout = recv_timeout;
+
+			//ip_set_option(client->pcb.tcp, SOF_REUSEADDR);
+			client->pcb.tcp->so_options |= SOF_REUSEADDR;
+			
+
+			client->recv_bufsize = IN_BUF_LEN;
             if ((err = netconn_recv(client, &nb)) == ERR_OK) {
                 void *data;
                 u16_t len;
+			
+				usleep(50);
+
+				if( !is_httpd_run ){
+					if(client != NULL){
+						printf("Closing connection\n");
+						netconn_close(client);
+						netconn_delete(client);
+					}
+					usleep(50);
+					ws_task();
+
+					break;
+				}
+			
                 netbuf_data(nb, &data, &len);
                 /* check for a GET request */
                 if (!strncmp(data, "GET ", 4)) {
-                    char *uri, *suf, *hdr;
+                    char *uri, *suf, *hdr, *hdr_sz;
 					int suf_len;
                     int uri_len = get_uri(data, len, &uri, &suf, &suf_len );
 
-					if(suf != NULL) hdr = suf_to_hdr(suf, suf_len);
-					else hdr = html_hdr;
-					
-					free(suf);
+					if(suf != NULL){
+						hdr = suf_to_hdr(suf, suf_len, &hdr_sz);
+						free(suf);
+					}else{ 
+						hdr = html_hdr;
+						hdr_sz = hdr_siz;
+					}
 
-					if(!strcmp(uri, "/ws") ){
-						free(uri);
+					//DBG("client->send_timeout %d\n", client->send_timeout );
+				
+					int r=websocket_connect(client, data, len);
+					DBG("after websocket_connect %x %d\n", data, len );
+					usleep(50);
+					if(r>0){ //!strcmp(uri, "/ws") ){
+						if(ws_client != NULL){
+							netconn_close(ws_client);
+							netconn_delete(ws_client);
+						}
+						ws_client = client;
+						client = NULL;
+						
+						if(ws_uri != NULL){
+							free(ws_uri);
+						}
+						ws_uri = uri;
+						uri = NULL;
+						//free(uri);
 					
-						int r=websocket_connect(client, data, len);
-						printf("post websocket_connect %d\n", r );
+						//if(xHandleWs != NULL) 
+						//	vTaskDelete( xHandleWs );
+						//xTaskCreate(&ws_task, "wsd", 256, NULL, 2, &xHandleWs);
+					
+						DBG("post websocket_connect %d\n", r );
 					}else{
-	                    int f = uri_to_file(uri, uri_len);
+						int flen;
+	                    int f = uri_to_file(uri, uri_len, &flen);
 	                    
 	                    if(f > 0){
 							free(uri);
 							uri_len = 0;
+							int totl=0;
 							
-							printf("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), f );
+							DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), f );
 							netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
 							
-							printf("pre malloc of %d\n", OUT_BUF_LEN+1 );
-							buf = malloc(OUT_BUF_LEN+1);
+							DBG("flen = %d\n", flen );
+							char *hb = malloc(strlen(hdr_sz)+10);
+							snprintf(hb, strlen(hdr_sz)+10-1, hdr_sz, flen);
+							DBG("%s\n", hb );
+							netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
+							free(hb);
+							usleep(50);
+							
+							DBG("pre malloc of %d\n", OUT_BUF_LEN+4 );
+							buf = malloc(OUT_BUF_LEN+4);
 							buf_len = OUT_BUF_LEN;
 							
 							int tlen;
 							do{
-								printf("pre read %d %x %d\n", f, buf, buf_len );
+								DBG("pre read %d %x %d totl=%d\n", f, buf, buf_len, totl);
 								//tlen = read(f, buf, buf_len);
-								tlen = SPIFFS_read(&fs, (spiffs_file)f, buf, buf_len); 
-								printf("pre netconn_write %d %x %d\n", f, buf, tlen );
+								tlen = SPIFFS_read(&fs, (spiffs_file)f, buf, buf_len&(~0x3)); 
+								totl += tlen;
+								DBG("pre netconn_write %d %x %d totl=%d\n", f, buf, tlen, totl);
 								if(tlen > 0){
 									netconn_write(client, buf, tlen, NETCONN_NOCOPY);
+									usleep(50);
 								}
 							}while(tlen > 0);
 							//close(f);
@@ -467,18 +715,15 @@ int httpd_task(lua_State* L) //void *pvParameters)
 						}else{ 
 							buf = do_something(uri, uri_len, &buf_len);
 						   
-							//printf("post do_smt %x %d\n", buf, buf_len);
-							
-							//printf("pre hdr_net_wrt %x %d\n", html_hdr, strlen(html_hdr) );
-							netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
+							//DBG("post do_smt %x %d\n", buf, buf_len);
 							
 							if(buf == NULL){
-								//printf("pre malloc %d\n", OUT_BUF_LEN+1);
+								//DBG("pre malloc %d\n", OUT_BUF_LEN+1);
 								
 								buf = malloc(OUT_BUF_LEN+1);
 								buf_len = OUT_BUF_LEN;
 								
-								//printf("pre sprintf %x %d\n", buf, buf_len);
+								//DBG("pre sprintf %x %d\n", buf, buf_len);
 								
 								snprintf(buf, OUT_BUF_LEN, webpage,
 									uri,
@@ -489,9 +734,19 @@ int httpd_task(lua_State* L) //void *pvParameters)
 							free(uri);
 							uri_len = 0;
 							
-							//printf("pre net out %x %d\n%s\n", buf, buf_len, buf);
+							//DBG("pre hdr_net_wrt %x %d\n", html_hdr, strlen(html_hdr) );
+							netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
+							
+							char *hb = malloc(sizeof(hdr_siz)+10);
+							snprintf(hb, sizeof(hdr_siz)+10-1, hdr_sz, strlen(buf));
+							netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
+							free(hb);
+							usleep(50);
+							
+							//DBG("pre net out %x %d\n%s\n", buf, buf_len, buf);
 							
 							netconn_write(client, buf, buf_len, NETCONN_NOCOPY);
+							usleep(50);
 							
 							free(buf);
 							buf_len = 0;
@@ -501,10 +756,33 @@ int httpd_task(lua_State* L) //void *pvParameters)
             }
             netbuf_delete(nb);
         }
-        printf("Closing connection\n");
-        netconn_close(client);
-        netconn_delete(client);
+		if(client != NULL){
+			printf("Closing connection\n");
+			netconn_close(client);
+			netconn_delete(client);
+			usleep(50);
+		} else {
+			usleep(50);
+		}
+		ws_task();
     }
+	netconn_close(nc);
+	netconn_delete(nc);
+
+printf("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
+	return 0;
+}
+
+int httpd_task_stop(lua_State* L){
+	is_httpd_run = 0;
+
+	
+//	client->send_timeout=1;
+//	client->recv_timeout=1;
+
+//	nc->send_timeout=1;
+//	nc->recv_timeout=1;
+	
 	return 0;
 }
 #endif
@@ -901,16 +1179,79 @@ void httpd_task(void *pvParameters){
 }
 #endif
 
-
-void httpd_start(lua_State* L) {
+/*
+int httpd_start(lua_State* L) {
 //	static TaskHandle_t xHandle = NULL;
 //	if(xHandle != NULL) 
 //		vTaskDelete( xHandle );
 	lua_settop(L,0);
 	lua_pushcfunction(L, &httpd_task);
 	int r = new_thread(L, 1);
-	printf("httpd started status=%d\n", r);
+	DBG("httpd started status=%d\n", r);
 //	xTaskCreate(&httpd_task, "httpd", 312, NULL, 2, &xHandle);
+
+	return 0;
 }
+*/
+
+static int httpd_recv_timeout(lua_State* L) {
+	int timeout = recv_timeout;
+	if(lua_gettop(L) > 0){
+		recv_timeout = luaL_optinteger(L, 1, DEF_RECV_TIMEOUT);
+		if(recv_timeout < 0) recv_timeout = DEF_RECV_TIMEOUT;
+	}
+	lua_pushinteger(L, timeout);
+	return 1;
+}
+
+static int httpd_send_timeout(lua_State* L) {
+	int timeout = send_timeout;
+	if(lua_gettop(L) > 0){
+		send_timeout = luaL_optinteger(L, 1, DEF_SEND_TIMEOUT);
+		if(send_timeout < 0) send_timeout = DEF_SEND_TIMEOUT;
+	}
+	lua_pushinteger(L, timeout);
+	return 1;
+}
+
+/*
+static int httpd_(lua_State* L) {
+	return 0;	 
+}
+
+static int httpd_(lua_State* L) {
+	return 0;	 
+}
+
+static int httpd_(lua_State* L) {
+	return 0;	 
+}
+
+static int httpd_(lua_State* L) {
+	return 0;	 
+}
+*/
+
+#include "modules.h"
+
+
+const LUA_REG_TYPE httpd_map[] = {
+//		{ LSTRKEY( "httpd" ),		LFUNCVAL( net_httpd_start ) },
+//		{ LSTRKEY( "httpd" ),		LFUNCVAL( httpd_start ) },
+		{ LSTRKEY( "main" ),			LFUNCVAL( httpd_task ) },
+		{ LSTRKEY( "stop" ),			LFUNCVAL( httpd_task_stop ) },
+		
+		{ LSTRKEY( "recv_timeout" ),	LFUNCVAL( httpd_recv_timeout ) },
+		{ LSTRKEY( "send_timeout" ),	LFUNCVAL( httpd_send_timeout ) },
+		
+		{ LNILKEY, LNILVAL }
+};
+
+int luaopen_httpd( lua_State *L ) {
+	return 0;
+}
+
+
+MODULE_REGISTER_MAPPED(HTTPD, httpd, httpd_map, luaopen_httpd);
 
 

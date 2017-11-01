@@ -15,7 +15,7 @@
 
 // Leave unchanged unless you really know what you're doing:
 #define MEM_ALIGNMENT                       4
-#define TCP_MSS                             1460
+#define TCP_MSS                             536 //1460
 #define TCP_SND_BUF                         (2*TCP_MSS)
 #define MEMP_MEM_MALLOC                     1
 #define MEM_LIBC_MALLOC                     1
@@ -32,10 +32,12 @@
 #define MEMCPY(dst,src,len)                 os_memcpy(dst,src,len)
 #define SMEMCPY(dst,src,len)                os_memcpy(dst,src,len)
 
+#if 0
 static inline uint32_t sys_now(void)
 {
     return NOW()/(TIMER_CLK_FREQ/1000);
 }
+#endif
 
 // For espconn:
 #define os_malloc(s)                        pvPortMalloc((s))
@@ -55,7 +57,7 @@ static inline uint32_t sys_now(void)
 // Tweakable:
 #define ESP_TIMEWAIT_THRESHOLD              10000
 
-#define TCP_TMR_INTERVAL                    125
+#define TCP_TMR_INTERVAL                    100 //125
 #define TCP_KEEPIDLE_DEFAULT                3000
 #define TCP_KEEPINTVL_DEFAULT               1000
 #define TCP_KEEPCNT_DEFAULT                 3

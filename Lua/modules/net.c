@@ -584,12 +584,11 @@ static int net_sntp(lua_State* L) {
 
 
 
-//#include "httpd.inc"
+//#include "httpd.inc.c"
+//int httpd_start(lua_State* L) ;
+//int httpd_task(lua_State* L) ;
+//int httpd_task_stop(lua_State* L) ;
 
-static int net_httpd_start(lua_State* L) {
-    httpd_start(L);
-    return 0;
-}
 
 
 #include "modules.h"
@@ -614,11 +613,30 @@ const LUA_REG_TYPE sock_map[] = {
 
 const LUA_REG_TYPE net_map[] = {
 		{ LSTRKEY( "setup" ),		LFUNCVAL( net_setup ) },
-		{ LSTRKEY( "httpd" ),		LFUNCVAL( net_httpd_start ) },
+		
 		{ LSTRKEY( "sntp" ),		LFUNCVAL( net_sntp )},
 		{ LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},
 		{ LSTRKEY( "packip" ),		LFUNCVAL( net_packip )},
 		{ LSTRKEY( "unpackip" ),	LFUNCVAL( net_unpackip )},
+
+		{ LSTRKEY( "SOCK_STREAM" ),	LINTVAL( NET_SOCK_STREAM )},
+		{ LSTRKEY( "SOCK_DGRAM" ),	LINTVAL( NET_SOCK_DGRAM )},
+		
+		{ LSTRKEY( "DHCP" ),	LINTVAL( NET_DHCP )},
+		{ LSTRKEY( "STATIC" ),	LINTVAL( NET_STATIC )},
+		
+		{ LSTRKEY( "ERR_OK" ),	LINTVAL( NET_ERR_OK )},
+		{ LSTRKEY( "ERR_TIMEDOUT" ),	LINTVAL( NET_ERR_TIMEDOUT )},
+		{ LSTRKEY( "ERR_CLOSED" ),	LINTVAL( NET_ERR_CLOSED )},
+		{ LSTRKEY( "ERR_ABORTED" ),	LINTVAL( NET_ERR_ABORTED )},
+		{ LSTRKEY( "ERR_OVERFLOW" ),	LINTVAL( NET_ERR_OVERFLOW )},
+		{ LSTRKEY( "ERR_OTHER" ),	LINTVAL( NET_ERR_OTHER )},
+		
+		{ LSTRKEY( "NO_TIMEOUT" ),	LINTVAL( 0 )},
+
+//		{ LSTRKEY( "" ),	LINTVAL(  )},
+//		{ LSTRKEY( "" ),	LINTVAL(  )},
+		
 		{ LNILKEY, LNILVAL }
 };
 
@@ -665,7 +683,6 @@ int luaopen_net( lua_State *L ) {
 	return 0;
 #endif
 }
-
 
 
 MODULE_REGISTER_MAPPED(SOCK, sock, sock_map, luaopen_net);
