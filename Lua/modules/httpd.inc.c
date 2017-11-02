@@ -87,12 +87,19 @@ enum{
 	REQ_WSconn,
 };
 
+enum{
+	Q_NOT_PROCESSED=0,
+	Q_PROCESSED,
+	//REQ_WSconn,
+};
+
+
 #define IN_BUF_LEN  512
-#define OUT_BUF_LEN  312
+#define OUT_BUF_LEN  256 //312  //536 //312
 //512
 
 #undef MAXPATHLEN
-#define MAXPATHLEN  32 //55 
+#define MAXPATHLEN  55 //32 //55 
 //PATH_MAX
 
 
@@ -148,8 +155,8 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
         "Content-type: application/lua\r\n\r\n" 
     };
 	
-	const char hdr_siz[] = "Content-Length: %d\r\n\r\n";
-	const char hdr_nosiz[] = "\r\n";
+	const char hdr_siz[] = "Connection: close\r\nContent-Length: %d\r\n\r\n";
+	const char hdr_nosiz[] = "Connection: close\r\n\r\n";
 
 	typedef struct {
 		const char* suf;
@@ -163,7 +170,7 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
 		{".gif", gif_hdr, hdr_siz},
 		{".css", css_hdr, hdr_siz},
 		{".js", js_hdr, hdr_siz},
-		{".lua", lua_hdr, hdr_nosiz},
+		{".lua", lua_hdr, hdr_siz},
 		{NULL, NULL}
 	};
 
@@ -176,7 +183,7 @@ char* def_files[]={
 };
 
 
-    const char webpage[] = {
+    const char webpage_404[] = {
         "<html><head><title>HTTP Server</title>"
         "<style> div.main {"
         "font-family: Arial;"
@@ -185,7 +192,7 @@ char* def_files[]={
         "background-color: #f1f1f1;}"
         "</style></head>"
         "<body><div class='main'>"
-        "<h3>HTTP Server</h3>"
+        "<h3>404</h3>"
         "<p>URL: %s</p>"
         "<p>Uptime: %d seconds</p>"
         "<p>Free heap: %d bytes</p>"
@@ -310,17 +317,6 @@ void prep_something( ){
 		/* disable LED */
 	//	  gpio_enable(2, GPIO_OUTPUT);
 	//	  gpio_write(2, true);
-}
-
-char* do_something(char *uri, int uri_len, int *out_len ){
-
-//	if (!strncmp(uri, "/on", uri_len))
-//		gpio_write(2, false);
-//	else if (!strncmp(uri, "/off", uri_len))
-//		gpio_write(2, true);
-
-	*out_len = 0;
-	return NULL;
 }
 
 
@@ -529,6 +525,22 @@ struct netconn *ws_client = NULL;
 char* ws_uri = NULL;
 int ws_len = 0;
 
+void ws_sock_del(){
+	if(ws_client != NULL){
+		websocket_close(ws_client);
+		
+		printf("Closing connection (ws_client)\n");
+		netconn_close(ws_client);
+		netconn_delete(ws_client);
+		ws_client = NULL;
+	}
+	
+	if(ws_uri != NULL){
+		free(ws_uri);
+		ws_uri = NULL;
+	}
+}
+
 void ws_task(){
 	err_t err;
 	//while(1){
@@ -549,16 +561,7 @@ void ws_task(){
 		
 		usleep(50);
 	} else {
-		if(ws_client != NULL){
-			netconn_close(ws_client);
-			netconn_delete(ws_client);
-			ws_client = NULL;
-		}
-		
-		if(ws_uri != NULL){
-			free(ws_uri);
-			ws_uri = NULL;
-		}
+		ws_sock_del();
 	}
 }
 
@@ -572,6 +575,134 @@ int send_timeout = DEF_SEND_TIMEOUT;
 struct netconn *client = NULL;
 struct netconn *nc = NULL; //netconn_new(NETCONN_TCP);
 
+
+int do_something(char **uri, int uri_len, char *hdr, char* hdr_sz, char *out ){
+
+//	if (!strncmp(uri, "/on", uri_len))
+//		gpio_write(2, false);
+//	else if (!strncmp(uri, "/off", uri_len))
+//		gpio_write(2, true);
+
+//	out = NULL;
+	return 0;
+}
+
+int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
+	int flen;
+	int f = uri_to_file(*uri, uri_len, &flen);
+	char* buf=NULL;
+	int buf_len;
+	
+	if(f > 0){
+	//	free(uri);
+	//	uri_len = 0;
+		int totl=0;
+		
+		DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), f );
+		netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
+		
+		DBG("flen = %d\n", flen );
+		char *hb = malloc(strlen(hdr_sz)+10);
+		snprintf(hb, strlen(hdr_sz)+10-1, hdr_sz, flen);
+		DBG("%s\n", hb );
+		netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
+		free(hb);
+		usleep(50);
+		
+		DBG("pre malloc of %d\n", OUT_BUF_LEN+4 );
+		buf = malloc(OUT_BUF_LEN+4);
+		buf_len = OUT_BUF_LEN;
+		
+		int tlen;
+		if(buf){
+			do{
+				DBG("pre read %d %x %d totl=%d\n", f, buf, buf_len, totl);
+				//tlen = read(f, buf, buf_len);
+				tlen = SPIFFS_read(&fs, (spiffs_file)f, buf, buf_len&(~0x3)); 
+				totl += tlen;
+				DBG("pre netconn_write %d %x %d totl=%d\n", f, buf, tlen, totl);
+				if(tlen > 0){
+					netconn_write(client, buf, tlen, NETCONN_NOCOPY);
+					usleep(50);
+				}
+			}while( tlen > 0 && !SPIFFS_eof(&fs, (spiffs_file)f ) );
+			
+			free(buf);
+			buf_len = 0;
+		}
+		//close(f);
+		SPIFFS_close(&fs, (spiffs_file)f);
+
+		return totl;
+	}
+	//*out = NULL;
+	return 0;
+}
+
+int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
+	int r=websocket_connect(client, data, len);
+	DBG("after websocket_connect %x %d %d\n", data, len, r );
+	usleep(50);
+	if(r>0){ 
+		ws_sock_del();
+		
+		ws_client = client;
+		client = NULL;
+		
+		ws_uri = *uri;
+		*uri = NULL;
+	
+		//if(xHandleWs != NULL) 
+		//	vTaskDelete( xHandleWs );
+		//xTaskCreate(&ws_task, "wsd", 256, NULL, 2, &xHandleWs);
+	
+		DBG("post websocket_connect %d\n", r );
+	}
+
+	//*out = NULL;
+	return r;
+}
+
+int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
+	char* buf=NULL;
+	int buf_len;
+	
+	buf_len = sizeof(webpage_404) +20 + 1; //OUT_BUF_LEN;
+	buf = malloc(buf_len); // OUT_BUF_LEN+1);
+
+	if(buf){	
+		//DBG("pre sprintf %x %d\n", buf, buf_len);
+		snprintf(buf, buf_len, webpage_404,
+				*uri,
+				xTaskGetTickCount() * portTICK_PERIOD_MS / 1000,
+				(int) xPortGetFreeHeapSize()
+		);
+		
+		//free(uri);
+		//uri_len = 0;
+				
+		//DBG("pre hdr_net_wrt %x %d\n", html_hdr, strlen(html_hdr) );
+		netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
+		
+		char *hb = malloc(sizeof(hdr_siz)+10);
+		snprintf(hb, sizeof(hdr_siz)+10-1, hdr_sz, strlen(buf));
+		netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
+		free(hb);
+		usleep(50);
+		
+		//DBG("pre net out %x %d\n%s\n", buf, buf_len, buf);
+		netconn_write(client, buf, buf_len, NETCONN_NOCOPY);
+		usleep(50);
+		
+		free(buf);
+	//	buf_len = 0;
+	}
+
+	//*out = NULL;
+	return buf_len;
+}
+
+
 int httpd_task(lua_State* L) //void *pvParameters)
 {
 //	luaC_fullgc(L, 1);
@@ -580,6 +711,8 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 	
     /*struct netconn * */client = NULL;
     /*struct netconn * */nc = netconn_new(NETCONN_TCP);
+	printf("Open connection (main nc)\n");
+
     if (nc == NULL) {
         printf("Failed to allocate socket.\n");
         vTaskDelete(NULL);
@@ -588,55 +721,60 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 	nc->recv_timeout = recv_timeout;
 	nc->recv_bufsize = IN_BUF_LEN;
 
-	//ip_set_option(nc->pcb.tcp, SOF_REUSEADDR);
-	nc->pcb.tcp->so_options |= SOF_REUSEADDR;
+	ip_set_option(nc->pcb.tcp, SOF_REUSEADDR);
+	//nc->pcb.tcp->so_options |= SOF_REUSEADDR;
 	
 	netconn_bind(nc, IP_ADDR_ANY, 80);
     netconn_listen(nc);
 	
-    char* buf;
-    int buf_len;
+//    char* buf;
+//    int buf_len;
 
 	prep_something();
 
 	is_httpd_run = 1;    
     while (is_httpd_run) {
         err_t err = netconn_accept(nc, &client);
+        if (client != NULL) 
+			printf("Open connection (client) %x\n", client);
 		usleep(50);
-        if (err == ERR_OK) {
+        if (client != NULL && err == ERR_OK) {
             struct netbuf *nb=NULL;
 			client->send_timeout = send_timeout;
 			client->recv_timeout = recv_timeout;
 
-			//ip_set_option(client->pcb.tcp, SOF_REUSEADDR);
-			client->pcb.tcp->so_options |= SOF_REUSEADDR;
+			ip_set_option(client->pcb.tcp, SOF_REUSEADDR);
+			//client->pcb.tcp->so_options |= SOF_REUSEADDR;
 			
-
 			client->recv_bufsize = IN_BUF_LEN;
             if ((err = netconn_recv(client, &nb)) == ERR_OK) {
                 void *data;
                 u16_t len;
 			
-				usleep(50);
-
 				if( !is_httpd_run ){
 					if(client != NULL){
-						printf("Closing connection\n");
+						printf("Closing connection (client) on http exit\n");
 						netconn_close(client);
 						netconn_delete(client);
+						client = NULL;
 					}
+					ws_sock_del();
 					usleep(50);
-					ws_task();
 
 					break;
 				}
-			
+				usleep(50);
+
                 netbuf_data(nb, &data, &len);
                 /* check for a GET request */
                 if (!strncmp(data, "GET ", 4)) {
                     char *uri, *suf, *hdr, *hdr_sz;
 					int suf_len;
-                    int uri_len = get_uri(data, len, &uri, &suf, &suf_len );
+					int uri_len;
+
+					ws_sock_del();
+					
+					uri_len = get_uri(data, len, &uri, &suf, &suf_len );
 
 					if(suf != NULL){
 						hdr = suf_to_hdr(suf, suf_len, &hdr_sz);
@@ -647,127 +785,39 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 					}
 
 					//DBG("client->send_timeout %d\n", client->send_timeout );
-				
-					int r=websocket_connect(client, data, len);
-					DBG("after websocket_connect %x %d\n", data, len );
-					usleep(50);
-					if(r>0){ //!strcmp(uri, "/ws") ){
-						if(ws_client != NULL){
-							netconn_close(ws_client);
-							netconn_delete(ws_client);
-						}
-						ws_client = client;
-						client = NULL;
-						
-						if(ws_uri != NULL){
-							free(ws_uri);
-						}
-						ws_uri = uri;
-						uri = NULL;
-						//free(uri);
+					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, NULL /*char *out*/ ) > 0){
+					}else
+					if( do_file(&uri, uri_len, hdr, hdr_sz, data, len, NULL/*char *out*/ ) > 0){
+					}else
+					if( do_something(&uri, uri_len, hdr, hdr_sz, NULL/*&buf_len*/) > 0){
+					}else 
+					{
+						do_404(&uri, uri_len, hdr, hdr_sz, data, len, NULL/*out*/);
+					}
 					
-						//if(xHandleWs != NULL) 
-						//	vTaskDelete( xHandleWs );
-						//xTaskCreate(&ws_task, "wsd", 256, NULL, 2, &xHandleWs);
-					
-						DBG("post websocket_connect %d\n", r );
-					}else{
-						int flen;
-	                    int f = uri_to_file(uri, uri_len, &flen);
-	                    
-	                    if(f > 0){
-							free(uri);
-							uri_len = 0;
-							int totl=0;
-							
-							DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), f );
-							netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
-							
-							DBG("flen = %d\n", flen );
-							char *hb = malloc(strlen(hdr_sz)+10);
-							snprintf(hb, strlen(hdr_sz)+10-1, hdr_sz, flen);
-							DBG("%s\n", hb );
-							netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
-							free(hb);
-							usleep(50);
-							
-							DBG("pre malloc of %d\n", OUT_BUF_LEN+4 );
-							buf = malloc(OUT_BUF_LEN+4);
-							buf_len = OUT_BUF_LEN;
-							
-							int tlen;
-							do{
-								DBG("pre read %d %x %d totl=%d\n", f, buf, buf_len, totl);
-								//tlen = read(f, buf, buf_len);
-								tlen = SPIFFS_read(&fs, (spiffs_file)f, buf, buf_len&(~0x3)); 
-								totl += tlen;
-								DBG("pre netconn_write %d %x %d totl=%d\n", f, buf, tlen, totl);
-								if(tlen > 0){
-									netconn_write(client, buf, tlen, NETCONN_NOCOPY);
-									usleep(50);
-								}
-							}while(tlen > 0);
-							//close(f);
-							SPIFFS_close(&fs, (spiffs_file)f);
-
-							free(buf);
-							buf_len = 0;
-						}else{ 
-							buf = do_something(uri, uri_len, &buf_len);
-						   
-							//DBG("post do_smt %x %d\n", buf, buf_len);
-							
-							if(buf == NULL){
-								//DBG("pre malloc %d\n", OUT_BUF_LEN+1);
-								
-								buf = malloc(OUT_BUF_LEN+1);
-								buf_len = OUT_BUF_LEN;
-								
-								//DBG("pre sprintf %x %d\n", buf, buf_len);
-								
-								snprintf(buf, OUT_BUF_LEN, webpage,
-									uri,
-									xTaskGetTickCount() * portTICK_PERIOD_MS / 1000,
-									(int) xPortGetFreeHeapSize()
-								);
-							}
-							free(uri);
-							uri_len = 0;
-							
-							//DBG("pre hdr_net_wrt %x %d\n", html_hdr, strlen(html_hdr) );
-							netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
-							
-							char *hb = malloc(sizeof(hdr_siz)+10);
-							snprintf(hb, sizeof(hdr_siz)+10-1, hdr_sz, strlen(buf));
-							netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
-							free(hb);
-							usleep(50);
-							
-							//DBG("pre net out %x %d\n%s\n", buf, buf_len, buf);
-							
-							netconn_write(client, buf, buf_len, NETCONN_NOCOPY);
-							usleep(50);
-							
-							free(buf);
-							buf_len = 0;
-						}
+					if(uri != NULL){
+						free(uri);
+						uri_len = 0;
 					}
                 }
             }
             netbuf_delete(nb);
         }
 		if(client != NULL){
-			printf("Closing connection\n");
+			printf("Closing connection (client)\n");
 			netconn_close(client);
 			netconn_delete(client);
-			usleep(50);
-		} else {
-			usleep(50);
+			client = NULL;
 		}
+		usleep(50);
 		ws_task();
     }
-	netconn_close(nc);
-	netconn_delete(nc);
+	if(nc != NULL){
+		printf("Closing connection (main nc)\n");
+		netconn_close(nc);
+		netconn_delete(nc);
+		nc = NULL;
+	}
 
 printf("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
 	return 0;
