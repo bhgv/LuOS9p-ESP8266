@@ -216,7 +216,8 @@ flash: all
 	picocom --baud $(ESPBAUD) $(UARTPORT)
 
 flashall: all
-	$(ROOT)mkspiffs/mkspiffs -c  $(ROOT)spiffs_image -b 8192 -p 256 -s 0x80000 $(BUILD_DIR)spiffs_image.img
+	$(ROOT)mkspiffs/mkspiffs -c  $(ROOT)spiffs_image -b 4096 -p 256 -s 0x80000 $(BUILD_DIR)spiffs_image.img
+#	$(ROOT)mkspiffs/mkspiffs -c  $(ROOT)spiffs_image -b 8192 -p 256 -s 0x80000 $(BUILD_DIR)spiffs_image.img
 	$(ESPTOOL) -p $(UARTPORT) --baud $(ESPBAUD) write_flash $(ESPTOOL_ARGS) \
                 0x0 $(RBOOT_BIN) 0x1000 $(RBOOT_CONF) 0x2000 $(FW_FILE) $(SPIFFS_ESPTOOL_ARGS)
 	picocom --baud $(ESPBAUD) $(UARTPORT)

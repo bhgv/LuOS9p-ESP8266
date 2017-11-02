@@ -24,7 +24,8 @@ CFLAGS += -DdefaultThreadStack=192*9 #8 #5
 CFLAGS += -DUSE_CFI=1                  # Enable CFI (common flash interface)
 CFLAGS += -DSPIFFS_ERASE_SIZE=4096     # SPI FLASH sector size (see your flah's datasheet)
 CFLAGS += -DSPIFFS_LOG_PAGE_SIZE=256   # SPI FLASH page size (see your flah's datasheet)
-CFLAGS += -DSPIFFS_LOG_BLOCK_SIZE=8192 # Logical block size, must be a miltiple of the page size
+#CFLAGS += -DSPIFFS_LOG_BLOCK_SIZE=8192 # Logical block size, must be a miltiple of the page size
+CFLAGS += -DSPIFFS_LOG_BLOCK_SIZE=4096 # Logical block size, must be a miltiple of the page size
 CFLAGS += -DSPIFFS_BASE_ADDR=0x100000  # SPI FLASH start adress for SPIFFS
 CFLAGS += -DSPIFFS_SIZE=0x80000        # SPIFFS size
 
