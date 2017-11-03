@@ -102,6 +102,16 @@ enum{
 #define MAXPATHLEN  55 //32 //55 
 //PATH_MAX
 
+typedef struct _get_par get_par;
+
+struct _get_par {
+	char *name;
+	char *val;
+	
+	get_par* next;
+};
+
+get_par* get_root = NULL;
 
 
 const char HTML_HEADER[] ={
@@ -152,11 +162,12 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
 
     const char lua_hdr[] = {
         "HTTP/1.1 200 OK\r\n" 
-        "Content-type: application/lua\r\n\r\n" 
+	"Content-type: text/html; charset=UTF-8\r\n" 
     };
+//       "Content-type: application/lua\r\n\r\n" 
 	
-	const char hdr_siz[] = "Connection: close\r\nContent-Length: %d\r\n\r\n";
-	const char hdr_nosiz[] = "Connection: close\r\n\r\n";
+	const char hdr_siz[] = "Keep-Alive: timeout=1, max=1\r\nConnection: close\r\nContent-Length: %d\r\n\r\n";
+	const char hdr_nosiz[] = "Keep-Alive: timeout=1, max=1\r\nConnection: close\r\n\r\n";
 
 	typedef struct {
 		const char* suf;
@@ -179,12 +190,13 @@ char* def_files[]={
 	"index.html",
 	"index.lua",
 	"index.cgi",
+	"index.ssi",
 	NULL
 };
 
 
     const char webpage_404[] = {
-        "<html><head><title>HTTP Server</title>"
+        "<html><head><title>luos9 v0.1 Server</title>"
         "<style> div.main {"
         "font-family: Arial;"
         "padding: 0.01em 16px;"
@@ -206,8 +218,36 @@ char* def_files[]={
 
 int is_httpd_run = 1;
 
+
+int get_list_add(get_par** first, char* name, char* val){
+	get_par* par = malloc( sizeof(get_par) );
+	if( par == NULL ) return 0;
+
+	par->name = name;
+	par->val = val;
+	par->next = *first;
+	*first = par;
+
+	return 1;
+}
+
+void get_list_free(get_par** first){
+	get_par* par = *first;
+	get_par* nxt;
+	for( ; par != NULL; par = nxt){
+		free(par->name);
+		free(par->val);
+		nxt = par->next;
+		free(par);
+	}
+	*first = NULL;
+}
+
+
+
+
 void websocket_write(struct netconn *nc, const uint8_t *data, uint16_t len, uint8_t mode){
-    if (len > 125)
+    if (len > OUT_BUF_LEN-2)
         return;
     unsigned char* buf = malloc(len + 2);
     buf[0] = 0x80 | mode;
@@ -320,11 +360,11 @@ void prep_something( ){
 }
 
 
-static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len){
+static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len, get_par** ppget_root){
 	*uri = NULL;
 //	*uri_len = 0;
 
-	char *sp1, *sp2, *i, *sufp;
+	char *sp1, *sp2, *sp3, *i, *sufp;
 	/* extract URI */
 	sp1 = in + 4;
 	//sp2 = memchr(sp1, ' ', in_len);
@@ -341,6 +381,44 @@ static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len){
 	int len = sp2 - sp1;
 	if(len > MAXPATHLEN || len <= 0) 
 		return 0;
+	
+	if(*sp2 == '?'){
+		char *nm=NULL;
+		char *val=NULL;
+		int l;
+		for(sp3 = i = sp2+1; i < sp1 + in_len; i++ ){
+			if( nm == NULL && *i == '=' ){
+				l = i - sp3;
+				nm = malloc(l + 1);
+				memcpy(nm, sp3, l);
+				nm[l] = '\0';
+				
+				sp3 = i + 1;
+			}
+			if( nm != NULL && (*i == '&' || *i == ' ') ){
+				l = i - sp3;
+				val = malloc(l + 1);
+				memcpy(val, sp3, l);
+				val[l] = '\0';
+				
+				sp3 = i + 1;
+
+				if( !get_list_add(ppget_root, nm, val) ){
+					free(nm);
+					free(val);
+				}
+				nm = NULL;
+				val = NULL;
+			}
+			if(*i == ' ') break;
+		}
+//		if(nm != NULL && val != NULL){
+//			get_list_add(ppget_root, nm, val);
+//		}else{
+			if(nm != NULL) free(nm); 
+			if(val != NULL) free(val);
+//		}
+	}
 
 	*uri = malloc(len+2);
 	memcpy(*uri, sp1, len);
@@ -351,8 +429,14 @@ static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len){
 		int l = sp2-sufp;
 		if(suf_len!=NULL) 
 			*suf_len = l;
-		*suf = malloc(l+1);
-		memcpy(*suf, sufp, l);
+		*suf = malloc(l+2);
+		//memcpy(*suf, sufp, l);
+		for( i = *suf; sufp < sp2; i++, sufp++ ){
+			if(*sufp >= 'A' && *sufp <= 'Z')
+				*i = 'a' + (*sufp - 'A');
+			else
+				*i = *sufp;
+		}
 		(*suf)[l] = '\0';
 		printf("suffix: %s\n", *suf);
 	}else if(suf!=NULL)
@@ -377,8 +461,6 @@ static char* suf_to_hdr(char* suf, int suf_len, char** siz){
 	}
 	return r;
 }
-
-
 
 
 #include <sys/spiffs/spiffs.h>
@@ -587,6 +669,155 @@ int do_something(char **uri, int uri_len, char *hdr, char* hdr_sz, char *out ){
 	return 0;
 }
 
+
+int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out, lua_State* L, get_par** ppget_list ){
+	char *pth = malloc(uri_len + 10);
+	if( pth == NULL ) return -1;
+
+	pth[0] = '/'; pth[1] = 'h'; pth[2] = 't'; pth[3] = 'm'; pth[4] = 'l'; //pth[] = ''; pth[] = ''; 
+	memcpy(&pth[5], *uri, uri_len);
+	pth[ uri_len + 5 ] = '\0';
+	DBG("do_lua: path = %s, get_list=%x\n", pth, *ppget_list);
+
+	int n_l = lua_gettop(L);
+	DBG("0 ");
+	
+	int r = luaL_loadfile(L, pth);
+	DBG("1 ");
+	switch( r ){
+		case LUA_OK: {
+				char *outstr = NULL;
+				int outlen = 0;
+		DBG("2 ");
+				get_par *get_el = *ppget_list;
+		DBG("3 ");
+				int cgi_lvl = lua_gettop(L);
+		//DBG("4 ");
+		
+				DBG("do_lua: file '%s' loaded\n", pth);
+
+				/**
+				lua_newtable(L);
+				
+				lua_pushliteral(L, "_G");
+				lua_getupvalue(L, cgi_lvl, 1);
+				lua_rawset(L, -3);
+				//lua_setfield(L, -2, "_G");
+
+				lua_pushliteral(L, "_GET");
+				lua_newtable(L);
+				while(get_el != NULL){
+					lua_pushstring(L, get_el->name);
+					lua_pushstring(L, get_el->val);
+					lua_rawset(L, -3);
+
+					DBG("par: %s = %s\n", get_el->name, get_el->val);
+
+					get_el = get_el->next;
+				}
+				get_list_free(ppget_list);
+
+				lua_rawset(L, -3);
+				//TODO: set CGI table here
+				lua_setupvalue(L, cgi_lvl, 1);
+				**/
+
+				//DBG("pre hdr_lua_wrt %x %d\n", lua_hdr, strlen(lua_hdr) );
+				netconn_write(client, lua_hdr, strlen(lua_hdr), NETCONN_NOCOPY);
+				
+				//DBG("pre hdr_lua_tail_wrt %x %d\n", hdr_nosiz, strlen(hdr_nosiz) );
+				netconn_write(client, hdr_nosiz, strlen(hdr_nosiz), NETCONN_NOCOPY);
+				/*
+				DBG("flen = %d\n", flen );
+				char *hb = malloc(strlen(hdr_sz)+10);
+				snprintf(hb, strlen(hdr_sz)+10-1, hdr_sz, flen);
+				DBG("%s\n", hb );
+				netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
+				free(hb);
+				*/
+
+				//lua_settop(L, cgi_lvl);
+				//luaC_fullgc(L, 1);
+				usleep(50);
+				do{
+					outlen = 0; outstr = NULL;
+					int n_c = lua_gettop(L);
+					
+					lua_pushvalue(L, cgi_lvl);
+					DBG("a try to call %s\n", lua_typename(L, lua_type(L, -1) ) );
+					r = lua_pcall(L, 0, 1, 0);
+					switch(r){
+						case LUA_OK: 
+							DBG("do_lua: ok run '%s'\n", pth);
+
+							outstr = lua_tolstring(L, -1, &outlen);
+							if( outlen > 0 ) {
+								if(outlen > OUT_BUF_LEN){
+									DBG("do_lua: output string len = %d, but MUST be <= %d\n", 
+										outlen, OUT_BUF_LEN);
+									
+								}
+								DBG("pre netconn_write lua %x %d\n", outstr, outlen);
+								netconn_write(client, outstr, outlen, NETCONN_NOCOPY);
+							}else{
+								outstr = NULL;
+							}
+
+							break;
+						
+						case LUA_ERRRUN: 
+							DBG("do_lua: can't run '%s'\n", pth);
+							break;
+						
+						case LUA_ERRMEM: 
+							DBG("do_lua: no mem to run '%s'\n", pth);
+							break;
+						
+						case LUA_ERRERR: 
+							DBG("do_lua: runtime error in '%s'\n", pth);
+							break;
+						
+						case LUA_ERRGCMM: 
+							DBG("do_lua: gc error in '%s'\n", pth);
+							break;
+					};
+
+					lua_settop(L, n_c);
+					luaC_fullgc(L, 1);
+					usleep(50);
+				}while(outstr != NULL && outlen > 0);
+				lua_settop(L, cgi_lvl-1);
+				luaC_fullgc(L, 1);
+				usleep(50);
+			}
+			break;
+			
+		case LUA_ERRSYNTAX: 
+			DBG("do_lua: syntax error in '%s'\n", pth);
+			break;
+			
+		case LUA_ERRMEM: 
+			DBG("do_lua: can't alloc mem to load '%s'\n", pth);
+			break;
+			
+		case LUA_ERRGCMM:
+			DBG("do_lua: can't gc in '%s'\n", pth);
+			break;
+			
+		case LUA_ERRFILE:
+			DBG("do_lua: not found file path = %s\n", pth);
+			break;
+			
+	};
+
+	lua_settop(L, n_l);
+	luaC_fullgc(L, 1);
+
+	free(pth);
+
+	return 0;
+}
+
 int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
 	int flen;
 	int f = uri_to_file(*uri, uri_len, &flen);
@@ -703,11 +934,53 @@ int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len
 }
 
 
+int lget_params_cnt(lua_State* L) {
+	int i = 0;
+	get_par* el = get_root;
+	for( ; el != NULL; el = el->next){
+		i++;
+	}
+	lua_pushinteger(L, i);
+	return 1;
+}
+
+int lget_param(lua_State* L) {
+	get_par* el = get_root;
+	if(lua_gettop(L) == 0 || lua_type(L, 1) == LUA_TNIL){
+		return lget_params_cnt(L);
+	}else if(lua_type(L, 1) == LUA_TNUMBER){
+		int i = lua_tointeger(L, 1);
+		for( ; el != NULL && i > 1; el = el->next, i--);
+		if(el == NULL){
+			return 0;
+		}else{
+			lua_pushstring(L, el->name);
+			lua_pushstring(L, el->val);
+			return 2;
+		}
+	}else if(lua_type(L, 1) == LUA_TSTRING){
+		char *s = lua_tostring(L, 1);
+		for( ; el != NULL && !strcmp(s, el->name); el = el->next);
+		if(el == NULL){
+			return 0;
+		}else{
+			//lua_pushstring(L, el->name);
+			lua_pushstring(L, el->val);
+			return 1; //2;
+		}
+	}
+	
+	return 0;
+}
+
 int httpd_task(lua_State* L) //void *pvParameters)
 {
 //	luaC_fullgc(L, 1);
 //	static TaskHandle_t xHandleWs = NULL;
-printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
+	DBG("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
+
+	//lua_register(L, "GET_cnt", lget_get_params_cnt);
+	lua_register(L, "_GET", lget_param);
 	
     /*struct netconn * */client = NULL;
     /*struct netconn * */nc = netconn_new(NETCONN_TCP);
@@ -726,9 +999,6 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 	
 	netconn_bind(nc, IP_ADDR_ANY, 80);
     netconn_listen(nc);
-	
-//    char* buf;
-//    int buf_len;
 
 	prep_something();
 
@@ -759,6 +1029,9 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 						client = NULL;
 					}
 					ws_sock_del();
+					if(get_root != NULL){
+						get_list_free(&get_root);
+					}
 					usleep(50);
 
 					break;
@@ -774,11 +1047,11 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 
 					ws_sock_del();
 					
-					uri_len = get_uri(data, len, &uri, &suf, &suf_len );
+					uri_len = get_uri(data, len, &uri, &suf, &suf_len, &get_root );
 
 					if(suf != NULL){
 						hdr = suf_to_hdr(suf, suf_len, &hdr_sz);
-						free(suf);
+						//free(suf);
 					}else{ 
 						hdr = html_hdr;
 						hdr_sz = hdr_siz;
@@ -786,6 +1059,10 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 
 					//DBG("client->send_timeout %d\n", client->send_timeout );
 					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, NULL /*char *out*/ ) > 0){
+					}else
+					if( (!strcmp(suf, ".lua")) || (!strcmp(suf, ".cgi")) ){
+						DBG("lua cgi = %s\n", uri);
+						do_lua(&uri, uri_len, hdr, hdr_sz, data, len , NULL /*char *out*/, L, &get_root );
 					}else
 					if( do_file(&uri, uri_len, hdr, hdr_sz, data, len, NULL/*char *out*/ ) > 0){
 					}else
@@ -797,8 +1074,17 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 					
 					if(uri != NULL){
 						free(uri);
+						uri = NULL;
 						uri_len = 0;
 					}
+					if(suf != NULL){
+						free(suf);
+						suf = NULL;
+					}
+					if(get_root != NULL){
+						get_list_free(&get_root);
+					}
+							
                 }
             }
             netbuf_delete(nb);
@@ -819,7 +1105,7 @@ printf("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
 		nc = NULL;
 	}
 
-printf("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
+DBG("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
 	return 0;
 }
 
