@@ -80,3 +80,5 @@ CFLAGS += -DLUA_USE_PACK=1		       # pack
 CFLAGS += -DLUA_USE_THREAD=1			# thread
 CFLAGS += -DLUA_USE_EDITOR=0		       # editor
 CFLAGS += -DLUA_USE_I2C=1		       # editor
+
+CFLAGS += -DPATH_MAX=63 -DMAXPATHLEN=63 

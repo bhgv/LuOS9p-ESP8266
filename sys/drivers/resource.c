@@ -168,7 +168,7 @@ const char *resource_unit_name(tresource_type type, int unit) {
 
 const char *owner_name(tresource_owner owner) {
     switch (owner) {
-        case RES_SYSTEM:  return "LuaOS";
+        case RES_SYSTEM:  return "LuOS9";
         case RES_STEPPER: return "stepper";
         case RES_PWM:     return "pwm";
         case RES_UART:    return "uart";

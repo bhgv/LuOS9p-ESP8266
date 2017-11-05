@@ -47,7 +47,17 @@
 #include <sys/spiffs/spiffs_nucleus.h>
 #include <sys/spiffs/esp_spiffs.h>
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
+#include "pthread.h"
+
 #if 1 //USE_SPIFFS
+
+#define PATH_MAX	SPIFFS_OBJ_NAME_LEN - 1 //64
+#define MAXPATHLEN	PATH_MAX
 
 #define	EACCESS	5 // Permission denied
 
@@ -62,9 +72,34 @@
 
 spiffs fs;
 
+//static QueueHandle_t spiffsMux;
+pthread_mutex_t spiffs_mutex;
+
 static u8_t *my_spiffs_work_buf;
 static u8_t *my_spiffs_fds;
 static u8_t *my_spiffs_cache;
+
+/*
+void _spiffs_lock( spiffs *fs){
+//	xSemaphoreTakeRecursive(spiffsMux, portMAX_DELAY);
+	pthread_mutex_lock(&spiffs_mutex);
+}
+
+void _spiffs_unlock( spiffs *fs){
+//	xSemaphoreGiveRecursive(spiffsMux);
+    pthread_mutex_unlock(&spiffs_mutex);
+}
+*/
+
+void _spiffs_lock_init( /*spiffs *fs*/) {
+    pthread_mutexattr_t attr;
+
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+
+    pthread_mutex_init(&spiffs_mutex, &attr);
+}
+
 
 
 static void dir_path(char *npath, uint8_t base) {
@@ -253,7 +288,7 @@ int is_dir(const char *path) {
         strcat(npath,"/.");
     }
     
-    SPIFFS_opendir(&fs, "/", &d);   
+    SPIFFS_opendir(&fs, "/", &d); 
     while (SPIFFS_readdir(&d, &e)) {
         if (strncmp(npath, (const char *)e.name, strlen(npath)) == 0) {
             res = 1;
@@ -824,6 +859,8 @@ retry:
 }
 
 int spiffs_init() {
+	_spiffs_lock_init(/*&fs*/);
+	
     return spiffs_mount();
 }
 #endif

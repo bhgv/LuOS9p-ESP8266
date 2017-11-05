@@ -119,7 +119,7 @@ const char HTML_HEADER[] ={
 "Content-type: text/html\r\n\r\n"
 };
 
-const char WS_HEADER[] = "Upgrade: websocket\r\n";
+const char WS_HEADER[] = "Upgrade: websocket"; // \r\n";
 const char WS_GUID[] = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 const char WS_KEY[] = "Sec-WebSocket-Key: ";
 const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
@@ -264,7 +264,7 @@ static err_t websocket_parse(struct netconn *nc, unsigned char *data, u16_t data
     if (data != NULL && data_len > 1) {
 		if ((data[0] & 0x80) == 0) {
 		  printf("Warning: continuation frames not supported\n");
-		  return ERR_OK;
+		  return ERR_VAL;
 		}
         uint8_t opcode = data[0] & 0x0F;
         switch (opcode) {
@@ -276,15 +276,17 @@ static err_t websocket_parse(struct netconn *nc, unsigned char *data, u16_t data
                     for (int i = 0; i < data_len; i++)
                         data[i + 6] ^= data[2 + i % 4];
                     /* user callback */
-					DBG("ws rcvd: %d %x %s\n", data_len, opcode, &data[6]);
+					//DBG("ws rcvd: %d %x %s\n", data_len, opcode, &data[6]);
                     //websocket_cb(nc, &data[6], data_len, opcode);
+					return ERR_OK;
                 }
+				return ERR_VAL;
                 break;
             case 0x08: // close
                 return ERR_CLSD;
                 break;
         }
-        return ERR_OK;
+        return ERR_VAL;
     }
     return ERR_VAL;
 }
@@ -299,17 +301,22 @@ static err_t websocket_close(struct netconn *nc)
 
 static int websocket_connect(struct netconn *nc, char* data, int data_len/*, char* out, int max_out_len*/){
 	int r=0;
+	//DBG("wsc 1\n%s\nlen = %d\n", data, data_len);
 	if ( strnstr(data, WS_HEADER, data_len) ) {
 		#if 1
 	    unsigned char encoded_key[32];
 	    char key[64];
 	    char *key_start = strnstr(data, WS_KEY, data_len);
+		//DBG("wsc 2\n");
 	    if (key_start) {
 	        key_start += 19;
 	        char *key_end = strnstr(key_start, "\r\n", data_len);
+			//DBG("wsc 3\n");
 	        if (key_end) {
 	            int len = sizeof(char) * (key_end - key_start);
+				//DBG("wsc 4\n");
 	            if (len + sizeof(WS_GUID) < sizeof(key) && len > 0) {
+					//DBG("wsc 5\n");
 	                /* Concatenate key */
 	                memcpy(key, key_start, len);
 	                strlcpy(&key[len], WS_GUID, sizeof(key));
@@ -322,6 +329,7 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 	                mbedtls_base64_encode(NULL, 0, &olen, sha1sum, 20); //get length
 	                int ok = mbedtls_base64_encode(encoded_key, sizeof(encoded_key), &olen, sha1sum, 20);
 	                if (ok == 0) {
+						//DBG("wsc 6\n");
 						char* buf = malloc(OUT_BUF_LEN+1);
 						int buf_len = OUT_BUF_LEN;
 					
@@ -330,12 +338,13 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 	                    /* Send response */
 	                    //char buf[256];
 	                    u16_t len = snprintf(buf, buf_len, WS_RSP, encoded_key);
+						//DBG("wsc 7 \n%s\n", buf);
 	                    //http_write(pcb, buf, &len, TCP_WRITE_FLAG_COPY);
 	                    netconn_write(nc, buf, len, NETCONN_NOCOPY);
 						free(buf);
 	                    //return r; // ERR_OK;
 	                    //r = REQ_WS;
-						r = REQ_WSconn;
+						r = 1; //REQ_WSconn;
 	                }
 	            }else {
 	                printf("Key overflow\n");
@@ -425,22 +434,26 @@ static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len, g
 	(*uri)[len] = '\0';
 	printf("uri: %s\n", *uri);
 
-	if(suf!=NULL && sufp!=NULL){
-		int l = sp2-sufp;
-		if(suf_len!=NULL) 
-			*suf_len = l;
-		*suf = malloc(l+2);
-		//memcpy(*suf, sufp, l);
-		for( i = *suf; sufp < sp2; i++, sufp++ ){
-			if(*sufp >= 'A' && *sufp <= 'Z')
-				*i = 'a' + (*sufp - 'A');
-			else
-				*i = *sufp;
+	if(suf!=NULL){
+		if(sufp!=NULL){
+			int l = sp2-sufp;
+			if(suf_len!=NULL) 
+				*suf_len = l;
+			*suf = malloc(l+2);
+			//memcpy(*suf, sufp, l);
+			for( i = *suf; sufp < sp2; i++, sufp++ ){
+				if(*sufp >= 'A' && *sufp <= 'Z')
+					*i = 'a' + (*sufp - 'A');
+				else
+					*i = *sufp;
+			}
+			(*suf)[l] = '\0';
+			printf("suffix: %s\n", *suf);
+		}else{
+			*suf = NULL;
+			if(suf_len!=NULL) *suf_len = 0;
 		}
-		(*suf)[l] = '\0';
-		printf("suffix: %s\n", *suf);
-	}else if(suf!=NULL)
-		*suf = NULL;
+	}
 	
 	return len;
 }
@@ -478,12 +491,14 @@ static /*int*/spiffs_file uri_to_file(char* uri, int len, int *flen){
 //	struct stat sb;
 	spiffs_file r = -1;
 
-	if(len + 5 > MAXPATHLEN){
-		printf("Too long path: %db, must be < %d\n", len, MAXPATHLEN-5);
+	DBG("spiffs_file 1\n" );
+	if(len + 12 > MAXPATHLEN){
+		printf("Too long path: %db, must be < %d\n", len, MAXPATHLEN-12);
 		return r;
 	}
 	char *p = malloc(len+12);
 	
+	DBG("spiffs_file 2\n");
 	if(p==NULL){
 		printf("No mem\n");
 		return 0; //ERR_MEM;
@@ -492,6 +507,7 @@ static /*int*/spiffs_file uri_to_file(char* uri, int len, int *flen){
 	memcpy(&p[5], uri, len);
 	p[len+5] = '\0';
 
+	DBG("pre path = %s %d\n", p, len);
     if (is_dir(p) || p[len+4] == '/') {
 		DBG("dir %s\n", p);
 		
@@ -518,12 +534,14 @@ static /*int*/spiffs_file uri_to_file(char* uri, int len, int *flen){
 			r = SPIFFS_open(&fs, tp, SPIFFS_RDONLY, 0); 
 			if(r>0){
 				res = SPIFFS_fstat(&fs, r, &stat);
-				if (res == SPIFFS_OK && stat.size > 0) {
+				if (res == SPIFFS_OK && stat.size > 0 ) {
 					DBG("path = %s %d\n", tp, len);
-					*flen = stat.size;
+					if(flen != NULL) *flen = stat.size;
 					break;
 				}else{
 					SPIFFS_close(&fs, r);
+					r = 0;
+					if(flen != NULL) *flen = 0;
 				}
 			}
 			i++;
@@ -536,13 +554,16 @@ static /*int*/spiffs_file uri_to_file(char* uri, int len, int *flen){
 	DBG("path = %s %d\n", p, len);
 	
 	r = SPIFFS_open(&fs, p, SPIFFS_RDONLY, 0); 
+	DBG("after open %s r=%d\n", p, r);
 	if(r > 0){
 		DBG("pre fstat %s %d\n", p, r);
 		res = SPIFFS_fstat(&fs, r, &stat);
-		if (res == SPIFFS_OK) {
-			*flen = stat.size;
-//		} else {
-//			*flen = 0;
+		if (res == SPIFFS_OK ) {
+			if(flen != NULL) *flen = stat.size;
+		} else {
+			SPIFFS_close(&fs, r);
+			r = 0;
+			if(flen != NULL) *flen = 0;
 		}
 	}
 //    if (r < 0) {
@@ -623,8 +644,12 @@ void ws_sock_del(){
 	}
 }
 
-void ws_task(){
+void ws_task(lua_State *L){
 	err_t err;
+
+	lua_pushnil(L);
+	lua_setglobal(L, "wsData");
+
 	//while(1){
 	if(is_httpd_run) {
 		struct netbuf *nb=NULL;
@@ -636,7 +661,24 @@ void ws_task(){
 		
 			netbuf_data(nb, &data, &len);
 			if( websocket_parse(ws_client, data, len) == ERR_OK){
+				DBG("ws_task: %s %d\n", &data[6], len-6);
+
+				if(ws_uri != NULL){
+					char* s;
+					int l;
 				
+					lua_pushlstring(L, &data[6], len-6);
+					lua_setglobal(L, "wsData");
+					luaC_fullgc(L, 1);
+					
+					luaL_dofile(L, ws_uri);
+					s = lua_tolstring(L, -1, &l);
+					
+					DBG("res of %s:\n%s\n", ws_uri, s);
+					
+					websocket_write(ws_client, s, l, 1);
+					lua_pop(L, 1);
+				}
 			} 
 		}
 		netbuf_delete(nb);
@@ -645,6 +687,8 @@ void ws_task(){
 	} else {
 		ws_sock_del();
 	}
+
+	luaC_fullgc(L, 1);
 }
 
 
@@ -870,7 +914,7 @@ int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int le
 	return 0;
 }
 
-int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
+int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out, char *suff ){
 	int r=websocket_connect(client, data, len);
 	DBG("after websocket_connect %x %d %d\n", data, len, r );
 	usleep(50);
@@ -879,10 +923,36 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 		
 		ws_client = client;
 		client = NULL;
-		
-		ws_uri = *uri;
-		*uri = NULL;
-	
+
+		int ws_uri_len = uri_len+5;
+		ws_uri = malloc(ws_uri_len + 12);
+		ws_uri[0] = '/';
+		ws_uri[1] = 'h';
+		ws_uri[2] = 't';
+		ws_uri[3] = 'm';
+		ws_uri[4] = 'l';
+		memcpy(&ws_uri[5], *uri, uri_len);
+		if(suff != NULL && ( (!strcmp(suff, ".lua")) || (!strcmp(suff, ".cgi") ) ) ){
+			ws_uri[ws_uri_len] = '\0';
+		}else{
+			if( ws_uri[ws_uri_len - 1] == '/' ){
+				ws_uri_len--;
+			}
+			const char index_lua[] = "/index.lua";
+			memcpy( &ws_uri[ws_uri_len], index_lua, sizeof(index_lua) );
+			ws_uri_len += sizeof(index_lua);
+			ws_uri[ws_uri_len] = '\0';
+		}
+		DBG("ws cgi path = %s\n", ws_uri);
+
+		int f = SPIFFS_open(&fs, ws_uri, SPIFFS_RDONLY, 0); 
+		if(f <= 0){
+			ws_sock_del();
+		}else{
+			SPIFFS_close(&fs, f);
+		}
+		DBG("ws cgi file test = %d\n", f);
+
 		//if(xHandleWs != NULL) 
 		//	vTaskDelete( xHandleWs );
 		//xTaskCreate(&ws_task, "wsd", 256, NULL, 2, &xHandleWs);
@@ -890,8 +960,8 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 		DBG("post websocket_connect %d\n", r );
 	}
 
-	//*out = NULL;
-	return r;
+	DBG("pre exit websocket_connect %x %d %d\n", data, len, r );
+	return r > 0;
 }
 
 int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
@@ -1039,6 +1109,9 @@ int httpd_task(lua_State* L) //void *pvParameters)
 				usleep(50);
 
                 netbuf_data(nb, &data, &len);
+
+				//DBG("%s\n", data);
+				
                 /* check for a GET request */
                 if (!strncmp(data, "GET ", 4)) {
                     char *uri, *suf, *hdr, *hdr_sz;
@@ -1058,9 +1131,9 @@ int httpd_task(lua_State* L) //void *pvParameters)
 					}
 
 					//DBG("client->send_timeout %d\n", client->send_timeout );
-					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, NULL /*char *out*/ ) > 0){
+					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, NULL /*char *out*/, suf ) > 0){
 					}else
-					if( (!strcmp(suf, ".lua")) || (!strcmp(suf, ".cgi")) ){
+					if(suf != NULL && ( (!strcmp(suf, ".lua")) || (!strcmp(suf, ".cgi")) ) ){
 						DBG("lua cgi = %s\n", uri);
 						do_lua(&uri, uri_len, hdr, hdr_sz, data, len , NULL /*char *out*/, L, &get_root );
 					}else
@@ -1096,7 +1169,7 @@ int httpd_task(lua_State* L) //void *pvParameters)
 			client = NULL;
 		}
 		usleep(50);
-		ws_task();
+		ws_task(L);
     }
 	if(nc != NULL){
 		printf("Closing connection (main nc)\n");
@@ -1105,7 +1178,7 @@ int httpd_task(lua_State* L) //void *pvParameters)
 		nc = NULL;
 	}
 
-DBG("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
+	DBG("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
 	return 0;
 }
 

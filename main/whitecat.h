@@ -307,7 +307,6 @@
 //
 // LuaOS Lua modules to include
 //
-//#define LUA_USE_OS 1		       // os
 #define LUA_USE_TMR 1		       // timer
 //#define LUA_USE_PIO 1		       // gpio
 #define LUA_USE_LORA 0		       // lora

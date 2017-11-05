@@ -192,13 +192,27 @@ typedef unsigned char u8_t;
 // SPIFFS_LOCK and SPIFFS_UNLOCK protects spiffs from reentrancy on api level
 // These should be defined on a multithreaded system
 
+#include "pthread.h"
+
+extern pthread_mutex_t spiffs_mutex;
+
+inline void _spiffs_lock( /*spiffs *fs*/){
+//	xSemaphoreTakeRecursive(spiffsMux, portMAX_DELAY);
+	pthread_mutex_lock(&spiffs_mutex);
+}
+
+inline void _spiffs_unlock( /*spiffs *fs*/){
+//	xSemaphoreGiveRecursive(spiffsMux);
+    pthread_mutex_unlock(&spiffs_mutex);
+}
+
 // define this to enter a mutex if you're running on a multithreaded system
 #ifndef SPIFFS_LOCK
-#define SPIFFS_LOCK(fs)
+#define SPIFFS_LOCK(fs)		_spiffs_lock(/*fs*/)
 #endif
 // define this to exit a mutex if you're running on a multithreaded system
 #ifndef SPIFFS_UNLOCK
-#define SPIFFS_UNLOCK(fs)
+#define SPIFFS_UNLOCK(fs)	_spiffs_unlock(/*fs*/)
 #endif
 
 // Enable if only one spiffs instance with constant configuration will exist

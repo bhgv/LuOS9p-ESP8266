@@ -138,6 +138,7 @@ static int l_checkmode (const char *mode) {
 #define IOPREF_LEN	(sizeof(IO_PREFIX)/sizeof(char) - 1)
 #define IO_INPUT	(IO_PREFIX "input")
 #define IO_OUTPUT	(IO_PREFIX "output")
+#define IO_ERR	(IO_PREFIX "err")
 
 
 typedef luaL_Stream LStream;
@@ -698,6 +699,24 @@ static int f_flush (lua_State *L) {
 */
 #include "modules.h"
 
+#if LUA_USE_ROTABLE
+static int f_get_stdin (lua_State *L) {
+  lua_getfield(L, LUA_REGISTRYINDEX, IO_INPUT);  /* get file from registry */
+  return 1;
+}
+
+static int f_get_stdout (lua_State *L) {
+  lua_getfield(L, LUA_REGISTRYINDEX, IO_OUTPUT);  /* get file from registry */
+  return 1;
+}
+
+static int f_get_stderr (lua_State *L) {
+  lua_getfield(L, LUA_REGISTRYINDEX, IO_ERR);  /* get file from registry */
+  return 1;
+}
+
+#endif
+
 static const LUA_REG_TYPE iolib[] = {
   { LSTRKEY( "close"      ),			LFUNCVAL( io_close   ) },
   { LSTRKEY( "flush"      ),			LFUNCVAL( io_flush   ) },
@@ -713,10 +732,17 @@ static const LUA_REG_TYPE iolib[] = {
   { LSTRKEY( "receive"    ),			LFUNCVAL( f_receive  ) },
   { LSTRKEY( "send"       ),			LFUNCVAL( f_send     ) },
   { LSTRKEY( "attributes" ), 		    LFUNCVAL( f_attributes) },
+#if LUA_USE_ROTABLE
+	{ LSTRKEY( "stdin" ),			  LFUNCVAL( f_get_stdin) },
+	{ LSTRKEY( "stdout" ),			  LFUNCVAL( f_get_stdout) },
+	{ LSTRKEY( "stderr" ),			  LFUNCVAL( f_get_stderr) },
+#endif
   { LNILKEY, LNILVAL }
 };
 
 #if LUA_USE_ROTABLE
+
+#if 0
 static int luaL_io_index(lua_State *L) {
   int fres;
   if ((fres = luaR_findfunction(L, iolib)) != 0)
@@ -731,9 +757,22 @@ static const luaL_Reg io_load_funcs[] = {
 };
 #endif
 
+#endif
+
 /*
 ** methods for file handles
 */
+
+static const LUA_REG_TYPE flib[];
+
+static const LUA_REG_TYPE flib_load_funcs[] = {
+//	{ LSTRKEY("__index")    ,	LFUNCVAL( luaL_flib_index ) },
+	{ LSTRKEY("__index")	,	LROVAL( flib ) },
+	{ LSTRKEY("__gc")	   ,	LFUNCVAL( f_gc		  ) },
+	{ LSTRKEY("__tostring") ,	LFUNCVAL( f_tostring  ) },
+	{ LNILKEY, LNILVAL }
+};
+
 static const LUA_REG_TYPE flib[] = {
   { LSTRKEY( "close" 	  ),			LFUNCVAL( io_close 	 ) },
   { LSTRKEY( "flush" 	  ),			LFUNCVAL( f_flush 	 ) },
@@ -742,10 +781,14 @@ static const LUA_REG_TYPE flib[] = {
   { LSTRKEY( "seek" 	  ),			LFUNCVAL( f_seek 	 ) },
   { LSTRKEY( "setvbuf" 	  ),			LFUNCVAL( f_setvbuf  ) },
   { LSTRKEY( "write" 	  ),			LFUNCVAL( f_write 	 ) },
+
+  { LSTRKEY( "__metatable" ),			LROVAL( flib_load_funcs ) },
   { LNILKEY, LNILVAL }
 };
 
 #if LUA_USE_ROTABLE
+
+#if 0
 static int luaL_flib_index(lua_State *L) {
   int fres;
   if ((fres = luaR_findfunction(L, flib)) != 0)
@@ -760,6 +803,7 @@ static const luaL_Reg flib_load_funcs[] = {
     { "__tostring" , 	f_tostring      },
     { NULL, NULL }
 };
+#endif
 
 #else
 static void createmeta (lua_State *L) {
@@ -792,7 +836,8 @@ static void createstdfile (lua_State *L, FILE *f, const char *k,
     lua_pushvalue(L, -1);
     lua_setfield(L, LUA_REGISTRYINDEX, k);  /* add file to registry */
   }
-  lua_setfield(L, -2, fname);  /* add file to module */
+  lua_pop(L, 1);
+//  lua_setfield(L, -2, fname);  /* add file to module */
 }
 
 
@@ -804,22 +849,35 @@ LUAMOD_API int luaopen_io (lua_State *L) {
   createstdfile(L, stdin, IO_INPUT, "stdin");
   createstdfile(L, stdout, IO_OUTPUT, "stdout");
   createstdfile(L, stderr, NULL, "stderr");
+
+  return 1;
 #else
+
+#if 0
   luaL_newlib(L, io_load_funcs);  /* new module */
   lua_pushvalue(L, -1);
   lua_setmetatable(L, -2);
+#endif
 
+  luaL_newmetarotable(L, LUA_FILEHANDLE, (void*)flib );
+#if 0
   luaL_newmetatable(L, LUA_FILEHANDLE);  /* create metatable for file handles */
   lua_pushvalue(L, -1);  /* push metatable */
   lua_setfield(L, -2, "__index");  /* metatable.__index = metatable */
   luaL_setfuncs(L, flib_load_funcs, 0);  /* add file methods to new metatable */
+#endif
   lua_pop(L, 1);  /* pop new metatable */
 
   /* create (and set) default files */
   createstdfile(L, stdin, IO_INPUT, "stdin");
   createstdfile(L, stdout, IO_OUTPUT, "stdout");
-  createstdfile(L, stderr, NULL, "stderr");
+  createstdfile(L, stderr, /*NULL*/ IO_ERR, "stderr");
+  
+  return 0;
 #endif
 
-  return 1;
+//  return 1;
 }
+
+MODULE_REGISTER_MAPPED(IO_, io, iolib, luaopen_io);
+

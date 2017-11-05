@@ -65,9 +65,10 @@ void mach_dev() {
     printf("  /\\       /\\\n");
     printf(" /  \\_____/  \\\n");
     printf("/_____________\\\n");
-    printf("W H I T E C A T\n\n");
+    printf("W H I T E C A T\n");
+    printf("___ B H G V ___\n\n");
 
-    printf("LuaOS %s build %d Copyright (C) 2015 - 2016 whitecatboard.org\n\n", LUA_OS_VER, BUILD_TIME);
+    printf("LuOS9 %s build %d \nCopyright (C) 2015 - 2016 whitecatboard.org, 2017 bhgv\n\n", LUA_OS_VER, BUILD_TIME);
     
     openlog(__progname, LOG_CONS | LOG_NDELAY, LOG_LOCAL1);
 	

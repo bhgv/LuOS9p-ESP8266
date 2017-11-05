@@ -21,7 +21,9 @@
 #endif
 
 // WHITECAT BEGIN
+#ifndef MAXPATHLEN
 #define MAXPATHLEN PATH_MAX
+#endif
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))

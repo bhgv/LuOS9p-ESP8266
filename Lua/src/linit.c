@@ -81,7 +81,7 @@ LUALIB_API void luaL_openlibs (lua_State *L) {
 extern const luaL_Reg lua_libs1[];
 
 MODULE_REGISTER_UNMAPPED(_G, _G, luaopen_base);
-MODULE_REGISTER_UNMAPPED(IO, io, luaopen_io);
+//MODULE_REGISTER_UNMAPPED(IO, io, luaopen_io);
 //MODULE_REGISTER_UNMAPPED(PACKAGE, package, luaopen_package);
 
 
