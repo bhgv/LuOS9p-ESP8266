@@ -34,7 +34,7 @@
 #include "mbedtls/base64.h"
 
 
-#if 1
+#if 0
 #define DBG(...) printf(__VA_ARGS__)
 #else
 #define DBG(...)
@@ -43,6 +43,12 @@
 
 #if 1 //LWIP_HTTPD_STRNSTR_PRIVATE
 /** Like strstr but does not need 'buffer' to be NULL-terminated */
+
+void system_soft_wdt_feed(){
+//	wdt_flg = false;
+	WDT.FEED = WDT_FEED_MAGIC;
+}
+
 char*
 strnstr(const char* buffer, const char* token, size_t n)
 {
@@ -94,8 +100,8 @@ enum{
 };
 
 
-#define IN_BUF_LEN  512
-#define OUT_BUF_LEN  256 //312  //536 //312
+#define IN_BUF_LEN  400 //512
+#define OUT_BUF_LEN  400 //256 //312  //536 //312
 //512
 
 #undef MAXPATHLEN
@@ -110,6 +116,9 @@ struct _get_par {
 	
 	get_par* next;
 };
+
+void nb_free();
+
 
 get_par* get_root = NULL;
 
@@ -166,8 +175,10 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
     };
 //       "Content-type: application/lua\r\n\r\n" 
 	
-	const char hdr_siz[] = "Keep-Alive: timeout=1, max=1\r\nConnection: close\r\nContent-Length: %d\r\n\r\n";
-	const char hdr_nosiz[] = "Keep-Alive: timeout=1, max=1\r\nConnection: close\r\n\r\n";
+//	const char hdr_siz[] = "Keep-Alive: timeout=1, max=1\r\nConnection: close\r\nContent-Length: %d\r\n\r\n";
+//	const char hdr_nosiz[] = "Keep-Alive: timeout=1, max=1\r\nConnection: close\r\n\r\n";
+	const char hdr_siz[] = "Content-Length: %d\r\nConnection: close\r\n\r\n";
+	const char hdr_nosiz[] = "Connection: close\r\n\r\n";
 
 	typedef struct {
 		const char* suf;
@@ -255,7 +266,7 @@ void websocket_write(struct netconn *nc, const uint8_t *data, uint16_t len, uint
     memcpy(&buf[2], data, len);
     len += 2;
 //    tcp_write(nc, buf, len, TCP_WRITE_FLAG_COPY);
-	netconn_write(nc, buf, len, NETCONN_COPY);
+	netconn_write(nc, buf, len, NETCONN_NOCOPY);
 	free(buf);
 }
 
@@ -395,6 +406,9 @@ static int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len, g
 		char *nm=NULL;
 		char *val=NULL;
 		int l;
+
+		get_list_free(&get_root);
+
 		for(sp3 = i = sp2+1; i < sp1 + in_len; i++ ){
 			if( nm == NULL && *i == '=' ){
 				l = i - sp3;
@@ -623,6 +637,25 @@ httpd_init(void)
 #endif
 
 
+struct netbuf *nb=NULL;
+
+void nb_free(){
+	if(nb != NULL){
+		netbuf_delete(nb);
+		nb = NULL;
+	}
+}
+
+void nc_free(struct netconn **nc, char* msg){
+	if(*nc != NULL){
+		if(msg != NULL) 
+			printf(msg);
+		netconn_close(*nc);
+		netconn_delete(*nc);
+		*nc = NULL;
+	}
+}
+
 
 struct netconn *ws_client = NULL;
 char* ws_uri = NULL;
@@ -631,11 +664,12 @@ int ws_len = 0;
 void ws_sock_del(){
 	if(ws_client != NULL){
 		websocket_close(ws_client);
-		
-		printf("Closing connection (ws_client)\n");
-		netconn_close(ws_client);
-		netconn_delete(ws_client);
-		ws_client = NULL;
+
+		nc_free(&ws_client, "Closing connection (ws_client)\n");
+//		printf("Closing connection (ws_client)\n");
+//		netconn_close(ws_client);
+//		netconn_delete(ws_client);
+//		ws_client = NULL;
 	}
 	
 	if(ws_uri != NULL){
@@ -647,8 +681,8 @@ void ws_sock_del(){
 void ws_task(lua_State *L){
 	err_t err;
 
-	lua_pushnil(L);
-	lua_setglobal(L, "wsData");
+	//lua_pushnil(L);
+	//lua_setglobal(L, "wsData");
 
 	//while(1){
 	if(is_httpd_run) {
@@ -661,39 +695,43 @@ void ws_task(lua_State *L){
 		
 			netbuf_data(nb, &data, &len);
 			if( websocket_parse(ws_client, data, len) == ERR_OK){
-				DBG("ws_task: %s %d\n", &data[6], len-6);
+				//DBG("ws_task: %s %d\n", &data[6], len-6);
 
 				if(ws_uri != NULL){
 					char* s;
 					int l;
+					int n = lua_gettop(L);
 				
 					lua_pushlstring(L, &data[6], len-6);
 					lua_setglobal(L, "wsData");
 					luaC_fullgc(L, 1);
-					
+
 					luaL_dofile(L, ws_uri);
 					s = lua_tolstring(L, -1, &l);
 					
 					DBG("res of %s:\n%s\n", ws_uri, s);
 					
 					websocket_write(ws_client, s, l, 1);
-					lua_pop(L, 1);
+					lua_settop(L, n);
 				}
 			} 
 		}
-		netbuf_delete(nb);
+		if(nb != NULL){
+			netbuf_delete(nb);
+			nb = NULL;
+		}
 		
-		usleep(50);
 	} else {
 		ws_sock_del();
 	}
 
 	luaC_fullgc(L, 1);
+	usleep(50);
 }
 
 
 #define DEF_RECV_TIMEOUT  100
-#define DEF_SEND_TIMEOUT  2*60000
+#define DEF_SEND_TIMEOUT  60000
 
 int recv_timeout = DEF_RECV_TIMEOUT;
 int send_timeout = DEF_SEND_TIMEOUT;
@@ -714,7 +752,7 @@ int do_something(char **uri, int uri_len, char *hdr, char* hdr_sz, char *out ){
 }
 
 
-int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out, lua_State* L, get_par** ppget_list ){
+int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out, lua_State* L, get_par** ppget_list ){
 	char *pth = malloc(uri_len + 10);
 	if( pth == NULL ) return -1;
 
@@ -724,21 +762,23 @@ int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len
 	DBG("do_lua: path = %s, get_list=%x\n", pth, *ppget_list);
 
 	int n_l = lua_gettop(L);
-	DBG("0 ");
+	//DBG("0 ");
 	
 	int r = luaL_loadfile(L, pth);
-	DBG("1 ");
+	//DBG("1 ");
 	switch( r ){
 		case LUA_OK: {
 				char *outstr = NULL;
 				int outlen = 0;
-		DBG("2 ");
+		//DBG("2 ");
 				get_par *get_el = *ppget_list;
-		DBG("3 ");
+		//DBG("3 ");
 				int cgi_lvl = lua_gettop(L);
 		//DBG("4 ");
 		
 				DBG("do_lua: file '%s' loaded\n", pth);
+
+				//ws_sock_del();
 
 				/**
 				lua_newtable(L);
@@ -837,14 +877,17 @@ int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len
 			break;
 			
 		case LUA_ERRSYNTAX: 
+			//ws_sock_del();
 			DBG("do_lua: syntax error in '%s'\n", pth);
 			break;
 			
 		case LUA_ERRMEM: 
+			//ws_sock_del();
 			DBG("do_lua: can't alloc mem to load '%s'\n", pth);
 			break;
 			
 		case LUA_ERRGCMM:
+			//ws_sock_del();
 			DBG("do_lua: can't gc in '%s'\n", pth);
 			break;
 			
@@ -862,16 +905,19 @@ int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len
 	return 0;
 }
 
-int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
+int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out ){
 	int flen;
 	int f = uri_to_file(*uri, uri_len, &flen);
 	char* buf=NULL;
 	int buf_len;
 	
 	if(f > 0){
+		//ws_sock_del();
 	//	free(uri);
 	//	uri_len = 0;
 		int totl=0;
+
+		//nb_free();
 		
 		DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), f );
 		netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
@@ -884,23 +930,27 @@ int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int le
 		free(hb);
 		usleep(50);
 		
-		DBG("pre malloc of %d\n", OUT_BUF_LEN+4 );
-		buf = malloc(OUT_BUF_LEN+4);
-		buf_len = OUT_BUF_LEN;
+		DBG("pre malloc of %d\n", OUT_BUF_LEN );
+		buf = malloc(OUT_BUF_LEN);
+		buf_len = OUT_BUF_LEN-4;
 		
 		int tlen;
 		if(buf){
 			do{
 				DBG("pre read %d %x %d totl=%d\n", f, buf, buf_len, totl);
 				//tlen = read(f, buf, buf_len);
-				tlen = SPIFFS_read(&fs, (spiffs_file)f, buf, buf_len&(~0x3)); 
+				tlen = SPIFFS_read(&fs, (spiffs_file)f, buf, buf_len); //&(~0x3));
+				DBG("after read %d %x %d totl=%d\n", f, buf, buf_len, totl);
+				if(tlen < 0)
+					break;
 				totl += tlen;
 				DBG("pre netconn_write %d %x %d totl=%d\n", f, buf, tlen, totl);
 				if(tlen > 0){
 					netconn_write(client, buf, tlen, NETCONN_NOCOPY);
 					usleep(50);
 				}
-			}while( tlen > 0 && !SPIFFS_eof(&fs, (spiffs_file)f ) );
+			}while( tlen > 0 /*&& !SPIFFS_eof(&fs, (spiffs_file)f )*/ );
+			DBG("after do while read %d %x %d totl=%d\n", f, buf, buf_len, totl);
 			
 			free(buf);
 			buf_len = 0;
@@ -919,7 +969,8 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 	DBG("after websocket_connect %x %d %d\n", data, len, r );
 	usleep(50);
 	if(r>0){ 
-		ws_sock_del();
+		nb_free();
+		//ws_sock_del();
 		
 		ws_client = client;
 		client = NULL;
@@ -932,6 +983,10 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 		ws_uri[3] = 'm';
 		ws_uri[4] = 'l';
 		memcpy(&ws_uri[5], *uri, uri_len);
+		
+		//free(*uri);
+		//*uri = NULL;
+
 		if(suff != NULL && ( (!strcmp(suff, ".lua")) || (!strcmp(suff, ".cgi") ) ) ){
 			ws_uri[ws_uri_len] = '\0';
 		}else{
@@ -960,11 +1015,11 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 		DBG("post websocket_connect %d\n", r );
 	}
 
-	DBG("pre exit websocket_connect %x %d %d\n", data, len, r );
+	DBG("pre exit websocket_connect %d\n", r );
 	return r > 0;
 }
 
-int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out ){
+int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out ){
 	char* buf=NULL;
 	int buf_len;
 	
@@ -1043,22 +1098,39 @@ int lget_param(lua_State* L) {
 	return 0;
 }
 
+
 int httpd_task(lua_State* L) //void *pvParameters)
 {
+//	nc = NULL;
+//	client = NULL;
+//	ws_client = NULL;
+//	ws_uri = NULL;
+//	nb = NULL;
+//	get_root = NULL;
+
+	usleep(100);
+	system_soft_wdt_feed();
+	//taskYIELD();
+
+DBG( "_REENT = %x, __getreent = %x, _impure=%x\n\n", _REENT, __getreent(), _impure_ptr );
 //	luaC_fullgc(L, 1);
 //	static TaskHandle_t xHandleWs = NULL;
 	DBG("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
+	DBG("MEMP_NUM_TCP_PCB = %d\n", MEMP_NUM_TCP_PCB);
 
 	//lua_register(L, "GET_cnt", lget_get_params_cnt);
 	lua_register(L, "_GET", lget_param);
-	
-    /*struct netconn * */client = NULL;
+
+	nc_free(&client, NULL);
+//	nc_free(&nc, NULL);
+//    /*struct netconn * */client = NULL;
     /*struct netconn * */nc = netconn_new(NETCONN_TCP);
 	printf("Open connection (main nc)\n");
 
     if (nc == NULL) {
         printf("Failed to allocate socket.\n");
-        vTaskDelete(NULL);
+        //vTaskDelete(NULL);
+        return 0;
     }
 	
 	nc->recv_timeout = recv_timeout;
@@ -1074,39 +1146,45 @@ int httpd_task(lua_State* L) //void *pvParameters)
 
 	is_httpd_run = 1;    
     while (is_httpd_run) {
+		taskYIELD();
+		system_soft_wdt_feed();
+	
+		//DBG("httpd_task iter: \nws_client=%x, ws_uri=%x, \nnc=%x, client=%x\nnb=%x, get_root=%x\n",
+		//	ws_client, ws_uri, nc, client, nb, get_root
+		//);
+
         err_t err = netconn_accept(nc, &client);
         if (client != NULL) 
 			printf("Open connection (client) %x\n", client);
 		usleep(50);
         if (client != NULL && err == ERR_OK) {
-            struct netbuf *nb=NULL;
+            //struct netbuf *nb=NULL;
+            //nb_free();
 			client->send_timeout = send_timeout;
 			client->recv_timeout = recv_timeout;
+			client->recv_bufsize = IN_BUF_LEN;
 
 			ip_set_option(client->pcb.tcp, SOF_REUSEADDR);
 			//client->pcb.tcp->so_options |= SOF_REUSEADDR;
 			
-			client->recv_bufsize = IN_BUF_LEN;
+			//client->recv_bufsize = IN_BUF_LEN;
             if ((err = netconn_recv(client, &nb)) == ERR_OK) {
                 void *data;
                 u16_t len;
 			
 				if( !is_httpd_run ){
-					if(client != NULL){
-						printf("Closing connection (client) on http exit\n");
-						netconn_close(client);
-						netconn_delete(client);
-						client = NULL;
-					}
+					/*
+					nb_free();
+					nc_free(&client, "Closing connection (client) on http exit\n");
 					ws_sock_del();
 					if(get_root != NULL){
 						get_list_free(&get_root);
 					}
-					usleep(50);
-
+					//usleep(50);
+					*/
 					break;
 				}
-				usleep(50);
+				//usleep(50);
 
                 netbuf_data(nb, &data, &len);
 
@@ -1119,7 +1197,7 @@ int httpd_task(lua_State* L) //void *pvParameters)
 					int uri_len;
 
 					ws_sock_del();
-					
+
 					uri_len = get_uri(data, len, &uri, &suf, &suf_len, &get_root );
 
 					if(suf != NULL){
@@ -1129,22 +1207,27 @@ int httpd_task(lua_State* L) //void *pvParameters)
 						hdr = html_hdr;
 						hdr_sz = hdr_siz;
 					}
-
+					
 					//DBG("client->send_timeout %d\n", client->send_timeout );
 					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, NULL /*char *out*/, suf ) > 0){
-					}else
-					if(suf != NULL && ( (!strcmp(suf, ".lua")) || (!strcmp(suf, ".cgi")) ) ){
-						DBG("lua cgi = %s\n", uri);
-						do_lua(&uri, uri_len, hdr, hdr_sz, data, len , NULL /*char *out*/, L, &get_root );
-					}else
-					if( do_file(&uri, uri_len, hdr, hdr_sz, data, len, NULL/*char *out*/ ) > 0){
-					}else
-					if( do_something(&uri, uri_len, hdr, hdr_sz, NULL/*&buf_len*/) > 0){
-					}else 
-					{
-						do_404(&uri, uri_len, hdr, hdr_sz, data, len, NULL/*out*/);
+						//nb_free();
+					}else{
+						nb_free();
+						
+						if(suf != NULL && ( (!strcmp(suf, ".lua")) || (!strcmp(suf, ".cgi")) ) ){
+							DBG("lua cgi = %s\n", uri);
+							do_lua(&uri, uri_len, hdr, hdr_sz, /*data, len,*/ NULL /*char *out*/, L, &get_root );
+						}else
+						if( do_file(&uri, uri_len, hdr, hdr_sz, /*data, len,*/ NULL/*char *out*/ ) > 0){
+						}else
+						if( do_something(&uri, uri_len, hdr, hdr_sz, NULL/*&buf_len*/) > 0){
+						}else 
+						{
+							//nb_free();
+							//ws_sock_del();
+							do_404(&uri, uri_len, hdr, hdr_sz, /*data, len,*/ NULL/*out*/);
+						}
 					}
-					
 					if(uri != NULL){
 						free(uri);
 						uri = NULL;
@@ -1154,31 +1237,34 @@ int httpd_task(lua_State* L) //void *pvParameters)
 						free(suf);
 						suf = NULL;
 					}
-					if(get_root != NULL){
+					//if(get_root != NULL){
 						get_list_free(&get_root);
-					}
-							
+					//}
+					
                 }
             }
-            netbuf_delete(nb);
+			nb_free();
+            //netbuf_delete(nb);
         }
-		if(client != NULL){
-			printf("Closing connection (client)\n");
-			netconn_close(client);
-			netconn_delete(client);
-			client = NULL;
-		}
-		usleep(50);
+		nc_free(&client, "Closing connection (client)\n");
+		//usleep(50);
 		ws_task(L);
+		usleep(1000);
     }
-	if(nc != NULL){
-		printf("Closing connection (main nc)\n");
-		netconn_close(nc);
-		netconn_delete(nc);
-		nc = NULL;
-	}
+	
+	nb_free();
+	nc_free(&client, "Closing connection (client) on http exit\n");
+	ws_sock_del();
+	//if(get_root != NULL){
+		get_list_free(&get_root);
+	//}
+
+	nc_free(&nc, "Closing connection (main nc)\n");
 
 	DBG("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
+	DBG("exit httpd_task: \nws_client=%x, ws_uri=%x, \nnc=%x, client=%x\nnb=%x, get_root=%x\n",
+		ws_client, ws_uri, nc, client, nb, get_root
+	);
 	return 0;
 }
 

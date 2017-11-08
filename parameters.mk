@@ -76,7 +76,8 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    modules/pcf8591 \
 		    modules/pcf8574 \
 		    modules/mbedtls \
-		    modules/libesphttpd \
+
+#		    modules/libesphttpd \
 
 #		    modules/rboot-ota \
 
@@ -170,8 +171,13 @@ else ifeq ($(FLAVOR),sdklike)
     # the output of the compiler used to build the SDK libs (for comparison of
     # disassemblies when coding replacement routines).  It is not normally
     # intended to be used otherwise.
-    CFLAGS += -O2 -Os -fno-inline -fno-ipa-cp -fno-toplevel-reorder -fno-caller-saves -fconserve-stack
-    LDFLAGS += -O2
+    CFLAGS += \
+	    -g -Og -ggdb -DDEBUG_ESP_PORT=Serial \
+	    -fno-inline -fno-ipa-cp -fno-toplevel-reorder -fno-caller-saves -fconserve-stack
+#	    -O2 -Os \
+
+    LDFLAGS += -g -Og -ggdb -DDEBUG_ESP_PORT=Serial
+#-O2
 else
     C_CXX_FLAGS += -g -O2
     LDFLAGS += -g -O2

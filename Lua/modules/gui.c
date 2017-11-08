@@ -408,21 +408,21 @@ static void _cb_task (lua_State *L/*, int n, int cnt*/ ) {
 						static uint16_t blnk = 0;
 						char ch;
 						ssd1306_display_on(ADDR, false);
-						if(blnk & (1<<8))
+						if(blnk & (1<<9))
 							blnk=0;
 						//if(blnk & (1<<7))
 						//	ch=5;
 						//else
 							ch=SLEEP_PWM_CH;
 						
-						if(blnk & (1<<7))
+						if(blnk & (1<<8))
 							pca9685_set_pwm_value(PCA9685_ADDR_BASE, ch, 
-								4095 - ((1<<7)-1 -(blnk&((1<<7)-1))));
+								4095 - ((1<<8)-1 -(blnk&((1<<8)-1))));
 						else
 							pca9685_set_pwm_value(PCA9685_ADDR_BASE, ch, 
-								4095 - (blnk&((1<<7)-1)));
+								4095 - (blnk&((1<<8)-1)));
 
-						blnk+=16;
+						blnk+=1<<5;
 							
 				  	}
 				  }

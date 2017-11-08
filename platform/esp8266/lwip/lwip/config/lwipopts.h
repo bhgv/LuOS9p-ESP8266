@@ -20,7 +20,10 @@
 #define MEMP_MEM_MALLOC                     1
 #define MEM_LIBC_MALLOC                     1
 
+//#if what_is_it
 #define MEMP_NUM_TCP_PCB                    (*((volatile uint32*)0x600011FC))
+//#endif
+
 #define LWIP_RAND()                         rand()
 
 #if MEM_LIBC_MALLOC

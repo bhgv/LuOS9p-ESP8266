@@ -184,11 +184,11 @@ typedef void (*spiffs_file_callback)(struct spiffs_t *fs, spiffs_fileop_type op,
 #define SPIFFS_TYPE_SOFT_LINK           (4)
 
 #ifndef SPIFFS_LOCK
-#define SPIFFS_LOCK(fs)
+#define SPIFFS_LOCK(fs)		_spiffs_lock(/*fs*/)
 #endif
 
 #ifndef SPIFFS_UNLOCK
-#define SPIFFS_UNLOCK(fs)
+#define SPIFFS_UNLOCK(fs)	_spiffs_unlock(/*fs*/)
 #endif
 
 // phys structs

@@ -30,7 +30,8 @@ CFLAGS += -DKERNEL -DLUA_USE_CTYPE -DLUA_32BITS -DLUA_USE_ROTABLE=1 -DDEBUG_FREE
 #	-DLUA_USE_PACKAGE=1 
 #	-DLUA_USE_PIO=0 
 
-Lua_SRC_DIR = $(Lua_ROOT)src $(Lua_ROOT)modules $(Lua_ROOT)common $(Lua_ROOT)platform $(Lua_ROOT)httpd
+Lua_SRC_DIR = $(Lua_ROOT)src $(Lua_ROOT)modules $(Lua_ROOT)common $(Lua_ROOT)platform 
+#$(Lua_ROOT)httpd
 #EXTRA_COMPONENTS = extras/ssd1306 extras/i2c
 
 #EXTRA_CFLAGS=-DLWIP_HTTPD_CGI=1 

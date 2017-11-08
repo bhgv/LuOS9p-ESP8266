@@ -321,7 +321,9 @@ int new_thread(lua_State* L, int run) {
     int res, idx;
     pthread_t id;
     int retries;
-    
+
+	luaC_fullgc(L, 1);
+
 	DBG("nth 1 Free mem: %d\n",xPortGetFreeHeapSize());        
     // Allocate space for lthread info
     thread = (struct lthread *)malloc(sizeof(struct lthread));
