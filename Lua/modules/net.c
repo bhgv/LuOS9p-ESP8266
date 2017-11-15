@@ -319,7 +319,7 @@ static int net_unpackip( lua_State *L )
   const char* fmt;
   
   ip.ipaddr = ( u32 )luaL_checkinteger( L, 1 );
-  fmt = luaL_checkstring( L, 2 );
+  fmt = luaL_optstring( L, 2, "*n" );
   if( !strcmp( fmt, "*n" ) )
   {
     for( i = 0; i < 4; i ++ ) 
@@ -456,6 +456,7 @@ static int net_lookup(lua_State* L) {
 
 // net.setup( "your SSID", "your password")
 static int net_setup(lua_State* L) {
+	int r;
 //    const char *interface = "wf"; //luaL_checkstring( L, 1 );
 
 /*
@@ -487,8 +488,8 @@ static int net_setup(lua_State* L) {
 		strncpy(config.password, password, 64-1);
 		
 		/* required to call wifi_set_opmode before station_set_config */
-		sdk_wifi_set_opmode(STATION_MODE);
-		sdk_wifi_station_set_config(&config);
+		r = sdk_wifi_set_opmode(STATION_MODE);
+		r = sdk_wifi_station_set_config(&config);
 //    }
     
     return 0;
@@ -545,6 +546,36 @@ static int net_stat(lua_State* L) {
     return 0;    
 }   
 */
+
+static int net_get_local_ip(lua_State* L) {
+	struct ip_info info;
+//	uint32_t ip;
+	
+	sdk_wifi_get_ip_info(STATION_IF, &info);
+//	ip = info.ip;
+
+	char* fmt = luaL_optstring( L, 1, "*n" );
+	if( !strcmp( fmt, "*n" ) )
+	{
+	  lua_pushinteger(L, ip4_addr1(&info.ip) );
+	  lua_pushinteger(L, ip4_addr2(&info.ip) );
+	  lua_pushinteger(L, ip4_addr3(&info.ip) );
+	  lua_pushinteger(L, ip4_addr4(&info.ip) );
+	  return 4;
+	}
+	else if( !strcmp( fmt, "*s" ) )
+	{
+	  lua_pushfstring( L, "%d.%d.%d.%d", 
+						( int )ip4_addr1(&info.ip), 
+						( int )ip4_addr2(&info.ip), 
+						( int )ip4_addr3(&info.ip), 
+						( int )ip4_addr4(&info.ip) );
+	  return 1;
+	}
+
+	return 0;
+}
+
 
 static int net_sntp(lua_State* L) {
     int res;
@@ -618,6 +649,7 @@ const LUA_REG_TYPE net_map[] = {
 		{ LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},
 		{ LSTRKEY( "packip" ),		LFUNCVAL( net_packip )},
 		{ LSTRKEY( "unpackip" ),	LFUNCVAL( net_unpackip )},
+		{ LSTRKEY( "localip" ),		LFUNCVAL( net_get_local_ip )},
 
 		{ LSTRKEY( "SOCK_STREAM" ),	LINTVAL( NET_SOCK_STREAM )},
 		{ LSTRKEY( "SOCK_DGRAM" ),	LINTVAL( NET_SOCK_DGRAM )},
@@ -640,7 +672,9 @@ const LUA_REG_TYPE net_map[] = {
 		{ LNILKEY, LNILVAL }
 };
 
-int luaopen_net( lua_State *L ) {
+
+int luaopen_net
+	( lua_State *L ) {
 #if 0
     luaL_newlib(L, net_map);
 
@@ -683,6 +717,7 @@ int luaopen_net( lua_State *L ) {
 	return 0;
 #endif
 }
+
 
 
 MODULE_REGISTER_MAPPED(SOCK, sock, sock_map, luaopen_net);

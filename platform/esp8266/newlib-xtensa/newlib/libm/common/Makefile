@@ -51,10 +51,10 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-apple-darwin15.5.0
+build_triplet = i686-pc-linux-gnu
 host_triplet = xtensa-lx106-elf
-##am__append_1 = $(lsrc)
-#am__append_2 = $(lsrc)
+#am__append_1 = $(lsrc)
+am__append_2 = $(lsrc)
 DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am
 subdir = common
@@ -140,8 +140,8 @@ am__objects_3 = lib_a-atanl.$(OBJEXT) lib_a-cosl.$(OBJEXT) \
 	lib_a-logbl.$(OBJEXT) lib_a-nexttowardf.$(OBJEXT) \
 	lib_a-nexttoward.$(OBJEXT) lib_a-nexttowardl.$(OBJEXT) \
 	lib_a-log2l.$(OBJEXT)
-#am__objects_4 =  \
-#	$(am__objects_3)
+am__objects_4 =  \
+	$(am__objects_3)
 am_lib_a_OBJECTS = $(am__objects_1) \
 	$(am__objects_2) $(am__objects_4)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -174,8 +174,8 @@ am__objects_7 = atanl.lo cosl.lo sinl.lo tanl.lo tanhl.lo frexpl.lo \
 	fminl.lo fmal.lo acoshl.lo atanhl.lo remainderl.lo lgammal.lo \
 	erfl.lo erfcl.lo logbl.lo nexttowardf.lo nexttoward.lo \
 	nexttowardl.lo log2l.lo
-##am__objects_8 =  \
-##	$(am__objects_7)
+#am__objects_8 =  \
+#	$(am__objects_7)
 #am_libcommon_la_OBJECTS = $(am__objects_5) \
 #	$(am__objects_6) $(am__objects_8)
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
@@ -204,16 +204,16 @@ am__can_run_installinfo = \
 DATA = $(noinst_DATA)
 ETAGS = etags
 CTAGS = ctags
-ACLOCAL = ${SHELL} /Users/jaumeolivepetrus/newlib-xtensa/missing --run aclocal-1.11
+ACLOCAL = ${SHELL} /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/missing --run aclocal-1.11
 AMTAR = $${TAR-tar}
 AR = xtensa-lx106-elf-ar
 AS = xtensa-lx106-elf-as
-AUTOCONF = ${SHELL} /Users/jaumeolivepetrus/newlib-xtensa/missing --run autoconf
-AUTOHEADER = ${SHELL} /Users/jaumeolivepetrus/newlib-xtensa/missing --run autoheader
-AUTOMAKE = ${SHELL} /Users/jaumeolivepetrus/newlib-xtensa/missing --run automake-1.11
+AUTOCONF = ${SHELL} /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/missing --run automake-1.11
 AWK = gawk
-CC = gcc
-CCAS = gcc
+CC = xtensa-lx106-elf-gcc
+CCAS = xtensa-lx106-elf-as
 CCASFLAGS = -O2
 CCDEPMODE = depmode=gcc3
 CFLAGS = -O2
@@ -225,14 +225,14 @@ DEPDIR = .deps
 DLLTOOL = 
 DSYMUTIL = 
 DUMPBIN = 
-ECHO_C = \c
-ECHO_N = 
+ECHO_C = 
+ECHO_N = -n
 ECHO_T = 
 EGREP = 
 EXEEXT = 
 FGREP = 
 GREP = 
-INSTALL = /usr/local/bin/ginstall -c
+INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
@@ -247,8 +247,8 @@ LIPO =
 LN_S = 
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = ${SHELL} /Users/jaumeolivepetrus/newlib-xtensa/missing --run makeinfo
-MKDIR_P = /usr/local/bin/gmkdir -p
+MAKEINFO = ${SHELL} /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/missing --run makeinfo
+MKDIR_P = /bin/mkdir -p
 NEWLIB_CFLAGS =  -Os -mlongcalls -DREENTRANT_SYSCALLS_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_RENAME_R -DHAVE_GETTIMEOFDAY -DSIGNAL_PROVIDED -DABORT_PROVIDED -D__OPTIMIZE_SIZE__ -DPATH_MAX=64 -I. -fno-builtin
 NM = 
 NMEDIT = 
@@ -267,15 +267,15 @@ PACKAGE_VERSION = 2.2.0
 PATH_SEPARATOR = :
 RANLIB = xtensa-lx106-elf-ranlib
 READELF = xtensa-lx106-elf-readelf
-SED = /usr/local/bin/sed
+SED = /bin/sed
 SET_MAKE = 
-SHELL = /bin/sh
+SHELL = /bin/bash
 STRIP = xtensa-lx106-elf-strip
 VERSION = 2.2.0
-abs_builddir = /Users/jaumeolivepetrus/newlib-xtensa/newlib/libm/common
-abs_srcdir = /Users/jaumeolivepetrus/newlib-xtensa/newlib/libm/common
-abs_top_builddir = /Users/jaumeolivepetrus/newlib-xtensa/newlib/libm
-abs_top_srcdir = /Users/jaumeolivepetrus/newlib-xtensa/newlib/libm
+abs_builddir = /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/newlib/libm/common
+abs_srcdir = /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/newlib/libm/common
+abs_top_builddir = /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/newlib/libm
+abs_top_srcdir = /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/newlib/libm
 ac_ct_CC = 
 ac_ct_DUMPBIN = 
 aext = a
@@ -285,17 +285,17 @@ am__quote =
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-apple-darwin15.5.0
+build = i686-pc-linux-gnu
 build_alias = 
-build_cpu = x86_64
-build_os = darwin15.5.0
-build_vendor = apple
+build_cpu = i686
+build_os = linux-gnu
+build_vendor = pc
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
-exec_prefix = /usr/local/xtensa-lx106-elf
+exec_prefix = /home/q56/xtensa-lx106-elf
 host = xtensa-lx106-elf
 host_alias = xtensa-lx106-elf
 host_cpu = xtensa
@@ -304,7 +304,7 @@ host_vendor = lx106
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/jaumeolivepetrus/newlib-xtensa/install-sh
+install_sh = ${SHELL} /home/q56/bld/esp8266/2/Lua-RTOS-ESP8266/platform/esp8266/newlib-xtensa/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libm_machine_dir = xtensa
@@ -313,7 +313,7 @@ localstatedir = ${prefix}/var
 lpfx = lib_a-
 machine_dir = xtensa
 mandir = ${datarootdir}/man
-mkdir_p = /usr/local/bin/gmkdir -p
+mkdir_p = /bin/mkdir -p
 newlib_basedir = ./..
 oext = o
 oldincludedir = /usr/include

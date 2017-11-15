@@ -34,7 +34,8 @@
 
 #include "lwip/inet.h"
 #include "lwip/tcp.h"
-#include "lwip/ip_frag.h"
+//#include "lwip/ip4_frag.h"
+#include "ipv4/lwip/ip_frag.h"
 #include "lwip/netif.h"
 #include "lwip/init.h"
 #include "lwip/stats.h"

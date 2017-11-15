@@ -72,15 +72,18 @@ on two different systems.
 void
 _DEFUN (srand, (seed), unsigned int seed)
 {
+#if 1
   struct _reent *reent = _REENT;
 
   _REENT_CHECK_RAND48(reent);
   _REENT_RAND_NEXT(reent) = seed;
+#endif
 }
 
 int
 _DEFUN_VOID (rand)
 {
+#if 1
   struct _reent *reent = _REENT;
 
   /* This multiplier was obtained from Knuth, D.E., "The Art of
@@ -90,6 +93,16 @@ _DEFUN_VOID (rand)
   _REENT_RAND_NEXT(reent) =
      _REENT_RAND_NEXT(reent) * __extension__ 6364136223846793005LL + 1;
   return (int)((_REENT_RAND_NEXT(reent) >> 32) & RAND_MAX);
+#else
+//	static int cnt = 0;
+//	long long tmp = ticks();
+//	cnt++;
+
+//	return (int)(
+//		cnt ^ (tmp << 24) ^ (tmp << 16) ^ (tmp << 8) ^ tmp
+//		);
+	return hwrand();
+#endif
 }
 
 #endif /* _REENT_ONLY */

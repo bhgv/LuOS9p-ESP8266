@@ -40,6 +40,8 @@
 #include <sys/unistd.h>
 #include <sys/stat.h>
 
+#include <sys/uio.h>
+
 #ifndef L_SET
 #define L_SET   0       /* Seek from beginning of file.  */
 #define L_INCR  1       /* Seek from current position.  */

@@ -10,6 +10,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+//#include "lwip/ip4.h"
+#include "ipv4/lwip/ip.h"
+
 #include "esp_misc.h"
 #include "esp_wifi.h"
 #include "esp_softap.h"

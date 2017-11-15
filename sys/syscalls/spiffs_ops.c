@@ -43,9 +43,9 @@
 #include <sys/stat.h>
 #include <sys/syslog.h>
 
-#include <sys/spiffs/spiffs.h>
-#include <sys/spiffs/spiffs_nucleus.h>
-#include <sys/spiffs/esp_spiffs.h>
+#include <spiffs.h>
+#include <spiffs_nucleus.h>
+#include <esp_spiffs.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -779,6 +779,12 @@ int spiffs_format() {
 }
 
 int spiffs_mount() {
+#if 0 //1
+printf("spiffs_mount 0x%X 0x%X\n", SPIFFS_BASE_ADDR, SPIFFS_SIZE);
+	esp_spiffs_init(SPIFFS_BASE_ADDR, SPIFFS_SIZE);
+	esp_spiffs_mount();
+
+#else
     spiffs_config cfg;
     int unit = 0;
     int res = 0;
@@ -786,7 +792,7 @@ int spiffs_mount() {
 
     cfg.phys_addr 		 = SPIFFS_BASE_ADDR;
     cfg.phys_size 		 = SPIFFS_SIZE;
-    cfg.phys_erase_block = SPIFFS_ERASE_SIZE;
+    cfg.phys_erase_block	= SPIFFS_ERASE_SIZE;
     cfg.log_page_size    = SPIFFS_LOG_PAGE_SIZE;
     cfg.log_block_size   = SPIFFS_LOG_BLOCK_SIZE;
     
@@ -854,6 +860,7 @@ retry:
     }
     
     syslog(LOG_INFO, "spiffs%d mounted", unit);
+#endif
 
     return 1;
 }

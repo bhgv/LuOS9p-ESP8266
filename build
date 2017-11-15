@@ -5,7 +5,7 @@ platforms=(esp8266\ pic32mz)
 ROOT=$PWD
 
 if [[ " ${platforms[@]} " =~ " $1 " ]]; then
-  source ./platform/$1/env
+  source ./config/env
   make $2 -j4 -C main UARTPORT=/dev/ttyUSB0  #UARTPORT=/dev/tty.SLAB_USBtoUART
 else
   echo "Unsupported platform"

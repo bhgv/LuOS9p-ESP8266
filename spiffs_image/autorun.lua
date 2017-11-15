@@ -13,7 +13,9 @@ gui.setFont(6)
 
 menus_loop=true
 while menus_loop do
-htd = thread.start( httpd.main )
+htd = thread.start( httpd.loop )
+--httpd.loop()
+
 --net.httpd()
 gui.run "menu/httpd.lua"
 httpd.stop()

@@ -279,12 +279,13 @@ extern "C" {
 
 #endif /* configUSE_TIMERS */
 
+//{*}
 #ifndef INCLUDE_xTaskGetSchedulerState
-	#define INCLUDE_xTaskGetSchedulerState 0
+	#define INCLUDE_xTaskGetSchedulerState 		1 //0
 #endif
 
 #ifndef INCLUDE_xTaskGetCurrentTaskHandle
-	#define INCLUDE_xTaskGetCurrentTaskHandle 0
+	#define INCLUDE_xTaskGetCurrentTaskHandle 	1 //0
 #endif
 
 
@@ -396,7 +397,7 @@ extern "C" {
 #endif
 
 #ifndef configCHECK_FOR_STACK_OVERFLOW
-	#define configCHECK_FOR_STACK_OVERFLOW 0
+	#define configCHECK_FOR_STACK_OVERFLOW   1 //1 //0
 #endif
 
 /* The following event macros are embedded in the kernel API calls. */
@@ -498,7 +499,8 @@ extern "C" {
 #endif
 
 #ifndef traceTASK_CREATE_FAILED
-	#define traceTASK_CREATE_FAILED()
+	#define traceTASK_CREATE_FAILED() \
+					printf("!Err: %s: %d\n", __func__, __LINE__);
 #endif
 
 #ifndef traceTASK_DELETE

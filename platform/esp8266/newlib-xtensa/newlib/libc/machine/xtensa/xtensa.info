@@ -1,0 +1,84 @@
+This is xtensa.info, produced by makeinfo version 6.1 from xtensa.tex.
+
+
+File: xtensa.info,  Node: Xtensa
+
+1 Functions for Xtensa Processors
+*********************************
+
+This chapter describes machine-dependent functions that are included in
+the C library when it is built for Xtensa processors.
+
+* Menu:
+
+* setjmp::      Save stack environment
+* longjmp::     Non-local goto
+
+
+File: xtensa.info,  Node: setjmp,  Next: longjmp,  Up: Xtensa
+
+1.1 'setjmp'--save stack environment
+====================================
+
+*Synopsis*
+     #include <setjmp.h>
+     int setjmp(jmp_buf env);
+
+   *Description*
+'setjmp' and 'longjmp' are useful for dealing with errors and interrupts
+encountered in a low-level subroutine of a program.  'setjmp' saves the
+stack context/environment in 'env' for later use by 'longjmp'.  The
+stack context will be invalidated if the function which called 'setjmp'
+returns.
+
+
+   *Returns*
+'setjmp' returns 0 if returning directly, and non-zero when returning
+from 'longjmp' using the saved context.
+
+
+   *Portability*
+'setjmp' is ANSI C and POSIX.1.
+
+   setjmp requires no supporting OS subroutines.
+
+
+
+File: xtensa.info,  Node: longjmp,  Prev: setjmp,  Up: Xtensa
+
+1.2 'longjmp'--non-local goto
+=============================
+
+*Synopsis*
+     #include <setjmp.h>
+     void longjmp(jmp_buf env, int val);
+
+   *Description*
+'longjmp' and 'setjmp' are useful for dealing with errors and interrupts
+encountered in a low-level subroutine of a program.  'longjmp' restores
+the environment saved by the last call of 'setjmp' with the
+corresponding 'env' argument.  After 'longjmp' is completed, program
+execution continues as if the corresponding call of 'setjmp' had just
+returned the value 'val'.  'longjmp' cannot cause 0 to be returned.  If
+'longjmp' is invoked with a second argument of 0, 1 will be returned
+instead.
+
+
+   *Returns*
+This function never returns.
+
+
+   *Portability*
+'longjmp' is ANSI C and POSIX.1.
+
+   longjmp requires no supporting OS subroutines.
+
+
+
+
+Tag Table:
+Node: Xtensa72
+Node: setjmp384
+Node: longjmp1130
+
+End Tag Table

@@ -20,7 +20,7 @@
 # assume the 'root' directory (ie top of the tree) is the directory common.mk is in
 ROOT := $(dir $(lastword $(MAKEFILE_LIST)))
 
-include $(ROOT)parameters.mk
+include $(ROOT)config/parameters.mk
 
 ifndef PROGRAM
 $(error "Set the PROGRAM environment variable in your Makefile before including common.mk")
@@ -38,7 +38,8 @@ PROGRAM_DIR := $(dir $(firstword $(MAKEFILE_LIST)))
 
 # derive various parts of compiler/linker arguments
 SDK_LIB_ARGS  = $(addprefix -l,$(SDK_LIBS))
-LIB_ARGS      = $(addprefix -L,platform/$(PLATFORM)/)
+#LIB_ARGS      = $(addprefix -L,platform/$(PLATFORM)/)
+LIB_ARGS      = $(addprefix -L,modules)
 LIB_ARGS     += $(addprefix -l,$(LIBS))
 PROGRAM_OUT   = $(BUILD_DIR)$(PROGRAM).out
 LDFLAGS      += $(addprefix -T,$(LINKER_SCRIPTS))
@@ -216,6 +217,7 @@ flash: all
 	picocom --baud $(ESPBAUD) $(UARTPORT)
 
 flashall: all
+#	$(ROOT)mkspiffs/mkspiffs -D $(ROOT)spiffs_image -b 4096 -p 256 -s 0x80000 -f $(BUILD_DIR)spiffs_image.img
 	$(ROOT)mkspiffs/mkspiffs -c  $(ROOT)spiffs_image -b 4096 -p 256 -s 0x80000 $(BUILD_DIR)spiffs_image.img
 #	$(ROOT)mkspiffs/mkspiffs -c  $(ROOT)spiffs_image -b 8192 -p 256 -s 0x80000 $(BUILD_DIR)spiffs_image.img
 	$(ESPTOOL) -p $(UARTPORT) --baud $(ESPBAUD) write_flash $(ESPTOOL_ARGS) \

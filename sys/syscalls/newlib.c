@@ -131,11 +131,12 @@ unsigned sleep(unsigned int secs) {
 }
 
 int usleep(useconds_t usec) {
-	vTaskDelay(usec / portTICK_PERIOD_US);
+	vTaskDelay(1 + usec / portTICK_PERIOD_US);
 	
 	return 0;
 }
- 
+
+#if 1
 int _open_r(struct _reent *r, const char *pathname, int flags, int mode) {
 	return open(pathname, flags, mode);
 }
@@ -147,7 +148,6 @@ int _close_r(struct _reent *r, int fd) {
 int _unlink_r(struct _reent *r, const char *path) {
 	return unlink(path);
 }
-
 //#if 0
 int _fstat_r(struct _reent *r, int fd, void *buf) {
 	return fstat(fd, buf);
@@ -185,3 +185,6 @@ int _read_r(struct _reent *r, int fd, void *buf, size_t nbyte) {
 	
 	return nbyte;
 }
+#endif
+
+

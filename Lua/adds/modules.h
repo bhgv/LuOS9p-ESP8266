@@ -33,7 +33,8 @@ volatile static const PUT_IN_SECTION(LIB_TOSTRING(LIB_SECTION(fname,.lua_libs)))
 volatile static const PUT_IN_SECTION(LIB_TOSTRING(LIB_SECTION(fname,.lua_rotable))) luaR_entry LIB_CONCAT(lua_rotable,LIB_CONCAT(_,LIB_CONCAT(lname,LIB_USED(fname)))) = {LSTRKEY(LIB_TOSTRING(lname)), LROVAL(map)}; \
 } 
 
-#define USE_LIB(fname) LIB_INIT_DUMMY_FOO(fname)(L);
+#define USE_LIB(fname) void LIB_INIT_DUMMY_FOO(fname)(lua_State *L); \
+	LIB_INIT_DUMMY_FOO(fname)(L);
 
 #else
 #define MODULE_REGISTER(fname, lname, map)

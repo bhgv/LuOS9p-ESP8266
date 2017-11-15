@@ -11,7 +11,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <lwip/ip_addr.h>
+//#include <lwip/ip4_addr.h>
+//#include <lwip/ip4.h>
+#include <ipv4/lwip/ip.h>
 
 #ifdef	__cplusplus
 extern "C" {
@@ -42,6 +44,14 @@ enum {
 	SOFTAP_IF,
 	MAX_IF
 };
+
+/*
+struct ip_info {
+    struct ip4_addr ip;
+    struct ip4_addr netmask;
+    struct ip4_addr gw;
+};
+*/
 
 struct ip_info {
     struct ip_addr ip;

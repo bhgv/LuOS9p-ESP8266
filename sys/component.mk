@@ -35,6 +35,8 @@ CFLAGS += -DKERNEL
 #LDFLAGS += -Wl,--wrap=lwip_fcntl_r
 #LDFLAGS += -Wl,--wrap=lwip_close_r
 
+#EXTRA_COMPONENTS += $(sys_ROOT)/spiffs
+
 LDFLAGS += -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=free
 
 sys_SRC_DIR = $(sys_ROOT) \
@@ -44,9 +46,10 @@ sys_SRC_DIR = $(sys_ROOT) \
     $(sys_ROOT)drivers \
     $(sys_ROOT)drivers/$(PLATFORM) \
     $(sys_ROOT)unix \
-    $(sys_ROOT)spiffs \
     $(sys_ROOT)freertos \
     $(sys_ROOT)sys \
+
+#    $(sys_ROOT)spiffs \
 
 #    $(sys_ROOT)vfs \
 #    $(sys_ROOT)lwip \

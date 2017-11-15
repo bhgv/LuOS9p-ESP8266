@@ -5,9 +5,9 @@ Lua_INC_DIR = $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)sr
 	$(ROOT)modules/ssd1306 \
 	$(HOME)/esp-open-rtos/include/espressif \
 	$(HOME)/esp-open-rtos/include \
-	$(ROOT)platform/esp8266/core/include \
+	$(ROOT)modules/core/include \
 	$(ROOT)include/platform/esp8266/espressif/esp8266 \
-	$(ROOT)platform/esp8266/lwip/lwip/espressif/include \
+	$(ROOT)modules/lwip/lwip/espressif/include \
 	$(ROOT)FreeRTOS/Source/include \
 	$(ROOT)include \
 	$(ROOT)config/lua \

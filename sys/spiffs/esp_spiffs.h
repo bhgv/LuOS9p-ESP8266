@@ -1,53 +1,57 @@
-/*
- * Lua RTOS, write syscall implementation
+/**
+ * ESP8266 SPIFFS HAL configuration.
  *
- * Copyright (C) 2015 - 2017
- * IBEROXARXA SERVICIOS INTEGRALES, S.L. & CSS IBÉRICA, S.L.
- * 
- * Author: Jaume Olivé (jolive@iberoxarxa.com / jolive@whitecatboard.org)
- * 
- * All rights reserved.  
- *
- * Permission to use, copy, modify, and distribute this software
- * and its documentation for any purpose and without fee is hereby
- * granted, provided that the above copyright notice appear in all
- * copies and that both that the copyright notice and this
- * permission notice and warranty disclaimer appear in supporting
- * documentation, and that the name of the author not be used in
- * advertising or publicity pertaining to distribution of the
- * software without specific, written prior permission.
- *
- * The author disclaim all warranties with regard to this
- * software, including all implied warranties of merchantability
- * and fitness.  In no event shall the author be liable for any
- * special, indirect or consequential damages or any damages
- * whatsoever resulting from loss of use, data or profits, whether
- * in an action of contract, negligence or other tortious action,
- * arising out of or in connection with the use or performance of
- * this software.
+ * Part of esp-open-rtos
+ * Copyright (c) 2016 sheinz https://github.com/sheinz
+ * MIT License
  */
-
 #ifndef __ESP_SPIFFS_H__
 #define __ESP_SPIFFS_H__
 
 #include "spiffs.h"
 
-#define spi_flash_read sdk_spi_flash_read
-#define spi_flash_write sdk_spi_flash_write
-#define spi_flash_erase_sector sdk_spi_flash_erase_sector
+extern spiffs fs;
+
+#if SPIFFS_SINGLETON == 1
+/**
+ * Prepare for SPIFFS mount.
+ *
+ * The function allocates all the necessary buffers.
+ */
+void esp_spiffs_init();
+#else
+/**
+ * Prepare for SPIFFS mount.
+ *
+ * The function allocates all the necessary buffers.
+ *
+ * @param addr Base address for spiffs in flash memory.
+ * @param size File sistem size.
+ */
+void esp_spiffs_init(uint32_t addr, uint32_t size);
+#endif
 
 
-#define esp_spiffs_read esp32_spi_flash_read
-#define esp_spiffs_write esp32_spi_flash_write
-#define esp_spiffs_erase esp32_spi_flash_erase
+/**
+ * Free all memory buffers that were used by SPIFFS.
+ *
+ * The function should be called after SPIFFS unmount if the file system is not
+ * going to need any more.
+ */
+void esp_spiffs_deinit();
+
+/**
+ * Mount SPIFFS.
+ *
+ * esp_spiffs_init must be called first.
+ *
+ * Return SPIFFS return code.
+ */
+int32_t esp_spiffs_mount();
 
 
-s32_t esp32_spi_flash_read(u32_t addr, u32_t size, u8_t *dst);
-s32_t esp32_spi_flash_write(u32_t addr, u32_t size, const u8_t *src);
-s32_t esp32_spi_flash_erase(u32_t addr, u32_t size);
-
-#define low_spiffs_read  (spiffs_read *)esp32_spi_flash_read
-#define low_spiffs_write (spiffs_write *)esp32_spi_flash_write
-#define low_spiffs_erase (spiffs_erase *)esp32_spi_flash_erase
+s32_t esp_spiffs_read(u32_t addr, u32_t size, u8_t *dst);
+s32_t esp_spiffs_write(u32_t addr, u32_t size, u8_t *src);
+s32_t esp_spiffs_erase(u32_t addr, u32_t size);
 
 #endif  // __ESP_SPIFFS_H__

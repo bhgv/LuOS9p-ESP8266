@@ -36,14 +36,19 @@
 #ifndef _SYS_UIO_H_
 #define _SYS_UIO_H_
 
+#include "lwip/sockets.h"
+
+
 /*
  * XXX
  * iov_base should be a void *.
  */
+#if 1
 struct iovec {
     char    *iov_base;  /* Base address. */
     size_t   iov_len;   /* Length. */
 };
+#endif
 
 enum    uio_rw { UIO_READ, UIO_WRITE };
 

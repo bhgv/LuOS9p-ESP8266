@@ -483,7 +483,7 @@ int close(int fd) {
     return 0;
 }
 
-int fcntl(int fd, int cmd, ... ) {
+int fcntl(int fd, int cmd, ... /*int value*/ ) {
     register struct filedesc *fdp = p_fd;
     register struct file *fp;
     register char *pop;
@@ -505,54 +505,58 @@ int fcntl(int fd, int cmd, ... ) {
     mtx_unlock(&fd_mtx);
     
     switch (cmd) {
-    case F_DUPFD:
-        va_start(valist, cmd);        
-        int arg1 = va_arg(valist, int);
-        va_end(valist);
+    case F_DUPFD: {
+	        va_start(valist, cmd);        
+	        int arg1 = /*value; */va_arg(valist, int);
+	        va_end(valist);
 
-        if (arg1 >= NDFILE) {
-            errno = EINVAL;
-            return -1;
-        }
-        error = fdalloc(arg1, &i);
-        if (error) {
-            errno = error;
-            return -1;
-        }
-        finishdup(fdp, fd, i, &retval);
-        
+	        if (arg1 >= NDFILE) {
+	            errno = EINVAL;
+	            return -1;
+	        }
+	        error = fdalloc(arg1, &i);
+	        if (error) {
+	            errno = error;
+	            return -1;
+	        }
+	        finishdup(fdp, fd, i, &retval);
+    	}
+	
         return retval;
 
     case F_GETFD:
         retval = *pop & 1;
         return retval;
 
-      case F_SETFD:
-        va_start(valist, cmd);        
-        long arg2 = va_arg(valist, long);
-        va_end(valist);
+      case F_SETFD: {
+	        va_start(valist, cmd);        
+	        long arg2 = /*value; */va_arg(valist, long);
+	        va_end(valist);
 
-        *pop = (*pop &~ 1) | (arg2 & 1);
+	        *pop = (*pop &~ 1) | (arg2 & 1);
+      	}
+	  
         return (0);
 
     case F_GETFL:
         retval = OFLAGS(fp->f_flag);
         return retval;
 
-    case F_SETFL:
-        va_start(valist, cmd);        
-        long arg3 = va_arg(valist, long);
-        va_end(valist);
+    case F_SETFL: {
+	        va_start(valist, cmd);        
+	        long arg3 = /*value; */va_arg(valist, long);
+	        va_end(valist);
 
-        fp->f_flag &= ~FCNTLFLAGS;
-        fp->f_flag |= FFLAGS(arg3) & FCNTLFLAGS;
-        tmp = fp->f_flag & FNONBLOCK;
-        error = (*fp->f_ops->fo_ioctl)(fp, FIONBIO, (caddr_t)&tmp);
-        if (error) {
-            errno = error;
-            return -1;
-        }
-        
+	        fp->f_flag &= ~FCNTLFLAGS;
+	        fp->f_flag |= FFLAGS(arg3) & FCNTLFLAGS;
+	        tmp = fp->f_flag & FNONBLOCK;
+	        error = (*fp->f_ops->fo_ioctl)(fp, FIONBIO, (caddr_t)&tmp);
+	        if (error) {
+	            errno = error;
+	            return -1;
+	        }
+    	}
+	
         return 0;
 
 /*

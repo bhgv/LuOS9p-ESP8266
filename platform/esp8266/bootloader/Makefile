@@ -11,7 +11,7 @@
 # esptool.py (still need xxd, grep, sed to generate the header - see below.)
 BOOTLOADER_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-include ../../../parameters.mk
+include ../../../config/parameters.mk
 
 all: $(FIRMWARE_DIR)/rboot.bin
 

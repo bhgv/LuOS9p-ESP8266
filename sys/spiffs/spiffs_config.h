@@ -9,14 +9,13 @@
 #define SPIFFS_CONFIG_H_
 
 // ----------- 8< ------------
-// Following includes are for the linux test build of spiffs
-// These may/should/must be removed/altered/replaced in your target
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <ctype.h>
+// #include <FreeRTOS.h>    // for vPortEnterCritical/vPortExitCritical
 // ----------- >8 ------------
 
 typedef signed int s32_t;
@@ -45,46 +44,11 @@ typedef unsigned char u8_t;
 #define SPIFFS_CHECK_DBG(...) //printf(__VA_ARGS__)
 #endif
 
-// Defines spiffs debug print formatters
-// some general signed number
-#ifndef _SPIPRIi
-#define _SPIPRIi   "%d"
-#endif
-// address
-#ifndef _SPIPRIad
-#define _SPIPRIad  "%08x"
-#endif
-// block
-#ifndef _SPIPRIbl
-#define _SPIPRIbl  "%04x"
-#endif
-// page
-#ifndef _SPIPRIpg
-#define _SPIPRIpg  "%04x"
-#endif
-// span index
-#ifndef _SPIPRIsp
-#define _SPIPRIsp  "%04x"
-#endif
-// file descriptor
-#ifndef _SPIPRIfd
-#define _SPIPRIfd  "%d"
-#endif
-// file object id
-#ifndef _SPIPRIid
-#define _SPIPRIid  "%04x"
-#endif
-// file flags
-#ifndef _SPIPRIfl
-#define _SPIPRIfl  "%02x"
-#endif
-
-
 // Enable/disable API functions to determine exact number of bytes
 // for filedescriptor and cache buffers. Once decided for a configuration,
 // this can be disabled to reduce flash.
 #ifndef SPIFFS_BUFFER_HELP
-#define SPIFFS_BUFFER_HELP              0
+#define SPIFFS_BUFFER_HELP              1
 #endif
 
 // Enables/disable memory read caching of nucleus file system operations.
@@ -146,21 +110,7 @@ typedef unsigned char u8_t;
 // zero-termination character, meaning maximum string of characters
 // can at most be SPIFFS_OBJ_NAME_LEN - 1.
 #ifndef SPIFFS_OBJ_NAME_LEN
-#define SPIFFS_OBJ_NAME_LEN             (64)
-#endif
-
-// Maximum length of the metadata associated with an object.
-// Setting to non-zero value enables metadata-related API but also
-// changes the on-disk format, so the change is not backward-compatible.
-//
-// Do note: the meta length must never exceed
-// logical_page_size - (SPIFFS_OBJ_NAME_LEN + 64)
-//
-// This is derived from following:
-// logical_page_size - (SPIFFS_OBJ_NAME_LEN + sizeof(spiffs_page_header) +
-// spiffs_object_ix_header fields + at least some LUT entries)
-#ifndef SPIFFS_OBJ_META_LEN
-#define SPIFFS_OBJ_META_LEN             (1)
+#define SPIFFS_OBJ_NAME_LEN             (64) //(32)
 #endif
 
 // Size of buffer allocated on stack used when copying data.
@@ -175,7 +125,7 @@ typedef unsigned char u8_t;
 // not on mount point. If not, SPIFFS_format must be called prior to mounting
 // again.
 #ifndef SPIFFS_USE_MAGIC
-#define SPIFFS_USE_MAGIC                (1)
+#define SPIFFS_USE_MAGIC                (0) //(1)
 #endif
 
 #if SPIFFS_USE_MAGIC
@@ -192,53 +142,42 @@ typedef unsigned char u8_t;
 // SPIFFS_LOCK and SPIFFS_UNLOCK protects spiffs from reentrancy on api level
 // These should be defined on a multithreaded system
 
-#include "pthread.h"
-
-extern pthread_mutex_t spiffs_mutex;
-
-inline void _spiffs_lock( /*spiffs *fs*/){
-//	xSemaphoreTakeRecursive(spiffsMux, portMAX_DELAY);
-	pthread_mutex_lock(&spiffs_mutex);
-}
-
-inline void _spiffs_unlock( /*spiffs *fs*/){
-//	xSemaphoreGiveRecursive(spiffsMux);
-    pthread_mutex_unlock(&spiffs_mutex);
-}
-
 // define this to enter a mutex if you're running on a multithreaded system
 #ifndef SPIFFS_LOCK
-#define SPIFFS_LOCK(fs)		_spiffs_lock(/*fs*/)
+#define SPIFFS_LOCK(fs)        // vPortEnterCritical()
 #endif
 // define this to exit a mutex if you're running on a multithreaded system
 #ifndef SPIFFS_UNLOCK
-#define SPIFFS_UNLOCK(fs)	_spiffs_unlock(/*fs*/)
+#define SPIFFS_UNLOCK(fs)      // vPortExitCritical()
 #endif
 
 // Enable if only one spiffs instance with constant configuration will exist
 // on the target. This will reduce calculations, flash and memory accesses.
 // Parts of configuration must be defined below instead of at time of mount.
 #ifndef SPIFFS_SINGLETON
-#define SPIFFS_SINGLETON 0
+#define SPIFFS_SINGLETON 0 //1
 #endif
+
+// ESP8266 supports only sector erase, which is 4096 bytes
+#define SPIFFS_ESP_ERASE_SIZE       (4096)
 
 #if SPIFFS_SINGLETON
 // Instead of giving parameters in config struct, singleton build must
 // give parameters in defines below.
 #ifndef SPIFFS_CFG_PHYS_SZ
-#define SPIFFS_CFG_PHYS_SZ(ignore)        (1024*1024*2)
+#define SPIFFS_CFG_PHYS_SZ(ignore)          (SPIFFS_SIZE)
 #endif
 #ifndef SPIFFS_CFG_PHYS_ERASE_SZ
-#define SPIFFS_CFG_PHYS_ERASE_SZ(ignore)  (65536)
+#define SPIFFS_CFG_PHYS_ERASE_SZ(ignore)    (SPIFFS_ESP_ERASE_SIZE)
 #endif
 #ifndef SPIFFS_CFG_PHYS_ADDR
-#define SPIFFS_CFG_PHYS_ADDR(ignore)      (0)
+#define SPIFFS_CFG_PHYS_ADDR(ignore)        (SPIFFS_BASE_ADDR)
 #endif
 #ifndef SPIFFS_CFG_LOG_PAGE_SZ
-#define SPIFFS_CFG_LOG_PAGE_SZ(ignore)    (256)
+#define SPIFFS_CFG_LOG_PAGE_SZ(ignore)      (SPIFFS_LOG_PAGE_SIZE)
 #endif
 #ifndef SPIFFS_CFG_LOG_BLOCK_SZ
-#define SPIFFS_CFG_LOG_BLOCK_SZ(ignore)   (65536)
+#define SPIFFS_CFG_LOG_BLOCK_SZ(ignore)     (SPIFFS_LOG_BLOCK_SIZE)
 #endif
 #endif
 
@@ -259,7 +198,15 @@ inline void _spiffs_unlock( /*spiffs *fs*/){
 // NB: This adds config field fh_ix_offset in the configuration struct when
 // mounting, which must be defined.
 #ifndef SPIFFS_FILEHDL_OFFSET
-#define SPIFFS_FILEHDL_OFFSET                 0
+#define SPIFFS_FILEHDL_OFFSET                 17
+// Not ideal having to use a literal above, which is necessary because this file
+// is also included by tools that run on the host, but at least do some checks
+// when building the target code.
+#ifdef LWIP_SOCKET_OFFSET
+#if SPIFFS_FILEHDL_OFFSET < (LWIP_SOCKET_OFFSET + MEMP_NUM_NETCONN)
+#error SPIFFS_FILEHDL_OFFSET clashes with lwip sockets range.
+#endif
+#endif
 #endif
 
 // Enable this to compile a read only version of spiffs.
@@ -307,27 +254,11 @@ inline void _spiffs_unlock( /*spiffs *fs*/){
 #define SPIFFS_TEMPORAL_CACHE_HIT_SCORE       4
 #endif
 
-// Enable to be able to map object indices to memory.
-// This allows for faster and more deterministic reading if cases of reading
-// large files and when changing file offset by seeking around a lot.
-// When mapping a file's index, the file system will be scanned for index pages
-// and the info will be put in memory provided by user. When reading, the
-// memory map can be looked up instead of searching for index pages on the
-// medium. This way, user can trade memory against performance.
-// Whole, parts of, or future parts not being written yet can be mapped. The
-// memory array will be owned by spiffs and updated accordingly during garbage
-// collecting or when modifying the indices. The latter is invoked by when the
-// file is modified in some way. The index buffer is tied to the file
-// descriptor.
-#ifndef SPIFFS_IX_MAP
-#define SPIFFS_IX_MAP                         1
-#endif
-
 // Set SPIFFS_TEST_VISUALISATION to non-zero to enable SPIFFS_vis function
 // in the api. This function will visualize all filesystem using given printf
 // function.
 #ifndef SPIFFS_TEST_VISUALISATION
-#define SPIFFS_TEST_VISUALISATION         0
+#define SPIFFS_TEST_VISUALISATION         1
 #endif
 #if SPIFFS_TEST_VISUALISATION
 #ifndef spiffs_printf
@@ -366,6 +297,7 @@ typedef u16_t spiffs_page_ix;
 // size of this type can hold the highest object id on a full system,
 // i.e. 2 + (spiffs_file_system_size / (2*log_page_size))*2
 typedef u16_t spiffs_obj_id;
+//typedef u32_t spiffs_obj_id;
 // Object span index type. Make sure the size of this type can
 // hold the largest possible span index on the system -
 // i.e. (spiffs_file_system_size / log_page_size) - 1
