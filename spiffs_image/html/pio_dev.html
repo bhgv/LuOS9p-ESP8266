@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<!-- <link rel="stylesheet" type="text/css" href="css/siimple.min.css"> -->
+		<!-- link rel="stylesheet" type="text/css" href="css/style.css" -->
+		<!-- link rel="shortcut icon" href="img/favicon.png" -->
+
+		<title>luOS9 IoT PIO control page</title>
+		
+		<style>
+			ul.navbar {
+				list-style-type: none;
+				margin-bottom: 32px;
+				padding: 0;
+				overflow: hidden;
+				background-color: #333;
+			}
+			ul.navbar li {
+				float: left;
+			}
+			ul.navbar li a {
+				display: block;
+				color: white;
+				text-align: center;
+				padding: 14px 16px;
+				text-decoration: none;
+			}
+			ul.navbar li a:hover:not(.active) {
+				background-color: #111;
+			}
+			ul.navbar li a.active {
+				background-color: #09a0f6;
+			}
+			@media screen and (max-width: 600px){
+				ul.navbar li.right, 
+				ul.navbar li {float: none;}
+			}
+
+
+			td {
+				height: 40px;
+				font-size: 12px; color: blue; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+			}
+			label {
+				display: inline-block;
+				vertical-align: middle;
+				line-height: 30px;
+				color: #333;
+			}
+
+			/* Cначала обозначаем стили для IE8 и более старых версий
+			т.е. здесь мы немного облагораживаем стандартный чекбокс. */
+			input[type=checkbox] {
+				display: inline-block;
+				vertical-align: middle;
+			}
+			/* Это для всех браузеров, кроме совсем старых, которые не поддерживают
+			селекторы с плюсом. Показываем, что label кликабелен. */
+			input[type=checkbox] + label {
+				cursor: pointer;
+			}
+
+			/* Далее идет оформление чекбокса в современных браузерах, а также IE9 и выше.
+			Благодаря тому, что старые браузеры не поддерживают селекторы :not и :checked,
+			в них все нижеследующие стили не сработают. */
+
+			/* Прячем оригинальный чекбокс. */
+			input[type=checkbox]:not(checked) {
+				position: absolute;
+				opacity: 0;
+			}
+			input[type=checkbox]:not(checked) + label {
+				position: relative; /* будем позиционировать псевдочекбокс относительно label */
+				padding: 0 0 0 70px; /* оставляем слева от label место под псевдочекбокс */
+			}
+			/* Оформление первой части чекбокса в выключенном состоянии (фон). */
+			input[type=checkbox]:not(checked) + label:before {
+				content: 'Off';
+				padding-left: 35px;
+				width: 25px;
+				height: 31px;
+
+				position: absolute; left: 0;
+				background: #DDD; /*#CDD1DA;*/
+			  
+				border: 2px solid gray; border-radius: 20px;
+			}
+			/* Оформление второй части чекбокса в выключенном состоянии (переключатель). */
+			input[type=checkbox]:not(checked) + label:after {
+				content: '';
+				position: absolute; top: 3px; /*bottom: 0;*/ left: 3px;
+			  
+				width: 30px; height: 25px;
+				background: #FFF;
+				border: 2px solid #03A9F4; border-radius: 20px;
+			}
+			/* Меняем фон чекбокса, когда он включен. */
+			input[type=checkbox]:checked + label:before {
+				content: 'On';
+				padding-left: 5px;
+				width: 55px;
+				background: #9FD468;
+			}
+			/* Сдвигаем переключатель чекбокса, когда он включен. */
+			input[type=checkbox]:checked + label:after {
+				content: '';
+				left: 27px;
+			}
+			/* Показываем получение фокуса. */
+			input[type=checkbox]:focus + label:before {
+				/*box-shadow: 0 0 0 3px rgba(255,255,0,.5);*/
+			}
+		</style>
+
+<script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://"+window.location.host+"/dev";
+  var output;
+  
+  var ws;
+  var retries;
+  var val = 0.0;
+
+  var rcvd_tm = 0;
+  var rd_ch = 0; 
+  
+  var interval_timeout = 0;
+
+  function setMsg(cls, text) {
+    sbox = document.getElementById('status_box');
+    sbox.className = "alert alert-" + cls;
+    sbox.innerHTML = text;
+    //console.log(text);
+  }
+  function init()
+  {
+    output = document.getElementById("output");
+    wsOpen();
+
+	setInterval(
+		function() { 
+			//setMsg("info", "tst 1");
+			interval_timeout++;
+			
+			if(interval_timeout > 60*8){
+				rd_ch = 0;
+				interval_timeout = 0;
+				return;
+			}else if(rd_ch > 15){
+				return;
+			}
+			
+			if(ws === undefined || ws.readyState == 3 || retries++ > 50)
+				wsOpen();
+			if(ws.readyState != 1) return;
+
+			if(rcvd_tm > 0){
+				rcvd_tm--;
+				return;
+			}
+			
+			var cmd = "pio[" + rd_ch + "]=-1.0";      
+			doSend(cmd);
+			
+			rcvd_tm = 400;
+			
+			if(rd_ch >= 7){
+				rd_ch = 16;
+			}else
+				rd_ch++;
+		}
+		, 200
+	);
+
+  }
+
+  function wsOpen()
+  {
+    if (ws === undefined || ws.readyState != 0) {
+      if (retries > 50)
+        setMsg("error", "WebSocket timeout, retrying..");
+      else
+        setMsg("info", "Opening WebSocket..");
+
+      ws = new WebSocket(wsUri);
+      ws.onopen = function(evt) { onOpen(evt) };
+      ws.onclose = function(evt) { onClose(evt) };
+      ws.onmessage = function(evt) { onMessage(evt) };
+      ws.onerror = function(evt) { onError(evt) };
+    
+      //wsOpenStream();
+      retries = 0;  
+    }
+  }
+
+  function onOpen(evt)
+  {
+//    writeToScreen("CONNECTED");
+    setMsg("info", '<span style="color: red;">CONNECTED</span> ');
+  }
+
+  function onClose(evt)
+  {
+//    writeToScreen("DISCONNECTED");
+    setMsg("info", '<span style="color: red;">DISCONNECTED</span> ');
+  }
+
+  function onMessage(evt)
+  {
+//    writeToScreen('<span style="color: blue;">RECEIVED:' + evt.data+'</span>');
+    setMsg("info", '<span style="color: blue;">RECEIVED:</span> ' + evt.data);
+    
+    //var nm, v;
+    var ar = evt.data.split("=");
+    var el = document.getElementById(ar[0]);
+    var v = parseFloat(ar[1]);
+    el.innerHTML = (v > 0.0 ? " On" : " Off") ;
+
+    //console.log(ar[0] + "g = " + el.value);
+    
+    el = document.getElementById(ar[0] + "g");
+    el.checked = v > 0.0 ? 1 : 0;
+        
+//    websocket.close();
+
+	retries = 0;
+	
+	rcvd_tm = 0;
+  }
+
+  function onError(evt)
+  {
+    setMsg("error", '<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+//    writeToScreen("SENT: " + message); 
+//	setMsg("info", "SENT: " + message);
+    setMsg("info", '<span style="color: blue;">SENT:</span> ' + message);
+    
+	 if (ws.readyState == 3 || retries++ > 50)
+		wsOpen();
+	 else if (ws.readyState == 1)
+		ws.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+  
+  function sndKey(k_num) {
+    var v = document.getElementById("pio[" + k_num + "]g").checked ? 1 : 0;
+    var cmd = "pio[" + k_num + "]=" + v;
+    //writeToScreen('<span style="color: blue;">SENT:' + cmd+'</span>');
+    doSend(cmd);
+  }
+
+  window.addEventListener("load", init, false);
+
+</script>
+
+	</head>
+	<body>
+		<ul class="navbar">
+			<li><a href="/">Home</a></li>
+			<li><a class="active" href="pio_dev.html">PIO dev</a></li>
+			<li><a href="pwm_dev.html">PWM dev</a></li>
+			<li><a href="adc_dac_dev.html">ADC-DAC dev</a></li>
+			<li><a href="about.html">About</a></li>
+			<li><a href="test.lua?hello=world&test=CGI">Test Lua CGI</a></li>
+		</ul>
+		
+		<div class="grid main">
+			<h1>PIOs Test</h1>
+		
+			<div id="status_box" class="alert alert-info" align="center">Loading..</div>
+
+			<div class="cover" align="center">					
+					<table width="95%">
+					<tr><td>
+						<span style="color: violet; font-size: 18px;">General mode PIOs:</span>
+					</td><td>
+					</td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio[0]g" onclick="sndKey(0)">
+					<label for="pio[0]g">PIO 1 (0) =<span style="color:green;" id="pio[0]"> Off</span></label>
+					</td>
+					<td>
+					<input type="checkbox" name="lbutton8" id="pio[1]g" onclick="sndKey(1)">
+					<label for="pio[1]g">PIO 2 (1) =<span style="color:green;" id="pio[1]"> Off</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio[2]g" onclick="sndKey(2)">
+					<label for="pio[2]g">PIO 3 (2) =<span style="color:green;" id="pio[2]"> Off</span></label>
+					</td>
+					<td>
+					<input type="checkbox" name="lbutton8" id="pio[3]g" onclick="sndKey(3)">
+					<label for="pio[3]g">PIO 4 (3) =<span style="color:green;" id="pio[3]"> Off</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio[4]g" onclick="sndKey(4)">
+					<label for="pio[4]g">PIO 5 (4) =<span style="color:green;" id="pio[4]"> Off</span></label>
+					</td>
+					<td></td></tr>
+					
+					<tr><td>
+						<span style="color: violet; font-size: 18px;">AC keys:</span>
+					</td>
+					<td></td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio[5]g" onclick="sndKey(5)">
+					<label for="pio[5]g">AC key 3 (5) =<span style="color:green;" id="pio[5]"> Off</span></label>
+					</td>
+					<td>
+					<input type="checkbox" name="lbutton8" id="pio[6]g" onclick="sndKey(6)">
+					<label for="pio[6]g">AC key 2 (6) =<span style="color:green;" id="pio[6]"> Off</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio[7]g" onclick="sndKey(7)">
+					<label for="pio[7]g">AC key 1 (7) =<span style="color:green;" id="pio[7]"> Off</span></label>
+					</td>
+					<td></td></tr>
+
+<!--
+					<tr><td>
+						<span style="color: violet; font-size: 18px;">Keys:</span>
+					</td>
+					<td></td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio8" onclick="sndKey(8)">
+					<label for="pio8">button "Ok" (8) =<span style="color:green;" id="pio[8]"> Off</span></label>
+					</td>
+					<td>
+					<input type="checkbox" name="lbutton8" id="pio9" onclick="sndKey(9)">
+					<label for="pio9">button "<" (9) =<span style="color:green;" id="pio[9]"> Off</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio10" onclick="sndKey(10)">
+					<label for="pio10">button ">" (10) =<span style="color:green;" id="pio[10]"> Off</span></label>
+					</td>
+					<td>
+					<input type="checkbox" name="lbutton8" id="pio11" onclick="sndKey(11)">
+					<label for="pio11">button "A" (11) =<span style="color:green;" id="pio[11]"> Off</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio12" onclick="sndKey(12)">
+					<label for="pio12">button "V" (12) =<span style="color:green;" id="pio[12]"> Off</span></label>
+					</td>
+					<td>
+					<input type="checkbox" name="lbutton8" id="pio13" onclick="sndKey(13)">
+					<label for="pio13">button "<<" (13) =<span style="color:green;" id="pio[13]"> Off</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio14" onclick="sndKey(14)">
+					<label for="pio14">button ">>" (14) =<span style="color:green;" id="pio[14]"> Off</span></label>
+					</td>
+					<td>
+					<input type="checkbox" name="lbutton8" id="pio[15]g" onclick="sndKey(15)">
+					<label for="pio[15]g">ext. button (15) =<span style="color:green;" id="pio[15]"> Off</span></label>
+					</td></tr>
+-->
+					
+				</table>
+			</div>
+			
+			<div id="output"></div>
+		</div>
+
+	</body>
+	

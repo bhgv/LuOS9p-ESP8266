@@ -613,15 +613,6 @@ static int net_sntp(lua_State* L) {
 }
 
 
-
-
-//#include "httpd.inc.c"
-//int httpd_start(lua_State* L) ;
-//int httpd_task(lua_State* L) ;
-//int httpd_task_stop(lua_State* L) ;
-
-
-
 #include "modules.h"
 
 const LUA_REG_TYPE sock_map[] = {

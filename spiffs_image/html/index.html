@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<!-- <link rel="stylesheet" type="text/css" href="css/simple.min.css"> -->
+		<!-- link rel="stylesheet" type="text/css" href="css/style.css" -->
+		<!-- link rel="shortcut icon" href="img/favicon.png" -->
+		<title>HTTP Server</title>
+	</head>
+	<style>
+		ul.navbar {
+			list-style-type: none;
+			margin-bottom: 32px;
+			padding: 0;
+			overflow: hidden;
+			background-color: #333;
+		}
+		ul.navbar li {
+			float: left;
+		}
+		ul.navbar li a {
+			display: block;
+			color: white;
+			text-align: center;
+			padding: 14px 16px;
+			text-decoration: none;
+		}
+		ul.navbar li a:hover:not(.active) {
+			background-color: #111;
+		}
+		ul.navbar li a.active {
+			background-color: #09a0f6;
+		}
+		@media screen and (max-width: 600px){
+			ul.navbar li.right, 
+			ul.navbar li {float: none;}
+		}
+	</style>
+	<body>
+		<ul class="navbar">
+			<li><a class="active" href="/">Home</a></li>
+			<li><a href="pio_dev.html">PIO dev</a></li>
+			<li><a href="pwm_dev.html">PWM dev</a></li>
+			<li><a href="adc_dac_dev.html">ADC-DAC dev</a></li>
+			<li><a href="about.html">About</a></li>
+			<li><a href="test.lua?hello=world&test=CGI">Test Lua CGI</a></li>
+		</ul>
+
+		<div class="grid main">
+			<h1>ESP8266 HTTP Server</h1>
+
+			<div class="alert alert-done">HTTP Server is up and running.</div>
+
+			<p>This is an example HTTP server with CGI and SSI support. The switch below will allow you to test CGI handler and turn
+			the blue LED on or off.</p>
+
+			<div class="cover" align="center">
+				<div class="onoffswitch">
+					<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="led-switch" onclick="gpio();">
+					<label class="onoffswitch-label" for="led-switch">
+						<span class="onoffswitch-inner"></span>
+						<span class="onoffswitch-switch"></span>
+					</label>
+				</div>
+			</div>
+
+			<h1>Server Status</h1>
+			<table class="table table-striped">
+				<tr>
+					<td><b>Uptime:</b></td>
+					<td><!--#uptime--> seconds</td>
+				</tr>
+				<tr>
+					<td><b>Free heap:</b></td>
+					<td><!--#heap--> bytes</td>
+				</tr>
+				<tr>
+					<td><b>LED state:</b></td>
+					<td id="ledState"><!--#led--></td>
+				</tr>
+			</table>
+
+			<h1>How it works</h1>
+			<p> Each time the server detects a tag of the form <code>&lt;!--#name--&gt;</code> in a .shtml, .ssi or .shtm file
+				where <code>name</code> appears as one of the tags supplied to <code>http_set_ssi_handler</code> in the <code>pcConfigSSITags</code> array,
+				an insert string is appended after the tag string in file and sent back to the client.</p>
+			<p>A CGI handler function is called each time the server is asked for a file
+				whose name was previously registered as a CGI function using a call to <code>http_set_cgi_handler</code>.
+				This function allows you to access the parameters provided along with the URI.</p>
+		</div>
+
+		<script>
+			window.onload = function () {
+				var ls = document.getElementById('ledState').innerHTML;
+				ls = ls.split(/-->/).pop().trim();
+				document.getElementById('led-switch').checked = (ls == 'On');
+			};
+			function gpio() {
+				if (document.getElementById('led-switch').checked)
+					window.location.href = 'gpio?off=2';
+				else
+					window.location.href = 'gpio?on=2';
+			};
+		</script>
+	</body>
+</html>

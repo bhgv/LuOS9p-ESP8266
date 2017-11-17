@@ -132,6 +132,9 @@ void pca9685_set_pwm_value(unsigned char addr, uint8_t channel, uint16_t val);
  */
 bool pca9685_set_pwm_values(unsigned char addr, uint8_t first_ch, uint8_t channels, const uint16_t *values);
 
+
+uint16_t pca9685_get_pwm_value(unsigned char addr, uint8_t channel );
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<!-- <link rel="stylesheet" type="text/css" href="css/siimple.min.css"> -->
+		<!-- link rel="stylesheet" type="text/css" href="css/style.css" -->
+		<!-- link rel="shortcut icon" href="img/favicon.png" -->
+
+		<title>luOS9 IoT PWM control page</title>
+		
+		<style>
+			ul.navbar {
+				list-style-type: none;
+				margin-bottom: 32px;
+				padding: 0;
+				overflow: hidden;
+				background-color: #333;
+			}
+			ul.navbar li {
+				float: left;
+			}
+			ul.navbar li a {
+				display: block;
+				color: white;
+				text-align: center;
+				padding: 14px 16px;
+				text-decoration: none;
+			}
+			ul.navbar li a:hover:not(.active) {
+				background-color: #111;
+			}
+			ul.navbar li a.active {
+				background-color: #09a0f6;
+			}
+			@media screen and (max-width: 600px){
+				ul.navbar li.right, 
+				ul.navbar li {float: none;}
+			}
+
+
+			td {
+				height: 40px;
+				font-size: 12px; color: blue; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+			}
+			label {
+				display: inline-block;
+				vertical-align: middle;
+				line-height: 30px;
+				color: #333;
+			}
+
+
+			input[type=range] {
+				width:70%;
+				height: 31px;
+				display: inline-block;
+				vertical-align: middle;
+			  
+				-webkit-appearance: none;
+				background: transparent; /* Otherwise white in Chrome */
+
+				background: #DDD; /*#CDD1DA;*/
+				border: 2px solid gray; border-radius: 20px;
+			}
+			input[type=range]:focus {
+				outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+			}
+
+
+			/**
+			 * webkit
+			 */
+			input[type=range]::-webkit-slider-thumb {
+				display: block; width: 30px; height: 25px; margin: 6px;
+				background: #FFFFFF;
+				position: absolute; top: 0; bottom: 0;
+				border: 2px solid #03A9F4; border-radius: 20px;
+
+				cursor: pointer;
+				z-index: 20;
+				-webkit-appearance: none;
+				position: relative;
+			}
+
+
+			/**
+			 * moz
+			 */
+			input[type=range]::-moz-range-thumb {
+				display: block; width: 30px; height: 25px; margin: 6px;
+				background: #FFFFFF;
+				position: absolute; top: 0; bottom: 0;
+				border: 2px solid #03A9F4; border-radius: 20px;
+
+				cursor: pointer;
+				z-index: 20;
+			}
+
+
+			/**
+			 * ms
+			 */
+			input[type=range]::-ms-fill-lower {
+				background: transparent;
+			}
+
+			input[type=range]::-ms-thumb {
+				display: block; width: 30px; height: 25px; margin: 6px;
+				background: #FFFFFF;
+				position: absolute; top: 0; bottom: 0;
+				border: 2px solid #03A9F4; border-radius: 20px;
+
+				cursor: pointer;
+				z-index: 20;
+			}
+
+			input[type=range]::-ms-track {
+			  /*width: 100%;*/
+			  cursor: pointer;
+
+			  /* Hides the slider so custom styles can be added */
+			  background: transparent; 
+			  border-color: transparent;
+			  color: transparent;
+			}
+		</style>
+
+<script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://"+window.location.host+"/dev";
+  var output;
+  
+  var ws;
+  var retries;
+  var val = 0.0;
+
+  var rcvd_tm = 0;
+  var rd_ch = 0; 
+  
+  var interval_timeout = 0;
+
+  function setMsg(cls, text) {
+    sbox = document.getElementById('status_box');
+    sbox.className = "alert alert-" + cls;
+    sbox.innerHTML = text;
+    //console.log(text);
+  }
+  function init()
+  {
+    output = document.getElementById("output");
+    wsOpen();
+
+	setInterval(
+		function() { 
+			//setMsg("info", "tst 1");
+			interval_timeout++;
+			
+			if(interval_timeout > 60*8){
+				rd_ch = 0;
+				interval_timeout = 0;
+				return;
+			}else if(rd_ch > 15){
+				return;
+			}
+			
+			if(ws === undefined || ws.readyState == 3 || retries++ > 50)
+				wsOpen();
+			if(ws.readyState != 1) return;
+
+			if(rcvd_tm > 0){
+				rcvd_tm--;
+				return;
+			}
+			
+			var cmd = "pwm[" + rd_ch + "]=-1.0";      
+			doSend(cmd);
+			
+			rcvd_tm = 400;
+			
+			if(rd_ch >= 15){
+				rd_ch = 16;
+			}else
+				rd_ch++;
+		}
+		, 200
+	);
+
+  }
+
+  function wsOpen()
+  {
+    if (ws === undefined || ws.readyState != 0) {
+      if (retries > 50)
+        setMsg("error", "WebSocket timeout, retrying..");
+      else
+        setMsg("info", "Opening WebSocket..");
+
+      ws = new WebSocket(wsUri);
+      ws.onopen = function(evt) { onOpen(evt) };
+      ws.onclose = function(evt) { onClose(evt) };
+      ws.onmessage = function(evt) { onMessage(evt) };
+      ws.onerror = function(evt) { onError(evt) };
+    
+      //wsOpenStream();
+      retries = 0;  
+    }
+  }
+
+  function onOpen(evt)
+  {
+//    writeToScreen("CONNECTED");
+    setMsg("info", '<span style="color: red;">CONNECTED</span> ');
+  }
+
+  function onClose(evt)
+  {
+//    writeToScreen("DISCONNECTED");
+    setMsg("info", '<span style="color: red;">DISCONNECTED</span> ');
+  }
+
+  function onMessage(evt)
+  {
+//    writeToScreen('<span style="color: blue;">RECEIVED:' + evt.data+'</span>');
+    setMsg("info", '<span style="color: blue;">RECEIVED:</span> ' + evt.data);
+    
+    //var nm, v;
+    var ar = evt.data.split("=");
+    var el = document.getElementById(ar[0]);
+    el.innerHTML = " " + ar[1] + "%";
+    
+    //console.log(ar[0] + "g = " + el.value);
+    
+	el = document.getElementById(ar[0] + "g");
+	el.value = parseFloat(ar[1]);
+
+//    websocket.close();
+
+	retries = 0;
+	
+	rcvd_tm = 0;
+  }
+
+  function onError(evt)
+  {
+    setMsg("error", '<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+//    writeToScreen("SENT: " + message); 
+//	setMsg("info", "SENT: " + message);
+    setMsg("info", '<span style="color: blue;">SENT:</span> ' + message);
+
+	 if (ws.readyState == 3 || retries++ > 50)
+		wsOpen();
+	 else if (ws.readyState == 1)
+		ws.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+  
+  function sndPwmSldr(pwm_num) {
+    var v = document.getElementById("pwm[" + pwm_num + "]g").value;
+    var cmd = "pwm[" + pwm_num + "]=" + v;      
+    doSend(cmd);
+  }
+
+  window.addEventListener("load", init, false);
+
+</script>
+
+	</head>
+	<body>
+		<ul class="navbar">
+			<li><a href="/">Home</a></li>
+			<li><a href="pio_dev.html">PIO dev</a></li>
+			<li><a class="active" href="pwm_dev.html">PWM dev</a></li>
+			<li><a href="adc_dac_dev.html">ADC-DAC dev</a></li>
+			<li><a href="about.html">About</a></li>
+			<li><a href="test.lua?hello=world&test=CGI">Test Lua CGI</a></li>
+		</ul>
+		
+		<div> <!-- class="grid main"> -->
+			<h1>PWMs Test</h1>
+		
+			<div id="status_box" class="alert alert-info" align="center">Loading..</div>
+
+			<div class="cover" style="width: 95%; margin: 0 auto;">
+					<table style="width: 100%;"> <!-- width="95%" align="middle"> -->
+					<tr><td>
+						<span style="color: violet; font-size: 18px;">General mode PWMs:</span>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[0]g" oninput="sndPwmSldr(0)">
+					<label for="pwm[0]g">PWM 1 (0) =<span style="color:green;" id="pwm[0]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[1]g" oninput="sndPwmSldr(1)">
+					<label for="pwm[1]g">PWM 2 (1) =<span style="color:green;" id="pwm[1]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[2]g" oninput="sndPwmSldr(2)">
+					<label for="pwm[2]g">PWM 3 (2) =<span style="color:green;" id="pwm[2]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[3]g" oninput="sndPwmSldr(3)">
+					<label for="pwm[3]g">PWM 4 (3) =<span style="color:green;" id="pwm[3]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[4]g" oninput="sndPwmSldr(4)">
+					<label for="pwm[4]g">PWM 5 (4) =<span style="color:green;" id="pwm[4]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+						<span style="color: violet; font-size: 18px;">PCB signal LEDs:</span>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[5]g" oninput="sndPwmSldr(5)">
+					<label for="pwm[5]g">Sign 1 (5) =<span style="color:green;" id="pwm[5]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[6]g" oninput="sndPwmSldr(6)">
+					<label for="pwm[6]g">Sign 0 (6) =<span style="color:green;" id="pwm[6]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+						<span style="color: violet; font-size: 18px;">DC output PWMs:</span>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[7]g" oninput="sndPwmSldr(7)">
+					<label for="pwm[7]g">DC 3 (7) =<span style="color:green;" id="pwm[7]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[8]g" oninput="sndPwmSldr(8)">
+					<label for="pwm[8]g">DC 2 (8) =<span style="color:green;" id="pwm[8]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[9]g" oninput="sndPwmSldr(9)">
+					<label for="pwm[9]g">DC 1 (9) =<span style="color:green;" id="pwm[9]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+						<span style="color: violet; font-size: 18px;">Power Led PWMs:</span>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[10]g" oninput="sndPwmSldr(10)">
+					<label for="pwm[10]g">Led 1 (10) =<span style="color:green;" id="pwm[10]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[11]g" oninput="sndPwmSldr(11)">
+					<label for="pwm[11]g">Led 2 (11) =<span style="color:green;" id="pwm[11]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[12]g" oninput="sndPwmSldr(12)">
+					<label for="pwm[12]g">Led 3 (12) =<span style="color:green;" id="pwm[12]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[13]g" oninput="sndPwmSldr(13)">
+					<label for="pwm[13]g">Led 4 (13) =<span style="color:green;" id="pwm[13]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[14]g" oninput="sndPwmSldr(14)">
+					<label for="pwm[14]g">Led 5 (14) =<span style="color:green;" id="pwm[14]"> 50.0%</span></label>
+					</td></tr>
+					
+					<tr><td>
+					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="pwm[15]g" oninput="sndPwmSldr(15)">
+					<label for="pwm[15]g">Led 6 (15) =<span style="color:green;" id="pwm[15]"> 50.0%</span></label>
+					</td></tr>
+					
+				</table>
+			</div>
+			
+			<div id="output"></div>
+		</div>
+
+	</body>
+	

@@ -373,6 +373,8 @@ static void gui_controller( lua_State *L){
 }
 
 
+extern int (*cb_httpd)(lua_State *L);
+
 static void _cb_task (lua_State *L/*, int n, int cnt*/ ) { 
 	  uint32_t v;
 //	  int i = cnt;
@@ -425,6 +427,10 @@ static void _cb_task (lua_State *L/*, int n, int cnt*/ ) {
 						blnk+=1<<5;
 							
 				  	}
+				  }
+
+				  if(cb_httpd != NULL){
+				  	cb_httpd(L);
 				  }
 			  }
 //			  mtx_unlock(&tloop_mtx);
