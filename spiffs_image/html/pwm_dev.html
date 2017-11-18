@@ -3,6 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<!-- link rel="stylesheet" type="text/css" href="css/common.css" -->
+		<!-- link rel="stylesheet" type="text/css" href="css/range.css" -->
+		<link rel="stylesheet" type="text/css" href="css/the_all.css">
 		<!-- <link rel="stylesheet" type="text/css" href="css/siimple.min.css"> -->
 		<!-- link rel="stylesheet" type="text/css" href="css/style.css" -->
 		<!-- link rel="shortcut icon" href="img/favicon.png" -->
@@ -10,270 +13,41 @@
 		<title>luOS9 IoT PWM control page</title>
 		
 		<style>
-			ul.navbar {
-				list-style-type: none;
-				margin-bottom: 32px;
-				padding: 0;
-				overflow: hidden;
-				background-color: #333;
-			}
-			ul.navbar li {
-				float: left;
-			}
-			ul.navbar li a {
-				display: block;
-				color: white;
-				text-align: center;
-				padding: 14px 16px;
-				text-decoration: none;
-			}
-			ul.navbar li a:hover:not(.active) {
-				background-color: #111;
-			}
-			ul.navbar li a.active {
-				background-color: #09a0f6;
-			}
-			@media screen and (max-width: 600px){
-				ul.navbar li.right, 
-				ul.navbar li {float: none;}
-			}
-
-
-			td {
-				height: 40px;
-				font-size: 12px; color: blue; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
-			}
-			label {
-				display: inline-block;
-				vertical-align: middle;
-				line-height: 30px;
-				color: #333;
-			}
-
-
-			input[type=range] {
-				width:70%;
-				height: 31px;
-				display: inline-block;
-				vertical-align: middle;
-			  
-				-webkit-appearance: none;
-				background: transparent; /* Otherwise white in Chrome */
-
-				background: #DDD; /*#CDD1DA;*/
-				border: 2px solid gray; border-radius: 20px;
-			}
-			input[type=range]:focus {
-				outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
-			}
-
-
-			/**
-			 * webkit
-			 */
-			input[type=range]::-webkit-slider-thumb {
-				display: block; width: 30px; height: 25px; margin: 6px;
-				background: #FFFFFF;
-				position: absolute; top: 0; bottom: 0;
-				border: 2px solid #03A9F4; border-radius: 20px;
-
-				cursor: pointer;
-				z-index: 20;
-				-webkit-appearance: none;
-				position: relative;
-			}
-
-
-			/**
-			 * moz
-			 */
-			input[type=range]::-moz-range-thumb {
-				display: block; width: 30px; height: 25px; margin: 6px;
-				background: #FFFFFF;
-				position: absolute; top: 0; bottom: 0;
-				border: 2px solid #03A9F4; border-radius: 20px;
-
-				cursor: pointer;
-				z-index: 20;
-			}
-
-
-			/**
-			 * ms
-			 */
-			input[type=range]::-ms-fill-lower {
-				background: transparent;
-			}
-
-			input[type=range]::-ms-thumb {
-				display: block; width: 30px; height: 25px; margin: 6px;
-				background: #FFFFFF;
-				position: absolute; top: 0; bottom: 0;
-				border: 2px solid #03A9F4; border-radius: 20px;
-
-				cursor: pointer;
-				z-index: 20;
-			}
-
-			input[type=range]::-ms-track {
-			  /*width: 100%;*/
-			  cursor: pointer;
-
-			  /* Hides the slider so custom styles can be added */
-			  background: transparent; 
-			  border-color: transparent;
-			  color: transparent;
-			}
 		</style>
 
 <script language="javascript" type="text/javascript">
 
-  var wsUri = "ws://"+window.location.host+"/dev";
-  var output;
-  
-  var ws;
-  var retries;
-  var val = 0.0;
+	function get_cb(rd_ch) {
+		var cmd = "pwm[" + rd_ch + "]=-1.0";      
+		doSend(cmd);
+		
+		rcvd_tm = 400;
+		
+		if(rd_ch >= 15){
+			rd_ch = 16;
+		}else
+			rd_ch++;
+		
+		return rd_ch;
+	}
 
-  var rcvd_tm = 0;
-  var rd_ch = 0; 
-  
-  var interval_timeout = 0;
+	function set_label_val_cb(el, val) {
+		el.innerHTML = " " + val + "%";
+	}
 
-  function setMsg(cls, text) {
-    sbox = document.getElementById('status_box');
-    sbox.className = "alert alert-" + cls;
-    sbox.innerHTML = text;
-    //console.log(text);
-  }
-  function init()
-  {
-    output = document.getElementById("output");
-    wsOpen();
+	function set_ctl_state_cb(el, val) {
+		el.value = parseFloat(val);
+	}
+</script>
 
-	setInterval(
-		function() { 
-			//setMsg("info", "tst 1");
-			interval_timeout++;
-			
-			if(interval_timeout > 60*8){
-				rd_ch = 0;
-				interval_timeout = 0;
-				return;
-			}else if(rd_ch > 15){
-				return;
-			}
-			
-			if(ws === undefined || ws.readyState == 3 || retries++ > 50)
-				wsOpen();
-			if(ws.readyState != 1) return;
+<script type="text/javascript" src="js/common.js"></script>
 
-			if(rcvd_tm > 0){
-				rcvd_tm--;
-				return;
-			}
-			
-			var cmd = "pwm[" + rd_ch + "]=-1.0";      
-			doSend(cmd);
-			
-			rcvd_tm = 400;
-			
-			if(rd_ch >= 15){
-				rd_ch = 16;
-			}else
-				rd_ch++;
-		}
-		, 200
-	);
-
-  }
-
-  function wsOpen()
-  {
-    if (ws === undefined || ws.readyState != 0) {
-      if (retries > 50)
-        setMsg("error", "WebSocket timeout, retrying..");
-      else
-        setMsg("info", "Opening WebSocket..");
-
-      ws = new WebSocket(wsUri);
-      ws.onopen = function(evt) { onOpen(evt) };
-      ws.onclose = function(evt) { onClose(evt) };
-      ws.onmessage = function(evt) { onMessage(evt) };
-      ws.onerror = function(evt) { onError(evt) };
-    
-      //wsOpenStream();
-      retries = 0;  
-    }
-  }
-
-  function onOpen(evt)
-  {
-//    writeToScreen("CONNECTED");
-    setMsg("info", '<span style="color: red;">CONNECTED</span> ');
-  }
-
-  function onClose(evt)
-  {
-//    writeToScreen("DISCONNECTED");
-    setMsg("info", '<span style="color: red;">DISCONNECTED</span> ');
-  }
-
-  function onMessage(evt)
-  {
-//    writeToScreen('<span style="color: blue;">RECEIVED:' + evt.data+'</span>');
-    setMsg("info", '<span style="color: blue;">RECEIVED:</span> ' + evt.data);
-    
-    //var nm, v;
-    var ar = evt.data.split("=");
-    var el = document.getElementById(ar[0]);
-    el.innerHTML = " " + ar[1] + "%";
-    
-    //console.log(ar[0] + "g = " + el.value);
-    
-	el = document.getElementById(ar[0] + "g");
-	el.value = parseFloat(ar[1]);
-
-//    websocket.close();
-
-	retries = 0;
-	
-	rcvd_tm = 0;
-  }
-
-  function onError(evt)
-  {
-    setMsg("error", '<span style="color: red;">ERROR:</span> ' + evt.data);
-  }
-
-  function doSend(message)
-  {
-//    writeToScreen("SENT: " + message); 
-//	setMsg("info", "SENT: " + message);
-    setMsg("info", '<span style="color: blue;">SENT:</span> ' + message);
-
-	 if (ws.readyState == 3 || retries++ > 50)
-		wsOpen();
-	 else if (ws.readyState == 1)
-		ws.send(message);
-  }
-
-  function writeToScreen(message)
-  {
-    var pre = document.createElement("p");
-    pre.style.wordWrap = "break-word";
-    pre.innerHTML = message;
-    output.appendChild(pre);
-  }
-  
-  function sndPwmSldr(pwm_num) {
-    var v = document.getElementById("pwm[" + pwm_num + "]g").value;
-    var cmd = "pwm[" + pwm_num + "]=" + v;      
-    doSend(cmd);
-  }
-
-  window.addEventListener("load", init, false);
-
+<script language="javascript" type="text/javascript">
+	function sndPwmSldr(pwm_num) {
+		var v = document.getElementById("pwm[" + pwm_num + "]g").value;
+		var cmd = "pwm[" + pwm_num + "]=" + v;      
+		doSend(cmd);
+	}
 </script>
 
 	</head>

@@ -1,0 +1,7 @@
+meter {
+	width: 40%;
+	height: 15px;
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 30px;
+}

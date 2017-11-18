@@ -1,0 +1,190 @@
+/*---------------*/
+ul.navbar {
+	list-style-type: none;
+	margin-bottom: 32px;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+}
+ul.navbar li {
+	float: left;
+}
+ul.navbar li a {
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+}
+ul.navbar li a:hover:not(.active) {
+	background-color: #111;
+}
+ul.navbar li a.active {
+	background-color: #09a0f6;
+}
+@media screen and (max-width: 600px){
+	ul.navbar li.right, 
+	ul.navbar li {float: none;}
+}
+
+
+td {
+	height: 40px;
+	width: 50%;
+	font-size: 12px; color: blue; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+}
+label {
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 30px;
+	color: #333;
+}
+
+/*---------------*/
+meter {
+	width: 40%;
+	height: 15px;
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 30px;
+}
+
+/*---------------*/
+input[type=range] {
+	width:70%;
+	height: 31px;
+	display: inline-block;
+	vertical-align: middle;
+
+	-webkit-appearance: none;
+	background: transparent; /* Otherwise white in Chrome */
+
+	background: #DDD; /*#CDD1DA;*/
+	border: 2px solid gray; border-radius: 20px;
+}
+input[type=range]:focus {
+	outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+
+/**
+  * webkit
+  */
+input[type=range]::-webkit-slider-thumb {
+	display: block; width: 30px; height: 25px; margin: 6px;
+	background: #FFFFFF;
+	position: absolute; top: 0; bottom: 0;
+	border: 2px solid #03A9F4; border-radius: 20px;
+
+	cursor: pointer;
+	z-index: 20;
+	-webkit-appearance: none;
+	position: relative;
+}
+
+
+/**
+  * moz
+  */
+input[type=range]::-moz-range-thumb {
+	display: block; width: 30px; height: 25px; margin: 6px;
+	background: #FFFFFF;
+	position: absolute; top: 0; bottom: 0;
+	border: 2px solid #03A9F4; border-radius: 20px;
+
+	cursor: pointer;
+	z-index: 20;
+}
+
+
+/**
+  * ms
+  */
+input[type=range]::-ms-fill-lower {
+	background: transparent;
+}
+
+input[type=range]::-ms-thumb {
+	display: block; width: 30px; height: 25px; margin: 6px;
+	background: #FFFFFF;
+	position: absolute; top: 0; bottom: 0;
+	border: 2px solid #03A9F4; border-radius: 20px;
+
+	cursor: pointer;
+	z-index: 20;
+}
+
+input[type=range]::-ms-track {
+	/*width: 100%;*/
+	cursor: pointer;
+
+	/* Hides the slider so custom styles can be added */
+	background: transparent; 
+	border-color: transparent;
+	color: transparent;
+}
+
+/*---------------*/
+
+/* Cначала обозначаем стили для IE8 и более старых версий
+   т.е. здесь мы немного облагораживаем стандартный чекбокс. */
+input[type=checkbox] {
+	display: inline-block;
+	vertical-align: middle;
+}
+/* Это для всех браузеров, кроме совсем старых, которые не поддерживают
+   селекторы с плюсом. Показываем, что label кликабелен. */
+	input[type=checkbox] + label {
+	cursor: pointer;
+}
+
+/* Далее идет оформление чекбокса в современных браузерах, а также IE9 и выше.
+   Благодаря тому, что старые браузеры не поддерживают селекторы :not и :checked,
+   в них все нижеследующие стили не сработают. */
+
+/* Прячем оригинальный чекбокс. */
+input[type=checkbox]:not(checked) {
+	position: absolute;
+	opacity: 0;
+}
+input[type=checkbox]:not(checked) + label {
+	position: relative; /* будем позиционировать псевдочекбокс относительно label */
+	padding: 0 0 0 70px; /* оставляем слева от label место под псевдочекбокс */
+}
+/* Оформление первой части чекбокса в выключенном состоянии (фон). */
+input[type=checkbox]:not(checked) + label:before {
+	content: 'Off';
+	padding-left: 35px;
+	width: 25px;
+	height: 31px;
+
+	position: absolute; left: 0;
+	background: #DDD; /*#CDD1DA;*/
+
+	border: 2px solid gray; border-radius: 20px;
+}
+/* Оформление второй части чекбокса в выключенном состоянии (переключатель). */
+input[type=checkbox]:not(checked) + label:after {
+	content: '';
+	position: absolute; top: 3px; /*bottom: 0;*/ left: 3px;
+
+	width: 30px; height: 25px;
+	background: #FFF;
+	border: 2px solid #03A9F4; border-radius: 20px;
+}
+/* Меняем фон чекбокса, когда он включен. */
+input[type=checkbox]:checked + label:before {
+	content: 'On';
+	padding-left: 5px;
+	width: 55px;
+	background: #9FD468;
+}
+/* Сдвигаем переключатель чекбокса, когда он включен. */
+input[type=checkbox]:checked + label:after {
+	content: '';
+	left: 27px;
+}
+/* Показываем получение фокуса. */
+input[type=checkbox]:focus + label:before {
+	/*box-shadow: 0 0 0 3px rgba(255,255,0,.5);*/
+}

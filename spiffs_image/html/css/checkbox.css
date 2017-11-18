@@ -1,0 +1,62 @@
+/* Cначала обозначаем стили для IE8 и более старых версий
+   т.е. здесь мы немного облагораживаем стандартный чекбокс. */
+input[type=checkbox] {
+	display: inline-block;
+	vertical-align: middle;
+}
+/* Это для всех браузеров, кроме совсем старых, которые не поддерживают
+   селекторы с плюсом. Показываем, что label кликабелен. */
+	input[type=checkbox] + label {
+	cursor: pointer;
+}
+
+/* Далее идет оформление чекбокса в современных браузерах, а также IE9 и выше.
+   Благодаря тому, что старые браузеры не поддерживают селекторы :not и :checked,
+   в них все нижеследующие стили не сработают. */
+
+/* Прячем оригинальный чекбокс. */
+input[type=checkbox]:not(checked) {
+	position: absolute;
+	opacity: 0;
+}
+input[type=checkbox]:not(checked) + label {
+	position: relative; /* будем позиционировать псевдочекбокс относительно label */
+	padding: 0 0 0 70px; /* оставляем слева от label место под псевдочекбокс */
+}
+/* Оформление первой части чекбокса в выключенном состоянии (фон). */
+input[type=checkbox]:not(checked) + label:before {
+	content: 'Off';
+	padding-left: 35px;
+	width: 25px;
+	height: 31px;
+
+	position: absolute; left: 0;
+	background: #DDD; /*#CDD1DA;*/
+
+	border: 2px solid gray; border-radius: 20px;
+}
+/* Оформление второй части чекбокса в выключенном состоянии (переключатель). */
+input[type=checkbox]:not(checked) + label:after {
+	content: '';
+	position: absolute; top: 3px; /*bottom: 0;*/ left: 3px;
+
+	width: 30px; height: 25px;
+	background: #FFF;
+	border: 2px solid #03A9F4; border-radius: 20px;
+}
+/* Меняем фон чекбокса, когда он включен. */
+input[type=checkbox]:checked + label:before {
+	content: 'On';
+	padding-left: 5px;
+	width: 55px;
+	background: #9FD468;
+}
+/* Сдвигаем переключатель чекбокса, когда он включен. */
+input[type=checkbox]:checked + label:after {
+	content: '';
+	left: 27px;
+}
+/* Показываем получение фокуса. */
+input[type=checkbox]:focus + label:before {
+	/*box-shadow: 0 0 0 3px rgba(255,255,0,.5);*/
+}
