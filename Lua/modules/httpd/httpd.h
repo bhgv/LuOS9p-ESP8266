@@ -87,6 +87,10 @@ char* suf_to_hdr(char* suf, int suf_len, char** siz);
 int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len, get_par** ppget_root);
 spiffs_file uri_to_file(char* uri, int len, int *flen);
 
+int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out, lua_State* L, get_par** ppget_list );
+int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out );
+
+
 
 
 extern int is_httpd_run;

@@ -171,270 +171,6 @@ int do_something(char **uri, int uri_len, char *hdr, char* hdr_sz, char *out ){
 }
 
 
-int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out, lua_State* L, get_par** ppget_list ){
-	char *pth = malloc(uri_len + 10);
-	err_t err = ERR_OK;
-	
-	if( pth == NULL ) return -1;
-
-	pth[0] = '/'; pth[1] = 'h'; pth[2] = 't'; pth[3] = 'm'; pth[4] = 'l'; //pth[] = ''; pth[] = ''; 
-	memcpy(&pth[5], *uri, uri_len);
-	pth[ uri_len + 5 ] = '\0';
-	DBG("do_lua: path = %s, get_list=%x\n", pth, *ppget_list);
-
-	int n_l = lua_gettop(L);
-	
-	int r = luaL_loadfile(L, pth);
-	switch( r ){
-		case LUA_OK: {
-				char *outstr = NULL;
-				int outlen = 0;
-				get_par *get_el = *ppget_list;
-				int cgi_lvl = lua_gettop(L);
-		
-				DBG("do_lua: file '%s' loaded\n", pth);
-
-				//ws_sock_del();
-
-				/**
-				lua_newtable(L);
-				
-				lua_pushliteral(L, "_G");
-				lua_getupvalue(L, cgi_lvl, 1);
-				lua_rawset(L, -3);
-				//lua_setfield(L, -2, "_G");
-
-				lua_pushliteral(L, "_GET");
-				lua_newtable(L);
-				while(get_el != NULL){
-					lua_pushstring(L, get_el->name);
-					lua_pushstring(L, get_el->val);
-					lua_rawset(L, -3);
-
-					DBG("par: %s = %s\n", get_el->name, get_el->val);
-
-					get_el = get_el->next;
-				}
-				get_list_free(ppget_list);
-
-				lua_rawset(L, -3);
-				//TODO: set CGI table here
-				lua_setupvalue(L, cgi_lvl, 1);
-				**/
-
-				//DBG("pre hdr_lua_wrt %x %d\n", lua_hdr, strlen(lua_hdr) );
-				usleep(10);
-				if( check_conn(__func__, __LINE__) ){
-//					err = netconn_write(client, lua_hdr, strlen(lua_hdr), NETCONN_NOCOPY);
-					err = netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
-					print_err(err, __func__, __LINE__);
-				}
-				//if(err != ERR_OK) 
-				if(is_httpd_run == 4) 
-					return 0;
-				
-				//DBG("pre hdr_lua_tail_wrt %x %d\n", hdr_nosiz, strlen(hdr_nosiz) );
-				if( check_conn(__func__, __LINE__) ){
-//					err = netconn_write(client, hdr_nosiz, strlen(hdr_nosiz), NETCONN_NOCOPY);
-					err = netconn_write(client, hdr_sz, strlen(hdr_sz), NETCONN_NOCOPY);
-					print_err(err, __func__, __LINE__);
-				}
-				//if(err != ERR_OK) 
-				if(is_httpd_run == 4) 
-					return 0;
-				/*
-				DBG("flen = %d\n", flen );
-				char *hb = malloc(strlen(hdr_sz)+10);
-				snprintf(hb, strlen(hdr_sz)+10-1, hdr_sz, flen);
-				DBG("%s\n", hb );
-				netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
-				free(hb);
-				*/
-
-				//lua_settop(L, cgi_lvl);
-				//luaC_fullgc(L, 1);
-//				usleep(50);
-				do{
-					outlen = 0; outstr = NULL;
-					int n_c = lua_gettop(L);
-					
-					lua_pushvalue(L, cgi_lvl);
-					DBG("a try to call %s\n", lua_typename(L, lua_type(L, -1) ) );
-					r = lua_pcall(L, 0, 1, 0);
-					switch(r){
-						case LUA_OK: 
-							DBG("do_lua: ok run '%s'\n", pth);
-
-							outstr = lua_tolstring(L, -1, &outlen);
-							if( outlen > 0 ) {
-								if(outlen > OUT_BUF_LEN){
-									DBG("do_lua: output string len = %d, but MUST be <= %d\n", 
-										outlen, OUT_BUF_LEN);
-									
-								}
-								DBG("pre netconn_write lua %x %d\n", outstr, outlen);
-								usleep(10);
-								if( check_conn(__func__, __LINE__) ){
-									err = netconn_write(client, outstr, outlen, NETCONN_NOCOPY);
-									
-									lua_settop(L, n_c);
-
-									print_err(err, __func__, __LINE__);
-								}
-								//if(err != ERR_OK) 
-								if(is_httpd_run == 4) 
-									break;
-							}else{
-								//lua_settop(L, n_c)
-								outstr = NULL;
-							}
-
-							break;
-						
-						case LUA_ERRRUN: 
-							DBG("do_lua: can't run '%s'\n", pth);
-							break;
-						
-						case LUA_ERRMEM: 
-							DBG("do_lua: no mem to run '%s'\n", pth);
-							break;
-						
-						case LUA_ERRERR: 
-							DBG("do_lua: runtime error in '%s'\n", pth);
-							break;
-						
-						case LUA_ERRGCMM: 
-							DBG("do_lua: gc error in '%s'\n", pth);
-							break;
-					};
-
-					lua_settop(L, n_c);
-					luaC_fullgc(L, 1);
-					usleep(50);
-				}while(outstr != NULL && outlen > 0);
-				lua_settop(L, cgi_lvl-1);
-				luaC_fullgc(L, 1);
-				usleep(50);
-			}
-			break;
-			
-		case LUA_ERRSYNTAX: 
-			//ws_sock_del();
-			DBG("do_lua: syntax error in '%s'\n", pth);
-			break;
-			
-		case LUA_ERRMEM: 
-			//ws_sock_del();
-			DBG("do_lua: can't alloc mem to load '%s'\n", pth);
-			break;
-			
-		case LUA_ERRGCMM:
-			//ws_sock_del();
-			DBG("do_lua: can't gc in '%s'\n", pth);
-			break;
-			
-		case LUA_ERRFILE:
-			DBG("do_lua: not found file path = %s\n", pth);
-			break;
-			
-	};
-
-	lua_settop(L, n_l);
-	luaC_fullgc(L, 1);
-
-	free(pth);
-
-	return 0;
-}
-
-int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out ){
-	int flen = 0;
-	err_t err = ERR_OK;
-	int f = uri_to_file(*uri, uri_len, &flen);
-	char* buf=NULL;
-	int buf_len = 0;
-	
-	if(f > 0){
-		//ws_sock_del();
-	//	free(uri);
-	//	uri_len = 0;
-		int totl=0;
-
-		//nb_free();
-		
-		DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), f );
-		usleep(10);
-		if( check_conn(__func__, __LINE__) ){
-			err = netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
-			print_err(err, __func__, __LINE__);
-		}
-		//if(err != ERR_OK) 
-		if(is_httpd_run == 4) 
-			return 0;
-		
-		if( check_conn(__func__, __LINE__) ){
-			DBG("flen = %d\n", flen );
-			char *hb = malloc(strlen(hdr_sz)+10);
-			snprintf(hb, strlen(hdr_sz)+10-1, hdr_sz, flen);
-			DBG("%s\n", hb );
-			err = netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
-			free(hb);
-
-			print_err(err, __func__, __LINE__);
-		}
-		//if(err != ERR_OK) 
-		if(is_httpd_run == 4) 
-			return 0;
-		//usleep(50);
-		
-		DBG("pre malloc of %d\n", OUT_BUF_LEN );
-		buf = malloc(OUT_BUF_LEN);
-		buf_len = OUT_BUF_LEN-4;
-		
-		int tlen;
-		if(buf){
-			do{
-				DBG("pre read %d %x %d totl=%d\n", f, buf, buf_len, totl);
-				//tlen = read(f, buf, buf_len);
-				tlen = SPIFFS_read(&fs, (spiffs_file)f, buf, buf_len); //&(~0x3));
-				DBG("after read %d %x %d totl=%d\n", f, buf, buf_len, totl);
-				if(tlen < 0)
-					break;
-				totl += tlen;
-				DBG("pre netconn_write %d %x %d totl=%d\n", f, buf, tlen, totl);
-				if(tlen > 0){
-					//usleep(10);
-					int t_is_httpd_run = is_httpd_run;
-					if( check_conn(__func__, __LINE__) ){
-						err = netconn_write(client, buf, tlen, NETCONN_NOCOPY);
-						print_err(err, __func__, __LINE__);
-					}
-					//if(err != ERR_OK) 
-					if(is_httpd_run == 4){
-						if(err == ERR_ABRT) {
-							nc_free(&client, "Closing connection (client) aborted\n");
-							is_httpd_run = t_is_httpd_run;
-						}
-						break;
-					}
-					//usleep(50);
-				}
-			}while( tlen > 0 /*&& !SPIFFS_eof(&fs, (spiffs_file)f )*/ );
-			DBG("after do while read %d %x %d totl=%d\n", f, buf, buf_len, totl);
-			
-			free(buf);
-			buf_len = 0;
-		}
-		//close(f);
-		SPIFFS_close(&fs, (spiffs_file)f);
-
-		return totl;
-	}
-	//*out = NULL;
-	return 0;
-}
-
-
 int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out ){
 	char* buf=NULL;
 	int buf_len = 0;
@@ -511,14 +247,6 @@ int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 int httpd_task(lua_State* L) //void *pvParameters)
 {
 err_t err = ERR_OK;
-//	nc = NULL;
-//	client = NULL;
-//	ws_client = NULL;
-//	ws_uri = NULL;
-//	nb = NULL;
-//	get_root = NULL;
-
-//	usleep(10);
 //	system_soft_wdt_feed();
 	//taskYIELD();
 
@@ -603,7 +331,7 @@ err_t err = ERR_OK;
 			//client->pcb.tcp->so_options |= SOF_REUSEADDR;
 			
 			//client->recv_bufsize = IN_BUF_LEN;
-			usleep(10);
+			//usleep(10);
 			if( 
 				check_conn(__func__, __LINE__) &&
 				(err = print_err( netconn_recv(client, &nb), __func__, __LINE__ ) ) == ERR_OK
@@ -688,7 +416,7 @@ err_t err = ERR_OK;
 		nc_free(&client, "Closing connection (client)\n");
 		//usleep(50);
 		ws_task(L);
-		usleep(10);
+		//usleep(10);
 
 		if(is_httpd_run == 2)
 			is_httpd_run = 3;
@@ -799,23 +527,7 @@ static int httpd_send_timeout(lua_State* L) {
 	return 1;
 }
 
-/*
-static int httpd_(lua_State* L) {
-	return 0;	 
-}
 
-static int httpd_(lua_State* L) {
-	return 0;	 
-}
-
-static int httpd_(lua_State* L) {
-	return 0;	 
-}
-
-static int httpd_(lua_State* L) {
-	return 0;	 
-}
-*/
 
 #include "modules.h"
 
