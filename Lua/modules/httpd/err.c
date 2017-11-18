@@ -57,7 +57,7 @@ static char * err_msgs[] = {
 int check_conn(char* fn, int ln){
 	int r = 1;
 
-	usleep(50);
+	//usleep(50);
 	uint8_t st = sdk_wifi_station_get_connect_status();
 
 	DBG( "%s, %d: Wifi status = %d\n", fn, ln, st );
@@ -82,7 +82,7 @@ int check_conn(char* fn, int ln){
 }
 
 
-err_t print_err(err_t err){
+err_t print_err(err_t err, char* fn, int ln){
 	if(err != ERR_OK){
 		char* s = 0; //lwip_strerr(err); //0;
 		/**/
@@ -141,7 +141,12 @@ err_t print_err(err_t err){
 			
 		};
 		/**/
-		if(s != 0) printf("! %s: %s\n", (ERR_IS_FATAL(err) ? "fatal-err" : "err" ), s);
+		if(s != 0) {
+			if(fn != NULL)
+				printf("! %s: %s (%s: %d)\n", (ERR_IS_FATAL(err) ? "fatal-err" : "err" ), s, fn, ln);
+			else
+				printf("! %s: %s\n", (ERR_IS_FATAL(err) ? "fatal-err" : "err" ), s);
+		}
 		if(ERR_IS_FATAL(err)){
 			is_httpd_run = 4;
 		}

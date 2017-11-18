@@ -17,11 +17,11 @@
 		</style>
 
 <script language="javascript" type="text/javascript">
-	var dac = -1.0;
+//	var dac = -1.0;
 //  var rd_ch = 0; //-2 = dac, -3 = int adc, 0-3 = ext adc
 
 	function get_cb(rd_ch) {
-		var cmd = "adc[" + rd_ch + "]=" + (rd_ch == -2 ? dac : -1.0);      
+		var cmd = "adc[" + rd_ch + "]=-1.0"; // + (rd_ch == -2 ? dac : -1.0);      
 		doSend(cmd);
 		
 		rcvd_tm = 400;

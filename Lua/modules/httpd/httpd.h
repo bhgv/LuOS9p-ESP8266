@@ -19,12 +19,13 @@
 
 
 
-#define DEF_RECV_TIMEOUT  100
-#define DEF_SEND_TIMEOUT  60000
+#define DEF_RECV_TIMEOUT			100
+#define DEF_SEND_TIMEOUT			60000
 
+#define WS_MAX						3
 
 #define WS_TIMEOUT_NO_RECONNECT		10
-#define WS_TIMEOUT_UNCONNECT		300
+#define WS_TIMEOUT_UNCONNECT		500
 
 
 
@@ -51,10 +52,26 @@ typedef struct {
 } suf_hdr;
 
 
+typedef struct {
+	struct netconn* clnt;
+	char* uri;
+//	int len;
+	int age;
+} ws_node;
+
+
+char* strnstr(const char* buffer, const char* token, size_t n);
+char* strstr(const char* buffer, const char* token);
+
+
+
+void nc_free(struct netconn **nc, char* msg);
+void nb_free();
+
 
 
 int check_conn(char* fn, int ln);
-err_t print_err(err_t err);
+err_t print_err(err_t err, char* fn, int ln);
 
 void ws_sock_del();
 void ws_task(lua_State *L);

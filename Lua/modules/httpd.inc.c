@@ -227,7 +227,7 @@ int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 				if( check_conn(__func__, __LINE__) ){
 //					err = netconn_write(client, lua_hdr, strlen(lua_hdr), NETCONN_NOCOPY);
 					err = netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
-					print_err(err);
+					print_err(err, __func__, __LINE__);
 				}
 				//if(err != ERR_OK) 
 				if(is_httpd_run == 4) 
@@ -237,7 +237,7 @@ int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 				if( check_conn(__func__, __LINE__) ){
 //					err = netconn_write(client, hdr_nosiz, strlen(hdr_nosiz), NETCONN_NOCOPY);
 					err = netconn_write(client, hdr_sz, strlen(hdr_sz), NETCONN_NOCOPY);
-					print_err(err);
+					print_err(err, __func__, __LINE__);
 				}
 				//if(err != ERR_OK) 
 				if(is_httpd_run == 4) 
@@ -279,7 +279,7 @@ int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 									
 									lua_settop(L, n_c);
 
-									print_err(err);
+									print_err(err, __func__, __LINE__);
 								}
 								//if(err != ERR_OK) 
 								if(is_httpd_run == 4) 
@@ -366,7 +366,7 @@ int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int 
 		usleep(10);
 		if( check_conn(__func__, __LINE__) ){
 			err = netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
-			print_err(err);
+			print_err(err, __func__, __LINE__);
 		}
 		//if(err != ERR_OK) 
 		if(is_httpd_run == 4) 
@@ -380,7 +380,7 @@ int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int 
 			err = netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
 			free(hb);
 
-			print_err(err);
+			print_err(err, __func__, __LINE__);
 		}
 		//if(err != ERR_OK) 
 		if(is_httpd_run == 4) 
@@ -403,15 +403,21 @@ int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int 
 				totl += tlen;
 				DBG("pre netconn_write %d %x %d totl=%d\n", f, buf, tlen, totl);
 				if(tlen > 0){
-					usleep(10);
+					//usleep(10);
+					int t_is_httpd_run = is_httpd_run;
 					if( check_conn(__func__, __LINE__) ){
 						err = netconn_write(client, buf, tlen, NETCONN_NOCOPY);
-						print_err(err);
+						print_err(err, __func__, __LINE__);
 					}
 					//if(err != ERR_OK) 
-					if(is_httpd_run == 4) 
+					if(is_httpd_run == 4){
+						if(err == ERR_ABRT) {
+							nc_free(&client, "Closing connection (client) aborted\n");
+							is_httpd_run = t_is_httpd_run;
+						}
 						break;
-					usleep(50);
+					}
+					//usleep(50);
 				}
 			}while( tlen > 0 /*&& !SPIFFS_eof(&fs, (spiffs_file)f )*/ );
 			DBG("after do while read %d %x %d totl=%d\n", f, buf, buf_len, totl);
@@ -452,7 +458,7 @@ int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 		usleep(10);
 		if( check_conn(__func__, __LINE__) ){
 			err = netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
-			print_err(err);
+			print_err(err, __func__, __LINE__);
 		}
 		//if(err != ERR_OK)
 		if(is_httpd_run == 4) 
@@ -469,7 +475,7 @@ int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 			err = netconn_write(client, hdr_sz, strlen(hdr_sz), NETCONN_NOCOPY);
 			//free(hb);
 			
-			print_err(err);
+			print_err(err, __func__, __LINE__);
 		}
 		//if(err != ERR_OK)
 		if(is_httpd_run == 4) 
@@ -486,7 +492,7 @@ int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 			
 			free(buf);
 			
-			print_err(err);
+			print_err(err, __func__, __LINE__);
 		}else{
 			free(buf);
 		}
@@ -550,13 +556,13 @@ err_t err = ERR_OK;
 
 	if( check_conn(__func__, __LINE__) ){
 		err = netconn_bind(nc, IP_ADDR_ANY, 80);
-		print_err(err);
+		print_err(err, __func__, __LINE__);
 	}
 
 	if(is_httpd_run != 4){ 
 		if( check_conn(__func__, __LINE__) ){
 			err = netconn_listen(nc);
-			print_err(err);
+			print_err(err, __func__, __LINE__);
 
 			prep_something();
 		}
@@ -577,7 +583,7 @@ err_t err = ERR_OK;
 		nc_free(&client, NULL);
 		if( check_conn(__func__, __LINE__) ){
 			err = netconn_accept(nc, &client);
-			print_err(err);
+			print_err(err, __func__, __LINE__);
 		}
 		//if(err != ERR_OK) 
 		if(is_httpd_run == 4) 
@@ -600,7 +606,7 @@ err_t err = ERR_OK;
 			usleep(10);
 			if( 
 				check_conn(__func__, __LINE__) &&
-				(err = print_err( netconn_recv(client, &nb) ) ) == ERR_OK
+				(err = print_err( netconn_recv(client, &nb), __func__, __LINE__ ) ) == ERR_OK
 			) {
                 void *data;
                 u16_t len;
@@ -621,7 +627,7 @@ err_t err = ERR_OK;
 
 				if( check_conn(__func__, __LINE__) ){
 	                err = netbuf_data(nb, &data, &len);
-					print_err(err);
+					print_err(err, __func__, __LINE__);
 				}
 				//if(err != ERR_OK) 
 				if(is_httpd_run == 4) 

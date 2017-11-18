@@ -3,7 +3,7 @@ var wsUri = "ws://"+window.location.host+"/dev";
 var output;
 
 var ws;
-var retries;
+var retries = 0;
 var val = 0.0;
 
 var rcvd_tm = 0;
@@ -37,7 +37,7 @@ function init()
 				return;
 			}
 
-			if(ws === undefined || ws.readyState == 3 || retries++ > 30)
+			if(ws === undefined || ws.readyState == 3 || retries++ > 70)
 				wsOpen();
 			if(ws.readyState != 1) 
 				return;
@@ -56,7 +56,7 @@ function init()
 function wsOpen()
 {
 	if (ws === undefined || ws.readyState != 0) {
-		if (retries > 30)
+		if (retries > 0)
 			setMsg("error", "WebSocket timeout, retrying..");
 		else
 			setMsg("info", "Opening WebSocket..");
@@ -114,7 +114,7 @@ function doSend(message)
 //    writeToScreen("SENT: " + message); 
 	setMsg("info", '<span style="color: blue;">SENT:</span> ' + message);
 
-	if (ws.readyState == 3 || retries++ > 30)
+	if (ws.readyState == 3 || retries++ > 70)
 		wsOpen();
 	else if (ws.readyState == 1)
 		ws.send(message);
