@@ -88,7 +88,7 @@ static suf_hdr suf_hdr_tab[] = {
 };
 
 
-char* suf_to_hdr(char* suf, int suf_len, char** siz){
+char* suf_to_hdr(char* suf, char** siz){
 	char* r = html_hdr; //NULL;
 	*siz = hdr_siz;
 	int i=0;

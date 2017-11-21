@@ -36,14 +36,7 @@
 #include "mbedtls/sha1.h"
 #include "mbedtls/base64.h"
 
-/*
-#include <spiffs.h>
-//#include <spiffs_nucleus.h>
-#include <esp_spiffs.h>
-*/
-
 #include "httpd/httpd.h"
-
 
 
 
@@ -55,13 +48,9 @@
 
 
 
-//extern spiffs fs;
-
 int is_httpd_run = 0;
 
-
 char *hdr, *hdr_sz;
-
 
 
 #if 1 //LWIP_HTTPD_STRNSTR_PRIVATE
@@ -106,9 +95,6 @@ strstr(const char* buffer, const char* token)
 
 #if 1
 
-void nb_free();
-
-
 const char webpage_404[] = {
         "<html><head><title>luos9 v0.1 Server</title>"
         "<style> div.main {"
@@ -126,19 +112,27 @@ const char webpage_404[] = {
 };
 
 
-void prep_something( ){
+int recv_timeout = DEF_RECV_TIMEOUT;
+int send_timeout = DEF_SEND_TIMEOUT;
 
-}
+struct netconn *nc = NULL;
+
+nc_node* nc_clients[ NC_MAX ] = {
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+int nc_clients_cnt = 0;
 
 
-struct netbuf *nb=NULL;
-
-void nb_free(){
-	if(nb != NULL){
-		netbuf_delete(nb);
-		nb = NULL;
+void nb_free(struct netbuf **nb){
+	if(*nb != NULL){
+		netbuf_delete(*nb);
+		*nb = NULL;
 	}
 }
+
 
 void nc_free(struct netconn **nc, char* msg){
 	if(*nc != NULL){
@@ -151,27 +145,90 @@ void nc_free(struct netconn **nc, char* msg){
 }
 
 
+void nc_sock_del(int idx){
+	nc_node* el;
+	
+	if(idx < 0 || idx >= NC_MAX || idx >= nc_clients_cnt) return;
 
-int recv_timeout = DEF_RECV_TIMEOUT;
-int send_timeout = DEF_SEND_TIMEOUT;
+	el = nc_clients[idx];
+	
+	DBG("Removing connection (%d from %d)\n", idx, nc_clients_cnt);
+	if( el != NULL ){
+		if( el->clnt != NULL ){
+			char *s = malloc(81);
+			snprintf(s, 80, "Closing connection (client %d from %d)\n", idx, nc_clients_cnt);
+			nc_free(&(el->clnt), s);
+			free(s);
+		}
+		if(el->uri != NULL){
+			free(el->uri);
+			el->uri = NULL;
+		}
+		if(el->suf != NULL){
+			free(el->suf);
+		}
+		
+		if(el->cur_f > 0){
+			SPIFFS_close(&fs, el->cur_f);
+		}
+		
+		if(el->get_root != NULL){
+			get_list_free(&el->get_root);
+		}
+//		if(el->nb != NULL){
+//			nb_free(&el->nb);
+//		}
+		if(el->pth != NULL){
+			free(el->pth);
+		}
+		
+		free(el);
+	}
+	
+	for( ; idx < nc_clients_cnt-1; idx++){
+		nc_clients[idx] = nc_clients[idx+1];
+	}
 
-struct netconn *client = NULL;
-struct netconn *nc = NULL; //netconn_new(NETCONN_TCP);
-
-
-int do_something(char **uri, int uri_len, char *hdr, char* hdr_sz, char *out ){
-
-//	if (!strncmp(uri, "/on", uri_len))
-//		gpio_write(2, false);
-//	else if (!strncmp(uri, "/off", uri_len))
-//		gpio_write(2, true);
-
-//	out = NULL;
-	return 0;
+	nc_clients_cnt--;
+	nc_clients[ nc_clients_cnt ] = NULL;
 }
 
 
-int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out ){
+int nc_sock_add(struct netconn *new_client){
+	int idx = -1;
+	nc_node* el = NULL;
+
+	if( nc_clients_cnt >= NC_MAX ){
+		return -1;
+	}
+		
+	el = malloc( sizeof(nc_node) );
+	if(el == NULL)
+		return -1;
+	
+	el->clnt = new_client;
+	el->uri = NULL;
+	el->suf = NULL;
+	el->get_root = NULL;
+//	el->nb = NULL;
+	el->state = NC_CLOSE;
+	el->cur_f = 0;
+	
+	// VVV lua cgi
+	el->cgi_lvl = 0;
+	el->pth = NULL;
+	// AAA lua cgi
+
+	idx = nc_clients_cnt;
+	
+	nc_clients[ idx ] = el;
+	nc_clients_cnt++;
+	
+	return idx;
+}
+
+
+int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, nc_node *node ){
 	char* buf=NULL;
 	int buf_len = 0;
 	err_t err = ERR_OK;
@@ -180,23 +237,18 @@ int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 	buf = malloc(buf_len); // OUT_BUF_LEN+1);
 
 	if(buf){	
-		//DBG("pre sprintf %x %d\n", buf, buf_len);
-		snprintf(buf, buf_len, webpage_404,
+		DBG("pre sprintf %x %d\n", buf, buf_len);
+		int out_len = snprintf(buf, buf_len, webpage_404,
 				*uri,
 				xTaskGetTickCount() * portTICK_PERIOD_MS / 1000,
 				(int) xPortGetFreeHeapSize()
 		);
 		
-		//free(uri);
-		//uri_len = 0;
-				
-		//DBG("pre hdr_net_wrt %x %d\n", html_hdr, strlen(html_hdr) );
-		usleep(10);
+		DBG("pre hdr_net_wrt %x %d\n", hdr, strlen(hdr) );
 		if( check_conn(__func__, __LINE__) ){
-			err = netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
+			err = netconn_write(node->clnt, hdr, strlen(hdr)+1, NETCONN_NOCOPY);
 			print_err(err, __func__, __LINE__);
 		}
-		//if(err != ERR_OK)
 		if(is_httpd_run == 4) 
 		{
 			free(buf);
@@ -206,65 +258,96 @@ int do_404(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int l
 		if( check_conn(__func__, __LINE__) ){
 			//char *hb = malloc(sizeof(hdr_sz)+10);
 			//snprintf(hb, sizeof(hdr_siz)+10-1, hdr_sz, strlen(buf));
-			//usleep(10);
-//			err = netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
-			err = netconn_write(client, hdr_sz, strlen(hdr_sz), NETCONN_NOCOPY);
+			//err = netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
+			err = netconn_write(node->clnt, hdr_sz, strlen(hdr_sz), NETCONN_NOCOPY);
 			//free(hb);
 			
 			print_err(err, __func__, __LINE__);
 		}
-		//if(err != ERR_OK)
 		if(is_httpd_run == 4) 
 		{
 			free(buf);
 			return 0;
 		}
 		
-//		usleep(50);
-		
-		//DBG("pre net out %x %d\n%s\n", buf, buf_len, buf);
+		DBG("pre net out %x %d\n%s\n", buf, buf_len, buf);
 		if( check_conn(__func__, __LINE__) ){
-			err = netconn_write(client, buf, buf_len, NETCONN_NOCOPY);
-			
-			free(buf);
-			
+			err = netconn_write(node->clnt, buf, out_len, NETCONN_NOCOPY);
 			print_err(err, __func__, __LINE__);
-		}else{
-			free(buf);
 		}
-		//if(err != ERR_OK) 
+		free(buf);
+
 		if(is_httpd_run == 4) 
 			return 0;
-//		usleep(50);
-	//	buf_len = 0;
 	}
 
-	//*out = NULL;
 	return buf_len;
 }
 
 
-int httpd_task(lua_State* L) //void *pvParameters)
-{
-err_t err = ERR_OK;
-//	system_soft_wdt_feed();
-	//taskYIELD();
+int httpd_pas(lua_State* L, int idx ){
+	DBG( "%s: %d (%d from %d)\n", __func__, __LINE__, idx, nc_clients_cnt );
+	if(idx < 0 || idx >= NC_MAX || idx >= nc_clients_cnt )
+		return 0;
+	
+	nc_node *node = nc_clients[idx];
+	DBG( "%s: %d node=%x\n", __func__, __LINE__, node );
+	
+	if(node == NULL) return 0;
+	
+	DBG( "%s: %d node->state=%d, node->uri=%x\n", __func__, __LINE__, node->state, node->uri );
 
-//DBG( "_REENT = %x, __getreent = %x, _impure=%x\n\n", _REENT, __getreent(), _impure_ptr );
-//	luaC_fullgc(L, 1);
-//	static TaskHandle_t xHandleWs = NULL;
+	if( node->state == NC_CLOSE || node->uri == NULL ){
+		nc_sock_del(idx);
+		return 0;
+	}
+	
+	DBG( "%s: %d node=%x\n", __func__, __LINE__, node );
+	
+	char *uri = node->uri;
+	char *suf = node->suf;
+	
+	DBG( "%s: %d node=%d, uri=%x, suf=%x, clt=%x\n", __func__, __LINE__, node, uri, suf, node->clnt );
+	
+	int uri_len = uri == NULL ? 0 : strlen(uri);
+
+	DBG( "%s: %d node=%d, uri=%s, suf=%s, clt=%x\n", __func__, __LINE__, node, uri, suf ? suf : "", node->clnt );
+
+	hdr = suf_to_hdr(suf, &hdr_sz);
+	
+	//DBG("client->send_timeout %d\n", client->send_timeout );
+	DBG( "%s: %d\n", __func__, __LINE__ );
+
+#if 1
+	if(uri != NULL && suf != NULL && ( (!strcmp(suf, ".lua")) || (!strcmp(suf, ".cgi")) ) ){
+		node->type = NC_TYPE_GET;
+		
+		DBG("lua cgi = %s\n", uri);
+		do_lua(&uri, uri_len, hdr, hdr_sz, L, idx );
+
+		return 1;
+	}else
+#endif
+	if( uri != NULL && do_file(&uri, uri_len, hdr, hdr_sz, /*node*/idx ) > 0){
+		DBG( "%s: %d\n", __func__, __LINE__ );
+		node->type = NC_TYPE_GET;
+		
+		return 1;
+	}
+
+	return 0;
+}
+
+
+int httpd_task(lua_State* L) {
+	err_t err = ERR_OK;
+
 	//DBG("httpd_task 1 Free mem: %d\n",xPortGetFreeHeapSize());
-//	DBG("MEMP_NUM_TCP_PCB = %d\n", MEMP_NUM_TCP_PCB);
 
-	//lua_register(L, "GET_cnt", lget_get_params_cnt);
 	lua_register(L, "_GET", lget_param);
 
-//do{
-	nc_free(&client, NULL);
-//	nc_free(&nc, NULL);
-//    /*struct netconn * */client = NULL;
 	if( check_conn(__func__, __LINE__) ){
-		/*struct netconn * */nc = netconn_new(NETCONN_TCP);
+		nc = netconn_new(NETCONN_TCP);
 		printf("Open connection (main nc)\n");
 	}else{
 		nc_free(&nc, NULL);
@@ -272,7 +355,6 @@ err_t err = ERR_OK;
 
     if (nc == NULL || is_httpd_run == 4) {
         printf("Failed to allocate socket.\n");
-        //vTaskDelete(NULL);
         return 0;
     }
 	
@@ -291,157 +373,154 @@ err_t err = ERR_OK;
 		if( check_conn(__func__, __LINE__) ){
 			err = netconn_listen(nc);
 			print_err(err, __func__, __LINE__);
-
-			prep_something();
 		}
 	}
 
-	//is_httpd_run = 1;    
     while (is_httpd_run == 1 || is_httpd_run == 2) {
-//		usleep(10);
-//		taskYIELD();
-//		system_soft_wdt_feed();
+		struct netconn *clnt = NULL;
 	
 		//printf("httpd_task: Free mem: %d\n",xPortGetFreeHeapSize());
-		//DBG("httpd_task iter: \nws_client=%x, ws_uri=%x, \nnc=%x, client=%x\nnb=%x, get_root=%x\n",
-		//	ws_client, ws_uri, nc, client, nb, get_root
-		//);
 
-		usleep(10);
-		nc_free(&client, NULL);
 		if( check_conn(__func__, __LINE__) ){
-			err = netconn_accept(nc, &client);
+			err = netconn_accept(nc, &clnt);
 			print_err(err, __func__, __LINE__);
 		}
-		//if(err != ERR_OK) 
-		if(is_httpd_run == 4) 
+		if(is_httpd_run == 4) {
 			break;
+		}
 			
-        if (client != NULL) 
-			printf("Open connection (client) %x\n", client);
-//		usleep(50);
-        if (client != NULL && err == ERR_OK) {
-            //struct netbuf *nb=NULL;
-            //nb_free();
-			client->send_timeout = send_timeout;
-			client->recv_timeout = recv_timeout;
-			client->recv_bufsize = IN_BUF_LEN;
+        if (clnt != NULL) 
+			printf("Open connection (client) %x\n", clnt);
 
-			ip_set_option(client->pcb.tcp, SOF_REUSEADDR);
+		nc_node* node = NULL;
+		
+        if (clnt != NULL && err == ERR_OK) {
+            struct netbuf *nb=NULL;
+
+			clnt->send_timeout = send_timeout;
+			clnt->recv_timeout = recv_timeout;
+			clnt->recv_bufsize = IN_BUF_LEN;
+
+			ip_set_option(clnt->pcb.tcp, SOF_REUSEADDR);
 			//client->pcb.tcp->so_options |= SOF_REUSEADDR;
 			
-			//client->recv_bufsize = IN_BUF_LEN;
-			//usleep(10);
+			int nd_idx = nc_sock_add(clnt);
+			if( nd_idx < 0){
+				nc_free(&clnt, "client closed. too many connections\n" );
+				clnt = NULL;
+				node = NULL;
+			}else{
+				node = nc_clients[ nd_idx ];
+			}
+			
 			if( 
+				nd_idx >= 0 &&
+				node != NULL &&
 				check_conn(__func__, __LINE__) &&
-				(err = print_err( netconn_recv(client, &nb), __func__, __LINE__ ) ) == ERR_OK
+				(err = print_err( netconn_recv(node->clnt, &nb), __func__, __LINE__ ) ) == ERR_OK
 			) {
                 void *data;
                 u16_t len;
 			
 				if( !(is_httpd_run == 1 || is_httpd_run == 2) ){
-					/*
-					nb_free();
-					nc_free(&client, "Closing connection (client) on http exit\n");
-					ws_sock_del();
-					if(get_root != NULL){
-						get_list_free(&get_root);
-					}
-					//usleep(50);
-					*/
+					nb_free(&nb);
+					node->state = NC_CLOSE;
 					break;
 				}
-				//usleep(50);
 
 				if( check_conn(__func__, __LINE__) ){
 	                err = netbuf_data(nb, &data, &len);
 					print_err(err, __func__, __LINE__);
 				}
-				//if(err != ERR_OK) 
-				if(is_httpd_run == 4) 
+				if(is_httpd_run == 4) {
+					nb_free(&nb);
+					node->state = NC_CLOSE;
 					break;
-				//DBG("%s\n", data);
-				
+				}
+\				
                 /* check for a GET request */
-                if (!strncmp(data, "GET ", 4)) {
+				if (!strncmp(data, "GET ", 4)) {
                     char *uri = NULL;
 					char *suf = NULL;
 					int suf_len = 0;
 					int uri_len = 0;
-
-					ws_sock_del();
+					get_par* get_root = NULL;
 
 					uri_len = get_uri(data, len, &uri, &suf, &suf_len, &get_root );
 
-					hdr = suf_to_hdr(suf, suf_len, &hdr_sz);
+					node->uri = uri;
+					node->suf = suf;
+					node->get_root = get_root;
+					get_root = NULL;
 					
-					//DBG("client->send_timeout %d\n", client->send_timeout );
-					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, NULL /*char *out*/, suf ) > 0){
-						//nb_free();
-					}else{
-						nb_free();
+			//		node->nb = nb;
+					node->state = NC_BEGIN;
+
+					hdr = suf_to_hdr(suf, &hdr_sz);
+
+#if 1
+					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, node ) > 0){
+						nb_free(&nb);
 						
-						if(suf != NULL && ( (!strcmp(suf, ".lua")) || (!strcmp(suf, ".cgi")) ) ){
-							DBG("lua cgi = %s\n", uri);
-							do_lua(&uri, uri_len, hdr, hdr_sz, /*data, len,*/ NULL /*char *out*/, L, &get_root );
-						}else
-						if( do_file(&uri, uri_len, hdr, hdr_sz, /*data, len,*/ NULL/*char *out*/ ) > 0){
-						}else
-						if( do_something(&uri, uri_len, hdr, hdr_sz, NULL/*&buf_len*/) > 0){
-						}else 
+						node->type = NC_TYPE_WS;
+						node->state = NC_CLOSE;
+						nc_sock_del( nd_idx );
+					}else
+#endif
+					{
+						ws_socks_del();
+
+						nb_free(&nb);
+
+						if( !httpd_pas(L, nd_idx) )
 						{
-							//nb_free();
-							//ws_sock_del();
-							do_404(&uri, uri_len, hdr, hdr_sz, /*data, len,*/ NULL/*out*/);
+							node->type = NC_TYPE_GET;
+							
+							do_404(&uri, uri_len, hdr, hdr_sz, node );
+							
+							node->state = NC_CLOSE;
+							
+							//nc_sock_del( nd_idx );
 						}
 					}
-					if(uri != NULL){
-						free(uri);
-						uri = NULL;
-						uri_len = 0;
-					}
-					if(suf != NULL){
-						free(suf);
-						suf = NULL;
-					}
-					//if(get_root != NULL){
-						get_list_free(&get_root);
-					//}
-					
+
+					if(node->state == NC_BEGIN)
+						node->state = NC_CLOSE;
+
+//					if(node->state == NC_CLOSE){
+//						nc_sock_del(nd_idx);
+//					}
                 }
             }
-			nb_free();
-            //netbuf_delete(nb);
+			nb_free(&nb);
         }
-		nc_free(&client, "Closing connection (client)\n");
-		//usleep(50);
+
 		ws_task(L);
-		//usleep(10);
+		
+		if(nc_clients_cnt > 0){
+			httpd_pas(L, 0);
+		}
 
 		if(is_httpd_run == 2)
 			is_httpd_run = 3;
     }
-	
-	nb_free();
-	nc_free(&client, "Closing connection (client) on http exit\n");
-	ws_sock_del();
-	//if(get_root != NULL){
-		get_list_free(&get_root);
-	//}
+	ws_socks_del();
+
+	while(nc_clients_cnt > 0){
+		nc_sock_del(0);
+	}
+	nc_clients_cnt = 0;
 
 	nc_free(&nc, "Closing connection (main nc)\n");
 	
 	if(is_httpd_run == 3)
 		is_httpd_run = 2;
 
-//}while( is_httpd_run == 4);
-
 	DBG("httpd_task 2 Free mem: %d\n",xPortGetFreeHeapSize());
-	DBG("exit httpd_task: \nws_client=%x, ws_uri=%x, \nnc=%x, client=%x\nnb=%x, get_root=%x\n",
-		ws_client, ws_uri, nc, client, nb, get_root
-	);
+
 	return 0;
 }
+
 
 int httpd_task_loop_run(lua_State* L){
 	is_httpd_run = 1;
@@ -460,9 +539,7 @@ int httpd_task_loop_run(lua_State* L){
 }
 
 
-
 int (*cb_httpd)(lua_State *L) = NULL;
-
 
 int httpd_task_cb_run(lua_State* L){
 	is_httpd_run = 2;
@@ -492,21 +569,6 @@ int httpd_task_stop(lua_State* L){
 #endif
 
 
-/*
-int httpd_start(lua_State* L) {
-//	static TaskHandle_t xHandle = NULL;
-//	if(xHandle != NULL) 
-//		vTaskDelete( xHandle );
-	lua_settop(L,0);
-	lua_pushcfunction(L, &httpd_task);
-	int r = new_thread(L, 1);
-	DBG("httpd started status=%d\n", r);
-//	xTaskCreate(&httpd_task, "httpd", 312, NULL, 2, &xHandle);
-
-	return 0;
-}
-*/
-
 static int httpd_recv_timeout(lua_State* L) {
 	int timeout = recv_timeout;
 	if(lua_gettop(L) > 0){
@@ -516,6 +578,7 @@ static int httpd_recv_timeout(lua_State* L) {
 	lua_pushinteger(L, timeout);
 	return 1;
 }
+
 
 static int httpd_send_timeout(lua_State* L) {
 	int timeout = send_timeout;
@@ -531,7 +594,6 @@ static int httpd_send_timeout(lua_State* L) {
 
 #include "modules.h"
 
-
 const LUA_REG_TYPE httpd_map[] = {
 //		{ LSTRKEY( "httpd" ),		LFUNCVAL( net_httpd_start ) },
 //		{ LSTRKEY( "httpd" ),		LFUNCVAL( httpd_start ) },
@@ -546,9 +608,9 @@ const LUA_REG_TYPE httpd_map[] = {
 		{ LNILKEY, LNILVAL }
 };
 
+
 int luaopen_httpd( lua_State *L ) {
-	cb_httpd = NULL;
-	
+	cb_httpd = NULL;	
 	return 0;
 }
 

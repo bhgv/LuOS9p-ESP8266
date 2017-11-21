@@ -19,8 +19,10 @@
 
 
 
-#define DEF_RECV_TIMEOUT			100
-#define DEF_SEND_TIMEOUT			60000
+#define DEF_RECV_TIMEOUT			50
+#define DEF_SEND_TIMEOUT			30000
+
+#define NC_MAX						3
 
 #define WS_MAX						3
 
@@ -51,11 +53,44 @@ typedef struct {
 	const char* siz;
 } suf_hdr;
 
+enum {
+	NC_TYPE_GET,
+	NC_TYPE_WS,
+};
+
+typedef struct {
+	int type;
+	
+	struct netconn* clnt;
+	char* uri;
+	char* suf;
+
+	get_par *get_root;
+	
+//	struct netbuf *nb;
+
+	spiffs_file cur_f;
+
+	// VVV lua cgi
+	int cgi_lvl;
+	char *pth;
+	// AAA lua cgi
+
+	int state;
+} nc_node;
+
+
+enum {
+	NC_CLOSE = 0,
+	NC_EMPTY = 0,
+	NC_BEGIN,
+	NC_PAS,
+	NC_END,
+};
 
 typedef struct {
 	struct netconn* clnt;
 	char* uri;
-//	int len;
 	int age;
 } ws_node;
 
@@ -73,22 +108,23 @@ void nb_free();
 int check_conn(char* fn, int ln);
 err_t print_err(err_t err, char* fn, int ln);
 
-void ws_sock_del();
+void ws_socks_del();
+void ws_sock_del(int i);
 void ws_task(lua_State *L);
-int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out, char *suff );
+int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, nc_node *node );
 
 int get_list_add(get_par** first, char* name, char* val);
 void get_list_free(get_par** first);
 int lget_params_cnt(lua_State* L);
 int lget_param(lua_State* L);
 
-char* suf_to_hdr(char* suf, int suf_len, char** siz);
+char* suf_to_hdr(char* suf, char** siz);
 
 int get_uri(char* in, int in_len, char** uri, char** suf, int* suf_len, get_par** ppget_root);
 spiffs_file uri_to_file(char* uri, int len, int *flen);
 
-int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out, lua_State* L, get_par** ppget_list );
-int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out );
+int do_lua(char **uri, int uri_len, char *hdr, char* hdr_sz, lua_State* L, int nd_idx );
+int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, int nd_idx );
 
 
 

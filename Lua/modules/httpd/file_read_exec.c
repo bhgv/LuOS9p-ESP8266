@@ -46,13 +46,11 @@
 #endif
 
 
-extern struct netconn *client;
+
+static int totl=0;
 
 
-static spiffs_file cur_f = 0;
-
-
-int do_file_pas(spiffs_file cur_f){
+int do_file_pas(nc_node *node){
 	err_t err;
 	char* buf=NULL;
 	int buf_len = 0;
@@ -61,38 +59,49 @@ int do_file_pas(spiffs_file cur_f){
 	DBG("pre malloc of %d\n", OUT_BUF_LEN );
 	buf = malloc(OUT_BUF_LEN);
 	buf_len = OUT_BUF_LEN-4;
+
+	if(buf == NULL) return ERR_MEM;
 	
-	DBG("pre read %d %x %d\n", cur_f, buf, buf_len );
+	DBG("pre read %d %x %d\n", node->cur_f, buf, buf_len );
 	//tlen = read(f, buf, buf_len);
-	tlen = SPIFFS_read(&fs, cur_f, buf, buf_len); //&(~0x3));
-	DBG("after read %d %x %d\n", cur_f, buf, buf_len );
-	if(tlen < 0)
+	tlen = SPIFFS_read(&fs, node->cur_f, buf, buf_len); //&(~0x3));
+	DBG("after read %d %x %d\n", node->cur_f, buf, tlen );
+	if(tlen < 0){
+		free(buf);
+		buf = NULL;
+		
 		return 0;
-	//totl += tlen;
-	DBG("pre netconn_write %d %x %d\n", cur_f, buf, tlen );
+	}
+
+	DBG("pre netconn_write %d %x %d\n", node->cur_f, buf, tlen );
 	if(tlen > 0){
-		//usleep(10);
 		int t_is_httpd_run = is_httpd_run;
 		if( check_conn(__func__, __LINE__) ){
-			err = netconn_write(client, buf, tlen, NETCONN_NOCOPY);
+			DBG("%s: %d client=%x\n", __func__, __LINE__, node->clnt );
+			err = netconn_write(node->clnt, buf, tlen, NETCONN_NOCOPY);
+			DBG("post netconn_write %d, err=%d\n", node->cur_f, err );
 			print_err(err, __func__, __LINE__);
 		}
-		//if(err != ERR_OK) 
 		if(is_httpd_run == 4){
-			if(err == ERR_ABRT) {
-				nc_free(&client, "Closing connection (client) aborted\n");
+			if(err == ERR_ABRT || err == ERR_CLSD) {
+				//free(buf);
+				//buf = NULL;
+			
+				//nc_free(&node->clnt, "Closing connection (client) aborted\n");
+				//node->state = NC_END;
 				is_httpd_run = t_is_httpd_run;
+				//return 0;
 			}
 			tlen = 0;
 			//break;
 		}
-		//usleep(50);
 	}
 
 	if(buf != NULL){
-		DBG("after do while read %d %x %d totl=%d\n", f, buf, buf_len, totl);
+		DBG("after do while read %d %x %d totl=%d\n", node->cur_f, buf, buf_len, totl);
 		
 		free(buf);
+		buf = NULL;
 		buf_len = 0;
 	}
 
@@ -100,66 +109,106 @@ int do_file_pas(spiffs_file cur_f){
 }
 
 
-int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, /*char* data, int len,*/ char *out ){
+int do_file_begin(char **uri, int uri_len, char *hdr, char* hdr_sz, nc_node *node ){
 	int flen = 0;
 	err_t err = ERR_OK;
-
-	if(cur_f > 0)
-		SPIFFS_close(&fs, cur_f);
 	
-	cur_f = uri_to_file(*uri, uri_len, &flen);
+	node->cur_f = uri_to_file(node->uri, strlen(node->uri), &flen);
 	
-	if(cur_f > 0){
-		//ws_sock_del();
-	//	free(uri);
-	//	uri_len = 0;
-		int totl=0;
-
-		//nb_free();
+	if(node->cur_f > 0){
+		totl = 0;
 		
-		DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), cur_f );
-		//usleep(10);
+		DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), node->cur_f );
 		if( check_conn(__func__, __LINE__) ){
-			err = netconn_write(client, hdr, strlen(hdr), NETCONN_NOCOPY);
+			err = netconn_write(node->clnt, hdr, strlen(hdr), NETCONN_NOCOPY);
 			print_err(err, __func__, __LINE__);
 		}
-		//if(err != ERR_OK) 
 		if(is_httpd_run == 4) {
-			SPIFFS_close(&fs, cur_f);
-			cur_f = 0;
+			SPIFFS_close(&fs, node->cur_f);
+			node->cur_f = -1;
+			node->state = NC_CLOSE;
 			return 0;
 		}
 		
 		if( check_conn(__func__, __LINE__) ){
 			DBG("flen = %d\n", flen );
-			char *hb = malloc(strlen(hdr_sz)+10);
-			snprintf(hb, strlen(hdr_sz)+10-1, hdr_sz, flen);
+			char *hb = malloc(strlen(hdr_sz)+20);
+			snprintf(hb, strlen(hdr_sz)+20-1, hdr_sz, flen);
 			DBG("%s\n", hb );
-			err = netconn_write(client, hb, strlen(hb), NETCONN_NOCOPY);
+			err = netconn_write(node->clnt, hb, strlen(hb), NETCONN_NOCOPY);
 			free(hb);
 
 			print_err(err, __func__, __LINE__);
 		}
-		//if(err != ERR_OK) 
 		if(is_httpd_run == 4) {
-			SPIFFS_close(&fs, cur_f);
-			cur_f = 0;
+			SPIFFS_close(&fs, node->cur_f);
+			node->cur_f = -1;
+			node->state = NC_CLOSE;
 			return 0;
 		}
 		
-		int tlen = 0;
-		do{
-			tlen = do_file_pas( cur_f );
-			totl += tlen;
-		}while( tlen > 0 /*&& !SPIFFS_eof(&fs, (spiffs_file)f )*/ );
-
-		SPIFFS_close(&fs, cur_f );
-		cur_f = 0;
-
-		return totl;
+		node->state = NC_PAS;
+		
+		return 1;
 	}
 	return 0;
 }
 
+
+void do_file_end(nc_node *node){
+	if( node->cur_f > 0){
+		SPIFFS_close(&fs, node->cur_f );
+		node->cur_f = -1;
+	}
+	
+	node->state = NC_CLOSE;
+}
+
+
+
+extern nc_node* nc_clients[];
+extern int nc_clients_cnt;
+
+int do_file(char **uri, int uri_len, char *hdr, char* hdr_sz, int nd_idx ){
+	nc_node *node = nc_clients[nd_idx];
+	
+	DBG( "\n%s: %d nc_state=%d uri=%s, %s (%d from %d)\n", 
+		__func__, __LINE__, node->state, node->uri, *uri,
+		nd_idx, nc_clients_cnt);
+	
+	switch( node->state ){
+		case NC_BEGIN:
+			totl = 0;
+			int r = do_file_begin(uri, uri_len, hdr, hdr_sz, node);
+			return r;
+			//break;
+	
+		case NC_PAS:
+			{
+				int tlen = 0;
+				tlen = do_file_pas( node );
+				if(tlen > 0){
+					totl += tlen;
+				}else{
+					//nc_state = NC_END;
+					node->state = NC_END;
+				}
+				return 1;
+			}
+			//break;
+	
+		case NC_END:
+			do_file_end( node );
+			//nc_state = NC_CLOSE;
+			node->state = NC_CLOSE;
+			break;
+
+		case NC_CLOSE:
+			nc_sock_del( nd_idx );
+			return -1;
+		
+	}
+	return 1;
+}
 
 

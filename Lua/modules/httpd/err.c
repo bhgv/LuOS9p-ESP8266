@@ -151,7 +151,7 @@ err_t print_err(err_t err, char* fn, int ln){
 			is_httpd_run = 4;
 		}
 	}
-	usleep(50);
+//	usleep(50);
 	
 	return err;
 }

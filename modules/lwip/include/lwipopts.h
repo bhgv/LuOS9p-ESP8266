@@ -225,7 +225,7 @@
 /**
  * TCP_MAXRTX: Maximum number of retransmissions of data segments.
  */
-#define TCP_MAXRTX                      2 //4 //6
+#define TCP_MAXRTX                      1 //4 //6
 
 
 /**

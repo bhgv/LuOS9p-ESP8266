@@ -27,9 +27,7 @@
 
 
 
-
 get_par* get_root = NULL;
-
 
 
 int get_list_add(get_par** first, char* name, char* val){
@@ -44,6 +42,7 @@ int get_list_add(get_par** first, char* name, char* val){
 	return 1;
 }
 
+
 void get_list_free(get_par** first){
 	get_par* par = *first;
 	get_par* nxt;
@@ -57,8 +56,6 @@ void get_list_free(get_par** first){
 }
 
 
-
-
 int lget_params_cnt(lua_State* L) {
 	int i = 0;
 	get_par* el = get_root;
@@ -68,6 +65,7 @@ int lget_params_cnt(lua_State* L) {
 	lua_pushinteger(L, i);
 	return 1;
 }
+
 
 int lget_param(lua_State* L) {
 	get_par* el = get_root;
@@ -97,7 +95,5 @@ int lget_param(lua_State* L) {
 	
 	return 0;
 }
-
-
 
 

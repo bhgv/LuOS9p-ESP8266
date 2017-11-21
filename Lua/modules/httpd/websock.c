@@ -24,6 +24,8 @@
 
 #include "espressif/esp_common.h"
 
+#include "lwip/ip_addr.h"
+#include "lwip/tcp.h"
 #include "lwip/api.h"
 /*
 //#include "ipv4/lwip/ip.h"
@@ -33,7 +35,6 @@
 
 #include "mbedtls/sha1.h"
 #include "mbedtls/base64.h"
-
 
 #include "httpd/httpd.h"
 
@@ -46,9 +47,13 @@
 #endif
 
 
-extern struct netconn *client;
 
-//static uint32_t ws_timeout = 0;
+ws_node* ws_clients[WS_MAX] = {
+	NULL,
+	NULL,
+	NULL
+};
+int ws_clients_cnt = 0;
 
 
 const char WS_HEADER[] = "Upgrade: websocket"; // \r\n";
@@ -58,9 +63,6 @@ const char WS_RSP[] = "HTTP/1.1 101 Switching Protocols\r\n" \
 					  "Upgrade: websocket\r\n" \
 					  "Connection: Upgrade\r\n" \
 					  "Sec-WebSocket-Accept: %s\r\n\r\n";
-
-
-
 
 
 void websocket_write(struct netconn *nc, const uint8_t *data, uint16_t len, uint8_t mode){
@@ -93,8 +95,6 @@ static err_t websocket_parse(struct netconn *nc, unsigned char *data, u16_t data
                     for (int i = 0; i < data_len; i++)
                         data[i + 6] ^= data[2 + i % 4];
                     /* user callback */
-					//DBG("ws rcvd: %d %x %s\n", data_len, opcode, &data[6]);
-                    //websocket_cb(nc, &data[6], data_len, opcode);
 					return ERR_OK;
                 }
 				return ERR_VAL;
@@ -108,19 +108,19 @@ static err_t websocket_parse(struct netconn *nc, unsigned char *data, u16_t data
     return ERR_VAL;
 }
 
+
 static err_t websocket_close(struct netconn *nc)
 {
     const char buf[] = {0x88, 0x02, 0x03, 0xe8};
     u16_t len = sizeof(buf);
-//    return tcp_write(pcb, buf, len, TCP_WRITE_FLAG_COPY);
+
 	return netconn_write(nc, buf, len, NETCONN_COPY);
 }
 
+
 static int websocket_connect(struct netconn *nc, char* data, int data_len/*, char* out, int max_out_len*/){
 	int r=0;
-	//DBG("wsc 1\n%s\nlen = %d\n", data, data_len);
 	if ( 
-//		(ws_timeout == 0 || ws_timeout > WS_TIMEOUT_NO_RECONNECT) &&
 		strnstr(data, WS_HEADER, data_len) 
 	) {
 #if 1
@@ -136,7 +136,6 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 	            int len = sizeof(char) * (key_end - key_start);
 				//DBG("wsc 4\n");
 	            if (len + sizeof(WS_GUID) < sizeof(key) && len > 0) {
-					//DBG("wsc 5\n");
 	                /* Concatenate key */
 	                memcpy(key, key_start, len);
 	                strlcpy(&key[len], WS_GUID, sizeof(key));
@@ -149,7 +148,6 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 	                mbedtls_base64_encode(NULL, 0, &olen, sha1sum, 20); //get length
 	                int ok = mbedtls_base64_encode(encoded_key, sizeof(encoded_key), &olen, sha1sum, 20);
 	                if (ok == 0) {
-						//DBG("wsc 6\n");
 						int buf_len = sizeof(WS_RSP) + olen + 4;
 						char* buf = malloc(buf_len+1);
 					
@@ -157,8 +155,6 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 	                    printf("Base64 encoded: %s\n", encoded_key);
 	                    /* Send response */
 	                    u16_t len = snprintf(buf, buf_len, WS_RSP, encoded_key);
-						//DBG("wsc 7 \n%s\n", buf);
-						//usleep(10);
 						err_t err = ERR_OK;
 						if( check_conn(__func__, __LINE__) ){
 	                    	err = netconn_write(nc, buf, len, NETCONN_NOCOPY);
@@ -184,26 +180,13 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 
 
 
-
-
-
-//struct netconn *ws_client;
-ws_node* ws_clients[WS_MAX] = {
-	NULL,
-	NULL,
-	NULL
-};
-int ws_clients_cnt = 0;
-//char* ws_uri = NULL;
-//int ws_len = 0;
-
-
 typedef float (*ws_dev_foo)(int, float);
 
 struct ws_dev_tab {
 	char* name;
 	ws_dev_foo foo;
 };
+
 
 
 #include <pca9685/pca9685.h>
@@ -238,9 +221,11 @@ static float dev_pwm(int ch, float v){
 	return ov;
 }
 
+
+
 #include <pcf8591/pcf8591.h>
 extern unsigned char dac;
-//#define ADDR PCF8591_DEFAULT_ADDRESS
+
 static float dev_adc(int ch, float v){
 	float ov = -1.0;
 
@@ -273,6 +258,8 @@ static float dev_dac(int idx, float par){
 	return 0.;
 }
 
+
+
 #include <pcf8574/pcf8575.h>
 
 static float dev_pio(int ch, float par){
@@ -300,6 +287,7 @@ static float dev_pio(int ch, float par){
 	return ov;
 }
 
+
 struct ws_dev_tab dev_tab[] = {
 	{"pwm", dev_pwm},
 	{"pio", dev_pio},
@@ -309,32 +297,54 @@ struct ws_dev_tab dev_tab[] = {
 };
 
 
+
 void ws_sock_del(int idx){
 	ws_node* el;
-	
-	if(idx < 0 || idx >= WS_MAX) return;
+
+	DBG("%s: %d i=%d, cnt=%d\n", __func__, __LINE__, idx, ws_clients_cnt);
+	if(idx < 0 || idx >= WS_MAX || idx >= ws_clients_cnt) return;
 
 	el = ws_clients[idx];
 	if( el != NULL ){
 		if(el->clnt != NULL){
+			printf("%s: %d pre ws close\n", __func__, __LINE__);
 			websocket_close(el->clnt);
-			char *s = malloc(151);
-			snprintf(s, 150,  "Closing connection (ws_client %d from %d)\n", idx, ws_clients_cnt);
+			printf("%s: %d post ws close\n", __func__, __LINE__);
+			char *s = malloc(81);
+			snprintf(s, 80,  "Closing connection (ws_client %d from %d)\n", idx, ws_clients_cnt);
+			nc_free(&(el->clnt), s);
 			free(s);
-			nc_free(&(el->clnt),s);
 		}
 		
 		if(el->uri != NULL){
 			free(el->uri);
 			el->uri = NULL;
 		}
-		free(el);
 		
-		for( ; idx < WS_MAX-1; idx++){
-			ws_clients[idx] = ws_clients[idx+1];
+		free(el);
+	}
+	
+	for( ; idx < ws_clients_cnt-1; idx++){
+		ws_clients[idx] = ws_clients[idx+1];
+	}
+	
+	ws_clients_cnt--;
+	ws_clients[ ws_clients_cnt ] = NULL;
+}
+
+
+void ws_sock_del_doubles(struct netconn *ws_client){
+	if(ws_client == NULL) return;
+
+	u32_t ip = ws_client->pcb.tcp->remote_ip.addr;
+
+	int i;
+	for(i = ws_clients_cnt-1; i >= 0; i--){
+		ws_node* nd = ws_clients[ i ];
+		struct netconn *clnt = nd->clnt;
+		if(clnt->pcb.tcp->remote_ip.addr == ip){
+			ws_sock_del( i );
 		}
-		ws_clients[WS_MAX-1] = NULL;
-		ws_clients_cnt--;
 	}
 }
 
@@ -343,57 +353,73 @@ ws_node* ws_sock_add(struct netconn *new_client){
 	int idx;
 	ws_node* el = NULL;
 
-	if(ws_clients_cnt >= WS_MAX-1){
-		ws_sock_del(WS_MAX-1);
+	if(ws_clients_cnt == WS_MAX ){
+		ws_sock_del( WS_MAX-1 );
 	}
-	
-	for(idx = WS_MAX-1; idx > 0; idx--)
-		ws_clients[idx] = ws_clients[idx-1];
+
+	ws_sock_del_doubles( new_client );
 	
 	el = malloc( sizeof(ws_node) );
+	if( el == NULL ) return NULL;
+	
+	for(idx = ws_clients_cnt; idx > 0; idx--){
+		ws_clients[idx] = ws_clients[idx-1];
+	}
+	ws_clients_cnt++;
+	
 	el->clnt = new_client;
 	el->uri = NULL;
 	el->age = 0;
 
 	ws_clients[0] = el;
-	ws_clients_cnt++;
 	
 	return el;
 }
 
 
 void ws_sock_gotop(int idx){
-	if(idx < 0 || idx >= WS_MAX) return;
+	if( idx < 0 || idx >= ws_clients_cnt ) return;
+//	if( idx == 0 ) return;
 
-	ws_node *el = ws_clients[idx];
+	ws_node *el = ws_clients[ idx ];
 
 	for( ; idx > 0; idx-- ){
-		ws_clients[idx] = ws_clients[idx-1];
+		ws_clients[ idx ] = ws_clients[ idx-1 ];
 	}
 	ws_clients[0] = el;
 }
 
 
+void ws_socks_del(){
+	while( ws_clients_cnt > 0 ){		
+//		DBG("%s: %d  cnt=%d\n", __func__, __LINE__, ws_clients_cnt);
+		ws_sock_del( 0 );
+	}
+//	ws_clients_cnt = 0;
+}
+
+
+
+extern get_par* get_root;
+
 void ws_sub_task(lua_State *L, int idx){
 	err_t err = ERR_OK;
 	int t_is_httpd_run = is_httpd_run;
 
-	if(idx < 0 || idx >= WS_MAX) return;
+	if( idx < 0 || idx >= WS_MAX || idx >= ws_clients_cnt ) return;
 
 	ws_node *el = ws_clients[idx];
 
 	if(el == NULL) return;
 
-	//ws_timeout++;
 	el->age++;
 
 	//lua_pushnil(L);
 	//lua_setglobal(L, "wsData");
 
-	//while(1){
 	if(is_httpd_run == 1 || is_httpd_run == 2) {
 		struct netbuf *nb=NULL;
-		//usleep(10);
+
 		if (
 			el->clnt != NULL && 
 			check_conn(__func__, __LINE__) &&
@@ -402,20 +428,17 @@ void ws_sub_task(lua_State *L, int idx){
 			unsigned char *data;
 			u16_t len;
 		
-			//usleep(50);
-		
 			if( check_conn(__func__, __LINE__) ){
 				err = netbuf_data(nb, &data, &len);
 				print_err(err, __func__, __LINE__);
 			}
-			//if(err != ERR_OK) 
 			if(is_httpd_run == 4) 
 				return;
 			
 			if( websocket_parse(el->clnt, data, len) == ERR_OK){
 				unsigned char* ws_data = &data[6];
 				int ws_data_len = len-6;
-				//DBG("ws_task: %s %d\n", &data[6], len-6);
+				DBG("ws_task: %s %d\n", &data[6], len-6);
 
 				if(el->uri != NULL){
 					if(!strcmp(el->uri, "/dev")){
@@ -426,14 +449,14 @@ void ws_sub_task(lua_State *L, int idx){
 						memcpy(s, ws_data, ws_data_len);
 						s[ws_data_len] = '\0';
 						
-						netbuf_delete(nb);
-						nb = NULL;
+						//netbuf_delete(nb);
+						//nb = NULL;
 						ws_data = NULL;
 						
 						int r = sscanf(s, "%c%c%c[%d]=%f", &c1, &c2, &c3, &idx, &par);
 						free(s);
 
-						//DBG("after scanf res = %d %c%c%c[%d]=%f\n", r, c1, c2, c3, idx, par);
+						DBG("after scanf res = %d %c%c%c[%d]=%f\n", r, c1, c2, c3, idx, par);
 						if( r == 5 ){
 							struct ws_dev_tab* p_dev_tab = dev_tab;
 							for( ; p_dev_tab->name != NULL; p_dev_tab++ ){
@@ -466,8 +489,9 @@ void ws_sub_task(lua_State *L, int idx){
 						const char* s;
 						int l;
 						int n = lua_gettop(L);
+
+//						get_root = el->get_root;
 					
-						usleep(10);
 						luaC_fullgc(L, 1);
 						
 						lua_pushlstring(L, ws_data, ws_data_len);
@@ -481,25 +505,26 @@ void ws_sub_task(lua_State *L, int idx){
 						websocket_write(el->clnt, (const uint8_t*)s, l, 1);
 						lua_settop(L, n);
 					
-						usleep(10);
 						luaC_fullgc(L, 1);
 
 						el->age = 0;
 						ws_sock_gotop(idx);
 					}
 				}
+//				netbuf_delete(nb);
+//				nb = NULL;
 			} 
 		}else{
 			if(is_httpd_run == 4 ){
-				if(err == ERR_ABRT){
+				if(
+					err == ERR_ABRT ||
+					err == ERR_CLSD
+				){
 					ws_sock_del(idx);
 					el = NULL;
 					is_httpd_run = t_is_httpd_run;
 				}else{
-					int i;
-					for( i = 0; i < WS_MAX; i++ ){
-						ws_sock_del(i);
-					}
+					ws_socks_del();
 					el = NULL;
 				}
 			}
@@ -514,46 +539,36 @@ void ws_sub_task(lua_State *L, int idx){
 			ws_sock_del(idx);
 			//ws_timeout = 0;
 		}
-//	} else {
-//		ws_sock_del();
 	}
 
-	usleep(50);
 }
 
 
 void ws_task(lua_State *L){
 	int i;
-	//ws_node *el;
 	
 	if(is_httpd_run == 1 || is_httpd_run == 2) {
-		for(i = 0; i < WS_MAX; i++){
-			//el = ws_clients[ i ];
-			//if( el != NULL){
-				ws_sub_task(L, i);
-			//}
+		for(i = 0; i < ws_clients_cnt; i++){
+			ws_sub_task(L, i);
 		}
 	}else{
-		for(i = 0; i < WS_MAX; i++){
-			ws_sock_del( i );
-		}
+		ws_socks_del();
 	}
 }
 
 
-
-
-int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, char *out, char *suff ){
-	int r=websocket_connect(client, data, len);
+int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int len, nc_node *node ){
+	if(node == NULL) return 0;
+	
+	char *suff = node->suf;
+	
+	int r=websocket_connect(node->clnt, data, len);
+	
 	DBG("after websocket_connect %x %d %d\n", data, len, r );
-	usleep(50);
 	if(r>0){ 
-		nb_free();
-		//ws_sock_del();
+		ws_node *el = ws_sock_add(node->clnt);
 
-		ws_node *el = ws_sock_add(client);
-		//ws_client = client;
-		client = NULL;
+		node->clnt = NULL;
 
 		if(!strncmp(*uri, "/dev", uri_len)){
 			char *u = malloc(5);
@@ -568,7 +583,7 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 			return 1;
 		}
 
-		int ws_uri_len = uri_len+5;
+		int ws_uri_len = uri_len+5 + 1;
 		char *u = malloc(ws_uri_len + 12);
 		el->uri = u;
 		
@@ -578,9 +593,6 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 		u[3] = 'm';
 		u[4] = 'l';
 		memcpy(&u[5], *uri, uri_len);
-		
-		//free(*uri);
-		//*uri = NULL;
 
 		if(suff != NULL && ( (!strcmp(suff, ".lua")) || (!strcmp(suff, ".cgi") ) ) ){
 			u[ws_uri_len] = '\0';
@@ -595,31 +607,20 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 		}
 		DBG("ws cgi path = %s\n", u);
 
-		usleep(10);
 		int f = SPIFFS_open(&fs, u, SPIFFS_RDONLY, 0); 
+		DBG("ws cgi file test = %d\n", f);
 		if(f <= 0){
-			ws_sock_del(0);
+			ws_socks_del();
 		}else{
 			SPIFFS_close(&fs, f);
 		}
-		DBG("ws cgi file test = %d\n", f);
 
-		//if(xHandleWs != NULL) 
-		//	vTaskDelete( xHandleWs );
-		//xTaskCreate(&ws_task, "wsd", 256, NULL, 2, &xHandleWs);
-	
 		DBG("post websocket_connect %d\n", r );
 	}
 
 	DBG("pre exit websocket_connect %d\n", r );
 	return r > 0;
 }
-
-
-
-
-
-
 
 
 
