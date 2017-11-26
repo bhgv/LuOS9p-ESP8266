@@ -9,8 +9,18 @@
  *     2014/3/31, v1.0 create this file.
 *******************************************************************************/
 
+
+#include <c_types.h>
+
+#include <etstimer.h>
+
+#define ICACHE_FLASH_ATTR 
+
+#include "espressif/esp_timer.h"
+#include "espressif/esp_wifi.h"
+
 #include "ets_sys.h"
-#include "os_type.h"
+//#include "os_type.h"
 //#include "os.h"
 
 #include "lwip/inet.h"

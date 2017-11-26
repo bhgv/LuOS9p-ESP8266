@@ -53,7 +53,14 @@
 #include "lwip/sys.h"
 #include "lwip/timers.h"
 #include "lwip/inet_chksum.h"
-#include "os_type.h"
+
+#include <c_types.h>
+
+#include <etstimer.h>
+
+#define ICACHE_FLASH_ATTR 
+
+//#include "os_type.h"
 #include "osapi.h"
 
 #include "lwip/app/ping.h"

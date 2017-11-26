@@ -9,6 +9,11 @@
  *     2014/3/31, v1.0 create this file. Corrected PV` 2014/12/20, v1.0
 *******************************************************************************/
 
+
+//#include "lwipopts.h"
+
+//#include "lwip/opt.h"
+
 #include "lwip/netif.h"
 #include "lwip/inet.h"
 #include "netif/etharp.h"
@@ -16,9 +21,13 @@
 #include "lwip/ip.h"
 #include "lwip/init.h"
 #include "ets_sys.h"
-#include "os_type.h"
+//#include "os_type.h"
 //#include "os.h"
+#include <c_types.h>
+
 #include "lwip/mem.h"
+
+#include <espressif/esp_timer.h>
 
 #include "lwip/app/espconn_tcp.h"
 #include "lwip/app/espconn_udp.h"
@@ -26,10 +35,20 @@
 
 #include "user_interface.h"
 
+#include "espressif/esp_sta.h"
+
 espconn_msg *plink_active = NULL;
 espconn_msg *pserver_list = NULL;
 remot_info premot[5];
 uint32 link_timer = 0;
+
+#define ICACHE_FLASH_ATTR 
+
+
+#define MEMP_NUM_TCP_PCB                    (*((volatile uint32*)0x600011FC))
+//#undef MEMP_NUM_TCP_PCB
+//uint32 MEMP_NUM_TCP_PCB = 8;
+
 
 /******************************************************************************
  * FunctionName : espconn_copy_partial

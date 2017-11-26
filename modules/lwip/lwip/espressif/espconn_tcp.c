@@ -9,6 +9,10 @@
  *     2014/3/31, v1.0 create this file.
 *******************************************************************************/
 
+//#include "lwipopts.h"
+
+//#include "lwip/opt.h"
+
 #include "lwip/netif.h"
 #include "lwip/inet.h"
 #include "netif/etharp.h"
@@ -18,8 +22,16 @@
 #include "lwip/tcp_impl.h"
 #include "lwip/memp.h"
 
+#include <c_types.h>
+
+#include <etstimer.h>
+
+#define ICACHE_FLASH_ATTR 
+
+#include "espressif/esp_timer.h"
+
 #include "ets_sys.h"
-#include "os_type.h"
+//#include "os_type.h"
 //#include "os.h"
 #include "lwip/mem.h"
 #include "lwip/app/espconn_tcp.h"
@@ -37,6 +49,11 @@ static err_t
 espconn_server_recv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err);
 static void
 espconn_server_close(void *arg, struct tcp_pcb *pcb);
+
+
+#define MEMP_NUM_TCP_PCB                    (*((volatile uint32*)0x600011FC))
+//#undef MEMP_NUM_TCP_PCB
+//extern uint32 MEMP_NUM_TCP_PCB;
 
 ///////////////////////////////common function/////////////////////////////////
 /******************************************************************************

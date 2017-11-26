@@ -51,8 +51,12 @@
 
 #include "lwip/sys.h"
 
+#include <c_types.h>
+#include <lwip/app/dhcpserver.h>
+
 #include <FreeRTOS.h>
 #include <task.h>
+
 #include <httpd/httpd.h>
 
 
@@ -480,12 +484,12 @@ static int net_setup(lua_State* L) {
 		const char *ssid=luaL_checkstring( L, 1); //2 );
 		const char *password=luaL_optstring( L, 2, ""); //3 , "");
 		
-		struct sdk_station_config config = {
-			.ssid =		"",
-			.password =	"",
-		};
+		struct sdk_station_config config;
+		
 		strncpy(config.ssid, ssid, 32-1);
 		strncpy(config.password, password, 64-1);
+
+		dhcps_stop();
 		
 		/* required to call wifi_set_opmode before station_set_config */
 		r = sdk_wifi_set_opmode(STATION_MODE);
@@ -613,6 +617,76 @@ static int net_sntp(lua_State* L) {
 }
 
 
+
+static int net_ap (lua_State* L) {
+     struct ip_info ap_ip;
+    uint8_t sdk_wifi_get_opmode();
+
+	char *AP_SSID = luaL_checkstring(L, 1);
+	char *AP_PSK = luaL_optstring(L, 2, "");
+
+	dhcps_stop();
+
+    sdk_wifi_set_opmode(SOFTAP_MODE);
+	
+    printf("wifi mode = %d\n", sdk_wifi_get_opmode() );
+//        case STATIONAP_MODE:
+//        case SOFTAP_MODE:
+            IP4_ADDR(&ap_ip.ip, 172, 16, 0, 1);
+            IP4_ADDR(&ap_ip.gw, 0, 0, 0, 0);
+            IP4_ADDR(&ap_ip.netmask, 255, 255, 255, 0);
+//            sdk_wifi_set_ip_info(1, &ap_ip);
+            sdk_wifi_set_ip_info(SOFTAP_IF, &ap_ip);
+
+/**/
+            struct sdk_softap_config ap_config = {
+                //.ssid = AP_SSID,
+                .ssid_hidden = 0,
+                .channel = 3,
+                //.ssid_len = strlen(AP_SSID),
+                .authmode = ( AP_PSK == NULL || AP_PSK[0] == '\0' )
+		                			? AUTH_OPEN 
+		                			: AUTH_WPA_WPA2_PSK,
+//				.authmode = AUTH_WPA_WPA2_PSK,
+                //.password = AP_PSK,
+                .max_connection = 5,
+                .beacon_interval = 100,
+            };
+
+			int l = strlen(AP_SSID);
+			l = l < 32 ? l : 31;
+			memcpy(ap_config.ssid, AP_SSID, l);
+			ap_config.ssid[ l ] = '\0';
+			ap_config.ssid_len = l;
+
+			l = strlen(AP_PSK);
+			l = l < 64 ? l : 63;
+			memcpy(ap_config.password, AP_PSK, l);
+			ap_config.password[ l ] = '\0';
+			
+            sdk_wifi_softap_set_config(&ap_config);
+			
+/**/
+
+//            ip_addr_t first_client_ip;
+//            IP4_ADDR(&first_client_ip, 172, 16, 0, 2);
+//            dhcpserver_start(&first_client_ip, 4);
+//            dhcpserver_set_dns(&ap_ip.ip);
+//			dhcpserver_set_router(&ap_ip.ip);
+			dhcps_start(&ap_ip);
+
+//			break;
+//		case STATION_MODE:
+//			break;
+//		default:
+//			break;
+//	}
+	return 0;
+}
+
+
+
+
 #include "modules.h"
 
 const LUA_REG_TYPE sock_map[] = {
@@ -634,7 +708,8 @@ const LUA_REG_TYPE sock_map[] = {
 };
 
 const LUA_REG_TYPE net_map[] = {
-		{ LSTRKEY( "setup" ),		LFUNCVAL( net_setup ) },
+	    { LSTRKEY( "ap" ),		LFUNCVAL( net_ap )},
+		{ LSTRKEY( "sta" ),		LFUNCVAL( net_setup ) },
 		
 		{ LSTRKEY( "sntp" ),		LFUNCVAL( net_sntp )},
 		{ LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},

@@ -117,12 +117,7 @@ int send_timeout = DEF_SEND_TIMEOUT;
 
 struct netconn *nc = NULL;
 
-nc_node* nc_clients[ NC_MAX ] = {
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+nc_node* nc_clients[ NC_MAX ];
 int nc_clients_cnt = 0;
 
 
@@ -609,8 +604,23 @@ const LUA_REG_TYPE httpd_map[] = {
 };
 
 
+extern ws_node* ws_clients[];
+extern int ws_clients_cnt;
+
 int luaopen_httpd( lua_State *L ) {
-	cb_httpd = NULL;	
+	int i;
+	for(i=0; i < WS_MAX; i++){
+		ws_clients[ i ] = NULL;
+	}
+	ws_clients_cnt = 0;
+	
+	for(i=0; i < NC_MAX; i++){
+		nc_clients[ i ] = NULL;
+	}
+	nc_clients_cnt = 0;
+	
+	cb_httpd = NULL;
+	
 	return 0;
 }
 

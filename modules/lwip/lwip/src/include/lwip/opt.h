@@ -151,7 +151,7 @@
  *      memp_malloc() or memp_free() is called (useful but slow!)
  */
 //#ifndef MEMP_OVERFLOW_CHECK
-#define MEMP_OVERFLOW_CHECK             0 //1 //0
+#define MEMP_OVERFLOW_CHECK             1 //0
 //#endif
 
 /**
@@ -159,7 +159,7 @@
  * sure that there are no cycles in the linked lists.
  */
 //#ifndef MEMP_SANITY_CHECK
-#define MEMP_SANITY_CHECK               0 //1 //0
+#define MEMP_SANITY_CHECK               1 //0
 //#endif
 
 /**
@@ -679,7 +679,7 @@
  * LWIP_DHCP==1: Enable DHCP module.
  */
 #ifndef LWIP_DHCP
-#define LWIP_DHCP                       0
+#define LWIP_DHCP                       1 //0
 #endif
 
 /**
@@ -953,7 +953,7 @@
  * an upper limit on the MSS advertised by the remote host.
  */
 #ifndef TCP_MSS
-#define TCP_MSS                         536
+#define TCP_MSS                         548 //536
 #endif
 
 /**
@@ -1479,7 +1479,7 @@
  * If LWIP_SO_RCVBUF is used, this is the default value for recv_bufsize.
  */
 #ifndef RECV_BUFSIZE_DEFAULT
-#define RECV_BUFSIZE_DEFAULT            INT_MAX
+#define RECV_BUFSIZE_DEFAULT            548 //INT_MAX
 #endif
 
 /**

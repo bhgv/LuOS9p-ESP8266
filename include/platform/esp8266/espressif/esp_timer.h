@@ -13,6 +13,8 @@ extern "C" {
 /* timer related */
 typedef void sdk_os_timer_func_t(void *timer_arg);
 
+#define os_timer_func_t sdk_os_timer_func_t
+
 typedef struct _os_timer_t {
 	struct _os_timer_t *timer_next;
     void               *freerots_handle;
@@ -22,6 +24,8 @@ typedef struct _os_timer_t {
     bool               timer_repeat_flag;
     void               *timer_arg;
 } sdk_os_timer_t;
+
+#define os_timer_t sdk_os_timer_t
 
 #ifdef	__cplusplus
 }

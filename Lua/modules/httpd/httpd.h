@@ -9,8 +9,8 @@
 
 
 
-#define IN_BUF_LEN  400 //512
-#define OUT_BUF_LEN  312 //256 //312  //536 //312
+#define IN_BUF_LEN  548 //400 //512
+#define OUT_BUF_LEN  548 //312 //256 //312  //536 //312
 //512
 
 #undef MAXPATHLEN
@@ -24,7 +24,7 @@
 
 #define NC_MAX						3
 
-#define WS_MAX						3
+#define WS_MAX						5
 
 #define WS_TIMEOUT_NO_RECONNECT		10
 #define WS_TIMEOUT_UNCONNECT		500

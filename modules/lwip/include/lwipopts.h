@@ -39,7 +39,7 @@
 #define ESP_TIMEWAIT_THRESHOLD              10000
 #define LWIP_TIMEVAL_PRIVATE                0
 
-#define RECV_BUFSIZE_DEFAULT  512
+#define RECV_BUFSIZE_DEFAULT  548 //512
 
 /*
    -----------------------------------------------
@@ -220,12 +220,12 @@
  *     LWIP_CALLBACK_API==1: The PCB callback function is called directly
  *         for the event. This is the default.
 */
-#define TCP_MSS                         536 //1460
+#define TCP_MSS                         548 //536 //1460
 
 /**
  * TCP_MAXRTX: Maximum number of retransmissions of data segments.
  */
-#define TCP_MAXRTX                      1 //4 //6
+#define TCP_MAXRTX                      2 //4 //6
 
 
 /**

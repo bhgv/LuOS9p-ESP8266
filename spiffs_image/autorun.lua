@@ -6,8 +6,8 @@ for k in pairs(os) do _G[k]=os[k] end
 g=gpio
 
 
-net.setup("TP-LINK", "")
-
+net.sta("TP-LINK", "")
+thread.sleep(1)
 
 gui.setFont(6)
 
@@ -23,7 +23,7 @@ httpd.stop()
 oled.cls()
 oled.draw()
 
-thread.sleep(1)
+--thread.sleep(1)
 --thread.stop(htd)
 gui.setFont(6)
 gui.run "menu/main.lua"

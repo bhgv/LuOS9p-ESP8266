@@ -15,7 +15,7 @@
 
 // Leave unchanged unless you really know what you're doing:
 #define MEM_ALIGNMENT                       4
-#define TCP_MSS                             536 //1460
+#define TCP_MSS                             548 //536 //1460
 #define TCP_SND_BUF                         (2*TCP_MSS)
 #define MEMP_MEM_MALLOC                     1
 #define MEM_LIBC_MALLOC                     1
@@ -85,7 +85,7 @@ static inline uint32_t sys_now(void)
 
 #ifdef LWIP_OUR_IF
   #define LWIP_NETIF_HOSTNAME               1 // our eagle_lwip_if.o required
-  #define LWIP_NETIF_HOSTNAME_PREFIX        "esp8266-"
+  #define LWIP_NETIF_HOSTNAME_PREFIX        "luos9-"
 #endif
 
 // #define LWIP_DEBUG

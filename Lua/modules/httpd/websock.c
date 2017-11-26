@@ -48,11 +48,7 @@
 
 
 
-ws_node* ws_clients[WS_MAX] = {
-	NULL,
-	NULL,
-	NULL
-};
+ws_node* ws_clients[WS_MAX];
 int ws_clients_cnt = 0;
 
 

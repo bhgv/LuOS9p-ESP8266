@@ -2,7 +2,7 @@
 #define __ESPCONN_H__
 
 #include "lwip/dns.h"
-#include "os_type.h"
+//#include "os_type.h"
 
 #if 0
 #define espconn_printf(fmt, args...) os_printf(fmt,## args)

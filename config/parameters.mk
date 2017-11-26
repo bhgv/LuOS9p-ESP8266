@@ -76,7 +76,10 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    $(ROOT)modules/pcf8591 \
 		    $(ROOT)modules/pcf8574 \
 		    $(ROOT)modules/mbedtls \
+		    $(ROOT)modules/lpeg \
 		    $(ROOT)sys/spiffs \
+
+#		    $(ROOT)modules/dhcpserver \
 
 #		    $(ROOT)modules/libesphttpd \
 
