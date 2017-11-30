@@ -631,7 +631,9 @@ TickType_t xTimeNow;
 			software timer. */
 			pxTimer = xMessage.u.xTimerParameters.pxTimer;
 
-			if( listIS_CONTAINED_WITHIN( NULL, &( pxTimer->xTimerListItem ) ) == pdFALSE )
+			if( ((unsigned long)pxTimer & 0xfff00000) != 0x3ff00000 ) return;
+			
+			if(listIS_CONTAINED_WITHIN( NULL, &( pxTimer->xTimerListItem ) ) == pdFALSE )
 			{
 				/* The timer is in a list, remove it. */
 				( void ) uxListRemove( &( pxTimer->xTimerListItem ) );
@@ -659,7 +661,7 @@ TickType_t xTimeNow;
 			    case tmrCOMMAND_RESET_FROM_ISR :
 				case tmrCOMMAND_START_DONT_TRACE :
 					/* Start or restart a timer. */
-					if( prvInsertTimerInActiveList( pxTimer,  xMessage.u.xTimerParameters.xMessageValue + pxTimer->xTimerPeriodInTicks, xTimeNow, xMessage.u.xTimerParameters.xMessageValue ) == pdTRUE )
+					if( prvInsertTimerInActiveList( pxTimer, xMessage.u.xTimerParameters.xMessageValue + pxTimer->xTimerPeriodInTicks, xTimeNow, xMessage.u.xTimerParameters.xMessageValue ) == pdTRUE )
 					{
 						/* The timer expired before it was added to the active
 						timer list.  Process it now. */

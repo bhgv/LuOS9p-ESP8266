@@ -1,4 +1,10 @@
 
+WIFI_SSID = "TP-LINK"
+WIFI_PASS = ""
+
+AP_SSID = "luos_test_ap"
+AP_PASS = ""
+
 p=print
 
 for k in pairs(os) do _G[k]=os[k] end
@@ -6,8 +12,36 @@ for k in pairs(os) do _G[k]=os[k] end
 g=gpio
 
 
-net.sta("TP-LINK", "")
-thread.sleep(1)
+oled.cls()
+oled.print(5, 10, "try to connect to:")
+oled.print(27, 22, '"' .. WIFI_SSID .. '"')
+
+net.sta(WIFI_SSID, WIFI_PASS)
+
+local i = 0
+local ip1, ip2, ip3, ip4 = 0, 0, 0, 0
+
+while i < 20 do
+    oled.print (32, 40, "  " .. i .. " s  ")
+    oled.draw()
+
+    thread.sleep(1)
+    ip1, ip2, ip3, ip4 = net.localip "*n"
+    if ip1 ~= 0 or ip2 ~= 0 then
+	break;
+    else
+	i = i + 1
+    end
+end
+
+ip1, ip2 = net.localip "*n"
+if ip1 == 0 and ip2 == 0 then
+    net.ap(AP_SSID, AP_PASS)
+end
+
+oled.cls()
+oled.draw()
+
 
 gui.setFont(6)
 

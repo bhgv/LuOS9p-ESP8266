@@ -51,9 +51,9 @@ static void
 espconn_server_close(void *arg, struct tcp_pcb *pcb);
 
 
-#define MEMP_NUM_TCP_PCB                    (*((volatile uint32*)0x600011FC))
-//#undef MEMP_NUM_TCP_PCB
-//extern uint32 MEMP_NUM_TCP_PCB;
+//#define MEMP_NUM_TCP_PCB                    (*((volatile uint32*)0x600011FC))
+#undef MEMP_NUM_TCP_PCB
+extern uint32 MEMP_NUM_TCP_PCB;
 
 ///////////////////////////////common function/////////////////////////////////
 /******************************************************************************

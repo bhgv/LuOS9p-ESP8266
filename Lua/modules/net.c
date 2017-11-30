@@ -639,7 +639,19 @@ static int net_ap (lua_State* L) {
             sdk_wifi_set_ip_info(SOFTAP_IF, &ap_ip);
 
 /**/
-            struct sdk_softap_config ap_config = {
+            struct sdk_softap_config *ap_config = malloc( sizeof( struct sdk_softap_config ) );
+
+			sdk_wifi_softap_get_config(ap_config);
+			
+			ap_config->ssid_hidden = 0;
+			ap_config->channel = 3;
+			ap_config->authmode = ( AP_PSK == NULL || AP_PSK[0] == '\0' )
+		                			? AUTH_OPEN 
+		                			: AUTH_WPA_WPA2_PSK;
+			ap_config->max_connection = 5;
+			ap_config->beacon_interval = 100;
+			/**
+			{
                 //.ssid = AP_SSID,
                 .ssid_hidden = 0,
                 .channel = 3,
@@ -649,22 +661,24 @@ static int net_ap (lua_State* L) {
 		                			: AUTH_WPA_WPA2_PSK,
 //				.authmode = AUTH_WPA_WPA2_PSK,
                 //.password = AP_PSK,
-                .max_connection = 5,
+                .max_connection = 6,
                 .beacon_interval = 100,
             };
-
+			**/
 			int l = strlen(AP_SSID);
 			l = l < 32 ? l : 31;
-			memcpy(ap_config.ssid, AP_SSID, l);
-			ap_config.ssid[ l ] = '\0';
-			ap_config.ssid_len = l;
+			memcpy(ap_config->ssid, AP_SSID, l);
+			ap_config->ssid[ l ] = '\0';
+			ap_config->ssid_len = l;
 
 			l = strlen(AP_PSK);
 			l = l < 64 ? l : 63;
-			memcpy(ap_config.password, AP_PSK, l);
-			ap_config.password[ l ] = '\0';
+			memcpy(ap_config->password, AP_PSK, l);
+			ap_config->password[ l ] = '\0';
 			
-            sdk_wifi_softap_set_config(&ap_config);
+            sdk_wifi_softap_set_config(ap_config);
+			
+			free(ap_config);
 			
 /**/
 

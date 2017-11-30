@@ -151,7 +151,7 @@
  *      memp_malloc() or memp_free() is called (useful but slow!)
  */
 //#ifndef MEMP_OVERFLOW_CHECK
-#define MEMP_OVERFLOW_CHECK             1 //0
+#define MEMP_OVERFLOW_CHECK             0 //1 //0
 //#endif
 
 /**
@@ -159,7 +159,7 @@
  * sure that there are no cycles in the linked lists.
  */
 //#ifndef MEMP_SANITY_CHECK
-#define MEMP_SANITY_CHECK               1 //0
+#define MEMP_SANITY_CHECK               0 //1 //0
 //#endif
 
 /**

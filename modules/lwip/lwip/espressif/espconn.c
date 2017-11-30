@@ -45,9 +45,9 @@ uint32 link_timer = 0;
 #define ICACHE_FLASH_ATTR 
 
 
-#define MEMP_NUM_TCP_PCB                    (*((volatile uint32*)0x600011FC))
-//#undef MEMP_NUM_TCP_PCB
-//uint32 MEMP_NUM_TCP_PCB = 8;
+//#define MEMP_NUM_TCP_PCB                    (*((volatile uint32*)0x600011FC))
+#undef MEMP_NUM_TCP_PCB
+uint32 MEMP_NUM_TCP_PCB = 8;
 
 
 /******************************************************************************

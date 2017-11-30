@@ -27,7 +27,7 @@
 #define WS_MAX						5
 
 #define WS_TIMEOUT_NO_RECONNECT		10
-#define WS_TIMEOUT_UNCONNECT		500
+#define WS_TIMEOUT_UNCONNECT		1000
 
 
 

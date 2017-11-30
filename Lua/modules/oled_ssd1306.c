@@ -74,7 +74,7 @@ static int ldisp_mode( lua_State *L )
 }
 
 
-static int ldisp_cls( lua_State *L )
+int ldisp_cls( lua_State *L )
 {
 	int i;
 	for(i=0; i<(DISPLAY_WIDTH * DISPLAY_HEIGHT/8); i++)

@@ -67,7 +67,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 	}
 	pinsert->pnext = NULL;
 	
-	printf("%s: %d i = %d\n", __func__, __LINE__, i);
+DBG("%s: %d i = %d\n", __func__, __LINE__, i);
 }
 
 /******************************************************************************
@@ -130,7 +130,8 @@ static uint8_t* ICACHE_FLASH_ATTR add_offer_options(uint8_t *optptr)
 DBG("%s: %d\n", __func__, __LINE__);
         struct ip_addr ipadd;
 
-        ipadd.addr = *( (uint32_t *) &server_address);
+//        ipadd.addr = *( (uint32_t *) &server_address);
+        ipadd.addr = server_address.addr;
 
 #ifdef USE_CLASS_B_NET
         *optptr++ = DHCP_OPTION_SUBNET_MASK;
@@ -248,7 +249,8 @@ static void ICACHE_FLASH_ATTR create_msg(struct dhcps_msg *m)
 DBG("%s: %d m=%x\n", __func__, __LINE__, m);
         struct ip_addr client;
 
-        client.addr = *( (uint32_t *) &client_address);
+//        client.addr = *( (uint32_t *) &client_address);
+        client.addr = client_address.addr;
 
         m->op = DHCP_REPLY;
         m->htype = DHCP_HTYPE_ETHERNET;
@@ -297,7 +299,7 @@ DBG("%s: %d\n", __func__, __LINE__);
         end = add_offer_options(end);
         end = add_end(end);
 
-	    p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
+	    p = pbuf_alloc(PBUF_TRANSPORT, sizeof( struct dhcps_msg ), PBUF_RAM);
 #if DHCPS_DEBUG
 		printf("udhcp: send_offer>>p->ref = %d\n", p->ref);
 #endif
@@ -494,7 +496,8 @@ DBG("%s: %d\n", __func__, __LINE__);
         struct ip_addr client;
     	bool is_dhcp_parse_end = false;
 
-        client.addr = *( (uint32_t *) &client_address);// Ҫ�����DHCP�ͻ��˵�IP
+        //client.addr = *( (uint32_t *) &client_address);// Ҫ�����DHCP�ͻ��˵�IP
+        client.addr = client_address.addr;
 
         u8_t *end = optptr + len;
         u16_t type = 0;

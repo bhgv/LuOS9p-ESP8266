@@ -212,9 +212,9 @@ end
 static void gui_screen_lightup( lua_State *L){
 	if(no_sleep <= 0){
 		ssd1306_display_on(ADDR, true);
-		ssd1306_set_contrast(ADDR, 0x9f) ;
+		ssd1306_set_contrast(ADDR, 0x7f) ;
 
-		pca9685_set_pwm_value(PCA9685_ADDR_BASE, SLEEP_PWM_CH, 4095 - 100);
+		pca9685_set_pwm_value(PCA9685_ADDR_BASE, SLEEP_PWM_CH, 4095 - 1000);
 	}
 	no_sleep = NO_SLEEP_DELAY;
 }
@@ -375,7 +375,7 @@ static void gui_controller( lua_State *L){
 
 extern int (*cb_httpd)(lua_State *L);
 
-static void _cb_task (lua_State *L/*, int n, int cnt*/ ) { 
+static void _cb_task (lua_State *L ) { 
 	  uint32_t v;
 //	  int i = cnt;
 	  while(1) {
@@ -393,11 +393,12 @@ static void _cb_task (lua_State *L/*, int n, int cnt*/ ) {
 						case MSG_EXIT:
 							msg=NO_MSG;
 							//lua_gc(L, LUA_GCCOLLECT, 0);
-							luaC_fullgc(L, 1);
+							//luaC_fullgc(L, 1);
 							return;
-							break;
+							//break;
 					}
-					lua_gc(L, LUA_GCCOLLECT, 0);
+					//lua_gc(L, LUA_GCCOLLECT, 0);
+					//luaC_fullgc(L, 1);
 
 				  	if(no_sleep > 0){
 						//ssd1306_display_on(ADDR, true);
@@ -444,6 +445,11 @@ static int main_loop( lua_State *L ){
 		gui_screen_lightup(L);
 		new_menu(L, 1);
 		_cb_task(L);
+
+		ldisp_cls(L);
+		ssd1306_load_frame_buffer(ADDR, ssd1306_buffer);
+		//ssd1306_display_on(ADDR, false);
+		no_sleep = 0;
 	}
 	return 0;
 }
