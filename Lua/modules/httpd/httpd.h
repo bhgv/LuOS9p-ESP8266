@@ -22,7 +22,7 @@
 #define DEF_RECV_TIMEOUT			50
 #define DEF_SEND_TIMEOUT			30000
 
-#define NC_MAX						3
+#define NC_MAX						5
 
 #define WS_MAX						5
 

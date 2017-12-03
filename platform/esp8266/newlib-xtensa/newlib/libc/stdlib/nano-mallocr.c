@@ -337,7 +337,7 @@ void nano_free (RARG void * free_p)
     chunk * p_to_free;
     chunk * p, * q;
 
-    if (free_p == NULL) return;
+    if (free_p == NULL || free_p & 0xff000000 < 0x3f000000) return;
 
     p_to_free = get_chunk_from_ptr(free_p);
 

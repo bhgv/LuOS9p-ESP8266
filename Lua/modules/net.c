@@ -460,41 +460,23 @@ static int net_lookup(lua_State* L) {
 
 // net.setup( "your SSID", "your password")
 static int net_setup(lua_State* L) {
+	struct sdk_station_config config;
 	int r;
-//    const char *interface = "wf"; //luaL_checkstring( L, 1 );
-
-/*
-    if (!platform_net_exists(interface)) {
-        return luaL_error(L, "unknown interface");    
-    }
-
-    //if (strcmp(interface, "en") == 0) {
-        
-    //}
     
-//    if (strcmp(interface, "gprs") == 0) {
-//        const char *apn = luaL_checkstring( L, 2 );
-//        const char *pin = luaL_checkstring( L, 3 );
-//        
-//        platform_net_setup_gprs(apn, pin);
-//    }
-*/
-    
-//    if (strcmp(interface, "wf") == 0) {
-		const char *ssid=luaL_checkstring( L, 1); //2 );
-		const char *password=luaL_optstring( L, 2, ""); //3 , "");
-		
-		struct sdk_station_config config;
-		
-		strncpy(config.ssid, ssid, 32-1);
-		strncpy(config.password, password, 64-1);
+	const char *ssid=luaL_checkstring( L, 1);
+	const char *password=luaL_optstring( L, 2, "");
+	
+	strncpy(config.ssid, ssid, 32-1);
+	strncpy(config.password, password, 64-1);
 
-		dhcps_stop();
+	dhcps_stop();
+	usleep(50);
 		
-		/* required to call wifi_set_opmode before station_set_config */
-		r = sdk_wifi_set_opmode(STATION_MODE);
-		r = sdk_wifi_station_set_config(&config);
-//    }
+	/* required to call wifi_set_opmode before station_set_config */
+	//if(sdk_wifi_get_opmode() != STATION_MODE)
+		sdk_wifi_set_opmode(STATION_MODE);
+	r = sdk_wifi_station_set_config(&config);
+	printf("sdk_wifi_station_set_config(%s, %s) = %d\n", config.ssid, config.password, r);
     
     return 0;
 }
@@ -701,6 +683,166 @@ static int net_ap (lua_State* L) {
 
 
 
+#include <espressif/esp_timer.h>
+#include <espressif/esp_wifi.h>
+#include <espressif/esp_sta.h>
+#include <espressif/esp_misc.h>
+#include <espressif/esp_system.h>
+
+//WiFi access point data
+typedef struct {
+	char ssid[32];
+	char bssid[8];
+	int channel;
+	char rssi;
+	char enc;
+} ApData;
+
+//Scan result
+typedef struct {
+	char scanInProgress; //if 1, don't access the underlying stuff from the webpage.
+	ApData **apData;
+	int noAps;
+} ScanResultData;
+
+//Static scan status storage.
+static ScanResultData *cgiWifiAps;
+
+//Callback the code calls when a wlan ap scan is done. Basically stores the result in
+//the cgiWifiAps struct.
+void wifiScanDoneCb(void *arg, sdk_scan_status_t status) {
+	int n;
+	struct sdk_bss_info *bss_link = (struct sdk_bss_info *)arg;
+	//printf("wifiScanDoneCb %d\n", status);
+	if (status!=SCAN_OK) {
+		cgiWifiAps->scanInProgress=0;
+		return;
+	}
+
+	//Clear prev ap data if needed.
+	if (cgiWifiAps->apData!=NULL) {
+		for (n=0; n<cgiWifiAps->noAps; n++) free(cgiWifiAps->apData[n]);
+		free(cgiWifiAps->apData);
+		cgiWifiAps->apData = NULL;
+	}
+
+	//Count amount of access points found.
+	n=0;
+	while (bss_link != NULL) {
+		bss_link = bss_link->next.stqe_next;
+		n++;
+	}
+	//Allocate memory for access point data
+	cgiWifiAps->apData=(ApData **)malloc(sizeof(ApData *)*n);
+	if (cgiWifiAps->apData==NULL) {
+		printf("Out of memory allocating apData\n");
+		return;
+	}
+	cgiWifiAps->noAps=n;
+	printf("Scan done: found %d APs\n", n);
+
+	//Copy access point data to the static struct
+	n=0;
+	bss_link = (struct sdk_bss_info *)arg;
+	while (bss_link != NULL) {
+		if (n>=cgiWifiAps->noAps) {
+			//This means the bss_link changed under our nose. Shouldn't happen!
+			//Break because otherwise we will write in unallocated memory.
+			printf("Huh? I have more than the allocated %d aps!\n", cgiWifiAps->noAps);
+			break;
+		}
+		//Save the ap data.
+		cgiWifiAps->apData[n]=(ApData *)malloc(sizeof(ApData));
+		if (cgiWifiAps->apData[n]==NULL) {
+			printf("Can't allocate mem for ap buff.\n");
+			cgiWifiAps->scanInProgress=0;
+			return;
+		}
+		cgiWifiAps->apData[n]->rssi=bss_link->rssi;
+		cgiWifiAps->apData[n]->channel=bss_link->channel;
+		cgiWifiAps->apData[n]->enc=bss_link->authmode;
+		strncpy(cgiWifiAps->apData[n]->ssid, (char*)bss_link->ssid, 32);
+		memcpy(cgiWifiAps->apData[n]->bssid, (char*)bss_link->bssid, 6);
+
+		bss_link = bss_link->next.stqe_next;
+		n++;
+	}
+	//We're done.
+	cgiWifiAps->scanInProgress=0;
+}
+
+
+static int net_scan_aps (lua_State* L) {
+	int i;
+	if (cgiWifiAps == NULL || !cgiWifiAps->scanInProgress) {
+		if(cgiWifiAps != NULL) {
+			if (cgiWifiAps->apData!=NULL) {
+				for (i=0; i<cgiWifiAps->noAps; i++) free(cgiWifiAps->apData[i]);
+				free(cgiWifiAps->apData);
+				cgiWifiAps->apData = NULL;
+			}
+
+			free(cgiWifiAps);
+			cgiWifiAps = NULL;
+		}
+		cgiWifiAps = malloc(sizeof(ScanResultData));
+		cgiWifiAps->scanInProgress=1;
+		cgiWifiAps->apData = NULL;
+		cgiWifiAps->noAps = 0;
+		
+		sdk_wifi_set_opmode(STATION_MODE);
+
+		sdk_wifi_station_scan(NULL, (sdk_scan_done_cb_t)&wifiScanDoneCb);
+
+		while(cgiWifiAps->scanInProgress){
+			sleep(1);
+		}
+
+		if(cgiWifiAps->noAps > 0 && cgiWifiAps->apData != NULL) {
+			lua_newtable(L);
+			for (i = 0; i < cgiWifiAps->noAps; i++){
+				lua_newtable(L);
+				
+				lua_pushstring(L, cgiWifiAps->apData[ i ]->ssid);
+				lua_setfield(L, -2, "ssid");
+
+				unsigned int mak = 0; 
+				char *mki = cgiWifiAps->apData[ i ]->bssid;
+				mak = 
+					( mki[0] << (8*5) ) |
+					( mki[1] << (8*4) ) |
+					( mki[2] << (8*3) ) |
+					( mki[3] << (8*2) ) |
+					( mki[4] << (8*1) ) |
+					( mki[5] );
+				
+				lua_pushinteger(L, mak);
+				lua_setfield(L, -2, "bssid");
+				
+				lua_rawseti(L, -2, i+1);
+			
+				free(cgiWifiAps->apData[ i ]);
+			}
+			free(cgiWifiAps->apData);
+			cgiWifiAps->apData = NULL;
+			
+			i = 1;
+		}else{
+			i = 0;
+		}
+		
+		free(cgiWifiAps);
+		cgiWifiAps = NULL;
+
+		return i;
+	}
+	return 0;
+}
+
+
+
+
+
 #include "modules.h"
 
 const LUA_REG_TYPE sock_map[] = {
@@ -724,8 +866,10 @@ const LUA_REG_TYPE sock_map[] = {
 const LUA_REG_TYPE net_map[] = {
 	    { LSTRKEY( "ap" ),		LFUNCVAL( net_ap )},
 		{ LSTRKEY( "sta" ),		LFUNCVAL( net_setup ) },
+		{ LSTRKEY( "scan" ), 	LFUNCVAL( net_scan_aps ) },
 		
 		{ LSTRKEY( "sntp" ),		LFUNCVAL( net_sntp )},
+		
 		{ LSTRKEY( "lookup" ),		LFUNCVAL( net_lookup )},
 		{ LSTRKEY( "packip" ),		LFUNCVAL( net_packip )},
 		{ LSTRKEY( "unpackip" ),	LFUNCVAL( net_unpackip )},
@@ -753,8 +897,7 @@ const LUA_REG_TYPE net_map[] = {
 };
 
 
-int luaopen_net
-	( lua_State *L ) {
+int luaopen_net( lua_State *L ) {
 #if 0
     luaL_newlib(L, net_map);
 

@@ -1,9 +1,5 @@
 
-WIFI_SSID = "TP-LINK"
-WIFI_PASS = ""
-
-AP_SSID = "luos_test_ap"
-AP_PASS = ""
+dofile("wifi_ssid_pass.lua")
 
 p=print
 
@@ -11,56 +7,67 @@ for k in pairs(os) do _G[k]=os[k] end
 
 g=gpio
 
-
-oled.cls()
-oled.print(5, 10, "try to connect to:")
-oled.print(27, 22, '"' .. WIFI_SSID .. '"')
-
 net.sta(WIFI_SSID, WIFI_PASS)
 
-local i = 0
-local ip1, ip2, ip3, ip4 = 0, 0, 0, 0
+print( "gui set font" )
+gui.setFont(6)
 
-while i < 20 do
-    oled.print (32, 40, "  " .. i .. " s  ")
-    oled.draw()
+is_sta = true
 
-    thread.sleep(1)
-    ip1, ip2, ip3, ip4 = net.localip "*n"
-    if ip1 ~= 0 or ip2 ~= 0 then
-	break;
-    else
-	i = i + 1
+print( "Sta/Ap select" )
+gui.run "menu/sta.lua"
+
+--[[
+if is_sta then
+    print( "Try connect '" .. WIFI_SSID .. "'" )
+    oled.cls()
+    oled.print(5, 10, "try to connect to:")
+    oled.print(27, 22, '"' .. WIFI_SSID .. '"')
+
+    net.sta(WIFI_SSID, WIFI_PASS)
+
+    local i = 0
+    local ip1, ip2, ip3, ip4 = 0, 0, 0, 0
+
+    is_sta = false
+    while i < 40 do
+	oled.print (32, 40, "  " .. i .. " s  ")
+        oled.draw()
+
+	thread.sleep(1)
+        ip1, ip2, ip3, ip4 = net.localip "*n"
+	if ip1 ~= 0 then
+	    is_sta = true
+	    break
+        else
+	    i = i + 1
+	end
+    end
+    oled.cls()
+--    oled.draw()
+
+--    ip1 = net.localip "*n"
+--    if ip1 == 0 then
+    if not is_sta then
+	print( "can't connect to '" .. WIFI_SSID .. "', start AP '" .. AP_SSID .. "'" )
+	net.ap(AP_SSID, AP_PASS)
     end
 end
+]]
 
-ip1, ip2 = net.localip "*n"
-if ip1 == 0 and ip2 == 0 then
-    net.ap(AP_SSID, AP_PASS)
-end
-
-oled.cls()
-oled.draw()
-
-
-gui.setFont(6)
+--thread.sleep(1)
 
 menus_loop=true
 while menus_loop do
-htd = thread.start( httpd.loop )
---httpd.loop()
+    print( "run httpd + httpd_menu" )
+    htd = thread.start( httpd.loop )
+    thread.sleep(1)
+    gui.run "menu/httpd.lua"
 
---net.httpd()
-gui.run "menu/httpd.lua"
-httpd.stop()
+    print( "stop httpd & run main menu" )
+    httpd.stop()
 
-oled.cls()
-oled.draw()
-
---thread.sleep(1)
---thread.stop(htd)
-gui.setFont(6)
-gui.run "menu/main.lua"
+    gui.run "menu/main.lua"
 end
 
 

@@ -113,7 +113,7 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 SDK_LIBS ?= main net80211 phy pp wpa
 
 # open source libraries linked in
-LIBS ?= hal gcc c m
+LIBS ?= hal gcc c m esp-gdbstub
 
 # set to 0 if you want to use the toolchain libc instead of esp-open-rtos newlib
 OWN_LIBC ?= 1
@@ -144,7 +144,7 @@ CPPFLAGS	+= -mlongcalls -mtext-section-literals
 
 include $(ROOT)config/config.mk
 #include $(ROOT)platform/$(PLATFORM)/config.mk
-EXTRA_LDFLAGS   = 
+EXTRA_LDFLAGS   = -L$(ROOT)modules/esp-gdbstub/lib 
 #-Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=realloc -Wl,--wrap=free
 LDFLAGS		= -nostdlib -L$(BUILD_DIR)sdklib -L$(ROOT)lib -u $(ENTRY_SYMBOL) -Wl,--no-check-sections \
 	    -Wl,-Map=$(BUILD_DIR)$(PROGRAM).map $(EXTRA_LDFLAGS)
@@ -154,7 +154,8 @@ CFLAGS      += -DUSE_CUSTOM_HEAP=0 -I$(ROOT)Lua/src -I$(ROOT)FreeRTOS/Source/inc
 	    -I$(ROOT)modules/lwip/lwip/espressif/include \
 	    -I$(ROOT)modules/core/include/esp \
 	    -I$(ROOT)modules/core/include \
-	    -I$(ROOT)sys 
+	    -I$(ROOT)sys \
+	    -I$(ROOT)modules/esp-gdbstub/include 
 
 LINKER_SCRIPTS += $(ROOT)config/ld/program.ld $(ROOT)config/ld/rom.ld
 

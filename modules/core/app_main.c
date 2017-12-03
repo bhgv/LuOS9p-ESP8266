@@ -36,6 +36,11 @@
 
 #include <sys/debug.h>
 
+#if GDBSTUB
+#include "gdbstub.h"
+#endif
+
+
 // WHITECAT BEGIN
 extern void mach_init();
 extern void newTick(void);
@@ -214,6 +219,11 @@ void IRAM sdk_user_start(void) {
     zero_bss();
 
     sdk_os_install_putc1(default_putc);
+
+#if GDBSTUB
+	gdbstub_init();
+#endif
+	
     if (cksum_magic == 0xffffffff) {
         // No checksum required
     } else if ((cksum_magic == 0x55aa55aa) &&

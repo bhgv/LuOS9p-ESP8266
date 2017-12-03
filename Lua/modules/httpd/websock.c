@@ -114,23 +114,24 @@ static err_t websocket_close(struct netconn *nc)
 }
 
 
+
+extern int nc_clients_cnt;
+
 static int websocket_connect(struct netconn *nc, char* data, int data_len/*, char* out, int max_out_len*/){
 	int r=0;
 	if ( 
 		strnstr(data, WS_HEADER, data_len) 
 	) {
-#if 1
+		if(nc_clients_cnt > 1) return 2;
+		
 	    unsigned char encoded_key[32];
 	    char key[64];
 	    char *key_start = strnstr(data, WS_KEY, data_len);
-		//DBG("wsc 2\n");
 	    if (key_start) {
 	        key_start += 19;
 	        char *key_end = strnstr(key_start, "\r\n", data_len);
-			//DBG("wsc 3\n");
 	        if (key_end) {
 	            int len = sizeof(char) * (key_end - key_start);
-				//DBG("wsc 4\n");
 	            if (len + sizeof(WS_GUID) < sizeof(key) && len > 0) {
 	                /* Concatenate key */
 	                memcpy(key, key_start, len);
@@ -166,7 +167,6 @@ static int websocket_connect(struct netconn *nc, char* data, int data_len/*, cha
 	            }
 			}
 	    }
-#endif
 //    } else {
 //        printf("Malformed packet\n");
 //        r= ERR_ARG;
@@ -303,7 +303,7 @@ void ws_sock_del(int idx){
 	el = ws_clients[idx];
 	if( el != NULL ){
 		if(el->clnt != NULL){
-			printf("%s: %d pre ws close\n", __func__, __LINE__);
+			DBG("%s: %d pre ws close\n", __func__, __LINE__);
 			websocket_close(el->clnt);
 			printf("%s: %d post ws close\n", __func__, __LINE__);
 			char *s = malloc(81);
@@ -561,7 +561,12 @@ int do_websock(char **uri, int uri_len, char *hdr, char* hdr_sz, char* data, int
 	int r=websocket_connect(node->clnt, data, len);
 	
 	DBG("after websocket_connect %x %d %d\n", data, len, r );
-	if(r>0){ 
+	if(r == 2){
+		node->type = NC_TYPE_GET;
+		return 2;
+	}else 
+	if(r == 1){ 
+		node->type = NC_TYPE_WS;
 		ws_node *el = ws_sock_add(node->clnt);
 
 		node->clnt = NULL;

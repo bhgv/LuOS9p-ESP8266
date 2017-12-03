@@ -1,22 +1,56 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no">
-		<!-- link rel="stylesheet" type="text/css" href="css/common.css" -->
-		<!-- link rel="stylesheet" type="text/css" href="css/range.css" -->
-		<!-- link rel="stylesheet" type="text/css" href="css/meter.css" -->
-		<link rel="stylesheet" type="text/css" href="css/the_all.css">
-		<!-- <link rel="stylesheet" type="text/css" href="css/siimple.min.css"> -->
-		<!-- link rel="stylesheet" type="text/css" href="css/style.css" -->
-		<!-- link rel="shortcut icon" href="img/favicon.png" -->
-
-		<title>luOS9 IoT ADC-DAC control page</title>
-		
-		<style>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <!--link rel="stylesheet" type="text/css" href="css/common.css"-->
+    <link rel="stylesheet" type="text/css" href="css/range.css">
+    <link rel="stylesheet" type="text/css" href="css/meter.css">
+    <!--link rel="stylesheet" type="text/css" href="css/the_all.css" -->
+    <title>luOS IoT ADC-DAC control page</title>
+    <style>
+      ul.navbar {
+        list-style-type: none;
+        margin-bottom: 32px;
+        padding: 0;
+        overflow: hidden;
+        background-color: #333;
+      }
+      ul.navbar li {
+        float: left;
+      }
+      ul.navbar li a {
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+      }
+      ul.navbar li a:hover:not(.active) {
+        background-color: #111;
+      }
+      ul.navbar li a.active {
+        background-color: #09a0f6;
+      }
+      @media screen and (max-width: 600px){
+        ul.navbar li.right, 
+        ul.navbar li {float: none;}
+      }
+      
+      
+      td {
+        height: 40px;
+        width: 50%;
+        font-size: 12px; color: blue; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+      }
+      label {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: 30px;
+        color: #333;
+      }
 		</style>
-
-<script language="javascript" type="text/javascript">
+    <script language="javascript" type="text/javascript">
 //	var dac = -1.0;
 //  var rd_ch = 0; //-2 = dac, -3 = int adc, 0-3 = ext adc
 
@@ -46,11 +80,8 @@
 	function set_ctl_state_cb(el, val) {
 		el.value = parseFloat(val);
 	}
-</script>
-
-<script type="text/javascript" src="js/common.js"></script>
-
-<script language="javascript" type="text/javascript">
+</script> <script type="text/javascript" src="js/common.js"></script>
+    <script language="javascript" type="text/javascript">
 	function sndDacSldr(adc_num) {
 		if(adc_num == -2){ 
 			var v = document.getElementById("adc[" + adc_num +"]g").value;
@@ -59,73 +90,77 @@
 			dac = v;
 		}
 	}
-</script>
-
-	</head>
-	<body>
-		<ul class="navbar">
-			<li><a href="/">Home</a></li>
-			<li><a href="pio_dev.html">PIO dev</a></li>
-			<li><a href="pwm_dev.html">PWM dev</a></li>
-			<li><a class="active" href="adc_dac_dev.html">ADC-DAC dev</a></li>
-			<li><a href="about.html">About</a></li>
-			<li><a href="test.lua?hello=world&test=CGI">Test Lua CGI</a></li>
-		</ul>
-		
-		<div> <!-- class="grid main"> -->
-			<h1>ADC-DAC Test</h1>
-		
-			<div id="status_box" class="alert alert-info"  align="center">Loading..</div>
-
-			<div class="cover" style="width: 95%; margin: 0 auto;">
-				<table style="width: 100%;">
-					<tr><td>
-						<span style="color: violet; font-size: 18px;">ext ADCs:</span>
-					</td>
-					<td></td></tr>
-					
-					<tr><td>
-					<meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[0]g"></meter>
-					<label for="adc[0]g">ADC 0 (0) =<span style="color:green;" id="adc[0]"> 50.0%</span></label>
-					</td>
-					<td>
-					<meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[1]g"></meter>
-					<label for="adc[1]g">ADC 1 (1) =<span style="color:green;" id="adc[1]"> 50.0%</span></label>
-					</td></tr>
-					
-					<tr><td>
-					<meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[2]g"></meter>
-					<label for="adc[2]g">ADC 2 (2) =<span style="color:green;" id="adc[2]"> 50.0%</span></label>
-					</td>
-					<td>
-					<meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[3]g"></meter>
-					<label for="adc[3]g">ADC 3 (3) =<span style="color:green;" id="adc[3]"> 50.0%</span></label>
-					</td></tr>
-					
-					<tr><td>
-						<span style="color: violet; font-size: 18px;">int ADC:</span>
-					</td></tr>
-					
-					<tr><td>
-					<meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[-3]g"></meter>
-					<label for="adc[-3]g">int ADC (-3) =<span style="color:green;" id="adc[-3]"> 50.0%</span></label>
-					</td>
-					<td></td></tr>
-				</table>
-				<table style="width: 100%;">
-					<tr><td>
-						<span style="color: violet; font-size: 18px;">DAC:</span>
-					</td></tr>
-					
-					<tr><td>
-					<input type="range" min="0.0" max="100.0" step="0.1" name="lbutton8" id="adc[-2]g" oninput="sndDacSldr(-2)">
-					<label for="adc[-2]g">DAC (-2) =<span style="color:green;" id="adc[-2]"> 50.0%</span></label>
-					</td></tr>
-				</table>
-			</div>
-			
-			<div id="output"></div>
-		</div>
-
-	</body>
-	
+</script> </head>
+  <body>
+    <ul class="navbar">
+      <li><a href="/">Home</a></li>
+      <li><a href="pio_dev.html">PIO dev</a></li>
+      <li><a href="pwm_dev.html">PWM dev</a></li>
+      <li><a class="active" href="adc_dac_dev.html">ADC-DAC dev</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="test.lua?hello=world&amp;test=CGI">Test Lua CGI</a></li>
+    </ul>
+    <div>
+      <!-- class="grid main"> -->
+      <h1>ADC-DAC Test</h1>
+      <div align="center">
+        <table><tr>
+        <td><div id="status_box">Loading..</div></td> 
+        <td><input value="Refresh Data" onclick="do_refresh();" type="button"></td>
+        </tr></table>
+      <div class="cover" style="width: 95%; margin: 0 auto;">
+        <table style="width: 100%;">
+          <tbody>
+            <tr>
+              <td> <span style="color: violet; font-size: 18px;">ext ADCs:</span>
+              </td>
+              <td><br>
+              </td>
+            </tr>
+            <tr>
+              <td> <meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[0]g"></meter>
+                <label for="adc[0]g">ADC 0 (0) =<span style="color:green;" id="adc[0]">
+                    50.0%</span></label> </td>
+              <td> <meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[1]g"></meter>
+                <label for="adc[1]g">ADC 1 (1) =<span style="color:green;" id="adc[1]">
+                    50.0%</span></label> </td>
+            </tr>
+            <tr>
+              <td> <meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[2]g"></meter>
+                <label for="adc[2]g">ADC 2 (2) =<span style="color:green;" id="adc[2]">
+                    50.0%</span></label> </td>
+              <td> <meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[3]g"></meter>
+                <label for="adc[3]g">ADC 3 (3) =<span style="color:green;" id="adc[3]">
+                    50.0%</span></label> </td>
+            </tr>
+            <tr>
+              <td> <span style="color: violet; font-size: 18px;">int ADC:</span>
+              </td>
+            </tr>
+            <tr>
+              <td> <meter min="0.0" max="100.0" value="50.0" name="lbutton8" id="adc[-3]g"></meter>
+                <label for="adc[-3]g">int ADC (-3) =<span style="color:green;" id="adc[-3]">
+                    50.0%</span></label> </td>
+              <td><br>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100%;">
+          <tbody>
+            <tr>
+              <td> <span style="color: violet; font-size: 18px;">DAC:</span> </td>
+            </tr>
+            <tr>
+              <td> <input min="0.0" max="100.0" step="0.1" name="lbutton8" id="adc[-2]g"
+                  oninput="sndDacSldr(-2)" type="range"> <label for="adc[-2]g">DAC
+                  (-2) =<span style="color:green;" id="adc[-2]"> 50.0%</span></label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+  </body>
+</html>

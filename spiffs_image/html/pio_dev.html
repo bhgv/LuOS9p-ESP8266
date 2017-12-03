@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no">
-		<!-- link rel="stylesheet" type="text/css" href="css/common.css" -->
-		<!-- link rel="stylesheet" type="text/css" href="css/checkbox.css" -->
-		<link rel="stylesheet" type="text/css" href="css/the_all.css">
-		<!-- <link rel="stylesheet" type="text/css" href="css/siimple.min.css"> -->
-		<!-- link rel="stylesheet" type="text/css" href="css/style.css" -->
-		<!-- link rel="shortcut icon" href="img/favicon.png" -->
-
-		<title>luOS9 IoT PIO control page</title>
-		
-		<style>
-		</style>
-
-<script language="javascript" type="text/javascript">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/checkbox.css">
+    <!--link rel="stylesheet" type="text/css" href="css/the_all.css" -->
+    <title>luOS IoT PIO control page</title>
+    <script language="javascript" type="text/javascript">
 
 	function get_cb(rd_ch) {
 		var cmd = "pio[" + rd_ch + "]=-1.0";      
@@ -39,134 +31,94 @@
 		var v = parseFloat(val);
 		el.checked = v > 0.0 ? 1 : 0;
 	}
-</script>
-
-<script type="text/javascript" src="js/common.js"></script>
-
-<script language="javascript" type="text/javascript">
+</script> <script type="text/javascript" src="js/common.js"></script>
+    <script language="javascript" type="text/javascript">
 	function sndKey(k_num) {
 		var v = document.getElementById("pio[" + k_num + "]g").checked ? 1 : 0;
 		var cmd = "pio[" + k_num + "]=" + v;
 		//writeToScreen('<span style="color: blue;">SENT:' + cmd+'</span>');
 		doSend(cmd);
 	}
-</script>
-
-	</head>
-	<body>
-		<ul class="navbar">
-			<li><a href="/">Home</a></li>
-			<li><a class="active" href="pio_dev.html">PIO dev</a></li>
-			<li><a href="pwm_dev.html">PWM dev</a></li>
-			<li><a href="adc_dac_dev.html">ADC-DAC dev</a></li>
-			<li><a href="about.html">About</a></li>
-			<li><a href="test.lua?hello=world&test=CGI">Test Lua CGI</a></li>
-		</ul>
-		
-		<div class="grid main">
-			<h1>PIOs Test</h1>
-		
-			<div id="status_box" class="alert alert-info" align="center">Loading..</div>
-
-			<div class="cover" align="center">					
-					<table width="95%">
-					<tr><td>
-						<span style="color: violet; font-size: 18px;">General mode PIOs:</span>
-					</td><td>
-					</td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio[0]g" onclick="sndKey(0)">
-					<label for="pio[0]g">PIO 1 (0) =<span style="color:green;" id="pio[0]"> Off</span></label>
-					</td>
-					<td>
-					<input type="checkbox" name="lbutton8" id="pio[1]g" onclick="sndKey(1)">
-					<label for="pio[1]g">PIO 2 (1) =<span style="color:green;" id="pio[1]"> Off</span></label>
-					</td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio[2]g" onclick="sndKey(2)">
-					<label for="pio[2]g">PIO 3 (2) =<span style="color:green;" id="pio[2]"> Off</span></label>
-					</td>
-					<td>
-					<input type="checkbox" name="lbutton8" id="pio[3]g" onclick="sndKey(3)">
-					<label for="pio[3]g">PIO 4 (3) =<span style="color:green;" id="pio[3]"> Off</span></label>
-					</td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio[4]g" onclick="sndKey(4)">
-					<label for="pio[4]g">PIO 5 (4) =<span style="color:green;" id="pio[4]"> Off</span></label>
-					</td>
-					<td></td></tr>
-					
-					<tr><td>
-						<span style="color: violet; font-size: 18px;">AC keys:</span>
-					</td>
-					<td></td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio[5]g" onclick="sndKey(5)">
-					<label for="pio[5]g">AC key 3 (5) =<span style="color:green;" id="pio[5]"> Off</span></label>
-					</td>
-					<td>
-					<input type="checkbox" name="lbutton8" id="pio[6]g" onclick="sndKey(6)">
-					<label for="pio[6]g">AC key 2 (6) =<span style="color:green;" id="pio[6]"> Off</span></label>
-					</td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio[7]g" onclick="sndKey(7)">
-					<label for="pio[7]g">AC key 1 (7) =<span style="color:green;" id="pio[7]"> Off</span></label>
-					</td>
-					<td></td></tr>
-
-<!--
-					<tr><td>
-						<span style="color: violet; font-size: 18px;">Keys:</span>
-					</td>
-					<td></td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio8" onclick="sndKey(8)">
-					<label for="pio8">button "Ok" (8) =<span style="color:green;" id="pio[8]"> Off</span></label>
-					</td>
-					<td>
-					<input type="checkbox" name="lbutton8" id="pio9" onclick="sndKey(9)">
-					<label for="pio9">button "<" (9) =<span style="color:green;" id="pio[9]"> Off</span></label>
-					</td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio10" onclick="sndKey(10)">
-					<label for="pio10">button ">" (10) =<span style="color:green;" id="pio[10]"> Off</span></label>
-					</td>
-					<td>
-					<input type="checkbox" name="lbutton8" id="pio11" onclick="sndKey(11)">
-					<label for="pio11">button "A" (11) =<span style="color:green;" id="pio[11]"> Off</span></label>
-					</td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio12" onclick="sndKey(12)">
-					<label for="pio12">button "V" (12) =<span style="color:green;" id="pio[12]"> Off</span></label>
-					</td>
-					<td>
-					<input type="checkbox" name="lbutton8" id="pio13" onclick="sndKey(13)">
-					<label for="pio13">button "<<" (13) =<span style="color:green;" id="pio[13]"> Off</span></label>
-					</td></tr>
-					
-					<tr><td>
-					<input type="checkbox" name="lbutton8" id="pio14" onclick="sndKey(14)">
-					<label for="pio14">button ">>" (14) =<span style="color:green;" id="pio[14]"> Off</span></label>
-					</td>
-					<td>
-					<input type="checkbox" name="lbutton8" id="pio[15]g" onclick="sndKey(15)">
-					<label for="pio[15]g">ext. button (15) =<span style="color:green;" id="pio[15]"> Off</span></label>
-					</td></tr>
--->
-					
-				</table>
-			</div>
-			
-			<div id="output"></div>
-		</div>
-
-	</body>
-	
+</script> </head>
+  <body>
+    <ul class="navbar">
+      <li><a href="/">Home</a></li>
+      <li><a class="active" href="pio_dev.html">PIO dev</a></li>
+      <li><a href="pwm_dev.html">PWM dev</a></li>
+      <li><a href="adc_dac_dev.html">ADC-DAC dev</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="test.lua?hello=world&amp;test=CGI">Test Lua CGI</a></li>
+    </ul>
+    <div class="grid main">
+      <h1>PIOs Test</h1>
+      <div align="center">
+        <table><tr>
+        <td><div id="status_box">Loading..</div></td>
+        <td><input value="Refresh Data" onclick="do_refresh();" type="button"></td>
+        </tr></table>
+      <div class="cover" align="center">
+        <table width="95%">
+          <tbody>
+            <tr>
+              <td> <span style="color: violet; font-size: 18px;">General mode
+                  PIOs:</span> </td>
+              <td> <br>
+              </td>
+            </tr>
+            <tr>
+              <td> <input name="lbutton8" id="pio[0]g" onclick="sndKey(0)" type="checkbox">
+                <label for="pio[0]g">PIO 1 (0) =<span style="color:green;" id="pio[0]">
+                    Off</span></label> </td>
+              <td> <input name="lbutton8" id="pio[1]g" onclick="sndKey(1)" type="checkbox">
+                <label for="pio[1]g">PIO 2 (1) =<span style="color:green;" id="pio[1]">
+                    Off</span></label> </td>
+            </tr>
+            <tr>
+              <td> <input name="lbutton8" id="pio[2]g" onclick="sndKey(2)" type="checkbox">
+                <label for="pio[2]g">PIO 3 (2) =<span style="color:green;" id="pio[2]">
+                    Off</span></label> </td>
+              <td> <input name="lbutton8" id="pio[3]g" onclick="sndKey(3)" type="checkbox">
+                <label for="pio[3]g">PIO 4 (3) =<span style="color:green;" id="pio[3]">
+                    Off</span></label> </td>
+            </tr>
+            <tr>
+              <td> <input name="lbutton8" id="pio[4]g" onclick="sndKey(4)" type="checkbox">
+                <label for="pio[4]g">PIO 5 (4) =<span style="color:green;" id="pio[4]">
+                    Off</span></label> </td>
+              <td><br>
+              </td>
+            </tr>
+            <tr>
+              <td> <span style="color: violet; font-size: 18px;">AC keys:</span>
+              </td>
+              <td><br>
+              </td>
+            </tr>
+            <tr>
+              <td> <input name="lbutton8" id="pio[5]g" onclick="sndKey(5)" type="checkbox">
+                <label for="pio[5]g">AC key 3 (5) =<span style="color:green;" id="pio[5]">
+                    Off</span></label> </td>
+              <td> <input name="lbutton8" id="pio[6]g" onclick="sndKey(6)" type="checkbox">
+                <label for="pio[6]g">AC key 2 (6) =<span style="color:green;" id="pio[6]">
+                    Off</span></label> </td>
+            </tr>
+            <tr>
+              <td> <input name="lbutton8" id="pio[7]g" onclick="sndKey(7)" type="checkbox">
+                <label for="pio[7]g">AC key 1 (7) =<span style="color:green;" id="pio[7]">
+                    Off</span></label> </td>
+              <td><br>
+              </td>
+            </tr>
+            <!--
+					<tr><td>						<span style="color: violet; font-size: 18px;">Keys:</span>					</td>					<td></td></tr>										<tr><td>					<input type="checkbox" name="lbutton8" id="pio8" onclick="sndKey(8)">					<label for="pio8">button "Ok" (8) =<span style="color:green;" id="pio[8]"> Off</span></label>
+					</td>					<td>					<input type="checkbox" name="lbutton8" id="pio9" onclick="sndKey(9)">					<label for="pio9">button "<" (9) =<span style="color:green;" id="pio[9]"> Off</span></label>					</td></tr>										<tr><td>					<input type="checkbox" name="lbutton8" id="pio10" onclick="sndKey(10)">
+					<label for="pio10">button ">" (10) =<span style="color:green;" id="pio[10]"> Off</span></label>					</td>					<td>					<input type="checkbox" name="lbutton8" id="pio11" onclick="sndKey(11)">					<label for="pio11">button "A" (11) =<span style="color:green;" id="pio[11]"> Off</span></label>					</td></tr>										<tr><td>
+					<input type="checkbox" name="lbutton8" id="pio12" onclick="sndKey(12)">					<label for="pio12">button "V" (12) =<span style="color:green;" id="pio[12]"> Off</span></label>					</td>					<td>					<input type="checkbox" name="lbutton8" id="pio13" onclick="sndKey(13)">					<label for="pio13">button "<<" (13) =<span style="color:green;" id="pio[13]"> Off</span></label>					</td></tr>					
+					<tr><td>					<input type="checkbox" name="lbutton8" id="pio14" onclick="sndKey(14)">					<label for="pio14">button ">>" (14) =<span style="color:green;" id="pio[14]"> Off</span></label>					</td>					<td>					<input type="checkbox" name="lbutton8" id="pio[15]g" onclick="sndKey(15)">					<label for="pio[15]g">ext. button (15) =<span style="color:green;" id="pio[15]"> Off</span></label>					</td></tr>
+--> </tbody>
+        </table>
+      </div>
+    </div>
+    
+  </body>
+</html>

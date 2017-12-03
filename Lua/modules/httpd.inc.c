@@ -149,7 +149,7 @@ void nc_sock_del(int idx){
 	
 	DBG("Removing connection (%d from %d)\n", idx, nc_clients_cnt);
 	if( el != NULL ){
-		if( el->clnt != NULL ){
+		if( el->type != NC_TYPE_WS && el->clnt != NULL ){
 			char *s = malloc(81);
 			snprintf(s, 80, "Closing connection (client %d from %d)\n", idx, nc_clients_cnt);
 			nc_free(&(el->clnt), s);
@@ -454,10 +454,10 @@ int httpd_task(lua_State* L) {
 					hdr = suf_to_hdr(suf, &hdr_sz);
 
 #if 1
-					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, node ) > 0){
+					if( do_websock(&uri, uri_len, hdr, hdr_sz, data, len, node ) > 0 ){
 						nb_free(&nb);
 						
-						node->type = NC_TYPE_WS;
+						//node->type = NC_TYPE_WS;
 						node->state = NC_CLOSE;
 						nc_sock_del( nd_idx );
 					}else
@@ -490,7 +490,7 @@ int httpd_task(lua_State* L) {
 			nb_free(&nb);
         }
 
-		ws_task(L);
+		if(nc_clients_cnt == 0) ws_task(L);
 		
 		if(nc_clients_cnt > 0){
 			httpd_pas(L, 0);

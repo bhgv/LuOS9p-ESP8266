@@ -215,6 +215,15 @@ UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
 item. */
 List_t * const pxList = ( List_t * ) pxItemToRemove->pvContainer;
 
+/**/
+	if( 
+		( (unsigned long)pxItemToRemove->pxNext & (unsigned long)0xff000000) < 0x3f000000 ||
+		( (unsigned long)pxItemToRemove->pxPrevious & (unsigned long)0xff000000) < 0x3f000000 ||
+		( (unsigned long)pxList & (unsigned long)0xff000000) < 0x3f000000
+	)	
+		return 0;
+/**/
+
 	pxItemToRemove->pxNext->pxPrevious = pxItemToRemove->pxPrevious;
 	pxItemToRemove->pxPrevious->pxNext = pxItemToRemove->pxNext;
 

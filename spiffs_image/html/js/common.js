@@ -1,4 +1,3 @@
-
 var wsUri = "ws://"+window.location.host+"/dev";
 var output;
 
@@ -51,6 +50,13 @@ function init()
 		},
 		200
 	);
+}
+
+function do_refresh()
+{
+	rd_ch = 0;
+	interval_timeout = 0;
+	return;
 }
 
 function wsOpen()
