@@ -871,7 +871,7 @@ LUAMOD_API int luaopen_io (lua_State *L) {
   /* create (and set) default files */
   createstdfile(L, stdin, IO_INPUT, "stdin");
   createstdfile(L, stdout, IO_OUTPUT, "stdout");
-  createstdfile(L, stderr, /*NULL*/ IO_ERR, "stderr");
+  //createstdfile(L, stderr, /*NULL*/ IO_ERR, "stderr");
   
   return 0;
 #endif

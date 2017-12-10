@@ -64,16 +64,16 @@ espconn_copy_partial(struct espconn *pesp_dest, struct espconn *pesp_source)
 	if (pesp_source->type == ESPCONN_TCP){
 		pesp_dest->proto.tcp->remote_port = pesp_source->proto.tcp->remote_port;
 		pesp_dest->proto.tcp->local_port = pesp_source->proto.tcp->local_port;
-		os_memcpy(pesp_dest->proto.tcp->remote_ip, pesp_source->proto.tcp->remote_ip, 4);
-		os_memcpy(pesp_dest->proto.tcp->local_ip, pesp_source->proto.tcp->local_ip, 4);
+		memcpy(pesp_dest->proto.tcp->remote_ip, pesp_source->proto.tcp->remote_ip, 4);
+		memcpy(pesp_dest->proto.tcp->local_ip, pesp_source->proto.tcp->local_ip, 4);
 		pesp_dest->proto.tcp->connect_callback = pesp_source->proto.tcp->connect_callback;
 		pesp_dest->proto.tcp->reconnect_callback = pesp_source->proto.tcp->reconnect_callback;
 		pesp_dest->proto.tcp->disconnect_callback = pesp_source->proto.tcp->disconnect_callback;
 	} else {
 		pesp_dest->proto.udp->remote_port = pesp_source->proto.udp->remote_port;
 		pesp_dest->proto.udp->local_port = pesp_source->proto.udp->local_port;
-		os_memcpy(pesp_dest->proto.udp->remote_ip, pesp_source->proto.udp->remote_ip, 4);
-		os_memcpy(pesp_dest->proto.udp->local_ip, pesp_source->proto.udp->local_ip, 4);
+		memcpy(pesp_dest->proto.udp->remote_ip, pesp_source->proto.udp->remote_ip, 4);
+		memcpy(pesp_dest->proto.udp->local_ip, pesp_source->proto.udp->local_ip, 4);
 	}
 	pesp_dest->recv_callback = pesp_source->recv_callback;
 	pesp_dest->sent_callback = pesp_source->sent_callback;
@@ -104,7 +104,7 @@ void ICACHE_FLASH_ATTR espconn_list_creat(espconn_msg **phead, espconn_msg* pins
 
 /*	ptest = *phead;
 	while(ptest != NULL){
-		os_printf("espconn_list_creat %p\n", ptest);
+		printf("espconn_list_creat %p\n", ptest);
 		ptest = ptest->pnext;
 	}*/
 }
@@ -136,7 +136,7 @@ void ICACHE_FLASH_ATTR espconn_list_delete(espconn_msg **phead, espconn_msg* pde
 	}
 /*	ptest = *phead;
 	while(ptest != NULL){
-		os_printf("espconn_list_delete %p\n", ptest);
+		printf("espconn_list_delete %p\n", ptest);
 		ptest = ptest->pnext;
 	}*/
 }
@@ -195,30 +195,30 @@ espconn_connect(struct espconn *espconn)
     } else if (espconn ->type != ESPCONN_TCP)
     	return ESPCONN_ARG;
 
-    if (wifi_get_opmode() == ESPCONN_STA){
-    	wifi_get_ip_info(STA_NETIF,&ipinfo);
+    if (sdk_wifi_get_opmode() == ESPCONN_STA){
+    	sdk_wifi_get_ip_info(STA_NETIF,&ipinfo);
     	if (ipinfo.ip.addr == 0){
    	 		return ESPCONN_RTE;
    	 	}
-    } else if(wifi_get_opmode() == ESPCONN_AP){
-    	wifi_get_ip_info(AP_NETIF,&ipinfo);
+    } else if(sdk_wifi_get_opmode() == ESPCONN_AP){
+    	sdk_wifi_get_ip_info(AP_NETIF,&ipinfo);
     	if (ipinfo.ip.addr == 0){
     		return ESPCONN_RTE;
     	}
-    } else if(wifi_get_opmode() == ESPCONN_AP_STA){
+    } else if(sdk_wifi_get_opmode() == ESPCONN_AP_STA){
     	IP4_ADDR(&ipaddr, espconn->proto.tcp->remote_ip[0],
     	    	    		espconn->proto.tcp->remote_ip[1],
     	    	    		espconn->proto.tcp->remote_ip[2],
     	    	    		espconn->proto.tcp->remote_ip[3]);
     	ipaddr.addr <<= 8;
-    	wifi_get_ip_info(AP_NETIF,&ipinfo);
+    	sdk_wifi_get_ip_info(AP_NETIF,&ipinfo);
     	ipinfo.ip.addr <<= 8;
     	espconn_printf("softap_addr = %x, remote_addr = %x\n", ipinfo.ip.addr, ipaddr.addr);
 
     	if (ipaddr.addr != ipinfo.ip.addr){
-    		connect_status = wifi_station_get_connect_status();
+    		connect_status = sdk_wifi_station_get_connect_status();
 			if (connect_status == STATION_GOT_IP){
-				wifi_get_ip_info(STA_NETIF,&ipinfo);
+				sdk_wifi_get_ip_info(STA_NETIF,&ipinfo);
 				if (ipinfo.ip.addr == 0)
 					return ESPCONN_RTE;
 			} else {
@@ -496,7 +496,7 @@ espconn_get_connection_info(struct espconn *pespconn, remot_info **pcon_info, ui
 	if (pespconn == NULL)
 		return ESPCONN_ARG;
 
-	os_memset(premot, 0, sizeof(premot));
+	memset(premot, 0, sizeof(premot));
 	pespconn->link_cnt = 0;
 	plist = plink_active;
 	switch (pespconn->type){
@@ -508,7 +508,7 @@ espconn_get_connection_info(struct espconn *pespconn, remot_info **pcon_info, ui
 							if (plist->pssl != NULL){
 								premot[pespconn->link_cnt].state = plist->pespconn->state;
 								premot[pespconn->link_cnt].remote_port = plist->pcommon.remote_port;
-								os_memcpy(premot[pespconn->link_cnt].remote_ip, plist->pcommon.remote_ip, 4);
+								memcpy(premot[pespconn->link_cnt].remote_ip, plist->pcommon.remote_ip, 4);
 								pespconn->link_cnt ++;
 							}
 							break;
@@ -516,7 +516,7 @@ espconn_get_connection_info(struct espconn *pespconn, remot_info **pcon_info, ui
 							if (plist->pssl == NULL){
 								premot[pespconn->link_cnt].state = plist->pespconn->state;
 								premot[pespconn->link_cnt].remote_port = plist->pcommon.remote_port;
-								os_memcpy(premot[pespconn->link_cnt].remote_ip, plist->pcommon.remote_ip, 4);
+								memcpy(premot[pespconn->link_cnt].remote_ip, plist->pcommon.remote_ip, 4);
 								pespconn->link_cnt ++;
 							}
 							break;
@@ -533,7 +533,7 @@ espconn_get_connection_info(struct espconn *pespconn, remot_info **pcon_info, ui
 				if (plist->pespconn->type == ESPCONN_UDP){
 					premot[pespconn->link_cnt].state = plist->pespconn->state;
 					premot[pespconn->link_cnt].remote_port = plist->pcommon.remote_port;
-					os_memcpy(premot[pespconn->link_cnt].remote_ip, plist->pcommon.remote_ip, 4);
+					memcpy(premot[pespconn->link_cnt].remote_ip, plist->pcommon.remote_ip, 4);
 					pespconn->link_cnt ++;
 				}
 				plist = plist->pnext;
@@ -598,7 +598,7 @@ sint8 ICACHE_FLASH_ATTR espconn_regist_time(struct espconn *espconn, uint32 inte
 			return ESPCONN_ARG;
 	} else {
 		link_timer = interval;
-		os_printf("espconn_regist_time %d\n", link_timer);
+		printf("espconn_regist_time %d\n", link_timer);
 		return ESPCONN_OK;
 	}
 }
@@ -694,10 +694,10 @@ uint32 espconn_port(void)
     static uint32 randnum = 0;
 
     do {
-        port = system_get_time();
+        port = sdk_system_get_time();
 
         if (port < 0) {
-            port = os_random() - port;
+            port = random() - port;
         }
 
         port %= 0xc350;

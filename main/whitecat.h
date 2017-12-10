@@ -312,7 +312,7 @@
 #define LUA_USE_LORA 0		       // lora
 #define LUA_USE_PACK 1		       // pack
 #define LUA_USE_THREAD 1		   // thread
-#define LUA_USE_EDITOR 0	       // editor
+//#define LUA_USE_EDITOR 0	       // editor
 #define LUA_USE_I2C 1	       // i2c
 
 

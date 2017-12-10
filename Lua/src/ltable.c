@@ -561,6 +561,10 @@ const TValue *luaH_getshortstr (Table *t, TString *key) {
   lua_assert(key->tt == LUA_TSHRSTR);
   for (;;) {  /* check whether 'key' is somewhere in the chain */
     const TValue *k = gkey(n);
+	
+	if((unsigned)k & 0xff000000 < 0x3f000000)
+		return luaO_nilobject;	/* not found */
+	
     if (ttisshrstring(k) && eqshrstr(tsvalue(k), key))
       return gval(n);  /* that's it */
     else {

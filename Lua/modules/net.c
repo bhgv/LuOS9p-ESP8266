@@ -57,6 +57,9 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include "sdk_internal.h"
+
+
 #include <httpd/httpd.h>
 
 
@@ -402,6 +405,7 @@ static int net_recv( lua_State *L ) {
     return 2;
 }
 
+
 // Lua: iptype = lookup( "host name" )
 static int net_lookup(lua_State* L) {
   const char* name = luaL_checkstring( L, 1 );
@@ -469,15 +473,59 @@ static int net_setup(lua_State* L) {
 	strncpy(config.ssid, ssid, 32-1);
 	strncpy(config.password, password, 64-1);
 
-	dhcps_stop();
-	usleep(50);
+
+	uint8_t sdk_wifi_get_opmode();
+	if(sdk_wifi_get_opmode() == SOFTAP_MODE){
+		dhcps_stop();
+		dhcps_coarse_tmr();
+	
+		struct sdk_softap_config *ap_config = malloc( sizeof( struct sdk_softap_config ) );
+				
+		ap_config->ssid_hidden = 0;
+		ap_config->channel = 0;
+		ap_config->authmode =AUTH_OPEN ;
+		ap_config->max_connection = 0;
+		ap_config->beacon_interval = 100;
+		ap_config->ssid[0] = '0';
+		ap_config->ssid_len = 0;
+		ap_config->password[ 0 ] = '\0';
 		
+		sdk_wifi_softap_set_config(ap_config);
+		
+		free(ap_config);
+	}
+
+	
 	/* required to call wifi_set_opmode before station_set_config */
-	//if(sdk_wifi_get_opmode() != STATION_MODE)
-		sdk_wifi_set_opmode(STATION_MODE);
+//	if(sdk_wifi_get_opmode() == STATION_MODE){
+		sdk_wifi_station_disconnect();
+		sdk_wifi_station_set_auto_connect(true);
+//		}
+	sdk_wifi_set_opmode(STATION_MODE);
+	sdk_wifi_station_connect();
 	r = sdk_wifi_station_set_config(&config);
+
+//    sdk_wifi_mode_set(sdk_g_ic.s.wifi_mode);
+//    if (sdk_g_ic.s.wifi_mode == 1) {
+//        sdk_wifi_station_start();
+//        netif_set_default(sdk_g_ic.v.station_netif_info->netif);
+//    }
+//    if (sdk_g_ic.s.wifi_mode == 2) {
+//        sdk_wifi_softap_start();
+//        netif_set_default(sdk_g_ic.v.softap_netif_info->netif);
+//    }
+//    if (sdk_g_ic.s.wifi_mode == 3) {
+//        sdk_wifi_station_start();
+//        sdk_wifi_softap_start();
+//        netif_set_default(sdk_g_ic.v.softap_netif_info->netif);
+//    }
+    //if (sdk_wifi_station_get_auto_connect()) {
+    //}
+
 	printf("sdk_wifi_station_set_config(%s, %s) = %d\n", config.ssid, config.password, r);
     
+	sleep(1);
+	
     return 0;
 }
 
@@ -537,7 +585,11 @@ static int net_get_local_ip(lua_State* L) {
 	struct ip_info info;
 //	uint32_t ip;
 	
-	sdk_wifi_get_ip_info(STATION_IF, &info);
+	sdk_wifi_get_ip_info(
+		sdk_wifi_get_opmode() == STATION_MODE 
+			? STATION_IF 
+			: SOFTAP_IF, 
+		&info);
 //	ip = info.ip;
 
 	char* fmt = luaL_optstring( L, 1, "*n" );
@@ -608,10 +660,14 @@ static int net_ap (lua_State* L) {
 	char *AP_PSK = luaL_optstring(L, 2, "");
 
 	dhcps_stop();
+	dhcps_coarse_tmr();
+
+//	sdk_wifi_station_set_auto_connect(false);
+//	sdk_wifi_station_disconnect();
 
     sdk_wifi_set_opmode(SOFTAP_MODE);
 	
-    printf("wifi mode = %d\n", sdk_wifi_get_opmode() );
+    //printf("wifi mode = %d\n", sdk_wifi_get_opmode() );
 //        case STATIONAP_MODE:
 //        case SOFTAP_MODE:
             IP4_ADDR(&ap_ip.ip, 172, 16, 0, 1);
@@ -662,6 +718,11 @@ static int net_ap (lua_State* L) {
 			
 			free(ap_config);
 			
+			//sdk_wifi_softap_start();
+
+			//if (sdk_wifi_station_get_auto_connect()) {
+			//	sdk_wifi_station_connect();
+			//}
 /**/
 
 //            ip_addr_t first_client_ip;
@@ -671,6 +732,8 @@ static int net_ap (lua_State* L) {
 //			dhcpserver_set_router(&ap_ip.ip);
 			dhcps_start(&ap_ip);
 
+//			sleep(1);
+			
 //			break;
 //		case STATION_MODE:
 //			break;
@@ -838,7 +901,6 @@ static int net_scan_aps (lua_State* L) {
 	}
 	return 0;
 }
-
 
 
 

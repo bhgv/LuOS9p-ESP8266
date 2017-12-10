@@ -7,15 +7,23 @@ for k in pairs(os) do _G[k]=os[k] end
 
 g=gpio
 
-net.sta(WIFI_SSID, WIFI_PASS)
 
 print( "gui set font" )
 gui.setFont(6)
 
-is_sta = true
+sta_loop = true
 
-print( "Sta/Ap select" )
-gui.run "menu/sta.lua"
+while sta_loop do
+    sta_loop = false
+
+    net.sta(WIFI_SSID, WIFI_PASS)
+
+    is_sta = true
+
+    print( "Sta/Ap select" )
+    gui.run "menu/sta.lua"
+
+    while net.localip() == 0 do end
 
 --[[
 if is_sta then
@@ -55,21 +63,21 @@ if is_sta then
 end
 ]]
 
---thread.sleep(1)
-
-menus_loop=true
-while menus_loop do
-    print( "run httpd + httpd_menu" )
-    htd = thread.start( httpd.loop )
     thread.sleep(1)
-    gui.run "menu/httpd.lua"
 
-    print( "stop httpd & run main menu" )
-    httpd.stop()
+    menus_loop=true
+    while menus_loop do
+	print( "run httpd + httpd_menu" )
+	htd = thread.start( httpd.loop )
+	thread.sleep(1)
+	gui.run "menu/httpd.lua"
 
-    gui.run "menu/main.lua"
+	print( "stop httpd & run main menu" )
+	httpd.stop()
+
+	gui.run "menu/main.lua"
+    end
 end
-
 
 oled.cls()
 oled.setFont(3)

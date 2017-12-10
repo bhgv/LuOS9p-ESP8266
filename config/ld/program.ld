@@ -84,40 +84,6 @@ PROVIDE(_memmap_cacheattr_reset = _memmap_cacheattr_wb_trapnull);
 
 SECTIONS
 {
-/* //ex from esp32
-  .flash.rodata : ALIGN(4)
-  {
-    _lua_rtos_rodata_start = ABSOLUTE(.);
-
-    /* This is the array for Lua libraries to load at startup * /
-    . = ALIGN(4);
-    lua_libs1 = ABSOLUTE(.);
-    KEEP (*(.lua_libs1))
-    LONG(0) LONG(0)
-
-    /* This is the array for readonly Lua tables * /
-    lua_rotable = ABSOLUTE(.);
-    KEEP(*(.lua_rotable1))
-    LONG(0) LONG(0)
-
-    /* This is the array for drivers available in Lua RTOS build * /
-    drivers = ABSOLUTE(.);
-    KEEP(*(.drivers))
-    LONG(0) LONG(0)
-
-    KEEP(*(.driver_error))
-    KEEP(*(.driver_error_map))
-
-    /* This is the array for sensors available in Lua RTOS build * /
-    sensors = ABSOLUTE(.);
-    KEEP(*(.sensors))
-    LONG(0) LONG(0)
-
-    _lua_rtos_rodata_end = ABSOLUTE(.);
-  } >drom0_0_seg
-*/
-
-
   .dport0.rodata : ALIGN(4)
   {
     _dport0_rodata_start = ABSOLUTE(.);
@@ -157,11 +123,12 @@ SECTIONS
     *(.iram1.*)
     /* SDK libraries expect their .text sections to link to iram, not irom */
     /**open_esplibs_libnet80211.a:*ieee80211_sta.o(.literal .text .literal.* .text.*) */
-    *sdklib*:*(.literal .text .literal.* .text.*) 
+     *sdklib*.*:*(.literal .text .literal.* .text.*)  
+    /* *libmain.*:*(.literal .text .literal.* .text.*) */
 
     /* SDK libraries that used in bootup process, interruption handling
      * and other ways where flash cache (iROM) is unavailable: */
-    /**open_esplibs_lib*:*(.literal .literal.* .text .text.*) */
+     /* *open_esplibs_*.*:*(.literal .literal.* .text .text.*) */
  
 /*
     *open_esplibs_libnet80211.a:*ieee80211_sta.o(.literal .text .literal.* .text.*)
@@ -193,6 +160,9 @@ SECTIONS
     *sys.a:*uart.o(.literal .text .literal.* .text.*)
     *sys.a:*console.o(.literal .text .literal.* .text.*)
     *sys.a:*clock.o(.literal .text .literal.* .text.*)
+
+     /* *lua.a:lgc.o(.literal .text .literal.* .text.*) */
+     /* *lua.a:ldo.o(.literal .text .literal.* .text.*) */
 
     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
     *(.fini.literal)
@@ -303,7 +273,16 @@ SECTIONS
 
     /**open_esplibs_libnet80211.a:*(.literal .text .literal.* .text.*) */
 	/**open_esplibs_libnet80211.a:*ieee80211_sta.o(.literal .text .literal.* .text.*) */
-	/**sdklib*:*(.literal .text .literal.* .text.*) */
+	/* *open_esplibs_*.*:*(.literal .text .literal.* .text.*) */
+	/* *sdklib*.*:*(.literal .text .literal.* .text.*) */
+	/* *libmain*.*:*(.literal .text .literal.* .text.*) */
+	/* *gdbstub*:*(.literal .text .literal.* .text.*) */
+      *json*.*:*(.literal .text .literal.* .text.*) 
+      /* *lua*.*:*(.literal .text .literal.* .text.*) */
+       *luadata*.*:*(.literal .text .literal.* .text.*) 
+       *lua9p*.*:*(.literal .text .literal.* .text.*) 
+      *mbedtls*.*:*(.literal .text .literal.* .text.*) 
+      *mqtt*.*:*(.literal .text .literal.* .text.*) 
 
     *(.literal .text .literal.* .text.* .rodata .rodata.*)
     /* Anything explicitly marked as "irom" or "irom0" should go here */

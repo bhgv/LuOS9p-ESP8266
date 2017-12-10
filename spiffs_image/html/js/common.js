@@ -36,7 +36,7 @@ function init()
 				return;
 			}
 
-			if(ws === undefined || ws.readyState == 3 || retries++ > 70)
+			if(ws == undefined || ws.readyState == 3 || retries > 100)
 				wsOpen();
 			if(ws.readyState != 1) 
 				return;
@@ -80,19 +80,19 @@ function wsOpen()
 function onOpen(evt)
 {
 //    writeToScreen("CONNECTED");
-	setMsg("info", '<span style="color: red;">CONNECTED</span> ');
+	setMsg("info", '<span style="color:red;">CONNECTED</span> ');
 }
 
 function onClose(evt)
 {
 //    writeToScreen("DISCONNECTED");
-	setMsg("info", '<span style="color: red;">DISCONNECTED</span> ');
+	setMsg("info", '<span style="color:red;">DISCONNECTED</span> ');
 }
 
 function onMessage(evt)
 {
 //    writeToScreen('<span style="color: blue;">RECEIVED:' + evt.data+'</span>');
-	setMsg("info", '<span style="color: blue;">RECEIVED:</span> ' + evt.data);
+	setMsg("info", '<span style="color:green;">RECEIVED:</span> ' + evt.data);
 
 	var ar = evt.data.split("=");
 	var el = document.getElementById(ar[0]);
@@ -106,23 +106,25 @@ function onMessage(evt)
 //    websocket.close();
 
 	retries = 0;
-
 	rcvd_tm = 0;
 }
 
 function onError(evt)
 {
-	setMsg("error", '<span style="color: red;">ERROR:</span> ' + evt.data);
+	setMsg("error", '<span style="color:red;">ERROR:</span> ' + evt.data);
 }
 
 function doSend(message)
 {
 //    writeToScreen("SENT: " + message); 
-	setMsg("info", '<span style="color: blue;">SENT:</span> ' + message);
+	setMsg("info", '<span style="color:blue;">SENT:</span> ' + message);
 
-	if (ws.readyState == 3 || retries++ > 70)
+	if (ws.readyState == 3){
 		wsOpen();
-	else if (ws.readyState == 1)
+	}
+	while (ws.readyState == 3 && retries++ < 400);
+
+	if (ws.readyState == 1)
 		ws.send(message);
 }
 

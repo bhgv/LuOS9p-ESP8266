@@ -10,6 +10,7 @@ local menu_main = {
 	{name="DAC out", menu="menu/dac.lua", ind_t=stf.ind, }, 
 	{name="PWM out", menu="menu/pwm.lua", ind_t=stf.ind, }, 
 	{name="Gpio in/out", menu="menu/pio.lua", ind_t=stf.ind, },
+	{name="Other Sta/Ap", act={ok=function() menus_loop=false; sta_loop=true; gui.exit(); end, }, },
 	{name="Exit menu", act={ok=function() menus_loop=false; gui.exit(); end, }, },
 	{name=" ..redraw"}
 };

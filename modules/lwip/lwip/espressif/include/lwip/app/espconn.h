@@ -29,6 +29,7 @@ typedef void (* espconn_reconnect_callback)(void *arg, sint8 err);
 #define ESPCONN_CONN       -11   /* Not connected.           */
 
 #define ESPCONN_ARG        -12   /* Illegal argument.        */
+#define ESPCONN_IF         -14   /* Low level error.         */
 #define ESPCONN_ISCONN     -15   /* Already connected.       */
 
 #define ESPCONN_SSL			0x01

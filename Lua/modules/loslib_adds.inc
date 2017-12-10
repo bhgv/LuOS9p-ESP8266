@@ -83,7 +83,7 @@ return 0;
 }
 
 static int os_edit (lua_State *L) {
-/*
+/**/
     const char *path = luaL_checkstring(L, 1);
 
     // Create file if does not exists
@@ -96,14 +96,15 @@ static int os_edit (lua_State *L) {
     char* lua_argv[] = {(char *)"edit", (char *)path, NULL};
     edit_main(2, lua_argv);
     console_clear();
-*/
+/**/
     return 0;    
 }
 
 static int os_sleep(lua_State *L) {
 	unsigned int seconds = luaL_checkinteger(L, 1);
 
-	cpu_sleep(seconds);
+//	cpu_sleep(seconds);
+	sleep(seconds);
 	
 	return 0;
 }

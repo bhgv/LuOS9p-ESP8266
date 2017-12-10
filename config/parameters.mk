@@ -78,6 +78,18 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    $(ROOT)modules/mbedtls \
 		    $(ROOT)modules/lpeg \
 		    $(ROOT)sys/spiffs \
+		    $(ROOT)modules/mqtt \
+		    $(ROOT)modules/luadata \
+		    $(ROOT)modules/lua9p \
+		    $(ROOT)modules/sjson \
+
+#		    $(ROOT)modules/mdns \
+
+#		    $(ROOT)modules/sjson \
+#		    $(ROOT)modules/luacurl \
+#		    $(ROOT)modules/cURLv3 \
+#		    $(ROOT)modules/smart \
+#		    $(ROOT)modules/mqtt \
 
 #		    $(ROOT)modules/dhcpserver \
 
@@ -169,23 +181,25 @@ ifeq ($(SPLIT_SECTIONS),1)
 endif
 
 ifeq ($(FLAVOR),debug)
-    C_CXX_FLAGS += -g -O0
-    LDFLAGS += -g -O0
+    C_CXX_FLAGS += -O2
+    LDFLAGS += -O2
 else ifeq ($(FLAVOR),sdklike)
     # These are flags intended to produce object code as similar as possible to
     # the output of the compiler used to build the SDK libs (for comparison of
     # disassemblies when coding replacement routines).  It is not normally
     # intended to be used otherwise.
     CFLAGS += \
-	    -g -Og -ggdb -DDEBUG_ESP_PORT=Serial \
+	    -O2 -Os \
 	    -fno-inline -fno-ipa-cp -fno-toplevel-reorder -fno-caller-saves -fconserve-stack
-#	    -O2 -Os \
+#	    -g -Og -ggdb -DDEBUG_ESP_PORT=Serial \
 
-    LDFLAGS += -g -Og -ggdb -DDEBUG_ESP_PORT=Serial
+    LDFLAGS += -O2
+
+#-Og -ggdb -DDEBUG_ESP_PORT=Serial
 #-O2
 else
     C_CXX_FLAGS += -g -O2
-    LDFLAGS += -g -O2
+    LDFLAGS += -O2
 endif
 
 GITSHORTREV=\"$(shell cd $(ROOT); git rev-parse --short -q HEAD 2> /dev/null)\"

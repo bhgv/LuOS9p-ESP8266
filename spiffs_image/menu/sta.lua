@@ -21,6 +21,7 @@ for i = 1,#sta do
 	    },
 	};
     end
+    sta[i] = nil;
 end
 j = #menu_sta + 1;
 

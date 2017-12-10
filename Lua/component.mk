@@ -1,17 +1,19 @@
 INC_DIRS += $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)src $(Lua_ROOT)platform
 
-Lua_INC_DIR = $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules $(Lua_ROOT)src \
+Lua_INC_DIR = $(Lua_ROOT)adds $(Lua_ROOT)common $(Lua_ROOT)modules \
+	$(Lua_ROOT)src \
 	$(ROOT)sys \
 	$(ROOT)modules/ssd1306 \
-	$(HOME)/esp-open-rtos/include/espressif \
-	$(HOME)/esp-open-rtos/include \
 	$(ROOT)modules/core/include \
 	$(ROOT)include/platform/esp8266/espressif/esp8266 \
 	$(ROOT)modules/lwip/lwip/espressif/include \
 	$(ROOT)FreeRTOS/Source/include \
 	$(ROOT)include \
 	$(ROOT)config/lua \
-	 $(Lua_ROOT)httpd \
+	$(Lua_ROOT)httpd \
+
+#	$(HOME)/esp-open-rtos/include/espressif \
+#	$(HOME)/esp-open-rtos/include \
 
 #	$(HOME)/esp-open-rtos/extras \
 
@@ -45,13 +47,13 @@ ESP_IP ?= 192.168.4.1
 #Tag for OTA images. 0-27 characters. Change to eg your projects title.
 #LIBESPHTTPD_OTA_TAGNAME ?= generic
 
-LIBESPHTTPD_MAX_CONNECTIONS ?= 2
+#LIBESPHTTPD_MAX_CONNECTIONS ?= 2
 #LIBESPHTTPD_STACKSIZE ?= 2048
 
 CFLAGS += -DFREERTOS=1 
 #-DLIBESPHTTPD_OTA_TAGNAME="\"$(LIBESPHTTPD_OTA_TAGNAME)\"" 
 #-DFLASH_SIZE=$(FLASH_SIZE)
-EXTRA_CFLAGS += -DMEMP_NUM_NETCONN=$(LIBESPHTTPD_MAX_CONNECTIONS)
+#EXTRA_CFLAGS += -DMEMP_NUM_NETCONN=$(LIBESPHTTPD_MAX_CONNECTIONS)
 
 
 

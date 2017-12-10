@@ -160,19 +160,19 @@ espconn_udp_recv(void *arg, struct udp_pcb *upcb, struct pbuf *p,
     precv->pcommon.remote_ip[1] = ip4_addr2_16(&upcb->remote_ip);
     precv->pcommon.remote_ip[2] = ip4_addr3_16(&upcb->remote_ip);
     precv->pcommon.remote_ip[3] = ip4_addr4_16(&upcb->remote_ip);
-    os_memcpy(precv->pespconn->proto.udp->remote_ip, precv->pcommon.remote_ip, 4);
+    memcpy(precv->pespconn->proto.udp->remote_ip, precv->pcommon.remote_ip, 4);
     precv->pespconn->proto.udp->remote_port = port;
     precv->pcommon.remote_port = port;
     precv->pcommon.pcb = upcb;
 
-	if (wifi_get_opmode() != 1) {
-		wifi_get_ip_info(1, &ipconfig);
+	if (sdk_wifi_get_opmode() != 1) {
+		sdk_wifi_get_ip_info(1, &ipconfig);
 
 		if (!ip_addr_netcmp((struct ip_addr *)precv->pespconn->proto.udp->remote_ip, &ipconfig.ip, &ipconfig.netmask)) {
-			wifi_get_ip_info(0, &ipconfig);
+			sdk_wifi_get_ip_info(0, &ipconfig);
 		}
 	} else {
-		wifi_get_ip_info(0, &ipconfig);
+		sdk_wifi_get_ip_info(0, &ipconfig);
 	}
 	upcb->local_ip = ipconfig.ip;
 	precv->pespconn->proto.udp->local_ip[0] = ip4_addr1_16(&upcb->local_ip);
@@ -184,7 +184,7 @@ espconn_udp_recv(void *arg, struct udp_pcb *upcb, struct pbuf *p,
 //        q = p;
 
 //        while (q != NULL) {
-//            pdata = (u8_t *)os_zalloc(q ->len + 1);
+//            pdata = (u8_t *)zalloc(q ->len + 1);
 //            length = pbuf_copy_partial(q, pdata, q ->len, 0);
 //
 //            LWIP_DEBUGF(ESPCONN_UDP_DEBUG, ("espconn_udp_server_recv %d %x\n", __LINE__, length));
@@ -197,9 +197,9 @@ espconn_udp_recv(void *arg, struct udp_pcb *upcb, struct pbuf *p,
 //            }
 //
 //            q = q->next;
-//            os_free(pdata);
+//            free(pdata);
 //        }
-    	pdata = (u8_t *)os_zalloc(p ->tot_len + 1);
+    	pdata = (u8_t *)zalloc(p ->tot_len + 1);
     	length = pbuf_copy_partial(p, pdata, p ->tot_len, 0);
     	precv->pcommon.pcb = upcb;
         pbuf_free(p);
@@ -208,7 +208,7 @@ espconn_udp_recv(void *arg, struct udp_pcb *upcb, struct pbuf *p,
 				precv->pespconn->recv_callback(precv->pespconn, pdata, length);
 			}
 		}
-		os_free(pdata);
+		free(pdata);
     } else {
         return;
     }
@@ -234,7 +234,7 @@ void ICACHE_FLASH_ATTR espconn_udp_disconnect(espconn_msg *pdiscon)
 
     espconn_list_delete(&plink_active, pdiscon);
 
-    os_free(pdiscon);
+    free(pdiscon);
     pdiscon = NULL;
 }
 
@@ -254,7 +254,7 @@ espconn_udp_server(struct espconn *pespconn)
     if (upcb == NULL) {
         return ESPCONN_MEM;
     } else {
-        pserver = (espconn_msg *)os_zalloc(sizeof(espconn_msg));
+        pserver = (espconn_msg *)zalloc(sizeof(espconn_msg));
 
         if (pserver == NULL) {
             udp_remove(upcb);

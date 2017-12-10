@@ -58,7 +58,7 @@
 int linux_console = 0;
 #endif
 
-#define MINEXTEND      32768
+#define MINEXTEND      512 //32768
 #define LINEBUF_EXTRA  32
 
 #ifndef TABSIZE
@@ -192,7 +192,7 @@ struct editor {
   struct editor *next;       // Next editor
   struct editor *prev;       // Previous editor
 
-  char filename[FILENAME_MAX];
+  char filename[PATH_MAX]; //FILENAME_MAX];
 };
 
 struct env {
@@ -209,6 +209,16 @@ struct env {
  
   int untitled;             // Counter for untitled files
 };
+
+
+
+#undef getchar
+int getchar(){
+	char ch;
+	while (!uart_read(CONSOLE_UART, (char *)&ch, 2000)) ;
+	return ch;
+}
+
 
 //
 // Editor buffer functions
@@ -789,6 +799,7 @@ void get_modifier_keys(int *shift, int *ctrl) {
 
 int getkey() {
   int ch, shift, ctrl;
+
 
   ch = getchar();
   if (ch < 0) return ch;
@@ -2093,7 +2104,11 @@ int edit_main(int argc, char *argv[]) {
   }
 #endif
 
-setvbuf(stdout, NULL, 0, 8192);
+int buff_size = 8192;
+//setvbuf(stdout, NULL, 0, 1024); //8192);
+while (setvbuf(stdout, NULL, _IOFBF, buff_size) != 0) {
+	buff_size = buff_size - 256;
+}
 
 #ifdef __linux__
   tcgetattr(0, &orig_tio);

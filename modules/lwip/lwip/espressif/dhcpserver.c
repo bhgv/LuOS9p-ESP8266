@@ -41,6 +41,8 @@ static list_node *plist = NULL;
 #define ICACHE_FLASH_ATTR 
 #define DHCPS_DEBUG 	0//1
 
+//#define USE_DNS 		1
+
 #define DBG(...) 		//printf(__VA_ARGS__)
 
 /******************************************************************************
@@ -694,6 +696,8 @@ static void ICACHE_FLASH_ATTR handle_dhcp(void *arg,
 {
 DBG("%s: %d\n", __func__, __LINE__);
 		
+		//struct dhcps_msg *pmsg_dhcps = NULL;
+		
 		pmsg_dhcps = malloc( sizeof(dhcps_msg) );
 		if(pmsg_dhcps == NULL) return;
 		
@@ -815,6 +819,8 @@ DBG("%s: %d\n", __func__, __LINE__);
 void ICACHE_FLASH_ATTR dhcps_start(struct ip_info *info)
 {
 DBG("%s: %d\n", __func__, __LINE__);
+	//struct dhcps_msg *pmsg_dhcps = NULL;
+
 	pmsg_dhcps = malloc( sizeof(dhcps_msg) );
 	if(pmsg_dhcps == NULL) return; 
 	memset(pmsg_dhcps /*&msg_dhcps*/, 0, sizeof(dhcps_msg));
