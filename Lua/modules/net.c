@@ -434,18 +434,19 @@ static int net_lookup(lua_State* L) {
 	}
 //	if (rc == 0) {
 		struct addrinfo *res = result;
+		struct addrinfo *res2 = NULL;
 		while (res) {
 			if (res->ai_family == AF_INET) {
-				result = res;
+				res2 = res;
 				break;
 			}
 			res = res->ai_next;
 		}
 
-		if (result->ai_family == AF_INET) {
+		if (res2 != NULL && res2->ai_family == AF_INET) {
 			address.sin_port = htons(port);
 			address.sin_family = family = AF_INET;
-            address.sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
+            address.sin_addr = ((struct sockaddr_in*)(res2->ai_addr))->sin_addr;
 		} else {
             rc = -1;
         }
@@ -453,12 +454,12 @@ static int net_lookup(lua_State* L) {
         freeaddrinfo(result);
 //	}
     
-//  if (rc == 0) {
+  if (rc == 0) {
       lua_pushinteger( L, address.sin_addr.s_addr );
       return 1;
-//  } else {
-//      return 0;
-//  }
+  } else {
+      return 0;
+  }
 }
 
 

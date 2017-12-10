@@ -78,10 +78,11 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    $(ROOT)modules/mbedtls \
 		    $(ROOT)modules/lpeg \
 		    $(ROOT)sys/spiffs \
-		    $(ROOT)modules/mqtt \
 		    $(ROOT)modules/luadata \
-		    $(ROOT)modules/lua9p \
-		    $(ROOT)modules/sjson \
+		    $(ROOT)modules/luadata_io \
+
+#		    $(ROOT)modules/mqtt \
+#		    $(ROOT)modules/sjson \
 
 #		    $(ROOT)modules/mdns \
 

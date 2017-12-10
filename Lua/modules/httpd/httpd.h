@@ -22,9 +22,9 @@
 #define DEF_RECV_TIMEOUT			50
 #define DEF_SEND_TIMEOUT			30000
 
-#define NC_MAX						5
+#define NC_MAX						4
 
-#define WS_MAX						5
+#define WS_MAX						4
 
 #define WS_TIMEOUT_NO_RECONNECT		10
 #define WS_TIMEOUT_UNCONNECT		1000

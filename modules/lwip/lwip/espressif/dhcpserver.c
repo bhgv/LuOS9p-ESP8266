@@ -31,7 +31,7 @@ static struct ip_addr server_address;
 static struct ip_addr client_address;//added
 static struct ip_addr client_address_plus;
 //static struct dhcps_msg msg_dhcps;
-static struct dhcps_msg *pmsg_dhcps = NULL;
+//static struct dhcps_msg *pmsg_dhcps = NULL;
 struct dhcps_state s;
 
 static struct dhcps_lease dhcps_lease;
@@ -696,7 +696,7 @@ static void ICACHE_FLASH_ATTR handle_dhcp(void *arg,
 {
 DBG("%s: %d\n", __func__, __LINE__);
 		
-		//struct dhcps_msg *pmsg_dhcps = NULL;
+		struct dhcps_msg *pmsg_dhcps = NULL;
 		
 		pmsg_dhcps = malloc( sizeof(dhcps_msg) );
 		if(pmsg_dhcps == NULL) return;
@@ -819,7 +819,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 void ICACHE_FLASH_ATTR dhcps_start(struct ip_info *info)
 {
 DBG("%s: %d\n", __func__, __LINE__);
-	//struct dhcps_msg *pmsg_dhcps = NULL;
+	struct dhcps_msg *pmsg_dhcps = NULL;
 
 	pmsg_dhcps = malloc( sizeof(dhcps_msg) );
 	if(pmsg_dhcps == NULL) return; 
