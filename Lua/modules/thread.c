@@ -322,7 +322,7 @@ int new_thread(lua_State* L, int run) {
     pthread_t id;
     int retries;
 
-	luaC_fullgc(L, 1);
+	//luaC_fullgc(L, 1);
 
 	DBG("nth 1 Free mem: %d\n",xPortGetFreeHeapSize());        
     // Allocate space for lthread info
@@ -415,7 +415,8 @@ static int thread_sleep(lua_State* L) {
     // Check argument (seconds)
     seconds = luaL_checkinteger(L, 1);
     
-    sleep(seconds);
+    //sleep(seconds);
+    vTaskDelay( (seconds * 1000) / portTICK_PERIOD_MS );
     
     return 0;
 }
@@ -426,7 +427,8 @@ static int thread_sleepms(lua_State* L) {
     // Check argument (seconds)
     milliseconds = luaL_checkinteger(L, 1);
     
-    usleep(milliseconds * 1000);
+    //usleep(milliseconds * 1000);
+    vTaskDelay( (milliseconds) / portTICK_PERIOD_MS );
     
     return 0;
 }
@@ -437,8 +439,9 @@ static int thread_sleepus(lua_State* L) {
     // Check argument (seconds)
     useconds = luaL_checkinteger(L, 1);
     
-    usleep(useconds);
-    
+    //usleep(useconds);
+    vTaskDelay( (useconds) / portTICK_PERIOD_US );
+
     return 0;
 }
 

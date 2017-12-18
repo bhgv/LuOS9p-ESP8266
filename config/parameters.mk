@@ -80,6 +80,12 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    $(ROOT)sys/spiffs \
 		    $(ROOT)modules/luadata \
 		    $(ROOT)modules/luadata_io \
+		    $(ROOT)modules/styx \
+		    $(ROOT)modules/pid \
+
+
+#		    $(ROOT)modules/9p/curie \
+#		    $(ROOT)modules/9p/duat \
 
 #		    $(ROOT)modules/mqtt \
 #		    $(ROOT)modules/sjson \

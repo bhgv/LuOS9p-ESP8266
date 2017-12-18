@@ -277,12 +277,17 @@ SECTIONS
 	/* *sdklib*.*:*(.literal .text .literal.* .text.*) */
 	/* *libmain*.*:*(.literal .text .literal.* .text.*) */
 	/* *gdbstub*:*(.literal .text .literal.* .text.*) */
-      *json*.*:*(.literal .text .literal.* .text.*) 
+      /* *json*.*:*(.literal .text .literal.* .text.*)  */
       /* *lua*.*:*(.literal .text .literal.* .text.*) */
        *luadata*.*:*(.literal .text .literal.* .text.*) 
        *lua9p*.*:*(.literal .text .literal.* .text.*) 
+       *styx*.*:*(.literal .text .literal.* .text.*) 
+       *pid*.*:*(.literal .text .literal.* .text.*) 
       *mbedtls*.*:*(.literal .text .literal.* .text.*) 
-      *mqtt*.*:*(.literal .text .literal.* .text.*) 
+/*
+      *duat*.*:*(.literal .text .literal.* .text.*) 
+      *curie*.*:*(.literal .text .literal.* .text.*) 
+*/
 
     *(.literal .text .literal.* .text.* .rodata .rodata.*)
     /* Anything explicitly marked as "irom" or "irom0" should go here */

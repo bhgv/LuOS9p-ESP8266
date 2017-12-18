@@ -7,30 +7,12 @@
  * 
  * All rights reserved.  
  *
- * Permission to use, copy, modify, and distribute this software
- * and its documentation for any purpose and without fee is hereby
- * granted, provided that the above copyright notice appear in all
- * copies and that both that the copyright notice and this
- * permission notice and warranty disclaimer appear in supporting
- * documentation, and that the name of the author not be used in
- * advertising or publicity pertaining to distribution of the
- * software without specific, written prior permission.
- *
- * The author disclaim all warranties with regard to this
- * software, including all implied warranties of merchantability
- * and fitness.  In no event shall the author be liable for any
- * special, indirect or consequential damages or any damages
- * whatsoever resulting from loss of use, data or profits, whether
- * in an action of contract, negligence or other tortious action,
- * arising out of or in connection with the use or performance of
- * this software.
  */
 
 
 #include "lua.h"
 #include "lauxlib.h"
 
-//#include <common/i2c-def.h>
 #include <pca9685/pca9685.h>
 
 
@@ -104,18 +86,18 @@ static int lpwm_set_val( lua_State* L ) {
 	int ch = luaL_checkinteger(L, 1);
 	int v = luaL_checkinteger(L, 2);
 
-	int max = 4096;
+	int max = 4095;
 	if(n > 2) max = luaL_checkinteger(L, 3);
 	
 	if(ch < 0 || ch > 15) return 0;
 	
 	if(max <= 0) max = 1;
-	else if(max > 4096) max = 4096;
+	else if(max > 4095) max = 4095;
 
 	if(v < 0) v = 0;
 	else if(v > max) v = max;
 	
-	v = v * 4096 / max;
+	v = v * 4095 / max;
     pca9685_set_pwm_value(ADDR, ch, v);
     
     lua_pushboolean(L, 1);

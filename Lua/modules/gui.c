@@ -62,6 +62,11 @@ static char msg=NO_MSG;
 static char gui_fnt=0;
 #define GUI_FNT gui_fnt
 
+
+
+//int cb_to = 0;
+
+
 static void draw_menu( lua_State *L, int menu_cur){
 	font_info_t *fnt_bk=font;
 	font = font_builtin_fonts[GUI_FNT];
@@ -128,6 +133,28 @@ static void draw_menu( lua_State *L, int menu_cur){
 	luaC_fullgc(L, 1);
 }
 
+
+static int run_gui_cb( lua_State *L){
+	int n = lua_gettop( L);
+	int r = 1;
+	
+	lua_pushstring(L,"cb");
+	lua_rawget( L, menu_cur);
+	if(lua_isfunction(L, -1)){
+		//lua_pushnil(L);
+		lua_call(L, 0, 1);
+		r = lua_toboolean(L, -1);
+//	}else{
+//		lua_pop(L, 1);
+	}
+
+	lua_settop( L, n);
+	luaC_fullgc(L, 1);
+	
+	return r;
+}
+
+	
 static void draw( lua_State *L){
 	int i;
 	for(i=0; i<(DISPLAY_WIDTH * DISPLAY_HEIGHT/8); i++)
@@ -220,14 +247,17 @@ static void gui_screen_lightup( lua_State *L){
 }
 
 static void gui_controller( lua_State *L){
-	usleep(50);
+	//usleep(50);
 	int n = lua_gettop( L);
+
 	int b = pcf8575_port_read(PCF8575_DEFAULT_ADDRESS);
 	int i=m_cur_pos;
 	int cur_ln; //=menu_cur[i];
 	int m=0; //cur_ln.menu
 	int act=0; //cur_ln.act
 	int par=0; //cur_ln.par
+
+
 
 //	int menu_cur_len = lua_rawlen(L, menu_cur);
 	lua_rawgeti( L, menu_cur, i);
@@ -256,6 +286,34 @@ static void gui_controller( lua_State *L){
 	}else{
 		lua_pop(L, 1);
 	}
+
+
+
+
+	
+#if 0
+		if(menu_cur > 0 && cb_to++ > 10){
+			cb_to = 0;
+	/*
+			if( run_gui_cb(L) != 0 ){
+				draw(L);
+			}
+	*/
+			lua_pushstring(L,"cb");
+			lua_rawget( L, menu_cur);
+			if(lua_isfunction(L, -1)){
+				//lua_pushnil(L);
+				lua_call(L, 0, 0);
+				//r = lua_toboolean(L, -1);
+				draw(L);
+			}else{
+				lua_pop(L, 1);
+			}
+		}
+#endif
+		
+
+
 
   if((b & _ok) == 0 ){
   	gui_screen_lightup(L);
@@ -371,6 +429,17 @@ static void gui_controller( lua_State *L){
   }
   else if((b & _ekey) == 0 ){
   }
+
+/*
+  if(cb_to++ > 20){
+	  cb_to = 0;
+  
+	  if( run_gui_cb(L) != 0 ){
+		  draw(L);
+	  }
+  }
+*/
+  
   lua_settop( L, n);
 
   usleep(50);
@@ -381,6 +450,7 @@ extern int (*cb_httpd)(lua_State *L);
 
 static void _cb_task (lua_State *L ) { 
 	  uint32_t v;
+	  int cb_to = 0;
 //	  int i = cnt;
 	  while(1) {
 		  if(!portIN_ISR()){
@@ -403,6 +473,16 @@ static void _cb_task (lua_State *L ) {
 					}
 					//lua_gc(L, LUA_GCCOLLECT, 0);
 					//luaC_fullgc(L, 1);
+
+/**/
+					//if(cb_to++ >= 4){
+						//cb_to = 0;
+
+						if( run_gui_cb(L) ){
+							draw(L);
+						}
+					//}
+/**/
 
 				  	if(no_sleep > 0){
 						//ssd1306_display_on(ADDR, true);

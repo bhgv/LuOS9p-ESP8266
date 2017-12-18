@@ -44,7 +44,6 @@
 // WHITECAT BEGIN
 extern void mach_init();
 extern void newTick(void);
-extern void runCallbacks(void);
 // WHITECAT END
 
 /* This is not declared in any header file (but arguably should be) */
@@ -264,9 +263,17 @@ void IRAM vApplicationStackOverflowHook(xTaskHandle task, char *task_name) {
 void IRAM vApplicationIdleHook(void) {
 }
 
+
+void runCallbacks(void);
+void pid_tick(int ticks);
+long long ticks() ;
+
 // .text+0x404
 void IRAM vApplicationTickHook(void) {
 	newTick();
+
+	pid_tick( ticks() );
+	
 	runCallbacks();
 }
 

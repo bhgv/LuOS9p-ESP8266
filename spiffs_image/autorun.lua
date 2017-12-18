@@ -11,72 +11,34 @@ g=gpio
 print( "gui set font" )
 gui.setFont(6)
 
-sta_loop = true
+is_sta = true
+sel_mnu = 0
 
-while sta_loop do
-    sta_loop = false
-
-    net.sta(WIFI_SSID, WIFI_PASS)
-
-    is_sta = true
-
-    print( "Sta/Ap select" )
-    gui.run "menu/sta.lua"
-
-    while net.localip() == 0 do end
-
---[[
-if is_sta then
-    print( "Try connect '" .. WIFI_SSID .. "'" )
-    oled.cls()
-    oled.print(5, 10, "try to connect to:")
-    oled.print(27, 22, '"' .. WIFI_SSID .. '"')
-
-    net.sta(WIFI_SSID, WIFI_PASS)
-
-    local i = 0
-    local ip1, ip2, ip3, ip4 = 0, 0, 0, 0
-
-    is_sta = false
-    while i < 40 do
-	oled.print (32, 40, "  " .. i .. " s  ")
-        oled.draw()
-
-	thread.sleep(1)
-        ip1, ip2, ip3, ip4 = net.localip "*n"
-	if ip1 ~= 0 then
-	    is_sta = true
-	    break
-        else
-	    i = i + 1
-	end
-    end
-    oled.cls()
---    oled.draw()
-
---    ip1 = net.localip "*n"
---    if ip1 == 0 then
-    if not is_sta then
-	print( "can't connect to '" .. WIFI_SSID .. "', start AP '" .. AP_SSID .. "'" )
-	net.ap(AP_SSID, AP_PASS)
-    end
-end
-]]
-
+while sel_mnu ~= 5 do
+    gui.run "menu/select.lua"
     thread.sleep(1)
 
-    menus_loop=true
-    while menus_loop do
-	print( "run httpd + httpd_menu" )
-	htd = thread.start( httpd.loop )
+    if sel_mnu == 4 then
+	gui.run "menu/soldr.lua"
+    elseif sel_mnu == 2 then
+	net.sta(WIFI_SSID, WIFI_PASS)
+
+	is_sta = true
+
+	gui.run "menu/sta.lua"
+
+	while net.localip() == 0 do end
+    elseif sel_mnu == 1 then
+	thread.start( httpd.loop )
 	thread.sleep(1)
 	gui.run "menu/httpd.lua"
 
-	print( "stop httpd & run main menu" )
 	httpd.stop()
-
+	thread.sleep(1)
+    elseif sel_mnu == 3 then
 	gui.run "menu/main.lua"
     end
+
 end
 
 oled.cls()
@@ -107,4 +69,9 @@ oled.setContrast(0)
 
 oled.setFont(0)
 -- ]]
+
+thread.sleep(2)
+oled.cls()
+
+
 

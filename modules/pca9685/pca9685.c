@@ -226,7 +226,7 @@ void pca9685_set_pwm_value(unsigned char addr, uint8_t channel, uint16_t val)
 //        write_reg(addr, reg + OFFS_REG_LED_OFF, LED_FULL_ON_OFF);
 //    }
 //    else 
-    if (val >= 0 && val <= 4096)
+    if (val >= 0 && val < 4096)
     {
         // Normal
 //        uint8_t buf[4] = { 0, 0, val, val >> 8 };
@@ -248,6 +248,8 @@ void pca9685_set_pwm_value(unsigned char addr, uint8_t channel, uint16_t val)
 		platform_i2c_send_byte(0, (val >> 8));
 		
 		platform_i2c_send_stop(0);
+
+//		printf("%s: %d  ch=%d, v=%d\n", __func__, __LINE__, channel, val);
     }
 //    else
 //    {
