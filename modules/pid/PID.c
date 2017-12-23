@@ -1,4 +1,5 @@
-/*	Floating point PID control loop for Microcontrollers
+/*
+	Floating point PID control loop for Microcontrollers
 	Copyright (C) 2015 Jesus Ruben Santa Anna Zamudio.
 
 	This program is free software: you can redistribute it and/or modify
@@ -17,6 +18,11 @@
 	Author website: http://www.geekfactory.mx
 	Author e-mail: ruben at geekfactory dot mx
  */
+
+#include "lua.h"
+#include "lauxlib.h"
+
+
 #include "PID.h"
 
 pid_ctl_t pid_create(pid_ctl_t pid, float* in, float* out, float* set, float kp, float ki, float kd, 
@@ -46,7 +52,7 @@ bool pid_need_compute(pid_ctl_t pid)
 	return(tick_get() - pid->lasttime >= pid->sampletime) ? true : false;
 }
 
-void pid_compute(pid_ctl_t pid, long long ticks)
+void IRAM pid_compute(pid_ctl_t pid, long long ticks)
 {
 	// Check if control is enabled
 	if (!pid->automode)
@@ -85,6 +91,7 @@ void pid_tune(pid_ctl_t pid, float kp, float ki, float kd)
 	
 	//Compute sample time in seconds
 	float ssec = ((float) pid->sampletime) / ((float) TICK_SECOND);
+	if(ssec == 0.0) ssec = 0.001;
 
 	pid->Kp = kp;
 	pid->Ki = ki * ssec;
@@ -97,13 +104,15 @@ void pid_tune(pid_ctl_t pid, float kp, float ki, float kd)
 	}
 }
 
-void pid_sample(pid_ctl_t pid, uint32_t time)
+void pid_sample(pid_ctl_t pid, /*uint32_t*/ long long time)
 {
 	if (time > 0) {
-		float ratio = (float) (time * (TICK_SECOND / 1000)) / (float) pid->sampletime;
+		float ratio = ( (float)time * (float)(TICK_SECOND / 1000)) / (float) pid->sampletime;
+		if(ratio == 0.0) ratio = 0.001;
+		
 		pid->Ki *= ratio;
 		pid->Kd /= ratio;
-		pid->sampletime = time * (TICK_SECOND / 1000);
+		pid->sampletime = time * (long long)(TICK_SECOND / 1000);
 	}
 }
 

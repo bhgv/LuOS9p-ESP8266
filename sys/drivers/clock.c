@@ -122,7 +122,7 @@ int _gettimeofday_r(struct timeval *tv , struct timezone *tz) {
     return 0;
  }
 
- long long ticks() {
+ long long IRAM ticks() {
      return tticks;
  }
 

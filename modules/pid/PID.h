@@ -66,7 +66,7 @@ struct pid_controller {
 	float lastin; //!< Last input value for differential term
 	// Time related
 	/*uint32_t*/ long long lasttime; //!< Stores the time when the control loop ran last time
-	uint32_t sampletime; //!< Defines the PID sample time
+	/*uint32_t*/ long long sampletime; //!< Defines the PID sample time
 	// Operation mode
 	uint8_t automode; //!< Defines if the PID controller is enabled or disabled
 	enum pid_control_directions direction;
@@ -141,7 +141,7 @@ extern "C" {
 	 * @param pid The PID controller instance to modify
 	 * @param time The time in milliseconds between computations
 	 */
-	void pid_sample(pid_ctl_t pid, uint32_t time);
+	void pid_sample(pid_ctl_t pid, /*uint32_t*/long long time);
 
 	/**
 	 * @brief Sets the limits for the PID controller output

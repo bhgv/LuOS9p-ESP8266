@@ -24,7 +24,7 @@ void sdk_os_timer_setfn(ETSTimer *ptimer, ETSTimerFunc *pfunction, void *parg) {
     struct timer_list_st **tailptr;
 
     if (timer_list) {
-        for (entry = timer_list; ; entry = entry->next) {
+        for (entry = timer_list; ((int)entry&0xfff00000) >= 0x3ff00000; entry = entry->next) {
             if (entry->timer == ptimer) {
                 if (ptimer->timer_arg == parg && ptimer->timer_func == pfunction) {
                     return;

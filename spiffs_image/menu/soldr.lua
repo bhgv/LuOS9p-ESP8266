@@ -3,11 +3,11 @@ local solder_t = 0.0
 local cur_t = adc[1]
 local xtm = true
 
-local k = {p=20.0, i=-7.0, d =20.0, };
+local pid_k = {p=20.0, i=-7.0, d =20.0, };
 
 local pid_i = pid.new()
 pid.limits(pid_i, 0, 100)
-pid.tune(pid_t, k.p, k.i, k.d)
+pid.tune(pid_i, pid_k.p, pid_k.i, pid_k.d)
 
 
 local sol_f = function(i)
@@ -22,8 +22,8 @@ end
 
 
 local k_f = function(p, i)
-    k[p]=k[p] + i;
-    pid.tune(pid_i, k.p, k.i, k.d);
+    pid_k[p]=pid_k[p] + i;
+    pid.tune(pid_i, pid_k.p, pid_k.i, pid_k.d);
 end
 
 
@@ -71,9 +71,9 @@ local menu_sol={
 	{name="Curr t", par=1, ind_t=function(y, k) oled.print(94, y, string.format("%.1f%%", cur_t ) ); end, },
 	{name="Solder PWM =", par=9, ind_t=function(y, k) oled.print(94, y, string.format("%.1f%%", pwm[k] ) ); end, },
 
-	{name="tune Kp", par="p", act=acts_tune, ind_t=function(y, p) oled.print(94, y, string.format("%.1f", k[p] ) ); end, },
-	{name="tune Ki", par="i", act=acts_tune, ind_t=function(y, p) oled.print(94, y, string.format("%.1f", k[p] ) ); end, },
-	{name="tune Kd", par="d", act=acts_tune, ind_t=function(y, p) oled.print(94, y, string.format("%.1f", k[p] ) ); end, },
+	{name="tune Kp", par="p", act=acts_tune, ind_t=function(y, p) oled.print(94, y, string.format("%.1f", pid_k[p] ) ); end, },
+	{name="tune Ki", par="i", act=acts_tune, ind_t=function(y, p) oled.print(94, y, string.format("%.1f", pid_k[p] ) ); end, },
+	{name="tune Kd", par="d", act=acts_tune, ind_t=function(y, p) oled.print(94, y, string.format("%.1f", pid_k[p] ) ); end, },
 
 	{name="exit Solder", act={ ok=function() solder_run=nil; pid.del(pid_i); gui.exit(); end, }, },
 	{name=" ..redraw"},

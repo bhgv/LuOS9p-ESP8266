@@ -282,7 +282,7 @@ SECTIONS
        *luadata*.*:*(.literal .text .literal.* .text.*) 
        *lua9p*.*:*(.literal .text .literal.* .text.*) 
        *styx*.*:*(.literal .text .literal.* .text.*) 
-       *pid*.*:*(.literal .text .literal.* .text.*) 
+       /* *pid*.*:*(.literal .text .literal.* .text.*)  */
       *mbedtls*.*:*(.literal .text .literal.* .text.*) 
 /*
       *duat*.*:*(.literal .text .literal.* .text.*) 

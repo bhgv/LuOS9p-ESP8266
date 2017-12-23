@@ -27,23 +27,31 @@ struct mtx cb_mtx;
 struct mtx tloop_mtx;
 
 QueueHandle_t cbqueue=NULL;
+extern QueueHandle_t guiqueue;
 
 
 void runCallbacks(void) {
 	static uint16_t cb_delay = 0;
-	uint32_t tv;
-	if(cbqueue != NULL){
+	static uint32_t tv, gtv;
 		mtx_lock(&cb_mtx);
-		if(cb_delay >= CB_DELAY){
-			tv = cb_delay; 
-			xQueueSend(cbqueue, &tv, 0);
-			cb_delay = 0;
-		}else{
-			cb_delay++;
+		
+		if(cbqueue != NULL){
+			if(cb_delay >= CB_DELAY){
+				tv = cb_delay; 
+				xQueueSend(cbqueue, &tv, 0);
+				cb_delay = 0;
+			}else{
+				cb_delay++;
+			}
 		}
+		
+		if(guiqueue != NULL){
+			gtv = 1;
+			xQueueSend(guiqueue, &gtv, 0);
+		}
+		
 		// Called every tick
 		mtx_unlock(&cb_mtx);
-	}
 }
 
 

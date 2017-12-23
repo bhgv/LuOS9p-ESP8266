@@ -23,7 +23,7 @@
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 64
 
-#define NO_SLEEP_DELAY  100
+#define NO_SLEEP_DELAY  100*16
 
 #define SLEEP_PWM_CH	6
 
@@ -47,7 +47,7 @@ extern uint8_t ssd1306_buffer[];
 extern font_info_t *font;
 extern font_face_t font_face;
 
-extern QueueHandle_t cbqueue;
+//extern QueueHandle_t cbqueue;
 
 static char menu;
 static char m_cur_pos = 1;
@@ -63,7 +63,7 @@ static char gui_fnt=0;
 #define GUI_FNT gui_fnt
 
 
-
+QueueHandle_t guiqueue=NULL;
 //int cb_to = 0;
 
 
@@ -136,7 +136,7 @@ static void draw_menu( lua_State *L, int menu_cur){
 
 static int run_gui_cb( lua_State *L){
 	int n = lua_gettop( L);
-	int r = 1;
+	int r = 0;
 	
 	lua_pushstring(L,"cb");
 	lua_rawget( L, menu_cur);
@@ -246,8 +246,11 @@ static void gui_screen_lightup( lua_State *L){
 	no_sleep = NO_SLEEP_DELAY;
 }
 
+
+
+int is_need_redraw = 0;
+
 static void gui_controller( lua_State *L){
-	//usleep(50);
 	int n = lua_gettop( L);
 
 	int b = pcf8575_port_read(PCF8575_DEFAULT_ADDRESS);
@@ -258,8 +261,6 @@ static void gui_controller( lua_State *L){
 	int par=0; //cur_ln.par
 
 
-
-//	int menu_cur_len = lua_rawlen(L, menu_cur);
 	lua_rawgeti( L, menu_cur, i);
 	cur_ln = lua_gettop(L);
 
@@ -287,34 +288,6 @@ static void gui_controller( lua_State *L){
 		lua_pop(L, 1);
 	}
 
-
-
-
-	
-#if 0
-		if(menu_cur > 0 && cb_to++ > 10){
-			cb_to = 0;
-	/*
-			if( run_gui_cb(L) != 0 ){
-				draw(L);
-			}
-	*/
-			lua_pushstring(L,"cb");
-			lua_rawget( L, menu_cur);
-			if(lua_isfunction(L, -1)){
-				//lua_pushnil(L);
-				lua_call(L, 0, 0);
-				//r = lua_toboolean(L, -1);
-				draw(L);
-			}else{
-				lua_pop(L, 1);
-			}
-		}
-#endif
-		
-
-
-
   if((b & _ok) == 0 ){
   	gui_screen_lightup(L);
     if( i == menu_cur_len ){
@@ -336,7 +309,7 @@ static void gui_controller( lua_State *L){
 		}
 		luaC_fullgc(L, 1);
 		//usleep(50);
-		draw(L);
+		is_need_redraw = 1; //draw(L);
     }
   }
   else if((b & _lft) == 0 ){
@@ -354,7 +327,7 @@ static void gui_controller( lua_State *L){
 	  }
 	  luaC_fullgc(L, 1);
 	  //usleep(50);
-	  draw(L);
+	  is_need_redraw = 1; //draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
     }
@@ -374,7 +347,7 @@ static void gui_controller( lua_State *L){
 	  }
 	  luaC_fullgc(L, 1);
 	  //usleep(50);
-	  draw(L);
+	  is_need_redraw = 1; //draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
     }
@@ -402,7 +375,7 @@ static void gui_controller( lua_State *L){
 	  }
 	  luaC_fullgc(L, 1);
 	  //usleep(50);
-	  draw(L);
+	  is_need_redraw = 1; //draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
     }
@@ -422,23 +395,13 @@ static void gui_controller( lua_State *L){
 	  }
 	  luaC_fullgc(L, 1);
 	  //usleep(50);
-	  draw(L);
+	  is_need_redraw = 1; //draw(L);
     }else if( m != 0 ){
 	  sub_menu(L, m);
     }
   }
   else if((b & _ekey) == 0 ){
   }
-
-/*
-  if(cb_to++ > 20){
-	  cb_to = 0;
-  
-	  if( run_gui_cb(L) != 0 ){
-		  draw(L);
-	  }
-  }
-*/
   
   lua_settop( L, n);
 
@@ -449,16 +412,19 @@ static void gui_controller( lua_State *L){
 extern int (*cb_httpd)(lua_State *L);
 
 static void _cb_task (lua_State *L ) { 
-	  uint32_t v;
-	  int cb_to = 0;
-//	  int i = cnt;
-	  while(1) {
-		  if(!portIN_ISR()){
-//			  if(cnt > 0) i--;
-//			  mtx_lock(&tloop_mtx);
-			  if(xQueueReceive(cbqueue, &v, 1024)) {
-				  if(v > 0) { 
-					gui_controller(L);
+	uint32_t v;
+	int cb_to = 0;
+	
+	uint32_t dly = 0;
+
+	while(guiqueue != NULL) {
+		if(!portIN_ISR()){
+			if(xQueueReceive(guiqueue, &v, 1024)) {
+				if(v > 0) { 					
+					if((dly&0xf) == 0){
+						gui_controller(L);
+					}
+					
 					switch(msg){
 						case MSG_GO_TOP:
 							msg=NO_MSG;
@@ -466,68 +432,82 @@ static void _cb_task (lua_State *L ) {
 							break;
 						case MSG_EXIT:
 							msg=NO_MSG;
-							//lua_gc(L, LUA_GCCOLLECT, 0);
-							//luaC_fullgc(L, 1);
+							luaC_fullgc(L, 1);
 							return;
-							//break;
 					}
-					//lua_gc(L, LUA_GCCOLLECT, 0);
 					//luaC_fullgc(L, 1);
 
-/**/
-					//if(cb_to++ >= 4){
-						//cb_to = 0;
+					if((dly&0x1f) == 0){
+						//if( run_gui_cb(L) != 0 ){
+						//	is_need_redraw = 1; //draw(L);
+						//}
+						is_need_redraw = run_gui_cb(L);
+						//printf("is_need_redraw = %d\n", is_need_redraw);
+					}
+					
+					if(is_need_redraw != 0 && 0x90+no_sleep > 0) {
+						draw(L);
+						is_need_redraw = 0;
+					}
 
-						if( run_gui_cb(L) ){
-							draw(L);
+					//if(dly&0x1f == 0){
+					  	if(no_sleep > 0){
+							//ssd1306_display_on(ADDR, true);
+							//ssd1306_set_contrast(ADDR, 0x9f) ;
+							no_sleep--;
+						}else if(0x9f+no_sleep > 0){
+							no_sleep--;
+							ssd1306_set_contrast(ADDR, 0x9f+no_sleep) ;
+					  	}else{
+							static uint16_t blnk = 0;
+							char ch;
+							ssd1306_display_on(ADDR, false);
+							if(blnk & (1<<9))
+								blnk=0;
+							//if(blnk & (1<<7))
+							//	ch=5;
+							//else
+							ch=SLEEP_PWM_CH;
+							
+							if(blnk & (1<<8))
+								pca9685_set_pwm_value(PCA9685_ADDR_BASE, ch, 
+									4095 - ((1<<8)-1 -(blnk&((1<<8)-1))));
+							else
+								pca9685_set_pwm_value(PCA9685_ADDR_BASE, ch, 
+									4095 - (blnk&((1<<8)-1)));
+
+							blnk+=1<<5;
+						
 						}
 					//}
-/**/
 
-				  	if(no_sleep > 0){
-						//ssd1306_display_on(ADDR, true);
-						//ssd1306_set_contrast(ADDR, 0x9f) ;
-				  		no_sleep--;
-					}else if(0x9f+no_sleep > 0){
-				  		no_sleep--;
-						ssd1306_set_contrast(ADDR, 0x9f+no_sleep) ;
-				  	}else{
-						static uint16_t blnk = 0;
-						char ch;
-						ssd1306_display_on(ADDR, false);
-						if(blnk & (1<<9))
-							blnk=0;
-						//if(blnk & (1<<7))
-						//	ch=5;
-						//else
-							ch=SLEEP_PWM_CH;
-						
-						if(blnk & (1<<8))
-							pca9685_set_pwm_value(PCA9685_ADDR_BASE, ch, 
-								4095 - ((1<<8)-1 -(blnk&((1<<8)-1))));
-						else
-							pca9685_set_pwm_value(PCA9685_ADDR_BASE, ch, 
-								4095 - (blnk&((1<<8)-1)));
+					dly++;
+				}
 
-						blnk+=1<<5;
-							
-				  	}
-				  }
+				if(cb_httpd != NULL){
+					cb_httpd(L);
+				}
+			}
+//			mtx_unlock(&tloop_mtx);
+		}
+	}
+}
 
-				  if(cb_httpd != NULL){
-				  	cb_httpd(L);
-				  }
-			  }
-//			  mtx_unlock(&tloop_mtx);
-		  }
-	  }
-  }
 
 static int main_loop( lua_State *L ){
 	if(lua_isstring(L,1)){
 		gui_screen_lightup(L);
 		new_menu(L, 1);
+	
+		guiqueue = xQueueCreate(1, sizeof(uint32_t));
+		
 		_cb_task(L);
+		
+		QueueHandle_t tq = guiqueue;
+		if(tq != NULL){
+			guiqueue = NULL;
+			vQueueDelete(tq);
+		}
 
 		lua_settop(L, 0);
 		luaC_fullgc(L, 1);
@@ -551,6 +531,7 @@ static const LUA_REG_TYPE lgui_map[] = {
 
 
 int luaopen_gui( lua_State *L ) {
+	
   return 0;
 }
 
