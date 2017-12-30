@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+
+<Application>
+	<Window Title="Virtual Group Demo" HideOnEscape="true">
+		<ScrollGroup Legend="Virtual Group"
+					  HSliderMode="on"
+					  VSliderMode="on">
+			<Canvas MaxWidth="500"
+					MaxHeight="500"
+					CanvasWidth="500"
+					CanvasHeight="500"
+					AutoPosition="true">
+				<Group Columns="2">
+					<Button Height="free">
+						Foo
+					</Button>
+					<Button Height="free">
+						Bar
+					</Button>
+					<Button Height="free">
+						Baz
+					</Button>
+					<ScrollGroup Legend="Virtual Group"
+								 Width="500"
+								 Height="500"
+								 MinWidth="0"
+								 MinHeight="0"
+								 HSliderMode="on"
+								 VSliderMode="on">
+						<Canvas CanvasWidth="500"
+								CanvasHeight="500"
+								AutoPosition="true">
+							<Group Columns="2">
+								<Button Height="free">
+									Red
+								</Button>
+								<Button Height="free">
+									Green
+								</Button>
+								<Button Height="free">
+									Blue
+								</Button>
+								<ScrollGroup Legend="Virtual Group"
+											 Width="500"
+											 Height="500"
+											 MinWidth="0"
+											 MinHeight="0"
+											 HSliderMode="on"
+											 VSliderMode="on">
+									<Canvas CanvasWidth="500"
+											CanvasHeight="500"
+											AutoPosition="true">
+										<Group Columns="2">
+											<Button Height="free">
+												One
+											</Button>
+											<Button Height="free">
+												Two
+											</Button>
+											<Button Height="free">
+												Three
+											</Button>
+											<Button Height="free">
+												Four
+											</Button>
+										</Group>
+									</Canvas>
+								</ScrollGroup>
+							</Group>
+						</Canvas>
+					</ScrollGroup>
+				</Group>
+			</Canvas>
+		</ScrollGroup>
+	</Window>
+</Application>

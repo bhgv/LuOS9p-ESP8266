@@ -1,0 +1,286 @@
+
+--
+--	tekUI demo - German locale
+--	Note: Use UTF-8 encoding for international characters
+--
+
+ABOUT_APPLICATION = "_Anwendung";
+ABOUT_APPLICATION_INFORMATION = "Anwendungsinformation";
+ABOUT_LICENSE = "_Lizenz";
+ABOUT_SYSTEM = "_System";
+ABOUT_TEKUI = "Über tekUI";
+ALIGNMENT_BEGIN = "Anfang";
+ALIGNMENT_BOTTOM = "Unten";
+ALIGNMENT_BUTTON = "Ausrichtung";
+ALIGNMENT_CENTER = "Mitte";
+ALIGNMENT_DESCRIPTION = [[
+» Bestimmte Attribute legen fest, wie Elemente ausgerichtet werden, wenn Sie den Platz in ihrer Gruppe (auf einer gegebenen Achse) nicht vollständig ausnutzen.
+
+» Die obere Gruppe hat eine vertikale Orientierung und die Elemente haben unterschiedliche horizontale Ausrichtungen.
+
+» Die untere Gruppe hat eine horizontale Orientierung und die Elemente haben unterschiedliche vertikale Ausrichtungen.
+
+» Der Unterschied wird klarer ersichtlich, wenn man die Größe des Fensters verändert.
+]];
+ALIGNMENT_GROUP = "Gruppe";
+ALIGNMENT_HORIZONTAL = "Ausrichtung Horizontal";
+ALIGNMENT_LEFT = "Links";
+ALIGNMENT_RIGHT = "Rechts";
+ALIGNMENT_TITLE = "Ausrichtung";
+ALIGNMENT_TOP = "Oben";
+ALIGNMENT_VERTICAL = "Ausrichtung Vertikal";
+ANIMATIONS_BUTTON = "Animationen";
+ANIMATIONS_DESCRIPTION = [[
+» tekUI unterstützt einen Zeitgeber, an den sich jedes GUI-Element binden kann.
+
+» Er liefert eine stabile Ereignisquelle, die für animierte Klassen, Multimedia-Steuerelemente und weiche Animationen verwendet werden kann.
+
+» Das Zeitgeberintervall wird von dem ersten Element, das es anfordert, initiiert. tekUI ist streng ereignisgesteuert und verbraucht keine CPU-Zeit, wenn nichts zu tun ist.
+]];
+ANIMATIONS_FOCUS = "Fokus";
+ANIMATIONS_PARAMETERS = "Parameter";
+ANIMATIONS_SEGMENTS = "Segmente";
+ANIMATIONS_SPEED = "Geschwindigkeit";
+ANIMATIONS_START = "_Start";
+ANIMATIONS_STOP = "Sto_p";
+ANIMATIONS_TITLE = "Animationen";
+AVAILABLE_DEMOS = "Verfügbare Demos";
+BASEPATH = "Basispfad";
+BASEPATH_ANNOTATION = "Der Basispfad ist eine optionale Wurzel im Dateisystem,\nab der der Dateidialog operieren darf.";
+BORDER_BUTTON = "Rahmen";
+BORDER_CAPTION = "Rahmentitel";
+BORDER_DESCRIPTION = [[
+» Der obere Teil zeigt die grundlegenden Rahmenstile: Solide, Eingedrückt, Hervorspringend, Kerbe und Relief.
+
+» Was gemeinhin als Rahmen bezeichnet wird, ist in Wirklichkeit eine Komposition aus drei Teilrahmen: Dem Haupt-, Fassungs- und dem Fokusrahmen.
+]];
+BORDER_FOCUS = "Fokusrahmen";
+BORDER_GROOVE = "Kerbe";
+BORDER_INDIVIDUAL_STYLE = "Individueller Rahmenstil";
+BORDER_INDIVIDUAL_STYLES = "Individuelle Stile";
+BORDER_INSET = "Eingedrückt";
+BORDER_MAIN = "Hauptrahmen";
+BORDER_OUTSET = "Hervorspringend";
+BORDER_RIDGE = "Relief";
+BORDER_RIM = "Fassung";
+BORDER_SOLID = "Solide";
+BORDER_STYLES = "Rahmenstile";
+BORDER_SUB = "Teilrahmen";
+BORDER_TITLE = "Rahmen";
+BUTTONS_BUTTON = "Knopf";
+BUTTONS_CAPTION_STYLE = "Beschriftung";
+BUTTONS_CENTER = "Mitte";
+BUTTONS_COLORS = "Farben";
+BUTTONS_DESCRIPTION = [[
+» Hauptausschlaggebend für das Erscheinungsbild und das Verhalten eines Elements sind seine (visuelle) Klasse und sein Modus.
+
+» Knöpfe sind tatsächlich bloß Textelemente mit einer Knopfklasse (bestimmt das Aussehen) und einem Knopfmodus (bestimmt das Verhalten).
+
+» Weitere Attribute stehen z.B. für die Farbe und Ausrichtung des Texts zur Verfügung. 
+
+» Verschiedene Zeichensätze und Texte, die sich über mehrere Zeilen erstrecken, werden unterstützt.
+]];
+BUTTONS_NORMAL_STYLE = "Normal";
+BUTTONS_RIGHT_BOTTOM = "Rechts\nUnten";
+BUTTONS_TEXT_ALIGNMENTS = "Textausrichtung";
+BUTTONS_TEXT_STYLES = "Textstile";
+BUTTONS_TITLE = "Knöpfe";
+BUTTONS_TOP_LEFT = "Oben\nLinks";
+CANCEL = "Abbruch";
+CHOICES_BEER = "Bier";
+CHOICES_COFFEE = "Kaffee";
+CHOICES_DESCRIPTION = [[
+» Dies demonstriert die beiden grundlegenden Auswahlelemente: Radioknöpfe und Häkchen.
+]];
+CHOICES_DRINKING_STRAW = "Strohhalm";
+CHOICES_HOT = "Heiß";
+CHOICES_JUICE = "Saft";
+CHOICES_MANGO_LASSI = "Mango Lassi";
+CHOICES_ORDER_BEVERAGES = "Getränke Bestellen";
+CHOICES_SHAKEN = "Geschüttelt";
+CHOICES_STIRRED = "Gerührt";
+CHOICES_TITLE = "Auswahl";
+CHOICES_WHISKY = "Whisky";
+CHOICES_WITH_ICE = "Mit Eis";
+CHOOSE_FILE = "Datei Wählen";
+CLOSE_ALL = "Alle Schließen";
+COEFFICIENTS = "Koeffizienten";
+COMMENT = "Kommentar";
+CONFIRM_QUIT_APPLICATION = "Wollen Sie wirklich\ndie Anwendung beenden?";
+CUSTOMCLASS_ADDRESS = "Adresse";
+CUSTOMCLASS_DESCRIPTION = [[
+» Spezielle Probleme, wie die Eingabe gültiger IP-Adressen über einen Touchscreen, können in wenigen Zeilen Skript gelöst werden.
+
+» In diesem Beispiel wurde eine Netzwerk-Eingabeklasse mit besonderem Verhalten von der normalen Eingabeklasse abgeleitet.
+
+» Knöpfe in der Tastenfeld-Gruppe stammen von der normalen Textklasse ab. Sie fügen ihr jeweiliges Tastenereignis in die Nachrichtenschlange des Fensters ein.
+
+» Das Tastenfeld als Ganzes ist eine zusammengesetzte Klasse, die von der Gruppe abstammt.
+]];
+CUSTOMCLASS_DHCP = "Automatisch Beziehen (DHCP)";
+CUSTOMCLASS_DNS = "DNS";
+CUSTOMCLASS_GATEWAY = "Gateway";
+CUSTOMCLASS_KEYPAD = "Tastenfeld";
+CUSTOMCLASS_NETMASK = "Netzmaske";
+CUSTOMCLASS_NETWORK_CONFIGURATION = "Netzwerkkonfiguration";
+CUSTOMCLASS_TITLE = "Spezialklasse";
+DEBUGGING = "Debugging";
+DEBUG_CONSOLE = "Debugkonsole";
+DEBUG_LEVEL = "Debug-Level";
+DEBUG_OPTIONS = "Debug-Optionen";
+DEMO_TEXT = [[
+» Willkommen beim tekUI-Demo.
+
+» Benutzen Sie die Knöpfe auf der linken Seite, um einzelne Demos auszuwählen, oder verwenden Sie das Menü, um alle Demos auf einmal zu öffnen.
+
+» Die Demos sind als Plug-Ins für die Demoanwendung konzipiert und müssen daher nicht als separate Prozesse gestartet werden. (Aber ist auch möglich, sie einzeln zu starten.)
+]];
+DISCLAIMER = "Haftungsausschluss";
+DISCLAIMER_TEXT = [[
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.]];
+END = "Ende";
+FILE_REQUEST = "Dateiauswahl";
+FLOATTEXT_DESCRIPTION = [[
+» Diese Klasse handhabt sowohl vorformatierten Text als auch dynamische Layouts.
+ 
+» In dynamischen Layouts wird der Text an die dem Element zur Verfügung stehende Breite angepasst.
+]];
+FLOATTEXT_DYNAMIC_LAYOUT = "Dynamisches Layout";
+FLOATTEXT_PREFORMATTED = "Vorformatiert";
+FLOATTEXT_TITLE = "Fließtext",
+FLOATTEXT_YOU_CAN_DRAG_THE_BAR = "Sie können den Griff in der Mitte bewegen.";
+WIDGET_MODES = "Bedienel.-Modi";
+WIDGET_UNSELECT = "Deselekt.";
+GARBAGE_COLLECTOR = "Garbage\nCollector";
+GC_PAUSE = "Pause";
+GC_STEPMUL = "Steps";
+GRADIENT_LEGEND_WINDOW_GROUP = "Fenstergruppe";
+GRADIENT_LEGEND_GROUP_BORDER = "Gruppenrahmen";
+GRADIENT_LEGEND_BUTTON_BORDER = "Knopfrahmen";
+GRADIENT_BUTTON = "Knopf";
+GRADIENT_DESCRIPTION = [[
+» Hintergründe können mit einer Einzelfarbe, einer Pixmap oder einem Gradienten gezeichnet werden.
+
+» Außerdem können Elementhintergründe transparent sein, so dass ihr Elternelement durchscheint.
+]],
+GRADIENT_TITLE = "Gradient",
+GRAPHICS_BACKGROUND = "Hintergrund";
+GRAPHICS_BITMAPS = "Bitmaps";
+GRAPHICS_CHECKMARKS = "Häkchen";
+GRAPHICS_DESCRIPTION = [[
+» tekUI hat eine eingebaute Vektorgrafikklasse, die für Standardelemente wie Pfeile, Häkchen und Radioknöpfe verwendet wird.
+
+» Die Skalierung und Farbe von Vektorgrafiken passt sich an die Bildschirmfarben und die Elementgröße an. 
+
+» Standardgrafiken können mit Bitmaps (oder anderen Vektorgrafiken) überlagert werden, aber Vektorgrafiken sind normalerweise ressourcenfreundlicher als Bitmaps.
+
+» Wenn das obere Bitmap-Icon die Flaggen von Spanien und Italien anzeigt, ist PNG-Unterstützung aktiviert. Andernfalls wird nur das eingebaute PPM-Format unterstützt. Wenn sich der Bildhintergrund über das ganze Element erstreckt und nicht weiß ist, unterstützt der Display-Treiber einen Alphakanal. Wenn der Elementhintergrund ein blauer Gradient ist, ist Gradientenunterstützung aktiviert.
+]];
+GRAPHICS_RADIOBUTTONS = "Radioknöpfe";
+GRAPHICS_TITLE = "Grafiken";
+HELLO = "Hallo";
+HELLO_WORLD = "Hallo, Welt!";
+INPUT_DESCRIPTION = "Texteingabe",
+INPUT_TITLE = "Eingabe",
+INPUT_FIELD = "Eingabefeld",
+INPUT_FIELD_TEXT = "Eingabefeld",
+INPUT_FIELD_MAX_LENGTH = "Länge begrenzt",
+INPUT_FIELD_PASSWORD = "Passwortfeld",
+INPUT_FIELD_FIXED_WIDTH = "Fixe Breite",
+INPUT_FIELD_MULTILINE = "Mehrzeilig",
+INPUT_FIELD_MULTILINE_TEXT = "Mehrzeilige\nTexteingabe\n",
+INTERPRETER_VERSION = "Lua-Interpreterversion: %s";
+LAYOUT_BALANCING_GROUP = "Verschiebbare Gruppe";
+LAYOUT_DESCRIPTION = [[
+» In der obersten Gruppe wird die Breite jedes Elements von seinem individuellen Textinhalt bestimmt, während in der zweiten Gruppe das breiteste Element die Breite aller Elemente bestimmt.
+
+» Wenn Griffe in einer Gruppe enthalten sind, kann die Breite der Elemente vom Benutzer verändert werden.
+
+» Die beiden untersten Gruppen verwenden unterschiedliche Gewichtungen für ihre Elemente, während einige Elemente auch eine fixe Breite haben können.
+]];
+LAYOUT_DIFFERENT_WEIGHTS = "Verschiedene Gewichtungen";
+LAYOUT_FIX = "Fest";
+LAYOUT_FIXED_VS_FREE = "Fest und Frei";
+LAYOUT_GRID = "Gitter";
+LAYOUT_RELATIVE_SIZES = "Relative Größe";
+LAYOUT_SAME_SIZES = "Einheitliche Größe";
+LAYOUT_TITLE = "Layout";
+LEGEND_SELECTION_TYPE = "Typ der Auswahl";
+LEGEND_SELECT_PATHS = "Pfade auswählen...";
+LEGEND_SELECT_RESULT = "Auswahlergebnis";
+LIST_DESCRIPTION = [[
+» Listen können eine beliebige Anzahl Zeilen und Spalten haben. Ihre Breite und Höhe kann festgelegt oder adaptiv sein.
+
+» Listen unterstützen Kopfzeilen, eine Cursor-Zeile, Einzel- und Mehrzeilenselektion.
+
+» Listen können Pfeile und Schieberegler bei Bedarf aktivieren.
+]];
+LIST_TITLE = "Listen";
+LUA_COPYRIGHT_TEXT = [[
+Copyright © 1994-2007 Lua.org, PUC-Rio.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.]];
+LUA_LICENSE = "Lua Lizenzbestimmungen";
+LUA_VIRTUAL_MACHINE = "Lua VM";
+MEMORY_USAGE = "Speicher-\nverbrauch";
+MENU_ABOUT = "Über...";
+MENU_FILE = "_Datei";
+MENU_OPEN_STYLESHEET = "Stylesheet öffnen...";
+MENU_QUIT = "Be_enden";
+MENU_SETTINGS = "Einstellungen";
+MULTISELECT = "_Mehrfachauswahl";
+OKAY = "_Okay";
+OPEN_ALL = "Alle öffnen";
+OUTPUT = "Ausgabe";
+PATH = "_Pfad";
+POPUPS_DESCRIPTION = [[
+» Popup-Elemente sind rekursiv und dürfen weitere Popups als Kindelemente enthalten. Tatsächlich können Popups Elemente fast jeden Typs enthalten.
+
+» Menüs sind normale Gruppen (der visuellen Klasse "menubar") mit Kindern einer eigenen Elementklasse ("menuitem"). 
+
+» Andere Kombinationen und mehrere Menüs pro Fenster sind ebenfalls möglich. 
+]];
+POPUPS_TITLE = "Popups";
+PRESENTATION_DESCRIPTION = [[
+» Diese 'Ad-Hoc'-Klasse wandelt die Fließtextklasse ab und verwendet einen Zeitgeber für ihre Zwecke.
+]];
+PRESENTATION_TITLE = "Präsentation";
+PROPERTY = "Eigenschaft";
+QUIT = "Beenden";
+REVOKED = "Widerrufen";
+SELECT = "Auswählen",
+SELECTED = "Gewählt";
+SHOW_FILES_AND_DIRS = "Zeige Dateien und Verzeichnisse",
+SHOW_ONLY_DIRS = "Zeige nur Verzeichnisse",
+SLIDER_CONNECTIONS = "Verbindungen";
+SLIDER_CONTINUOUS = "Fließend";
+SLIDER_DESCRIPTION = [[
+» Schieberegler gibt es in verschiedenen Ausprägungen zum Einstellen von Zahlen und zum Scrollen.
+
+» Sie unterstützen numerische Angaben für Minimum, Maximum, Voreinstellung, Aktuellwert und Bereich, die sämtlich über das Benachrichtigungssystem zugänglich sind.
+
+» Per Voreinstellung bewegen sich Schieberegler flüssig-kontinuierlich, aber es kann eine Integer-Schrittweite erzwungen werden. Diese Unterscheidung ist allerdings ohne Bedeutung, wenn eine Integer-Version der Lua-VM verwendet wird.
+]];
+SLIDER_GAUGE = "Balken";
+SLIDER_INTEGER_STEP = "Ganzzahlig";
+SLIDER_RANGE = "Bereich";
+SLIDER_SLIDERS = "Schieberegler";
+SLIDER_TITLE = "Schieberegler";
+SLOW_RENDERING = "Langsames Zeichnen";
+STATUS = "Status";
+SYSTEM_INFORMATION = "Systeminformation";
+TEKUI_COPYRIGHT_TEXT = [[
+Copyright © 2008-2015 by the authors:
+
+Timm S. Müller <tmueller@schulze-mueller.de>
+Franciska Schulze <fschulze@schulze-mueller.de>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.]];
+TEKUI_DEMO = "tekUI Demo";
+TEKUI_LICENSE = "tekUI Lizenzbestimmungen";
+TEKUI_PACKAGE_VERSION = "tekUI-Version: %s";
+VALUE = "Wert";

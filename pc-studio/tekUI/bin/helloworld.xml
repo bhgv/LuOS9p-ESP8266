@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+
+<tekui:application>
+	<application>
+		<window Title="Hello" Orientation="vertical" HideOnEscape="true">
+			<button>
+				_Hello World!
+				<method Name="onPress">
+					self:getClass().onPress(self)
+					if self.Pressed == false then
+						print "Hello World!"
+					end
+				</method>
+			</button>
+			<button Id="button-quit" Mode="button" Class="button">
+				_Quit
+			</button>
+		</window>
+	</application>
+	<notifications>
+		<notify Id="button-quit" Attribute="Pressed" Value="false" Target="application" Method="quit" />
+	</notifications>
+</tekui:application>

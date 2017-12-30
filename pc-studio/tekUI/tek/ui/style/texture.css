@@ -1,0 +1,78 @@
+
+tek.ui.class.area {
+	background-attachment: scroll;
+}
+
+tek.ui.class.checkmark {
+	background-attachment: fixed;
+}
+
+tek.ui.class.floattext {
+	background-image: url(bin/graphics/back2.png);
+}
+
+tek.ui.class.group {
+	background-attachment: fixed;
+	background-image: url(bin/graphics/back1.png);
+}
+
+tek.ui.class.handle {
+	background-attachment: fixed;
+}
+
+tek.ui.class.imagewidget {
+}
+
+tek.ui.class.menuitem {
+}
+tek.ui.class.menuitem:active {
+	background-color: menu-active;
+}
+tek.ui.class.menuitem:hover {
+	background-color: menu-active;
+}
+tek.ui.class.menuitem:focus {
+	background-color: menu-active;
+}
+
+tek.ui.class.popupwindow {
+	background-color: white;
+}
+
+tek.ui.class.slider {
+}
+
+tek.ui.class.text {
+	background-image: url(bin/graphics/back2.png);
+}
+
+.caption {
+}
+
+.gauge-fill {
+	background-image: url(bin/graphics/back2.png);
+}
+
+.knob {
+	background-image: url(bin/graphics/back2.png);
+}
+
+.menubar {
+	background-color: white;
+	background-attachment: fixed;
+}
+
+.page-button {
+	background-attachment: fixed;
+}
+.page-button:active {
+}
+
+.page-button-fill {
+	background-attachment: fixed;
+	background-color: transparent;
+}
+
+.page-button-group {
+	background-attachment: fixed;
+}

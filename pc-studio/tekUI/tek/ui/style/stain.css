@@ -1,0 +1,126 @@
+
+/*
+**	tek/ui/style/stain.css
+**	Version: 1.0
+*/
+
+tek.ui.class.display {
+	rgb-outline: #2f2b28;
+	rgb-disabled: #2f2b28;
+	rgb-cursor: #611f1f;
+	rgb-list-active: #611f1f;
+	rgb-list: #232222;
+	rgb-background: #2b2724;
+	rgb-fill: #611f1f;
+	rgb-active-detail: #dfdedb;
+	rgb-menu-active: #611f1f;
+	rgb-border-shine: #504743;
+	rgb-disabled-detail-shine: #504741;
+	rgb-border-rim: #171514;
+	rgb-cursor-detail: #ffffff;
+	rgb-list-detail: #d3d2cf;
+	rgb-shadow: #151312;
+	rgb-border-legend: #999794;
+	rgb-active: #282320;
+	rgb-group: #2f2a27;
+	rgb-half-shadow: #1f1c1a;
+	rgb-list-alt: #1f1e1e;
+	rgb-focus: #2f2b28;
+	rgb-border-shadow: #1f1c1a;
+	rgb-hover: #312c29;
+	rgb-half-shine: #342f2c;
+	rgb-border-focus: #822801;
+	rgb-menu-detail: #dfdedb;
+	rgb-shine: #433c38;
+	rgb-list-active-detail: #ffffff;
+	rgb-focus-detail: #dfdedb;
+	rgb-menu: #3d3a32;
+	rgb-disabled-detail: #1f1c1a;
+	rgb-caption-detail: #b2b0ad;
+	rgb-hover-detail: #dfdedb;
+	rgb-detail: #dfdedb;
+}
+
+_editinput { 
+	background-color: #1a1b1e;
+	color: #e4e2c9;
+	mark-background-color: #4b1c23;
+	mark-color: #dcc;
+	cursor-background-color: #202728;
+	cursor-color: #e4e2c9;
+}
+
+.button {
+	background-color: gradient(0,0,#3e3d3b,0,30,tint(#3e3d3b,border-shadow,60%));
+}
+.button:hover {
+	background-color: gradient(0,0,#454442,0,30,tint(#454442,border-shadow,60%));
+}
+.button:focus {
+	background-color: gradient(0,0,#454442,0,30,tint(#454442,border-shadow,60%));
+}
+.button:active {
+	background-color: gradient(0,0,#3e3d3b,0,30,tint(#3e3d3b,border-shadow,60%));
+}
+.button:disabled {
+	background-color: gradient(0,0,#3e3d3b,0,30,tint(#3e3d3b,border-shadow,60%));
+}
+
+
+.menubar {
+	background-color: #352f2c;
+}
+
+tek.ui.class.group {
+	background-color: #352f2c;
+}
+
+tek.ui.class.window {
+	background-color: #352f2c;
+}
+
+tek.ui.class.slider {
+	border-style: solid;
+	border-width: 0;
+	padding: 2;
+}
+tek.ui.class.slider:active {
+	border-style: solid;
+}
+tek.ui.class.slider:hover {
+	background-color: background;
+}
+tek.ui.class.slider:active {
+	background-color: background;
+}
+
+.knob {
+	background-color: #3e3d3b;
+	border-width: 3;
+	border-focus-width: 0;
+	border-rim-width: 1;
+	margin: 0;
+	padding: 5;
+	min-width: 12;
+	min-height: 12;
+}
+
+
+
+tek.ui.class.popitem {
+	background-color: #3e3d3b;
+}
+tek.ui.class.popitem:hover {
+	background-color: #454442;
+}
+tek.ui.class.popitem:focus {
+	background-color: #454442;
+}
+tek.ui.class.popitem:active {
+	background-color: #3e3d3b;
+}
+tek.ui.class.popitem:disabled {
+	background-color: #3e3d3b;
+}
+
+

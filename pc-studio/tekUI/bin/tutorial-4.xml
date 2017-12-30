@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+
+<tekui:application>
+	<application AuthorStyleSheets="tutorial">
+		<window Title="Tutorial 4">
+			<button Id="button" MaxWidth="0">
+				Hello
+			</button>
+			<text Id="output" Legend="Output" Height="free" Style="font: :100" />
+		</window>
+	</application>
+	<notifications>
+		<notify Id="button" Attribute="Pressed" Value="true" Target="output" Method="setValue" Arg2="Text" Arg3="World" />
+		<notify Id="button" Attribute="Pressed" Value="false" Target="output" Method="setValue" Arg2="Text" Arg3="" />
+	</notifications>
+</tekui:application>

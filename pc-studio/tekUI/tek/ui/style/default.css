@@ -1,0 +1,420 @@
+
+/*
+**	tek/ui/style/default.css
+**
+**	Version: 3.4
+*/
+
+tek.ui.class.area {
+	margin: 1;
+}
+
+tek.ui.class.checkmark {
+	padding: 1;
+	margin: 0;
+	border-width: 1;
+	border-rim-width: 0;
+	border-focus-width: 1;
+	text-align: left;
+	background-attachment: fixed;
+}
+tek.ui.class.checkmark:active {
+	background-color: transparent;
+}
+tek.ui.class.checkmark:disabled {
+	background-color: transparent;
+}
+tek.ui.class.checkmark:focus {
+	background-color: transparent;
+}
+tek.ui.class.checkmark:hover {
+	background-color: transparent;
+}
+
+tek.ui.class.floattext {
+	background-color: list;
+}
+
+tek.ui.class.frame {
+	border-width: 2;
+	border-style: inset;
+}
+
+tek.ui.class.widget {
+	border-width: 3;
+	border-style: outset;
+	border-focus-width: 1;
+}
+tek.ui.class.widget:active {
+	background-color: active;
+	color: active-detail;
+	border-style: inset;
+}
+tek.ui.class.widget:disabled {
+	background-color: disabled;
+	color: disabled-detail;
+}
+tek.ui.class.widget:focus {
+	background-color: focus;
+	color: focus-detail;
+}
+tek.ui.class.widget:hover {
+	background-color: hover;
+	color: hover-detail;
+}
+
+tek.ui.class.gauge {
+	height: 0;
+}
+
+tek.ui.class.group {
+	margin: 0;
+	background-color: group;
+	border-width: 0;
+	border-focus-width: 0;
+}
+
+tek.ui.class.group:disabled {
+	background-color: group;
+}
+
+tek.ui.class.handle {
+	effect-class: ripple;
+	effect-kind: slant;
+	effect-orientation: across;
+	background-color: transparent;
+	padding: 4;
+	margin: 0;
+	border-width: 0;
+}
+tek.ui.class.handle:active {
+	background-color: hover;
+}
+
+tek.ui.class.imagewidget {
+	min-width: 10;
+	min-height: 13;
+	border-width: 3;
+}
+
+tek.ui.class.imagewidget:active {
+	color: transparent;
+}
+tek.ui.class.imagewidget:hover {
+	color: transparent;
+}
+tek.ui.class.imagewidget:focus {
+	color: transparent;
+}
+
+tek.ui.class.lister {
+	background-color: list;
+	background-color2: list-alt;
+	color: list-detail;
+	border-color: detail;
+}
+tek.ui.class.lister:active {
+	color: list-active-detail;
+	background-color: list-active;
+	border-color: detail;
+}
+
+tek.ui.class.menuitem.popup-root {
+	margin: 2;
+	width: 0;
+}
+
+tek.ui.class.numeric {
+	padding: 0;
+	border-style: inset;
+	border-width: 3;
+	border-rim-width: 0;
+}
+
+tek.ui.class.popitem {
+	border-width: 4;
+	border-style: outset;
+	border-focus-width: 1;
+	border-rim-width: 1;
+}
+
+tek.ui.class.popupwindow {
+	border-width: 1;
+	border-focus-width: 0;
+	border-style: solid;
+	border-color: dark;
+	background-color: menu;
+}
+
+tek.ui.class.slider {
+	height: 0;
+}
+
+tek.ui.class.slider:active {
+	border-style: inset;
+}
+
+tek.ui.class.spacer {
+	border-style: inset;
+	border-width: 1;
+}
+
+tek.ui.class.text {
+	border-style: inset;
+	padding: 2 5 2 5;
+}
+
+tek.ui.class.window {
+	padding: 0;
+	margin: 0;
+}
+
+/***************************************/
+
+tek.ui.class.checkmark.menuitem:active {
+	background-color: transparent;
+	color: menu-detail;
+}
+tek.ui.class.checkmark.menuitem:hover {
+	background-color: menu-active;
+	color: menu-active-detail;
+}
+tek.ui.class.checkmark.menuitem:focus {
+	background-color: menu-active;
+	color: menu-active-detail;
+}
+
+tek.ui.class.radiobutton.menuitem:active {
+	background-color: transparent;
+	color: menu-detail;
+}
+tek.ui.class.radiobutton.menuitem:hover {
+	background-color: menu-active;
+	color: menu-active-detail;
+}
+tek.ui.class.radiobutton.menuitem:focus {
+	background-color: menu-active;
+	color: menu-active-detail;
+}
+
+/***************************************/
+
+.button {
+	border-style: outset;
+	border-width: 4;
+	border-rim-width: 1;
+}
+
+.button:active {
+	border-style: inset;
+}
+
+.caption {
+	color: caption-detail;
+	border-width: 0;
+	background-color: transparent;
+	text-align: center;
+	vertical-align: center;
+	valign: center;
+}
+
+.gauge-fill {
+	border-style: solid;
+	border-color: dark;
+	border-width: 1;
+	background-color: fill;
+}
+
+.knob {
+	border-width: 3;
+	border-focus-width: 0;
+	border-rim-width: 1;
+	margin: 0;
+	padding: 5;
+}
+
+.knob-scrollbar {
+/* 	effect-class: ripple; */
+	effect-orientation: inline;
+	effect-kind: dot;
+}
+
+.legend {
+	border-legend-font: ui-small;
+	border-style: groove;
+	border-width: 2;
+	margin: 2;
+	padding: 1;
+}
+
+.menubar {
+	margin: 0;
+	border-style: solid;
+	border-width: 0 0 1 0;
+	padding: 0;
+	background-color: menu;
+	width: fill;
+}
+
+.menuitem {
+	margin: 0;
+	background-color: transparent;
+	border-width: 0;
+	color: menu-detail;
+	font: ui-menu;
+}
+.menuitem:active {
+	background-color: menu-active;
+	color: menu-active-detail;
+}
+.menuitem:hover {
+	background-color: menu-active;
+	color: menu-active-detail;
+}
+.menuitem:focus {
+	background-color: menu-active;
+	color: menu-active-detail;
+}
+
+.message {
+	padding: 12;
+}
+
+.page-button {
+	max-width: 0;
+	border-style: inset;
+	border-width: 2 0 2 2;
+	border-focus-width: 0;
+	margin: 0;
+}
+.page-button:active {
+	border-style: outset;
+	border-bottom-color: transparent;
+	background-color: transparent;
+}
+.page-button:focus {
+	background-color: hover;
+}
+.page-button-fill {
+	border-style: inset;
+	border-width: 0 0 2 2;
+	border-focus-width: 0;
+	background-color: transparent;
+	margin: 0;
+}
+.page-button-group {
+	margin: 4 2 0 0;
+	padding-left: 2;
+}
+.page-container {
+	border-width: 0 2 2 2;
+	margin: 0 2 2 2;
+	padding: 2;
+}
+
+.poplist-canvas {
+	margin: 0;
+	border-width: 0;
+}
+
+.scrollbar-arrowup {
+	margin-bottom: 0;
+}
+.scrollbar-arrowright {
+	margin-left: 0;
+}
+.scrollbar-arrowdown {
+	margin-top: 0;
+}
+.scrollbar-arrowleft {
+	margin-right: 0;
+}
+
+/***************************************/
+
+_listview-headitem {
+	padding: 0;
+	margin: 0;
+	border-width: 0;
+	text-align: left;
+}
+
+_scrollbar-arrow {
+	border-width: 3;
+	border-rim-width: 1;
+	min-width: 12;
+	min-height: 12;
+	margin: 0;
+	padding: 1;
+}
+_scrollbar-slider {
+	margin: 0;
+}
+
+
+_editinput { 
+	valign: center;
+}
+_editinput:disabled { 
+	color: disabled-detail;
+}
+
+tek.ui.class.input { 
+	border-style: inset;
+	padding: 0;
+	valign: center;
+}
+
+tek.ui.class.canvas.inputfield {
+/* 	border-color: border-shadow; */
+/* 	border-width: 2; */
+	margin: 1;
+	padding: 0;
+}
+
+
+/*
+.button {
+	background-color: gradient(0,0,tint(background,border-shadow,30%),0,30,tint(background,border-shine,30%));
+}
+.button:hover {
+	background-color: gradient(0,0,tint(background,border-shadow,50%),0,30,tint(background,border-shine,70%));
+}
+.button:focus {
+	background-color: gradient(0,0,tint(background,border-shadow,50%),0,30,tint(background,border-shine,70%));
+}
+.button:active {
+	background-color: gradient(0,0,tint(background,border-shadow,30%),0,30,tint(background,border-shine,30%));
+}
+.button:disabled {
+	background-color: gradient(0,0,tint(background,border-shadow,50%),0,30,tint(background,border-shine,30%));
+}
+*/
+
+
+.window-decoration {
+	border-width: 2;
+	border-style: solid;
+}
+
+.window-decoration-group {
+	border-style: groove;
+	border-top-width: 2;
+	border-bottom-width: 2;
+}
+
+.window-decoration-button {
+	margin: 0;
+	border-width: 0;
+	padding: 2;
+}
+
+.window-decoration-button:windowfocus {
+	background-color: active;
+	color: active-detail;
+}
+
+_window-decoration-dragbutton {
+	text-align: left;
+	font: ui-menu;
+}

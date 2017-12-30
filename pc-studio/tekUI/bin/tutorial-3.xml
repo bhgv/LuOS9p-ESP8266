@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+
+<tekui:application>
+	<application AuthorStyleSheets="tutorial">
+		<window Title="Tutorial 3">
+			<button MaxWidth="0">
+				Hello
+			</button>
+			<button MaxHeight="none">
+				World
+			</button>
+		</window>
+	</application>
+</tekui:application>

@@ -1,0 +1,1649 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<title>tekUI Changelog</title>
+		<link rel="stylesheet" href="manual.css" />
+	</head>
+	<body>
+		<h2>
+			tekUI Changelog
+		</h2>
+		<blockquote>
+			<ul>
+				<li>
+					Compiler tool can now amalgate Lua programs into stand-alone executables
+				</li>
+				<li>
+					Compiler tool: Now works with Lua 5.1/5.2/5.3 using the method shown in
+					lua-amalg by Philipp Janda, LUAARCH switch is no longer needed, module
+					sampling is now done in a LuaExec task, no module statistics files needed,
+					now works under Windows, too
+				</li>
+				<li>
+					Building a standalone tekUI executable now works under Windows and using
+					cross-compilation
+				</li>
+				<li>
+					Some X11 font issues corrected
+				</li>
+				<li>
+					Windows display driver could try to send tekUI messages to foreign
+					windows, leading to a crash, corrected
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.12:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Changes to the class system, module loader and documentation system,
+					no longer requires Lua 5.2, 5.3 to be compiled with LUA_COMPAT_MODULE
+				</li>
+				<li>
+					Windows HAL: Atomics enabled
+				</li>
+				<li>
+					Windows display: Added clipboard support, improved event handling, Win64
+					support, synchronous waiting, added Unicode text rendering, added better
+					support for keyboard qualifiers, windows opened at fixed positions had
+					wrong size, corrected, added support for bold and italic font styles
+				</li>
+				<li>
+					Visual, EditWindow, Input: added setSelection, TextEdit: uses application
+					clipboard, removed class clipboard, quirky attribute retrieval corrected
+				</li>
+				<li>
+					Application: added obtainClipboard, releaseClipboard
+				</li>
+				<li>
+					Changed notes about LuaJIT and some additions to documentation
+				</li>
+				<li>
+					LuaExec: Changes merged in, in <a href="manual.html#join"><code>join()</code></a> abort signals could be forwarded to
+					already dead task, corrected by freeing task after return from exec, in
+					<a href="manual.html#waitmsg"><code>waitmsg()</code></a> fixed recalculation of waittime, returned signals should be
+					correct now, childnotify example added to demonstrate GUI signal handlers
+				</li>
+				<li>
+					Exec: added semi-internal function <a href="manual.html#TFreeTask"><code>TFreeTask()</code></a>, user tasks are now
+					freed in destructor context after their return from exec, minor cleanup
+					in memory functions
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.11:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					HAL: fix for broken timer device under Windows, MMTimer timerequest abort
+					on signal arrival did not work for ages, corrected, giving e.g. <a href="manual.html#TWaitTime"><code>TWaitTime()</code></a> 
+					in Windows display driver much better response times and smoother updates.
+				</li>
+				<li>
+					Luaexec: added functions getmsg, getname, getsignals, run, sendport,
+					sendmsg, signal, sleep, wait, waitmsg, waittime, child methods abort, join,
+					sendport, sendmsg, signal, terminate, including error propagation through
+					running tasks, added childtask example
+				</li>
+				<li>
+					Default layouter: Fixed Weight attribute number representation problem
+					with Lua 5.3
+				</li>
+				<li>
+					Windows, RawFB, DirectFB display drivers: Slip fixed in instantiating
+					multiple times concurrently
+				</li>
+				<li>
+					X11 display driver: Workaround for Xft reinitialization b0rkedness
+				</li>
+				<li>
+					Exec: TInitmodule structure is now const, replyport field of messages is
+					now NULL on allocation, added support for silently ignoring destruction of
+					a task's own handle, allowing <a href="manual.html#TEKCreate"><code>TEKCreate()</code></a> to return a different task as the
+					basetask, added TTask_InitData and <a href="manual.html#GetInitData"><code>GetInitData()</code></a> to free TTask_UserData for
+					user affairs in basetask
+				</li>
+				<li>
+					TEKLib: Added support for mulithreaded, lazy singleton creation
+				</li>
+				<li>
+					Visual: Module instances' init requests are no longer reused, getting
+					rid of nearly incomprehensible trickery that did not work properly
+				</li>
+				<li>
+					Lua bindings of Visual and all display drivers: Module initnodes are now
+					part of the Lua state, the bindings are now fully reentrant
+				</li>
+				<li>
+					Visual module: Now registers a TEKlib atom &quot;msgport.ui.%p&quot; with
+					task address for message port rendezvous in local address space
+				</li>
+				<li>
+					Application, UI: Added support for MSG_SIGNAL
+				</li>
+				<li>
+					Added NetBSD support in config file and documentation
+				</li>
+				<li>
+					Minor corrections in documentation
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.10:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Exec: Changed list structure to eliminate the need for pointer aliasing
+				</li>
+				<li>
+					Improved Mac OS X support, added support for Solaris and HP-UX, improved
+					configuration and flexibility with regard to custom paths to third party
+					libraries; the Xvid extension is no longer enabled by default
+				</li>
+				<li>
+					Some cleanup in visibility of symbols, code and build system structure
+				</li>
+				<li>
+					UI: Now evaluates arg, ProgDir, LocalPath, etc. as late as possible,
+					allowing the library to be embedded in precompiled form, warnings for
+					each missing locale key are shown only once now
+				</li>
+				<li>
+					ImgLoad, Visual: Minor improvements in loading with alpha channel
+				</li>
+				<li>
+					Visual module: Minor API corrections, added documentation
+				</li>
+				<li>
+					Display: Some corrections in API documentation
+				</li>
+				<li>
+					UI: <a href="manual.html#loadImage"><code>loadImage()</code></a> can now load from an open file
+				</li>
+				<li>
+					Raw framebuffer: Improved region management, optimizations, added
+					support for window backing store, unified input handling, added alignment
+					for dirty regions, reducing region merge-ops
+				</li>
+				<li>
+					RawFB, X11: Now suspend indefinitely if no interval events are requested,
+					major source code cleanup
+				</li>
+				<li>
+					Compiler: added module exclude list, code cleanup, added documentation
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.09:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Added basic support for native Linux framebuffer and event interface.
+					Support can be compiled into the raw framebuffer display driver.
+				</li>
+				<li>
+					Raw framebuffers automatically recognize the need for a backbuffer now,
+					e.g. when a VNC server is running on top a Linux framebuffer and the pixel
+					formats differ. Backbuffer support can also be enabled explicitely using
+					ui.ExtraArgs = &quot;fb_backbuffer=true&quot;
+				</li>
+				<li>
+					Linux framebuffer keymaps are compiled-in for now, added tool etc/keymap2c
+					for conversion; default is /usr/share/keymaps/i386/qwerty/us.map.gz
+				</li>
+				<li>
+					UI, Window: Added ui.Mode = &quot;workbench&quot; for displays without a window
+					manager, supporting rudimentary window decorations for close, drag, and
+					resize. Added HaveWindowManager attribute to displays and Visual interface
+				</li>
+				<li>
+					Some restructuring and streamlining in pixel conversion and image loading
+				</li>
+				<li>
+					VNC portnumber can be configured using VNC_PORTNUMBER as well as
+					ui.ExtraArgs = &quot;vnc_portnumber=1234&quot;
+				</li>
+				<li>
+					Displays, Area, Canvas: Some layouting and refresh glitches corrected
+				</li>
+				<li>
+					Windows now better remember their window positions and sizes
+				</li>
+				<li>
+					<a href="manual.html#createPixmap"><code>createPixmap()</code></a> can now read images from open file handles
+				</li>
+				<li>
+					Input: doubleclick marks the whole line now
+				</li>
+				<li>
+					Sizeable: No longer adds empty blit regions to the Window, added sanity
+					checks, added cases for insertions above and below the visible area, now
+					operates on not shown elements correctly
+				</li>
+				<li>
+					Sizeable, ScrollGroup: Added support for merging damages and for
+					suppressing blits
+				</li>
+				<li>
+					Area, default layouter: Invisible attribute added
+				</li>
+				<li>
+					String: <a href="manual.html#getTextWidth"><code>getTextWidth()</code></a> missing range check, <a href="manual.html#attachdata"><code>attachdata()</code></a>, <a href="manual.html#getdata"><code>getdata()</code></a> added
+				</li>
+				<li>
+					Window: relayout calls to drawBegin/drawEnd were not exactly paired in
+					error case, corrected
+				</li>
+				<li>
+					Area, Group: Invisible, <a href="manual.html#onSetVisible"><code>onSetVisible()</code></a> added
+				</li>
+				<li>
+					DirList: changing the location field clears the current selection so that
+					the location field becomes the preferred selection
+				</li>
+				<li>
+					TextList: <a href="manual.html#deleteLine"><code>deleteLine()</code></a> added, better hardscroll support
+				</li>
+				<li>
+					<a href="manual.html#TextEdit:deleteLine"><code>TextEdit:deleteLine()</code></a> can now delete any line, not just the cursor line,
+					<a href="manual.html#enter"><code>enter()</code></a> now handles metadata correctly, <a href="manual.html#getNumLines"><code>getNumLines()</code></a> does not count an empty
+					first line anymore, <a href="manual.html#setCursor"><code>setCursor()</code></a> no longer performs damages if window updates
+					are suspended or if the cursor is invisible, &quot;wholeline&quot; cursor mode renamed
+					to &quot;bar+line&quot;, &quot;bar&quot; mode added, the ReadOnly attribute does not inhibit
+					marking text anymore, <a href="manual.html#updateMark"><code>updateMark()</code></a> added, window update suspension mechanism
+					reactivated and other fixes
+				</li>
+				<li>
+					Removed redundant code from display drivers
+				</li>
+				<li>
+					Visual: added large number of pixel formats and conversions, added pixmap
+					caching (used for gradients), added screenwidth/height properties
+				</li>
+				<li>
+					x11 driver, rawfb driver: added pixmap caching, added support for more
+					pixel formats
+				</li>
+				<li>
+					DirList: list dblclicks are acted upon mouse press, not release now
+				</li>
+				<li>
+					Added compiler tool again, some infrastructure for amalgamized builds added
+				</li>
+				<li>
+					UI: minor fixes in ProgDir/ProgName detection and stylesheet loading,
+				</li>
+				<li>
+					Application: Dialogues are now confined to the visible screen
+				</li>
+				<li>
+					Widget, UI: Added NoFocus attribute and FL_NOFOCUS
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.08:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Added support for dynamic reconfiguration from stylesheets during runtime
+				</li>
+				<li>
+					Area: Width/Height, Min/Max/Width/Height are no longer consolidated during
+					<a href="manual.html#new"><code>new()</code></a>, but interpreted by the layouter during runtime by accessing them via
+					<a href="manual.html#getAttr"><code>getAttr()</code></a> 
+				</li>
+				<li>
+					Demo program: Added menu item &quot;Open stylesheet...&quot;
+				</li>
+				<li>
+					Added a sanity check in <a href="manual.html#Window:update"><code>Window:update()</code></a> 
+				</li>
+				<li>
+					Added LUAVER variable in config to switch Lua install paths
+				</li>
+				<li>
+					Text, Canvas: KeepMinWidth/Height are now translated to flags
+				</li>
+				<li>
+					Rawfb: Topmost window is focused now after the focused window was closed
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.07:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					<a href="manual.html#ui:checkVersion"><code>ui.checkVersion()</code></a> added
+				</li>
+				<li>
+					ui, Area, Window: FL_ISWINDOW, FL_DONOTBLIT added and honoured
+				</li>
+				<li>
+					<a href="manual.html#Window:relayout"><code>Window:relayout()</code></a> uses FL_ISWINDOW to avoid expensive uses of <a href="manual.html#instanceOf"><code>instanceOf()</code></a> 
+				</li>
+				<li>
+					Slider knobs are no longer blitted
+				</li>
+				<li>
+					<a href="manual.html#Canvas:damage"><code>Canvas:damage()</code></a> did not check for rectangle, corrected
+				</li>
+				<li>
+					Build procedure: builds with just a single display driver can be configured
+					entirely via config file now
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.06:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Serious regression fixed: Since 1.02, updating sliders was abysmally
+					expensive and could disturb the refreshing of other elements
+				</li>
+				<li>
+					config.h, config, Makefiles: Some Mac OS X support added
+				</li>
+				<li>
+					<a href="manual.html#FloatText:erase"><code>FloatText:erase()</code></a> did not check for a DamageRegion, corrected
+				</li>
+				<li>
+					X11, Visual: some sanity checks added to drawbuffer and drawgradient
+				</li>
+				<li>
+					TextEdit: disabled window update suspension, disabled AutoIndent by
+					default, corrections to cursor updates and text width recalculation
+				</li>
+				<li>
+					EditWindow: enabled AutoIndent by default
+				</li>
+				<li>
+					<a href="manual.html#Input:handleKeyboard"><code>Input:handleKeyboard()</code></a>, cursorSOF/EOF/SOL/<a href="manual.html#EOL"><code>EOL()</code></a> added
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.05:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Added PNG file format support
+				</li>
+				<li>
+					Added loading images and rendering with alpha channel
+				</li>
+				<li>
+					RawFB driver: Added support for drawing bitmaps with alpha channel
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.04:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					ui, Application: Added UserStyles variable
+				</li>
+				<li>
+					Removed use of the <a href="manual.html#init"><code>init()</code></a> function
+				</li>
+				<li>
+					<a href="manual.html#CheckMark:getAttr"><code>CheckMark:getAttr()</code></a> removed
+				</li>
+				<li>
+					<a href="manual.html#Area:beginPopup"><code>Area:beginPopup()</code></a> added
+				</li>
+				<li>
+					PopItem: now uses <a href="manual.html#child:beginPopup"><code>child:beginPopup()</code></a> to prepare an element for being used
+					in a popup
+				</li>
+				<li>
+					<a href="manual.html#Widget:getPseudoClass"><code>Widget:getPseudoClass()</code></a> now gives hover precendece if the element is in a
+					popup
+				</li>
+				<li>
+					<a href="manual.html#Window:update"><code>Window:update()</code></a> could try to relayout elements without a rectangle,
+					corrected
+				</li>
+				<li>
+					Added some CSS documentation
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.03:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Bug in Area class (C version) fixed: Did not differentiate between
+					layouted rectangle 'unset' and 'zero'
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.02:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					PopItem: <a href="manual.html#getPseudoClass"><code>getPseudoClass()</code></a> removed
+				</li>
+				<li>
+					Window: <a href="manual.html#relayout"><code>relayout()</code></a> removed
+				</li>
+				<li>
+					TextList: improved logic for latching on list top or bottom
+				</li>
+				<li>
+					ScrollGroup: added HValue, VValue, H/VMax/Min/Range/Value are now
+					always updated
+				</li>
+				<li>
+					runxml: version added
+				</li>
+				<li>
+					some corrections in examples
+				</li>
+				<li>
+					Application, Area (Lua version): small optimizations
+				</li>
+				<li>
+					VNC server: Now using a nonblocking socket for signalling, maxfd is
+					constantly updated
+				</li>
+				<li>
+					TextEdit: AutoPosition reenabled, fixes regression
+				</li>
+				<li>
+					Slider, Gauge: now uses <a href="manual.html#rethinkLayout"><code>rethinkLayout()</code></a> instead of <a href="manual.html#Window:relayout"><code>Window.relayout()</code></a>,
+					leading to visually tighter updates
+				</li>
+				<li>
+					Input, EditWindow: clicking outside the element stops editing
+				</li>
+				<li>
+					UI, Area, Canvas, Group, PopItem, Sizeable, TextEdit, Widget, Window:
+					Added flags FL_AUTOPOSITION, FL_ERASEBG, FL_TRACKDAMAGE, FL_ACTIVATERMB,
+					FL_INITIALFOCUS
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.01:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Area: C version <a href="manual.html#erase"><code>erase()</code></a> did not use texture origins, corrected, in
+					<a href="manual.html#setFlags"><code>setFlags()</code></a> now only newly set flags cause FL_UPDATE to bubble up
+				</li>
+				<li>
+					String: Fixed a bug in range calculation that could corrupt the heap
+				</li>
+				<li>
+					Window: Added support for initializing HoldTickFirst and -Repeat
+				</li>
+				<li>
+					Added XML runner, examples and documentation
+				</li>
+				<li>
+					CheckMark, PopItem, Widget: Some corrections in precedence of style
+					pseudoclasses
+				</li>
+				<li>
+					Added prototype TextList class
+				</li>
+				<li>
+					Improved 'klinik' stylesheet
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			1.0:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					New versioning scheme established. The 1.0 version does not reflect some
+					exceptional achievement, and the major version will be changed more
+					frequently in the future. The versioning scheme resembles Lua's in that new
+					major versions indicate some nontrivial API changes. The UI library now
+					contains a version that reflects tekUI's overall package version number.
+				</li>
+				<li>
+					The document generator now accepts C source files, too, for classes which
+					have been written in or ported to C. The notation is the same, so the current
+					function headers only need to be enclosed in C comments.
+				</li>
+				<li>
+					tekUI example class written in C: Fixed a bug that thwarted child classes
+					to inherit from the example class. Rounded out the registration prolog, added
+					<a href="manual.html#tek_lua_register"><code>tek_lua_register()</code></a> that isolates 5.1/5.2 compatibility and simplifies
+					registration
+				</li>
+				<li>
+					Raw framebuffer: Improved window focus management, fixed memory leak
+				</li>
+				<li>
+					String class: documentation added
+				</li>
+				<li>
+					<a href="manual.html#Application:up"><code>Application:up()</code></a> added
+				</li>
+				<li>
+					Added examples demonstrating communication with child processes and
+					datagram socket server; socket and filestream communication are no longer
+					part of the display drivers, but now available throughout tek.lib.visual
+				</li>
+				<li>
+					Rendering of color gradients corrected
+				</li>
+				<li>
+					Area.Flags: is a numerical type now
+				</li>
+				<li>
+					The Area and Frame classes have been rewritten in C, the original Lua
+					versions are still available in the archive
+				</li>
+				<li>
+					New Input and TextEdit classes added, the TextInput class is obsolete.
+					Input is largely compatible with TextInput. The new class supports
+					multiline, proportional fonts, smooth scrolling, MaxLength, Size,
+					passwords, selections, and an internal clipboard, which can be shared with
+					the system clipboard (currently implemented in the X11 driver)
+				</li>
+				<li>
+					RawFB (in-memory) framebuffer display driver added, which is recursive:
+					Allows another display driver to be plugged in as its rendering back-end
+				</li>
+				<li>
+					Added Lua 5.2 support, and no longer uses Lua internal API functions
+				</li>
+				<li>
+					Added gradient support, available via stylesheets
+				</li>
+				<li>
+					RawFB: Added LibVNCServer support. Applications can now be shared with
+					the network, running headlessly or with an additional native display
+				</li>
+				<li>
+					Added 'klinik', 'stain', 'gradient' stylesheets
+				</li>
+				<li>
+					Default border now supports border-legend-align attribute, bug fixed
+					in focus border rendering
+				</li>
+				<li>
+					Element: Cascading stylesheets did not incorporate an element's hardcoded
+					class properties correctly, corrected, <a href="manual.html#getPseudoClass"><code>getPseudoClass()</code></a> added
+				</li>
+				<li>
+					ScrollGroup: Reduced object tree complexity in some cases, some checks
+					added
+				</li>
+				<li>
+					ui: Added FL_UPDATE, typo in &quot;BckSpc&quot; symbolic key name corrected, added
+					MSG_REQSELECTION, added FL_RECVINPUT, FL_RECVMOUSEMOVE, FL_CURSORFOCUS,
+					now automatically loads &quot;default&quot; as the first stylesheet unless &quot;minimal&quot;
+					is explicitely given in the THEME variable
+				</li>
+				<li>
+					Area: <a href="manual.html#setFlags"><code>setFlags()</code></a>, <a href="manual.html#checkClearFlags"><code>checkClearFlags()</code></a> added, taking care of FL_UPDATE
+					bubbling up in the graph on setting FL_REDRAW, FL_REDRAWBORDER, FL_CHANGED.
+					<a href="manual.html#getNext"><code>getNext()</code></a>, <a href="manual.html#getPrev"><code>getPrev()</code></a> now have an optional &quot;recursive&quot; mode argument.
+					added <a href="manual.html#getDisplacement"><code>getDisplacement()</code></a>, <a href="manual.html#getMsgFields"><code>getMsgFields()</code></a>. <a href="manual.html#checkHover"><code>checkHover()</code></a> renamed to
+					<a href="manual.html#checkHilite"><code>checkHilite()</code></a>; <a href="manual.html#getBG"><code>getBG()</code></a> now returns additional position-independency info
+					for better support of transaprent backgrounds, getMargin and getPadding
+					are now written in C
+				</li>
+				<li>
+					Group: now descends only into elements with FL_UPDATE set during updates,
+					which reduces the overhead for small, partial refreshes. <a href="manual.html#remMember"><code>remMember()</code></a> now
+					unweights a Group's remaining elements; no longer passes messages to
+					disabled or inactive elements
+				</li>
+				<li>
+					Lister: No longer unselects entries in <a href="manual.html#cleanup"><code>cleanup()</code></a>, more sanity checks
+				</li>
+				<li>
+					Application: User message handler is now established in <a href="manual.html#new"><code>new()</code></a>, added
+					FocusWindow attribute
+				</li>
+				<li>
+					Display, Visual: Added support for bold and italic in fontnames and with
+					<a href="manual.html#openFont"><code>openFont()</code></a>, better default/fallback fonts, added symbolic color &quot;bright&quot;,
+					<a href="manual.html#getattrs"><code>getattrs()</code></a> now supports query of selection and clipboard, <a href="manual.html#getPaintInfo"><code>getPaintInfo()</code></a> 
+					added
+				</li>
+				<li>
+					DirList: path/location field bugs fixed, some improvements especially in
+					regard to keyboard control
+				</li>
+				<li>
+					DirectFB Display driver: Totalwidth/pitch bug in drawbuffer corrected
+				</li>
+				<li>
+					X11 display: Issues with drawing argument ranges corrected, now stops
+					reading from stdin when an error occurs, Unicode keycode handling improved,
+					added saveunder/backingstore heuristic, compile-time options to reenable
+					default cursor, datagram socket for USER messages, improved pixmap memory
+					management
+				</li>
+				<li>
+					X11 display, Visual, Applications: Added support for selections and
+					clipboards. tekUI input messages are now userdata encapsulations of TEKlib
+					messages, passed into Lua space, unpacked only on demand when accessed, and
+					replied explicitely using <a href="manual.html#reply"><code>reply()</code></a> or implicitely through garbage collection.
+					messages can now perform a roundtrip through Lua space back to originator
+				</li>
+				<li>
+					TEKlib: Added more support for message port hooks
+				</li>
+				<li>
+					PopItem: Some initialization and other problems corrected
+				</li>
+				<li>
+					Widget, Window, PopItem: Added some right mouse button support
+				</li>
+				<li>
+					Widget: improved doubleclick state detection, now known in <a href="manual.html#onPress"><code>onPress()</code></a> etc.,
+					Hover attribute and <a href="manual.html#onHover"><code>onHover()</code></a> removed, simplified activation model based on
+					Hilite attribute, now all widgets receive FL_RECVINPUT, interactive elements
+					additionally receive FL_RECVMOUSEMOVE
+				</li>
+				<li>
+					Window: Focus and Activation in KEYDOWN handler is no longer changed when
+					a keyboard qualifier is present, more rigid checking for elements going
+					active or getting highlighted, no longer passes MSG_NEWSIZE and MSG_REFRESH
+					to group, minimized usage of <a href="manual.html#getByXY"><code>getByXY()</code></a>, <a href="manual.html#getHoverElementByXY"><code>getHoverElementByXY()</code></a> removed
+				</li>
+				<li>
+					TextInput: now stops editing when clicked outside and no other element is
+					activated, added <a href="manual.html#getText"><code>getText()</code></a> method
+				</li>
+				<li>
+					PageGroup: setting PageNumber now sends value and oldvalue in notification
+				</li>
+				<li>
+					Canvas: VScrollStep renamed to VIncrease, fixed some refresh problems
+				</li>
+				<li>
+					Slider: AutoFocus renamed to AutoCapture, Integer renamed to Step, the
+					latter can be a number value or a boolean; AutoCapture now on by default
+				</li>
+				<li>
+					Sizeable class moved into main class hierarchy
+				</li>
+				<li>
+					C dynamic UTF-8 and metadata string class added
+				</li>
+				<li>
+					UTF8String class removed
+				</li>
+				<li>
+					Fixed aliasing issues in compile flags when compiling with more recent
+					versions of GCC
+				</li>
+				<li>
+					Corrected some addresses and years in the documentation
+				</li>
+				<li>
+					Prototype text editor: improved
+				</li>
+				<li>
+					Improved region management, improved buffer rendering, added FONTDIR env
+					variable, default font is now DejaVu, display drivers no longer have to
+					provide a default font, improved font and pixmap cache management, reworked
+					some demos
+				</li>
+				<li>
+					ImageWidget: <a href="manual.html#onSetImage"><code>onSetImage()</code></a> and documentation added
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8k:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Area: reenabled &quot;auto&quot; mode for Width and Height
+				</li>
+				<li>
+					Documentation: Added layouting section, improved examples, corrections
+				</li>
+				<li>
+					Corrected usage of directory iterators from <a href="manual.html#lfs:dir"><code>lfs.dir()</code></a>, now working with
+					LuaFilesystem 1.5 again
+				</li>
+				<li>
+					Debug: added <a href="manual.html#wrout"><code>wrout()</code></a> function, simplified
+				</li>
+				<li>
+					Visual API: <a href="manual.html#tek_lib_visual_gettime"><code>tek_lib_visual_gettime()</code></a> stray line removed, causing Lua
+					stack corruption
+				</li>
+				<li>
+					PopItem: <a href="manual.html#beginPopup"><code>beginPopup()</code></a> could attempt to descend into items that have no
+					children, corrected
+				</li>
+				<li>
+					Visual API: Added an option to create images from tables
+				</li>
+				<li>
+					Minor changes and corrections for tekUI to go together with the latest
+					compiler issues and LuaJIT
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8j:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Gadget renamed to Widget, ListGadget renamed to Lister, ImageGadget renamed
+					to ImageWidget
+				</li>
+				<li>
+					Drawable class: removed
+				</li>
+				<li>
+					Object: Added class-wide handlers and a copy-on-write mechanism for
+					duplicating handlers on object-level on demand; static initialization of
+					handlers is no longer supported
+				</li>
+				<li>
+					Element: added <a href="manual.html#onSetStyle"><code>onSetStyle()</code></a> and <a href="manual.html#obSetClass"><code>obSetClass()</code></a>, some bugs fixed in style
+					sheet processing
+				</li>
+				<li>
+					Application: <a href="manual.html#hide"><code>hide()</code></a> hardened for side-effects from shutting down while
+					<a href="manual.html#hide"><code>hide()</code></a> is still in progress
+				</li>
+				<li>
+					Area: removed Drawable attribute, <a href="manual.html#show"><code>show()</code></a> no longer has a drawable argument,
+					removed Margin, added <a href="manual.html#getMargin"><code>getMargin()</code></a> and <a href="manual.html#getMinmax"><code>getMinmax()</code></a>, MinMax, Rect are Region
+					objects now
+				</li>
+				<li>
+					<a href="manual.html#Widget:onClick"><code>Widget:onClick()</code></a>, <a href="manual.html#onHold"><code>onHold()</code></a>, <a href="manual.html#onDblClick"><code>onDblClick()</code></a> added
+				</li>
+				<li>
+					<a href="manual.html#Group:addMember"><code>Group:addMember()</code></a> now allows elements to be added to uninitialized groups
+				</li>
+				<li>
+					<a href="manual.html#Lister:onDoubleClick"><code>Lister:onDoubleClick()</code></a> renamed to <a href="manual.html#onDblClick"><code>onDblClick()</code></a> and documented
+				</li>
+				<li>
+					<a href="manual.html#Slider:onHold"><code>Slider:onHold()</code></a> documented
+				</li>
+				<li>
+					Visual: added <a href="manual.html#setTextureOrigin"><code>setTextureOrigin()</code></a>, <a href="manual.html#pushClipRect"><code>pushClipRect()</code></a>, <a href="manual.html#popClipRect"><code>popClipRect()</code></a>, drawing
+					functions no longer receive texture origins as arguments, added <a href="manual.html#setBGPen"><code>setBGPen()</code></a>,
+					which can be used to set a background color or a texture for <a href="manual.html#fillRect"><code>fillRect()</code></a>,
+					renamed <a href="manual.html#copyarea"><code>copyarea()</code></a> to <a href="manual.html#blitArea"><code>blitArea()</code></a>, function names are now in lowerCamelCase
+				</li>
+				<li>
+					ScrollGroup: <a href="manual.html#copyArea"><code>copyArea()</code></a> renamed to <a href="manual.html#blitArea"><code>blitArea()</code></a> 
+				</li>
+				<li>
+					Window: Drawable attribute added, it is now created in <a href="manual.html#show"><code>show()</code></a> and
+					destroyed in <a href="manual.html#hide"><code>hide()</code></a>, removed Visible and Pens attributes, invalid color
+					specifications are now silently converted to the 'background' color
+				</li>
+				<li>
+					UI: Changed meaning of MSG_ALL, now excluding MSG_INTERVAL
+				</li>
+				<li>
+					added tek.ui.style.desktop, removed Theme class
+				</li>
+				<li>
+					Improved documentation and stylesheet, added Windows platform installation
+					note
+				</li>
+				<li>
+					Display: Simpler and faster color allocation, added <a href="manual.html#newDrawable"><code>newDrawable()</code></a>, Drawable
+					now encapsulated by Display
+				</li>
+				<li>
+					<a href="manual.html#Object:doNotify"><code>Object:doNotify()</code></a> added, now processes all notifications regardless of
+					esoteric side-effects during traversal, <a href="manual.html#addNotify"><code>addNotify()</code></a> positional argument
+					removed
+				</li>
+				<li>
+					UI: Added FL_POPITEM, added <a href="manual.html#getStyleSheet"><code>getStyleSheet()</code></a> from former Theme class, removed
+					region functions
+				</li>
+				<li>
+					PopItem: sets FL_POPITEM during connect, overwrites <a href="manual.html#doNotify"><code>doNotify()</code></a> to filter
+					out notifications in items which have been neither setup nor connected before
+				</li>
+				<li>
+					Demos: cleanup
+				</li>
+				<li>
+					Region: added <a href="manual.html#get"><code>get()</code></a> function, class check is now based on upvalue
+				</li>
+				<li>
+					Optimized default layouter, now using more C structures and fewer Lua stack
+				</li>
+				<li>
+					Editor, Sizeable and EditWindow classes added (not installed globally)
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8i:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Display, Visual: Removed numerical pens, all pens are symbolic now,
+					Display: removed RGBTab and FontTab
+				</li>
+				<li>
+					added ui.support library with functions operating on flag fields
+				</li>
+				<li>
+					added Fixed layouter
+				</li>
+				<li>
+					added Dynamic, Fixed and LayoutHook and improved some demos
+				</li>
+				<li>
+					<a href="manual.html#Element:addStyleClass"><code>Element:addStyleClass()</code></a> added, Properties attribute added, removed
+					<a href="manual.html#getProperty"><code>getProperty()</code></a> and <a href="manual.html#getProperties"><code>getProperties()</code></a>, style sheet properties, direct formattings
+					and hardcoded class properties are now decoded into a metatable graph
+				</li>
+				<li>
+					EditWindow: localizations added
+				</li>
+				<li>
+					Application: added Style and Preload attributes, removed Theme attribute,
+					renamed Styles to AuthorStyles, added AutorStyleSheets
+				</li>
+				<li>
+					<a href="manual.html#Drawable:getAttrs"><code>Drawable:getAttrs()</code></a> split into <a href="manual.html#getWH"><code>getWH()</code></a> and <a href="manual.html#getXY"><code>getXY()</code></a> 
+				</li>
+				<li>
+					PopItem: Now also elements descending from CheckMark collapse in popups,
+					no longer uses a &quot;popup-children&quot; style class if an element has children,
+					instead a style class &quot;popup-child&quot; is appended to all children during
+					<a href="manual.html#connectPopItem"><code>connectPopItem()</code></a> 
+				</li>
+				<li>
+					CheckMark: in <a href="manual.html#setState"><code>setState()</code></a>, precedence of the &quot;Hilite&quot; attribute over
+					&quot;Selected&quot; is now also considered for the foreground color
+				</li>
+				<li>
+					MenuItem: a predefined class &quot;menuitem&quot; is now appended to the element's
+					style classes during <a href="manual.html#init"><code>init()</code></a> 
+				</li>
+				<li>
+					Internal theme: use of menu colors corrected, removed &quot;internal&quot; style
+					sheet, added the respective properties in the &quot;desktop&quot; style sheet.
+				</li>
+				<li>
+					style sheets: 'parent-group' pseudo pen renamed to 'transparent',
+					'background-position' renamed to 'background-attachment'
+				</li>
+				<li>
+					<a href="manual.html#ui:loadStyleSheet"><code>ui.loadStyleSheet()</code></a> can now operate on open filehandles
+				</li>
+				<li>
+					RadioImage now paints a back pane
+				</li>
+				<li>
+					ImageGadget: did not implement vertical and right alignments, corrected
+				</li>
+				<li>
+					Input: setting the cursor with the mouse now also updates the LockCursorX
+					attribute, visual cursor position reporting corrected
+				</li>
+				<li>
+					Visual API: Window MaxWidth/MaxHeight wasn't unset when passing 'false',
+					corrected
+				</li>
+				<li>
+					Area: removed <a href="manual.html#relayout"><code>relayout()</code></a> function, <a href="manual.html#rethinkLayout"><code>rethinkLayout()</code></a> now has an additional
+					updateminmax argument, added <a href="manual.html#drawBegin"><code>drawBegin()</code></a> and <a href="manual.html#drawEnd"><code>drawEnd()</code></a> functions, removed
+					<a href="manual.html#refresh"><code>refresh()</code></a>, layout logic improved for growing elements, added Flag attribute,
+					removed Redraw attribute, removed BGColor, BGPosition, Margin, Padding,
+					<a href="manual.html#getProperties"><code>getProperties()</code></a>, FL_CHANGED is now set in <a href="manual.html#rethinkLayout"><code>rethinkLayout()</code></a>, added <a href="manual.html#getPadding"><code>getPadding()</code></a>,
+					renamed MarginAndBorder to Margin, renamed former 'grid-align' properties to
+					'halign' and 'valign'
+				</li>
+				<li>
+					FloatText: <a href="manual.html#layout"><code>layout()</code></a> took an existing Redraw into account, removed
+				</li>
+				<li>
+					Frame: phased out an additional <a href="manual.html#newBorderObject"><code>newBorderObject()</code></a> function, removed
+					RedrawBorder attribute, removed Border and BorderClass attributes, these are
+					created on the fly during border creation and isolated in the border object
+				</li>
+				<li>
+					Group: the Layout argument can now be a class name, not just a layouter
+					instance, <a href="manual.html#calcWeights"><code>calcWeights()</code></a> is now called when a changed layout is notified,
+					<a href="manual.html#addMember"><code>addMember()</code></a>/<a href="manual.html#remMember"><code>remMember()</code></a> are more solid now, removed <a href="manual.html#getStructure"><code>getStructure()</code></a>,
+					<a href="manual.html#getSameSize"><code>getSameSize()</code></a> and <a href="manual.html#calcWeights"><code>calcWeights()</code></a>, these are now isolated in the default
+					layouter, removed <a href="manual.html#onActivateGroup"><code>onActivateGroup()</code></a>, groups are no longer repainted
+					completely, but only when a fixed background-attachment is indicated
+				</li>
+				<li>
+					Handle: now calls <a href="manual.html#rethinkLayout"><code>rethinkLayout()</code></a> as it is supposed to, Orientation is now
+					determined during <a href="manual.html#setup"><code>setup()</code></a> 
+				</li>
+				<li>
+					ListGadget: Removed BGAlt, CursorBorder, CursorBorderClass attributes
+				</li>
+				<li>
+					PageGroup: simplified, now accepts a custom Layout
+				</li>
+				<li>
+					ScrollBar, Slider: <a href="manual.html#updateSlider"><code>updateSlider()</code></a> is no longer a local function and
+					forwards the call to its super class
+				</li>
+				<li>
+					ScrollGroup: internal sliders are handled more efficiently now, causing a
+					notification in their parent class now only when really needed
+				</li>
+				<li>
+					Slider, Gauge: MaxWidth, Width, MaxHeight and Height are now determined
+					during <a href="manual.html#setup"><code>setup()</code></a> 
+				</li>
+				<li>
+					Spacer: Orientation is now determined during <a href="manual.html#setup"><code>setup()</code></a> 
+				</li>
+				<li>
+					Text: Removed FGDisabled2, Font, TextHAlign, TextVAlign attributes
+				</li>
+				<li>
+					TextInput: Removed FGCursor and BGCursor attributes
+				</li>
+				<li>
+					<a href="manual.html#Window:relayout"><code>Window:relayout()</code></a> changed and no longer descends from Area but is now
+					rooted in the Window class, <a href="manual.html#calcWeights"><code>calcWeights()</code></a> is now under the control of the
+					Group class
+				</li>
+				<li>
+					UI: <a href="manual.html#freeRegion"><code>freeRegion()</code></a> and <a href="manual.html#testFlags"><code>testFlags()</code></a> removed, added element flags FL_REDRAW,
+					FL_REDRAWBORDER, FL_LAYOUT etc., simplified and renamed <a href="manual.html#prepareStyleSheet"><code>prepareStyleSheet()</code></a> 
+					to <a href="manual.html#unpackStyleSheet"><code>unpackStyleSheet()</code></a>, added <a href="manual.html#unpackProperty"><code>unpackProperty()</code></a> for direct formattings,
+					<a href="manual.html#loadStyleSheet"><code>loadStyleSheet()</code></a> now unpacks properties and merges pseudo class attributes
+					on the fly, removed NULLOFFS, new ui.ThemeName is &quot;default desktop&quot;
+				</li>
+				<li>
+					Layout base class added
+				</li>
+				<li>
+					Default layouter: Now uses the Layout base class in an upvalue to <a href="manual.html#new"><code>new()</code></a>,
+					added version string, handles weights internally when a change of a group's
+					contents or weights is indicated using the FL_CHANGED flag, bugs in the
+					SameSize calculation corrected, removed the &quot;auto&quot; state for Width and
+					Height, the logic is now more concise and faster
+				</li>
+				<li>
+					Theme: The internal style sheet is now more minimal and has been renamed
+					to &quot;minimal&quot;, many properties have been relocated to the new &quot;default&quot; style
+					sheet
+				</li>
+				<li>
+					Renamed 'check' and 'radio' images to 'checkmark' and 'radiobutton',
+					respectively
+				</li>
+				<li>
+					<a href="manual.html#Region:trans"><code>Region:trans()</code></a> renamed to <a href="manual.html#shift"><code>shift()</code></a>, <a href="manual.html#isNull"><code>isNull()</code></a> to <a href="manual.html#isEmpty"><code>isEmpty()</code></a> 
+				</li>
+				<li>
+					Makefiles updated to install new classes, args.lua, fixed layouter, new
+					style sheets
+				</li>
+				<li>
+					Markup: Tables produced erroneous HTML - now pop the current block from the
+					stack
+				</li>
+				<li>
+					Documentation generator: added macro support, added child class macro,
+					tables did not break out of the current block, corrected
+				</li>
+				<li>
+					improved documentation generator, documentation, stylesheet, README
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8h:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Window, Application: Hotkeys are now actuated on keydown, not on keyup
+				</li>
+				<li>
+					Area, UI, Theme, internal stylesheet: PEN_PARENTGROUP renamed to
+					PEN_DEFAULT, &quot;parent-group&quot; pseudo-color renamed to &quot;default&quot;, the default
+					color is now also evaluated for the foreground color
+				</li>
+				<li>
+					ImageGadget: Now supports PEN_DEFAULT for not using a single pen for
+					rendering its imagery. This allows control over the greying-out behaviour
+					of images in style sheets. Crashed when no image was set; corrected
+				</li>
+				<li>
+					UI, Display, Theme: Added symbolic pens PAPER and INK, DISABLEDDETAIL2
+					renamed to DISABLEDDETAILSHINE, LIST2 renamed to LISTALT, symbolic color
+					keys &quot;disabled-detail2&quot; renamed to &quot;disabled-detail-shine&quot;, &quot;list2&quot; to
+					&quot;list-alt&quot;
+				</li>
+				<li>
+					Display: more symbolic colors added (black, white, fuchsia, ...),
+					changed cursor color
+				</li>
+				<li>
+					Theme, internal stylesheet: added &quot;field&quot; class
+				</li>
+				<li>
+					ScrollBar: Implementation of arrow button and slider <a href="manual.html#checkFocus"><code>checkFocus()</code></a> was
+					broken, corrected, added AcceptFocus attribute
+				</li>
+				<li>
+					ScrollGroup: AcceptFocus attribute added
+				</li>
+				<li>
+					dark.css stylesheet added
+				</li>
+				<li>
+					UI: <a href="manual.html#loadLibrary"><code>loadLibrary()</code></a>, <a href="manual.html#require"><code>require()</code></a> added, removed pattern argument from
+					<a href="manual.html#loadClass"><code>loadClass()</code></a>, minimum version requirements are now enforced in most classes
+				</li>
+				<li>
+					Slider: now checks if it is allowed to receive the focus before it enters
+					capture mode
+				</li>
+				<li>
+					<a href="manual.html#Class:checkDescend"><code>Class:checkDescend()</code></a> renamed to <a href="manual.html#instanceOf"><code>instanceOf()</code></a> 
+				</li>
+				<li>
+					<a href="manual.html#Group:onActivateGroup"><code>Group:onActivateGroup()</code></a> added
+				</li>
+				<li>
+					Window, UI: Doubleclick jitter and timeout are now defined in UI
+				</li>
+				<li>
+					Gendoc: NAME argument is now /K, HEADER is now /K/M, allowing multiple
+					header files. A reference document is now supplied to normal jumps
+				</li>
+				<li>
+					UTF8String: <a href="manual.html#find"><code>find()</code></a>, <a href="manual.html#chars"><code>chars()</code></a> added
+				</li>
+				<li>
+					Canvas: <a href="manual.html#focusRect"><code>focusRect()</code></a> now has an optional &quot;smooth&quot; scroll positioning
+					argument, sanity check added
+				</li>
+				<li>
+					Text: now uses the &quot;IgnoreAltShift&quot; peudo qualifier for Keycode shortcuts,
+					KeyCode attribute was lost during repeated invocations of <a href="manual.html#setup"><code>setup()</code></a>, corrected,
+					'color2' style property renamed to 'color-disabled'
+				</li>
+				<li>
+					Raw Framebuffer display driver: added
+				</li>
+				<li>
+					64bit fixes and source code maintenance adjustments merged in from TEKlib
+				</li>
+				<li>
+					X11 Display: Now using the XVid extension and a more sophisticated window
+					opening procedure to much better support fullscreen applications
+				</li>
+				<li>
+					Visual, displays, Drawable: Added TVCMD_FLUSH command to TVRequest, a
+					<a href="manual.html#flush"><code>flush()</code></a> method and a dirty flag indicating visual changes
+				</li>
+				<li>
+					Visual, Lua bindings: Added length argument to <a href="manual.html#textSize"><code>textSize()</code></a> 
+				</li>
+				<li>
+					Args: Partly rewritten, now handles missing keywords correctly in /M/K
+					modifiers
+				</li>
+				<li>
+					Region: added <a href="manual.html#trans"><code>trans()</code></a>, <a href="manual.html#isNull"><code>isNull()</code></a> 
+				</li>
+				<li>
+					Region, Visual: Added _VERSION
+				</li>
+				<li>
+					Application: fixed initial double refresh bug, <a href="manual.html#requestFile"><code>requestFile()</code></a> now supports
+					an additional FocusElement argument, <a href="manual.html#setLastKey"><code>setLastKey()</code></a> added, requesters receive
+					the style class &quot;app-dialog&quot;, <a href="manual.html#addMember"><code>addMember()</code></a> now connects children recursively,
+					<a href="manual.html#getModalWindow"><code>getModalWindow()</code></a> added
+				</li>
+				<li>
+					<a href="manual.html#Area:layout"><code>Area:layout()</code></a> now handles blits in transposed drawing contexts
+				</li>
+				<li>
+					DirList: Added AutoWidth and FocusElement attributes, location field now
+					advances to the action button when Return is pressed
+				</li>
+				<li>
+					<a href="manual.html#Drawable:getClipRect"><code>Drawable:getClipRect()</code></a> added, any number of symbolic colors can now be
+					allocated
+				</li>
+				<li>
+					<a href="manual.html#Frame:layoutBorder"><code>Frame:layoutBorder()</code></a> split off from <a href="manual.html#layout"><code>layout()</code></a> 
+				</li>
+				<li>
+					ListGadget: fixed to work in absence of a style sheet
+				</li>
+				<li>
+					<a href="manual.html#Window:addBlit"><code>Window:addBlit()</code></a> added, <a href="manual.html#update"><code>update()</code></a> now calls <a href="manual.html#flush"><code>flush()</code></a> after repaints, the
+					KEYDOWN message handler now checks if a popup to which this event may have
+					been forwarded collapsed already, improved key repeat/retrigger handling
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8g:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Argument parser: Arguments with whitespaces were treated incorrectly
+					even if they were surrounded by quotes, corrected
+				</li>
+				<li>
+					Documentation generator: Added --author, --created, --adddate options
+				</li>
+				<li>
+					Markup: Added metadata options for &quot;author&quot; and &quot;created&quot;
+				</li>
+				<li>
+					<a href="manual.html#Canvas:damageChild"><code>Canvas:damageChild()</code></a> can now be called without a layout, allowing
+					<a href="manual.html#ListGadget:repaint"><code>ListGadget:repaint()</code></a> to work outside <a href="manual.html#Application:run"><code>Application:run()</code></a> 
+				</li>
+				<li>
+					DirList: added <a href="manual.html#onSelectEntry"><code>onSelectEntry()</code></a> handler
+				</li>
+				<li>
+					Application, Window: Major simplification in setup and closedown
+					procedure, the <a href="manual.html#show"><code>show()</code></a> method is now invoked shortly after opening the
+					window
+				</li>
+				<li>
+					Area: Changed meaning of the EraseBG attribute, removed calcOffset,
+					BGPen renamed to BGColor, <a href="manual.html#getElementByXY"><code>getElementByXY()</code></a> renamed to <a href="manual.html#Area:getByXY"><code>Area:getByXY()</code></a> 
+				</li>
+				<li>
+					Drawable: removed <a href="manual.html#closeFont"><code>closeFont()</code></a>, <a href="manual.html#fitMinAspect"><code>fitMinAspect()</code></a>, <a href="manual.html#openFont"><code>openFont()</code></a>, <a href="manual.html#drawPlot"><code>drawPlot()</code></a> 
+					renamed to <a href="manual.html#drawPoint"><code>drawPoint()</code></a> 
+				</li>
+				<li>
+					Gadget: Effect renamed to EffectClass, BGPen... to BG..., FGPen... to
+					FG..., InitialFocus is now functional, removed <a href="manual.html#onHold"><code>onHold()</code></a>, simplified
+				</li>
+				<li>
+					Gadget, FloatText: FGPen renamed to FGColor
+				</li>
+				<li>
+					ListGadget: Renamed BGPenAlt to BGAlt
+				</li>
+				<li>
+					TextInput: Renamed BGPenCursor to BGCursor
+				</li>
+				<li>
+					<a href="manual.html#Window:getWindowDimensions"><code>Window:getWindowDimensions()</code></a> renamed to <a href="manual.html#askMinMax"><code>askMinMax()</code></a>, <a href="manual.html#show"><code>show()</code></a> now invokes
+					<a href="manual.html#Group:show"><code>Group.show()</code></a> before <a href="manual.html#askMinMax"><code>askMinMax()</code></a>, now creates a Drawable during <a href="manual.html#setup"><code>setup()</code></a> 
+					and passes it to its superclass during <a href="manual.html#show"><code>show()</code></a> 
+				</li>
+				<li>
+					Theme, stylesheets: effect renamed to effect-class, smaller handles
+				</li>
+				<li>
+					Default Border, DrawHook, Border, Ripple Hook: <a href="manual.html#show"><code>show()</code></a> renamed to
+					<a href="manual.html#setup"><code>setup()</code></a>, <a href="manual.html#hide"><code>hide()</code></a> renamed to <a href="manual.html#cleanup"><code>cleanup()</code></a> 
+				</li>
+				<li>
+					Frame, ListGadget, TextInput: simplified
+				</li>
+				<li>
+					ScrollBar, Slider: now register Hold notification themselves
+				</li>
+				<li>
+					Application: Status can now be &quot;init&quot;, &quot;error&quot;, &quot;run&quot; and &quot;quit&quot;, some
+					cleanup
+				</li>
+				<li>
+					Application, Area and demos: Some cleanup, improved documentation,
+					demos, texts and imagery
+				</li>
+				<li>
+					Visual module: Added VISUAL_USE_INTERNAL_HASH compile-time option
+				</li>
+				<li>
+					Gendoc: Added --heading option
+				</li>
+				<li>
+					Theme, internal stylesheet: Slightly changed looks of handles
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8f:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Element: Major speedup in parsing style properties
+				</li>
+				<li>
+					<a href="manual.html#Drawable:openFont"><code>Drawable:openFont()</code></a>, <a href="manual.html#closeFont"><code>closeFont()</code></a>, <a href="manual.html#fitMinAspect"><code>fitMinAspect()</code></a> added, Visual API:
+					<a href="manual.html#font:getTextSize"><code>font:getTextSize()</code></a> added, Font and Display usage simplified in shortened
+					many classes
+				</li>
+				<li>
+					Improved some demos, texts, localizations, and style sheets
+				</li>
+				<li>
+					Compiler: added commandline arguments
+				</li>
+				<li>
+					C sources and their symbol names are now better suited for amalgamed
+					builds
+				</li>
+				<li>
+					Removed unused memory managers from TEKlib
+				</li>
+				<li>
+					Application: Added GCControl
+				</li>
+				<li>
+					Application, PopupWindow: Removed use of <a href="manual.html#checkDescend"><code>checkDescend()</code></a> 
+				</li>
+				<li>
+					FloatText: corrected flaky color property evaluation, UnusedRegion,
+					<a href="manual.html#updateUnusedRegion"><code>updateUnusedRegion()</code></a> removed, now handled by Canvas
+				</li>
+				<li>
+					Gauge, Slider: Added BackgroundRegion, <a href="manual.html#updateBackgroundRegion"><code>updateBackgroundRegion()</code></a>, faster
+					repaint
+				</li>
+				<li>
+					Region: now supports a custom datatype for rectangles, renamed
+					<a href="manual.html#overlap:::"><code>overlap...()</code></a> to <a href="manual.html#intersect:::"><code>intersect...()</code></a>, removed <a href="manual.html#free"><code>free()</code></a> and <a href="manual.html#intersect"><code>intersect()</code></a> methods,
+					added caching of rectangle nodes, management and caching of rectangle
+					nodes now more efficient, removed <a href="manual.html#getRects"><code>getRects()</code></a>, replaced by <a href="manual.html#forEach"><code>forEach()</code></a> 
+				</li>
+				<li>
+					Area, Canvas, FloatText, Gauge, Group, ImageGadget, ListGadget,
+					ScrollGroup, Slider, Window: Now using <a href="manual.html#region:forEach"><code>region:forEach()</code></a> instead of
+					<a href="manual.html#region:getRects"><code>region:getRects()</code></a> 
+				</li>
+				<li>
+					Default border, Border: <a href="manual.html#getBorderRegion"><code>getBorderRegion()</code></a> renamed to <a href="manual.html#getRegion"><code>getRegion()</code></a>, now
+					expecting a border to be supplied by the caller, now determines group
+					color from <a href="manual.html#getBGElement"><code>getBGElement()</code></a> 
+				</li>
+				<li>
+					UI: added <a href="manual.html#allocRegion"><code>allocRegion()</code></a>, <a href="manual.html#freeRegion"><code>freeRegion()</code></a>, <a href="manual.html#newRegion"><code>newRegion()</code></a>, <a href="manual.html#reuseRegion"><code>reuseRegion()</code></a>,
+					<a href="manual.html#destroyHook"><code>destroyHook()</code></a>, ProgDir is now guaranteed to contain a trailing path
+					separator
+				</li>
+				<li>
+					Area, Canvas, Frame, Gauge, Group, ListGadget, Slider: added region
+					caching and reusing
+				</li>
+				<li>
+					ListGadget, FloatText: innerloop of <a href="manual.html#draw"><code>draw()</code></a> is now a separate function
+				</li>
+				<li>
+					Element: Added <a href="manual.html#getAttr"><code>getAttr()</code></a> 
+				</li>
+				<li>
+					PopItem: implemented &quot;menuitem-size&quot; via <a href="manual.html#getAttr"><code>getAttr()</code></a> 
+				</li>
+				<li>
+					<a href="manual.html#Area:getBackground"><code>Area:getBackground()</code></a> renamed to <a href="manual.html#getBG"><code>getBG()</code></a>, <a href="manual.html#getRectangle"><code>getRectangle()</code></a> to <a href="manual.html#getRect"><code>getRect()</code></a>,
+					<a href="manual.html#markDamage"><code>markDamage()</code></a> to <a href="manual.html#damage"><code>damage()</code></a>, <a href="manual.html#focusRectangle"><code>focusRectangle()</code></a> to <a href="manual.html#focusRect"><code>focusRect()</code></a>,
+					BackgroundPosition to BGPosition, removed <a href="manual.html#getElement"><code>getElement()</code></a>, added
+					<a href="manual.html#getChildren"><code>getChildren()</code></a>, <a href="manual.html#getSiblings"><code>getSiblings()</code></a>, <a href="manual.html#getParent"><code>getParent()</code></a>, <a href="manual.html#getGroup"><code>getGroup()</code></a>, <a href="manual.html#getNext"><code>getNext()</code></a>,
+					<a href="manual.html#getPrev"><code>getPrev()</code></a>, <a href="manual.html#checkHover"><code>checkHover()</code></a>, <a href="manual.html#getBGElement"><code>getBGElement()</code></a>, Display removed, <a href="manual.html#show"><code>show()</code></a> now
+					takes only a Drawable as an argument and has no return value anymore
+				</li>
+				<li>
+					Application: Renamed CollectGarbage to GCControl, VendorName to Vendor,
+					VendorDomain to Domain
+				</li>
+				<li>
+					Canvas: renamed <a href="manual.html#markChildDamage"><code>markChildDamage()</code></a> to <a href="manual.html#damageChild"><code>damageChild()</code></a>, added UseChildBG
+					attribute, <a href="manual.html#onSetChild"><code>onSetChild()</code></a> is no longer passed ui.NOTIFY_OLDVALUE, now
+					handles child margins
+				</li>
+				<li>
+					CheckMark, RadioButton: renamed AltImage to SelectImage
+				</li>
+				<li>
+					DirList: renamed <a href="manual.html#getDirectoryIterator"><code>getDirectoryIterator()</code></a> to <a href="manual.html#getDirIterator"><code>getDirIterator()</code></a> 
+				</li>
+				<li>
+					Display: renamed <a href="manual.html#colorNameToRGB"><code>colorNameToRGB()</code></a> to <a href="manual.html#colorToRGB"><code>colorToRGB()</code></a>, <a href="manual.html#closeFont"><code>closeFont()</code></a> now
+					always returns false
+				</li>
+				<li>
+					FloatText: renamed Reposition argument from &quot;bottom&quot; to &quot;tail&quot;
+				</li>
+				<li>
+					Gadget: renamed EffectName to Effect
+				</li>
+				<li>
+					X11 Display: Added missing X11 include, added support for UTF-8 encoded
+					window titles, added fontconfig closedown, fixed uninitialized stack and
+					minor memory leak problems
+				</li>
+				<li>
+					<a href="manual.html#Window:handleInput"><code>Window:handleInput()</code></a> doesn't update MouseX,MouseY generally anymore
+					but in appropriate handlers
+				</li>
+				<li>
+					PopList: Renamed <a href="manual.html#onSelectEntry"><code>onSelectEntry()</code></a> to <a href="manual.html#onSelectLine"><code>onSelectLine()</code></a> 
+				</li>
+				<li>
+					Nano-X, X11 Display: stdin reader did not handle incomplete reads
+					correctly, fixed
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8e:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					Eliminated the use of 'ipairs' in many classes
+				</li>
+				<li>
+					Visual API, Image, ImageGadget, stock images: Changed image table
+					structure, added preliminary support for bitmap pens in <a href="manual.html#frect"><code>frect()</code></a>, removed
+					futile attemps in rounding from <a href="manual.html#drawimage"><code>drawimage()</code></a> 
+				</li>
+				<li>
+					UI: Renamed <a href="manual.html#createImage"><code>createImage()</code></a> to <a href="manual.html#getStockImage"><code>getStockImage()</code></a>, added <a href="manual.html#loadImage"><code>loadImage()</code></a>,
+					&quot;background-image&quot; handled, simplified match patterns in property
+					preparation
+				</li>
+				<li>
+					UI, Object: NOTIFY_ALWAYS now behaves like former NOTIFY_CHANGE,
+					NOTIFY_CHANGE has been removed
+				</li>
+				<li>
+					Visual, Visual/Lua binding, display drivers: <a href="manual.html#TVisualText"><code>TVisualText()</code></a> no longer
+					supports a background pen
+				</li>
+				<li>
+					Nano-X Display driver: drawbuffer now fully supported
+				</li>
+				<li>
+					Visual/Lua binding: <a href="manual.html#drawtext"><code>drawtext()</code></a> now requires the complete text bounding
+					box, supports background pixmaps and an additional x/y argument for the
+					texture origin, <a href="manual.html#frect"><code>frect()</code></a> now supports an additional x/y argument pair for
+					the texture origin
+				</li>
+				<li>
+					Default border: Group and element origins are now considered for texture
+					origins
+				</li>
+				<li>
+					Area: Added BackgroundPosition attribute, &quot;background-position&quot; style
+					property, <a href="manual.html#getBackground"><code>getBackground()</code></a> function, <a href="manual.html#erase"><code>erase()</code></a> now handles texture origins,
+					<a href="manual.html#init"><code>init()</code></a> now resets Focus, DamageRegion is or'ed to (no longer overwritten
+					during layout) and no longer reset in <a href="manual.html#erase"><code>erase()</code></a> but in <a href="manual.html#refresh"><code>refresh()</code></a> 
+				</li>
+				<li>
+					Area, Canvas, FloatText, Gauge, Group, ImageGadget, ListGadget, Slider:
+					<a href="manual.html#erase"><code>erase()</code></a> and <a href="manual.html#draw"><code>draw()</code></a> now consider texture origin
+				</li>
+				<li>
+					Display: Added AspectX, AspectY, added <a href="manual.html#fitMinAspect"><code>fitMinAspect()</code></a>, added pixmap cache,
+					<a href="manual.html#createPixmap"><code>createPixmap()</code></a>, <a href="manual.html#loadPixmap"><code>loadPixmap()</code></a>, <a href="manual.html#getPixmap"><code>getPixmap()</code></a>, &quot;ui-huge&quot; font default is now
+					&quot;Utopia&quot;, which is scalable and common under X11 even without Xft support
+				</li>
+				<li>
+					Drawable: Removed AspectX, AspectY, added support for color allocation by
+					accessing Pens with an &quot;#rrggbb&quot; key, added texture loader reacting on
+					url(...) keys, RGB colors are now cached with an unique identifier to avoid
+					double allocation, some sanity checks added
+				</li>
+				<li>
+					ImageGadget: Some layouting problems fixed, added several checks for
+					presence of an image, now supports ImageAspectX, ImageAspectY
+				</li>
+				<li>
+					PopItem: removed &quot;popup-root&quot; and &quot;popup-children&quot; pseudo classes, these
+					are now predefined classes and set during <a href="manual.html#connect"><code>connect()</code></a> if no other Class is
+					specified
+				</li>
+				<li>
+					Element, <a href="manual.html#Application:getElementById"><code>Application:getElementById()</code></a>, <a href="manual.html#getId"><code>getId()</code></a> unified and renamed to
+					<a href="manual.html#getById"><code>getById()</code></a> 
+				</li>
+				<li>
+					Visual API: Added pixmap objects, <a href="manual.html#createpixmap"><code>createpixmap()</code></a>, <a href="manual.html#freepixmap"><code>freepixmap()</code></a>, renamed
+					<a href="manual.html#drawppm"><code>drawppm()</code></a> to <a href="manual.html#drawpixmap"><code>drawpixmap()</code></a>, <a href="manual.html#frect"><code>frect()</code></a> now supports rendering a pixmap with a
+					texture origin
+				</li>
+				<li>
+					Merged BitmapImage and VectorImage class to Image
+				</li>
+				<li>
+					Gadget: <a href="manual.html#onActivate"><code>onActivate()</code></a> now implements collapsing of popups, removed the same
+					functionality from PopItem - CheckMark, RadioButtons etc. are now functional
+					in popups
+				</li>
+				<li>
+					<a href="manual.html#Group:markDamage"><code>Group:markDamage()</code></a> checks for presence of a FreeRegion now, <a href="manual.html#markDamage"><code>markDamage()</code></a> 
+					and <a href="manual.html#layout"><code>layout()</code></a> are now better prepared for tracking intra-area damages
+				</li>
+				<li>
+					PopItem: no longer resets Selected and Focus when opening
+				</li>
+				<li>
+					Region: <a href="manual.html#checkoverlap"><code>checkoverlap()</code></a> always returned true, corrected
+				</li>
+				<li>
+					CHANGES, VERSION: added
+				</li>
+				<li>
+					Documentation improved
+				</li>
+				<li>
+					Gendoc: Added support for the --header option in class tree documentations
+				</li>
+				<li>
+					Theme, internal stylesheet: Added background-position attributes
+				</li>
+				<li>
+					Installation: BitmapImage, VectorImage classes removed, Image class,
+					desktop.css, texture.css added
+				</li>
+				<li>
+					Gauges with vertical orientation are now running from bottom to top
+				</li>
+				<li>
+					Minor corrections in image layouting procedures and image data
+				</li>
+				<li>
+					CheckMark, PopItem: Improved image size calculation
+				</li>
+				<li>
+					MenuItem, PopList, Arrow Images: Corrected distorted coordinates
+				</li>
+				<li>
+					X11 Display: Removed a kludge that disabled Xft font rendering when the
+					composite extension was detected
+				</li>
+				<li>
+					Theme, Family, Element, Drawable, Button, Application, UTF8String: Minor
+					corrections in the documentation
+				</li>
+				<li>
+					Demos: Images were incompletely read under Windows and appeared scrambled,
+					corrected, improved border demo, changed some font attributes
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8d:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					<a href="manual.html#Application:quit"><code>Application:quit()</code></a> added, can now be passed an initial Display
+				</li>
+				<li>
+					Area, Canvas, Gadget: Added AutoPosition feature
+				</li>
+				<li>
+					<a href="manual.html#CheckMark:setState"><code>CheckMark:setState()</code></a>: Hilite has now precedence over Selected
+				</li>
+				<li>
+					CheckMark, RadioButton, ScrollBar: Now using external images
+				</li>
+				<li>
+					Compiler: added
+				</li>
+				<li>
+					Debug: Default level reset to WARN (this time also reflected in the
+					documentation)
+				</li>
+				<li>
+					Display: added colors user1 ... user4, <a href="manual.html#colorNameToRGB"><code>colorNameToRGB()</code></a>,
+					<a href="manual.html#getPaletteEntry"><code>getPaletteEntry()</code></a>, removed <a href="manual.html#allocPens"><code>allocPens()</code></a> 
+				</li>
+				<li>
+					Drawable: now supports on-demand allocation of custom colors
+				</li>
+				<li>
+					Element: Added <a href="manual.html#getNumProperty"><code>getNumProperty()</code></a>, slightly optimized
+				</li>
+				<li>
+					<a href="manual.html#List:changeItem"><code>List:changeItem()</code></a> was using a global instead of an argument, corrected
+				</li>
+				<li>
+					Installation procedure corrected
+				</li>
+				<li>
+					Meter class and example rewritten
+				</li>
+				<li>
+					Minor corrections and improvements in the documentation
+				</li>
+				<li>
+					PopItems: corrected notification handler for Active, fixing long-standing
+					double-activation bug
+				</li>
+				<li>
+					<a href="manual.html#Region:new"><code>Region.new()</code></a> can now cope with an empty initial rectangle
+				</li>
+				<li>
+					Slider: AutoFocus is now false by default, improved keyboard usage
+				</li>
+				<li>
+					Theme, internal stylesheet: minor corrections
+				</li>
+				<li>
+					<a href="manual.html#Text:getTextSize"><code>Text:getTextSize()</code></a> now also returns the layouted x/y, if present
+				</li>
+				<li>
+					UI: Added image class loader and <a href="manual.html#createImage"><code>createImage()</code></a>, added PEN_NUMBER,
+					PEN_USER1
+					through PEN_USER4, <a href="manual.html#createHook"><code>createHook()</code></a> now returns false on the predefined name
+					&quot;none&quot;
+				</li>
+				<li>
+					UI, Display, Theme: PEN_LIGHT removed, added PEN_OUTLINE
+				</li>
+				<li>
+					UTF8String: <a href="manual.html#set"><code>set()</code></a> and <a href="manual.html#char"><code>char()</code></a> can now be overridden, removed __<a href="manual.html#tostring"><code>tostring()</code></a> 
+					and __<a href="manual.html#concat"><code>concat()</code></a>, <a href="manual.html#unpack"><code>unpack()</code></a> was not known in <a href="manual.html#byte"><code>byte()</code></a> 
+				</li>
+				<li>
+					VectorImage, BitmapImage: data fields are now indexed numerically
+				</li>
+				<li>
+					Visual API: <a href="manual.html#drawImage"><code>drawImage()</code></a> data structure changed, implementation simplified
+					and several problems rectified
+				</li>
+				<li>
+					<a href="manual.html#Visual:drawImage"><code>Visual:drawImage()</code></a>, ImageGadget, <a href="manual.html#VectorImage:draw"><code>VectorImage:draw()</code></a> now supports an
+					override_pen argument for rendering an image monochromatically
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8c:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					README: Improved, updated
+				</li>
+				<li>
+					Debug: verbosity set to ERROR
+				</li>
+				<li>
+					Application: <a href="manual.html#requestFile"><code>requestFile()</code></a> arg.Center can now be set to false
+				</li>
+				<li>
+					Area: <a href="manual.html#layout"><code>layout()</code></a> simplified, should handle more blitting cases
+				</li>
+				<li>
+					Button, CheckMark, MenuItem, PopItem: keycode can now be set to false
+				</li>
+				<li>
+					FloatText, ListGadget: TrackDamage can now be set to false
+				</li>
+				<li>
+					Frame: border repaints can now be avoided if an element was blitted
+				</li>
+				<li>
+					<a href="manual.html#Text:onSetText"><code>Text:onSetText()</code></a> causes a less destructive repaint if KeepMinWidth is
+					enabled
+				</li>
+				<li>
+					Window: blits and updates are now implemented in the overriden <a href="manual.html#refresh"><code>refresh()</code></a> 
+					method and synchronized, removed notify option in <a href="manual.html#SetHiliteElement"><code>SetHiliteElement()</code></a>,
+					<a href="manual.html#setFocusElement"><code>setFocusElement()</code></a>, <a href="manual.html#setActiveElement"><code>setActiveElement()</code></a>, <a href="manual.html#setDblClickElement"><code>setDblClickElement()</code></a>, improved
+					documentation
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			0.8b:
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					CHANGES added
+				</li>
+			</ul>
+		</blockquote>
+	</body>
+</html>

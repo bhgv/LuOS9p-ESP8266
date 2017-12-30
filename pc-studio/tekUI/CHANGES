@@ -1,0 +1,768 @@
+
+== tekUI Changelog ==
+
+ * Compiler tool can now amalgate Lua programs into stand-alone executables
+ * Compiler tool: Now works with Lua 5.1/5.2/5.3 using the method shown in
+ lua-amalg by Philipp Janda, LUAARCH switch is no longer needed, module
+ sampling is now done in a LuaExec task, no module statistics files needed,
+ now works under Windows, too
+ * Building a standalone tekUI executable now works under Windows and using
+ cross-compilation
+ * Some X11 font issues corrected
+ * Windows display driver could try to send tekUI messages to foreign
+ windows, leading to a crash, corrected
+
+=== 1.12: ===
+
+ * Changes to the class system, module loader and documentation system,
+ no longer requires Lua 5.2, 5.3 to be compiled with LUA_COMPAT_MODULE
+ * Windows HAL: Atomics enabled
+ * Windows display: Added clipboard support, improved event handling, Win64
+ support, synchronous waiting, added Unicode text rendering, added better
+ support for keyboard qualifiers, windows opened at fixed positions had
+ wrong size, corrected, added support for bold and italic font styles
+ * Visual, EditWindow, Input: added setSelection, TextEdit: uses application
+ clipboard, removed class clipboard, quirky attribute retrieval corrected
+ * Application: added obtainClipboard, releaseClipboard
+ * Changed notes about LuaJIT and some additions to documentation
+ * LuaExec: Changes merged in, in join() abort signals could be forwarded to
+ already dead task, corrected by freeing task after return from exec, in
+ waitmsg() fixed recalculation of waittime, returned signals should be
+ correct now, childnotify example added to demonstrate GUI signal handlers
+ * Exec: added semi-internal function TFreeTask(), user tasks are now
+ freed in destructor context after their return from exec, minor cleanup
+ in memory functions
+
+=== 1.11: ===
+
+ * HAL: fix for broken timer device under Windows, MMTimer timerequest abort
+ on signal arrival did not work for ages, corrected, giving e.g. TWaitTime()
+ in Windows display driver much better response times and smoother updates.
+ * Luaexec: added functions getmsg, getname, getsignals, run, sendport,
+ sendmsg, signal, sleep, wait, waitmsg, waittime, child methods abort, join,
+ sendport, sendmsg, signal, terminate, including error propagation through
+ running tasks, added childtask example
+ * Default layouter: Fixed Weight attribute number representation problem
+ with Lua 5.3
+ * Windows, RawFB, DirectFB display drivers: Slip fixed in instantiating
+ multiple times concurrently
+ * X11 display driver: Workaround for Xft reinitialization b0rkedness
+ * Exec: TInitmodule structure is now const, replyport field of messages is
+ now NULL on allocation, added support for silently ignoring destruction of
+ a task's own handle, allowing TEKCreate() to return a different task as the
+ basetask, added TTask_InitData and GetInitData() to free TTask_UserData for
+ user affairs in basetask
+ * TEKLib: Added support for mulithreaded, lazy singleton creation
+ * Visual: Module instances' init requests are no longer reused, getting
+ rid of nearly incomprehensible trickery that did not work properly
+ * Lua bindings of Visual and all display drivers: Module initnodes are now
+ part of the Lua state, the bindings are now fully reentrant
+ * Visual module: Now registers a TEKlib atom "msgport.ui.%p" with
+ task address for message port rendezvous in local address space
+ * Application, UI: Added support for MSG_SIGNAL
+ * Added NetBSD support in config file and documentation
+ * Minor corrections in documentation
+
+=== 1.10: ===
+
+ * Exec: Changed list structure to eliminate the need for pointer aliasing
+ * Improved Mac OS X support, added support for Solaris and HP-UX, improved
+ configuration and flexibility with regard to custom paths to third party
+ libraries; the Xvid extension is no longer enabled by default
+ * Some cleanup in visibility of symbols, code and build system structure
+ * UI: Now evaluates arg, ProgDir, LocalPath, etc. as late as possible,
+ allowing the library to be embedded in precompiled form, warnings for
+ each missing locale key are shown only once now
+ * ImgLoad, Visual: Minor improvements in loading with alpha channel
+ * Visual module: Minor API corrections, added documentation
+ * Display: Some corrections in API documentation
+ * UI: loadImage() can now load from an open file
+ * Raw framebuffer: Improved region management, optimizations, added
+ support for window backing store, unified input handling, added alignment
+ for dirty regions, reducing region merge-ops
+ * RawFB, X11: Now suspend indefinitely if no interval events are requested,
+ major source code cleanup
+ * Compiler: added module exclude list, code cleanup, added documentation
+
+=== 1.09: ===
+
+ * Added basic support for native Linux framebuffer and event interface.
+ Support can be compiled into the raw framebuffer display driver.
+ * Raw framebuffers automatically recognize the need for a backbuffer now,
+ e.g. when a VNC server is running on top a Linux framebuffer and the pixel
+ formats differ. Backbuffer support can also be enabled explicitely using
+ ui.ExtraArgs = "fb_backbuffer=true"
+ * Linux framebuffer keymaps are compiled-in for now, added tool etc/keymap2c
+ for conversion; default is /usr/share/keymaps/i386/qwerty/us.map.gz
+ * UI, Window: Added ui.Mode = "workbench" for displays without a window
+ manager, supporting rudimentary window decorations for close, drag, and
+ resize. Added HaveWindowManager attribute to displays and Visual interface
+ * Some restructuring and streamlining in pixel conversion and image loading
+ * VNC portnumber can be configured using VNC_PORTNUMBER as well as
+ ui.ExtraArgs = "vnc_portnumber=1234" 
+ * Displays, Area, Canvas: Some layouting and refresh glitches corrected
+ * Windows now better remember their window positions and sizes
+ * createPixmap() can now read images from open file handles
+ * Input: doubleclick marks the whole line now
+ * Sizeable: No longer adds empty blit regions to the Window, added sanity
+ checks, added cases for insertions above and below the visible area, now
+ operates on not shown elements correctly
+ * Sizeable, ScrollGroup: Added support for merging damages and for
+ suppressing blits
+ * Area, default layouter: Invisible attribute added
+ * String: getTextWidth() missing range check, attachdata(), getdata() added
+ * Window: relayout calls to drawBegin/drawEnd were not exactly paired in 
+ error case, corrected
+ * Area, Group: Invisible, onSetVisible() added
+ * DirList: changing the location field clears the current selection so that
+ the location field becomes the preferred selection
+ * TextList: deleteLine() added, better hardscroll support
+ * TextEdit:deleteLine() can now delete any line, not just the cursor line,
+ enter() now handles metadata correctly, getNumLines() does not count an empty
+ first line anymore, setCursor() no longer performs damages if window updates
+ are suspended or if the cursor is invisible, "wholeline" cursor mode renamed
+ to "bar+line", "bar" mode added, the ReadOnly attribute does not inhibit
+ marking text anymore, updateMark() added, window update suspension mechanism
+ reactivated and other fixes
+ * Removed redundant code from display drivers
+ * Visual: added large number of pixel formats and conversions, added pixmap
+ caching (used for gradients), added screenwidth/height properties
+ * x11 driver, rawfb driver: added pixmap caching, added support for more 
+ pixel formats
+ * DirList: list dblclicks are acted upon mouse press, not release now
+ * Added compiler tool again, some infrastructure for amalgamized builds added
+ * UI: minor fixes in ProgDir/ProgName detection and stylesheet loading,
+ * Application: Dialogues are now confined to the visible screen
+ * Widget, UI: Added NoFocus attribute and FL_NOFOCUS
+
+=== 1.08: ===
+
+ * Added support for dynamic reconfiguration from stylesheets during runtime
+ * Area: Width/Height, Min/Max/Width/Height are no longer consolidated during
+ new(), but interpreted by the layouter during runtime by accessing them via
+ getAttr()
+ * Demo program: Added menu item "Open stylesheet..."
+ * Added a sanity check in Window:update()
+ * Added LUAVER variable in config to switch Lua install paths
+ * Text, Canvas: KeepMinWidth/Height are now translated to flags
+ * Rawfb: Topmost window is focused now after the focused window was closed
+
+=== 1.07: ===
+
+ * ui.checkVersion() added
+ * ui, Area, Window: FL_ISWINDOW, FL_DONOTBLIT added and honoured
+ * Window:relayout() uses FL_ISWINDOW to avoid expensive uses of instanceOf()
+ * Slider knobs are no longer blitted
+ * Canvas:damage() did not check for rectangle, corrected
+ * Build procedure: builds with just a single display driver can be configured
+ entirely via config file now
+
+=== 1.06: ===
+
+ * Serious regression fixed: Since 1.02, updating sliders was abysmally
+ expensive and could disturb the refreshing of other elements
+ * config.h, config, Makefiles: Some Mac OS X support added
+ * FloatText:erase() did not check for a DamageRegion, corrected
+ * X11, Visual: some sanity checks added to drawbuffer and drawgradient
+ * TextEdit: disabled window update suspension, disabled AutoIndent by
+ default, corrections to cursor updates and text width recalculation
+ * EditWindow: enabled AutoIndent by default
+ * Input:handleKeyboard(), cursorSOF/EOF/SOL/EOL() added
+
+=== 1.05: ===
+
+ * Added PNG file format support
+ * Added loading images and rendering with alpha channel
+ * RawFB driver: Added support for drawing bitmaps with alpha channel
+
+=== 1.04: ===
+
+ * ui, Application: Added UserStyles variable
+ * Removed use of the init() function
+ * CheckMark:getAttr() removed
+ * Area:beginPopup() added
+ * PopItem: now uses child:beginPopup() to prepare an element for being used
+ in a popup
+ * Widget:getPseudoClass() now gives hover precendece if the element is in a
+ popup
+ * Window:update() could try to relayout elements without a rectangle,
+ corrected
+ * Added some CSS documentation
+
+=== 1.03: ===
+
+ * Bug in Area class (C version) fixed: Did not differentiate between
+ layouted rectangle 'unset' and 'zero'
+
+=== 1.02: ===
+
+ * PopItem: getPseudoClass() removed
+ * Window: relayout() removed
+ * TextList: improved logic for latching on list top or bottom
+ * ScrollGroup: added HValue, VValue, H/VMax/Min/Range/Value are now
+ always updated
+ * runxml: version added
+ * some corrections in examples
+ * Application, Area (Lua version): small optimizations
+ * VNC server: Now using a nonblocking socket for signalling, maxfd is
+ constantly updated
+ * TextEdit: AutoPosition reenabled, fixes regression
+ * Slider, Gauge: now uses rethinkLayout() instead of Window.relayout(),
+ leading to visually tighter updates
+ * Input, EditWindow: clicking outside the element stops editing
+ * UI, Area, Canvas, Group, PopItem, Sizeable, TextEdit, Widget, Window:
+ Added flags FL_AUTOPOSITION, FL_ERASEBG, FL_TRACKDAMAGE, FL_ACTIVATERMB,
+ FL_INITIALFOCUS
+    
+=== 1.01: ===
+
+ * Area: C version erase() did not use texture origins, corrected, in
+ setFlags() now only newly set flags cause FL_UPDATE to bubble up
+ * String: Fixed a bug in range calculation that could corrupt the heap
+ * Window: Added support for initializing HoldTickFirst and -Repeat
+ * Added XML runner, examples and documentation
+ * CheckMark, PopItem, Widget: Some corrections in precedence of style
+ pseudoclasses
+ * Added prototype TextList class
+ * Improved 'klinik' stylesheet
+
+=== 1.0: ===
+
+ * New versioning scheme established. The 1.0 version does not reflect some
+ exceptional achievement, and the major version will be changed more
+ frequently in the future. The versioning scheme resembles Lua's in that new
+ major versions indicate some nontrivial API changes. The UI library now
+ contains a version that reflects tekUI's overall package version number.
+ * The document generator now accepts C source files, too, for classes which
+ have been written in or ported to C. The notation is the same, so the current
+ function headers only need to be enclosed in C comments.
+ * tekUI example class written in C: Fixed a bug that thwarted child classes
+ to inherit from the example class. Rounded out the registration prolog, added
+ tek_lua_register() that isolates 5.1/5.2 compatibility and simplifies
+ registration
+ * Raw framebuffer: Improved window focus management, fixed memory leak
+ * String class: documentation added
+ * Application:up() added
+ * Added examples demonstrating communication with child processes and
+ datagram socket server; socket and filestream communication are no longer
+ part of the display drivers, but now available throughout tek.lib.visual
+ * Rendering of color gradients corrected
+ * Area.Flags: is a numerical type now
+ * The Area and Frame classes have been rewritten in C, the original Lua
+ versions are still available in the archive
+ * New Input and TextEdit classes added, the TextInput class is obsolete.
+ Input is largely compatible with TextInput. The new class supports
+ multiline, proportional fonts, smooth scrolling, MaxLength, Size,
+ passwords, selections, and an internal clipboard, which can be shared with
+ the system clipboard (currently implemented in the X11 driver)
+ * RawFB (in-memory) framebuffer display driver added, which is recursive:
+ Allows another display driver to be plugged in as its rendering back-end
+ * Added Lua 5.2 support, and no longer uses Lua internal API functions
+ * Added gradient support, available via stylesheets
+ * RawFB: Added LibVNCServer support. Applications can now be shared with
+ the network, running headlessly or with an additional native display
+ * Added 'klinik', 'stain', 'gradient' stylesheets
+ * Default border now supports border-legend-align attribute, bug fixed
+ in focus border rendering
+ * Element: Cascading stylesheets did not incorporate an element's hardcoded
+ class properties correctly, corrected, getPseudoClass() added
+ * ScrollGroup: Reduced object tree complexity in some cases, some checks
+ added
+ * ui: Added FL_UPDATE, typo in "BckSpc" symbolic key name corrected, added
+ MSG_REQSELECTION, added FL_RECVINPUT, FL_RECVMOUSEMOVE, FL_CURSORFOCUS,
+ now automatically loads "default" as the first stylesheet unless "minimal"
+ is explicitely given in the THEME variable
+ * Area: setFlags(), checkClearFlags() added, taking care of FL_UPDATE
+ bubbling up in the graph on setting FL_REDRAW, FL_REDRAWBORDER, FL_CHANGED.
+ getNext(), getPrev() now have an optional "recursive" mode argument.
+ added getDisplacement(), getMsgFields(). checkHover() renamed to
+ checkHilite(); getBG() now returns additional position-independency info
+ for better support of transaprent backgrounds, getMargin and getPadding
+ are now written in C
+ * Group: now descends only into elements with FL_UPDATE set during updates,
+ which reduces the overhead for small, partial refreshes. remMember() now
+ unweights a Group's remaining elements; no longer passes messages to
+ disabled or inactive elements
+ * Lister: No longer unselects entries in cleanup(), more sanity checks
+ * Application: User message handler is now established in new(), added
+ FocusWindow attribute
+ * Display, Visual: Added support for bold and italic in fontnames and with
+ openFont(), better default/fallback fonts, added symbolic color "bright",
+ getattrs() now supports query of selection and clipboard, getPaintInfo()
+ added
+ * DirList: path/location field bugs fixed, some improvements especially in
+ regard to keyboard control
+ * DirectFB Display driver: Totalwidth/pitch bug in drawbuffer corrected
+ * X11 display: Issues with drawing argument ranges corrected, now stops
+ reading from stdin when an error occurs, Unicode keycode handling improved,
+ added saveunder/backingstore heuristic, compile-time options to reenable
+ default cursor, datagram socket for USER messages, improved pixmap memory
+ management
+ * X11 display, Visual, Applications: Added support for selections and
+ clipboards. tekUI input messages are now userdata encapsulations of TEKlib
+ messages, passed into Lua space, unpacked only on demand when accessed, and
+ replied explicitely using reply() or implicitely through garbage collection.
+ messages can now perform a roundtrip through Lua space back to originator
+ * TEKlib: Added more support for message port hooks
+ * PopItem: Some initialization and other problems corrected
+ * Widget, Window, PopItem: Added some right mouse button support
+ * Widget: improved doubleclick state detection, now known in onPress() etc.,
+ Hover attribute and onHover() removed, simplified activation model based on
+ Hilite attribute, now all widgets receive FL_RECVINPUT, interactive elements
+ additionally receive FL_RECVMOUSEMOVE
+ * Window: Focus and Activation in KEYDOWN handler is no longer changed when
+ a keyboard qualifier is present, more rigid checking for elements going
+ active or getting highlighted, no longer passes MSG_NEWSIZE and MSG_REFRESH
+ to group, minimized usage of getByXY(), getHoverElementByXY() removed
+ * TextInput: now stops editing when clicked outside and no other element is
+ activated, added getText() method
+ * PageGroup: setting PageNumber now sends value and oldvalue in notification
+ * Canvas: VScrollStep renamed to VIncrease, fixed some refresh problems
+ * Slider: AutoFocus renamed to AutoCapture, Integer renamed to Step, the
+ latter can be a number value or a boolean; AutoCapture now on by default
+ * Sizeable class moved into main class hierarchy
+ * C dynamic UTF-8 and metadata string class added
+ * UTF8String class removed
+ * Fixed aliasing issues in compile flags when compiling with more recent
+ versions of GCC
+ * Corrected some addresses and years in the documentation
+ * Prototype text editor: improved
+ * Improved region management, improved buffer rendering, added FONTDIR env
+ variable, default font is now DejaVu, display drivers no longer have to
+ provide a default font, improved font and pixmap cache management, reworked
+ some demos
+ * ImageWidget: onSetImage() and documentation added
+ 
+=== 0.8k: ===
+
+ * Area: reenabled "auto" mode for Width and Height
+ * Documentation: Added layouting section, improved examples, corrections
+ * Corrected usage of directory iterators from lfs.dir(), now working with
+ LuaFilesystem 1.5 again
+ * Debug: added wrout() function, simplified
+ * Visual API: tek_lib_visual_gettime() stray line removed, causing Lua
+ stack corruption
+ * PopItem: beginPopup() could attempt to descend into items that have no
+ children, corrected
+ * Visual API: Added an option to create images from tables
+ * Minor changes and corrections for tekUI to go together with the latest
+ compiler issues and LuaJIT
+
+=== 0.8j: ===
+ 
+ * Gadget renamed to Widget, ListGadget renamed to Lister, ImageGadget renamed
+ to ImageWidget
+ * Drawable class: removed
+ * Object: Added class-wide handlers and a copy-on-write mechanism for
+ duplicating handlers on object-level on demand; static initialization of
+ handlers is no longer supported
+ * Element: added onSetStyle() and obSetClass(), some bugs fixed in style
+ sheet processing
+ * Application: hide() hardened for side-effects from shutting down while
+ hide() is still in progress
+ * Area: removed Drawable attribute, show() no longer has a drawable argument,
+ removed Margin, added getMargin() and getMinmax(), MinMax, Rect are Region
+ objects now
+ * Widget:onClick(), onHold(), onDblClick() added
+ * Group:addMember() now allows elements to be added to uninitialized groups
+ * Lister:onDoubleClick() renamed to onDblClick() and documented
+ * Slider:onHold() documented
+ * Visual: added setTextureOrigin(), pushClipRect(), popClipRect(), drawing
+ functions no longer receive texture origins as arguments, added setBGPen(),
+ which can be used to set a background color or a texture for fillRect(),
+ renamed copyarea() to blitArea(), function names are now in lowerCamelCase
+ * ScrollGroup: copyArea() renamed to blitArea()
+ * Window: Drawable attribute added, it is now created in show() and
+ destroyed in hide(), removed Visible and Pens attributes, invalid color
+ specifications are now silently converted to the 'background' color
+ * UI: Changed meaning of MSG_ALL, now excluding MSG_INTERVAL
+ * added tek.ui.style.desktop, removed Theme class
+ * Improved documentation and stylesheet, added Windows platform installation
+ note
+ * Display: Simpler and faster color allocation, added newDrawable(), Drawable
+ now encapsulated by Display
+ * Object:doNotify() added, now processes all notifications regardless of
+ esoteric side-effects during traversal, addNotify() positional argument
+ removed
+ * UI: Added FL_POPITEM, added getStyleSheet() from former Theme class, removed
+ region functions
+ * PopItem: sets FL_POPITEM during connect, overwrites doNotify() to filter
+ out notifications in items which have been neither setup nor connected before
+ * Demos: cleanup
+ * Region: added get() function, class check is now based on upvalue
+ * Optimized default layouter, now using more C structures and fewer Lua stack
+ * Editor, Sizeable and EditWindow classes added (not installed globally)
+
+=== 0.8i: ===
+ 
+ * Display, Visual: Removed numerical pens, all pens are symbolic now, 
+ Display: removed RGBTab and FontTab
+ * added ui.support library with functions operating on flag fields
+ * added Fixed layouter
+ * added Dynamic, Fixed and LayoutHook and improved some demos
+ * Element:addStyleClass() added, Properties attribute added, removed
+ getProperty() and getProperties(), style sheet properties, direct formattings
+ and hardcoded class properties are now decoded into a metatable graph
+ * EditWindow: localizations added
+ * Application: added Style and Preload attributes, removed Theme attribute,
+ renamed Styles to AuthorStyles, added AutorStyleSheets
+ * Drawable:getAttrs() split into getWH() and getXY()
+ * PopItem: Now also elements descending from CheckMark collapse in popups,
+ no longer uses a "popup-children" style class if an element has children,
+ instead a style class "popup-child" is appended to all children during
+ connectPopItem()
+ * CheckMark: in setState(), precedence of the "Hilite" attribute over
+ "Selected" is now also considered for the foreground color
+ * MenuItem: a predefined class "menuitem" is now appended to the element's
+ style classes during init()
+ * Internal theme: use of menu colors corrected, removed "internal" style
+ sheet, added the respective properties in the "desktop" style sheet.
+ * style sheets: 'parent-group' pseudo pen renamed to 'transparent',
+ 'background-position' renamed to 'background-attachment'
+ * ui.loadStyleSheet() can now operate on open filehandles
+ * RadioImage now paints a back pane
+ * ImageGadget: did not implement vertical and right alignments, corrected
+ * Input: setting the cursor with the mouse now also updates the LockCursorX
+ attribute, visual cursor position reporting corrected
+ * Visual API: Window MaxWidth/MaxHeight wasn't unset when passing 'false',
+ corrected
+ * Area: removed relayout() function, rethinkLayout() now has an additional
+ updateminmax argument, added drawBegin() and drawEnd() functions, removed
+ refresh(), layout logic improved for growing elements, added Flag attribute,
+ removed Redraw attribute, removed BGColor, BGPosition, Margin, Padding,
+ getProperties(), FL_CHANGED is now set in rethinkLayout(), added getPadding(),
+ renamed MarginAndBorder to Margin, renamed former 'grid-align' properties to
+ 'halign' and 'valign'
+ * FloatText: layout() took an existing Redraw into account, removed
+ * Frame: phased out an additional newBorderObject() function, removed
+ RedrawBorder attribute, removed Border and BorderClass attributes, these are
+ created on the fly during border creation and isolated in the border object
+ * Group: the Layout argument can now be a class name, not just a layouter
+ instance, calcWeights() is now called when a changed layout is notified,
+ addMember()/remMember() are more solid now, removed getStructure(),
+ getSameSize() and calcWeights(), these are now isolated in the default
+ layouter, removed onActivateGroup(), groups are no longer repainted
+ completely, but only when a fixed background-attachment is indicated
+ * Handle: now calls rethinkLayout() as it is supposed to, Orientation is now
+ determined during setup()
+ * ListGadget: Removed BGAlt, CursorBorder, CursorBorderClass attributes
+ * PageGroup: simplified, now accepts a custom Layout
+ * ScrollBar, Slider: updateSlider() is no longer a local function and
+ forwards the call to its super class
+ * ScrollGroup: internal sliders are handled more efficiently now, causing a
+ notification in their parent class now only when really needed
+ * Slider, Gauge: MaxWidth, Width, MaxHeight and Height are now determined
+ during setup()
+ * Spacer: Orientation is now determined during setup()
+ * Text: Removed FGDisabled2, Font, TextHAlign, TextVAlign attributes
+ * TextInput: Removed FGCursor and BGCursor attributes
+ * Window:relayout() changed and no longer descends from Area but is now
+ rooted in the Window class, calcWeights() is now under the control of the
+ Group class
+ * UI: freeRegion() and testFlags() removed, added element flags FL_REDRAW,
+ FL_REDRAWBORDER, FL_LAYOUT etc., simplified and renamed prepareStyleSheet()
+ to unpackStyleSheet(), added unpackProperty() for direct formattings,
+ loadStyleSheet() now unpacks properties and merges pseudo class attributes
+ on the fly, removed NULLOFFS, new ui.ThemeName is "default desktop"
+ * Layout base class added
+ * Default layouter: Now uses the Layout base class in an upvalue to new(),
+ added version string, handles weights internally when a change of a group's
+ contents or weights is indicated using the FL_CHANGED flag, bugs in the
+ SameSize calculation corrected, removed the "auto" state for Width and
+ Height, the logic is now more concise and faster
+ * Theme: The internal style sheet is now more minimal and has been renamed
+ to "minimal", many properties have been relocated to the new "default" style
+ sheet
+ * Renamed 'check' and 'radio' images to 'checkmark' and 'radiobutton',
+ respectively
+ * Region:trans() renamed to shift(), isNull() to isEmpty()
+ * Makefiles updated to install new classes, args.lua, fixed layouter, new
+ style sheets
+ * Markup: Tables produced erroneous HTML - now pop the current block from the
+ stack
+ * Documentation generator: added macro support, added child class macro,
+ tables did not break out of the current block, corrected
+ * improved documentation generator, documentation, stylesheet, README
+
+=== 0.8h: ===
+
+ * Window, Application: Hotkeys are now actuated on keydown, not on keyup
+ * Area, UI, Theme, internal stylesheet: PEN_PARENTGROUP renamed to
+ PEN_DEFAULT, "parent-group" pseudo-color renamed to "default", the default
+ color is now also evaluated for the foreground color
+ * ImageGadget: Now supports PEN_DEFAULT for not using a single pen for
+ rendering its imagery. This allows control over the greying-out behaviour
+ of images in style sheets. Crashed when no image was set; corrected
+ * UI, Display, Theme: Added symbolic pens PAPER and INK, DISABLEDDETAIL2
+ renamed to DISABLEDDETAILSHINE, LIST2 renamed to LISTALT, symbolic color
+ keys "disabled-detail2" renamed to "disabled-detail-shine", "list2" to
+ "list-alt"
+ * Display: more symbolic colors added (black, white, fuchsia, ...),
+ changed cursor color
+ * Theme, internal stylesheet: added "field" class
+ * ScrollBar: Implementation of arrow button and slider checkFocus() was
+ broken, corrected, added AcceptFocus attribute
+ * ScrollGroup: AcceptFocus attribute added
+ * dark.css stylesheet added
+ * UI: loadLibrary(), require() added, removed pattern argument from
+ loadClass(), minimum version requirements are now enforced in most classes
+ * Slider: now checks if it is allowed to receive the focus before it enters
+ capture mode
+ * Class:checkDescend() renamed to instanceOf()
+ * Group:onActivateGroup() added
+ * Window, UI: Doubleclick jitter and timeout are now defined in UI
+ * Gendoc: NAME argument is now /K, HEADER is now /K/M, allowing multiple
+ header files. A reference document is now supplied to normal jumps
+ * UTF8String: find(), chars() added
+ * Canvas: focusRect() now has an optional "smooth" scroll positioning
+ argument, sanity check added
+ * Text: now uses the "IgnoreAltShift" peudo qualifier for Keycode shortcuts,
+ KeyCode attribute was lost during repeated invocations of setup(), corrected,
+ 'color2' style property renamed to 'color-disabled'
+ * Raw Framebuffer display driver: added
+ * 64bit fixes and source code maintenance adjustments merged in from TEKlib
+ * X11 Display: Now using the XVid extension and a more sophisticated window
+ opening procedure to much better support fullscreen applications
+ * Visual, displays, Drawable: Added TVCMD_FLUSH command to TVRequest, a
+ flush() method and a dirty flag indicating visual changes
+ * Visual, Lua bindings: Added length argument to textSize()
+ * Args: Partly rewritten, now handles missing keywords correctly in /M/K
+ modifiers
+ * Region: added trans(), isNull()
+ * Region, Visual: Added _VERSION
+ * Application: fixed initial double refresh bug, requestFile() now supports
+ an additional FocusElement argument, setLastKey() added, requesters receive
+ the style class "app-dialog", addMember() now connects children recursively,
+ getModalWindow() added
+ * Area:layout() now handles blits in transposed drawing contexts
+ * DirList: Added AutoWidth and FocusElement attributes, location field now
+ advances to the action button when Return is pressed
+ * Drawable:getClipRect() added, any number of symbolic colors can now be
+ allocated
+ * Frame:layoutBorder() split off from layout()
+ * ListGadget: fixed to work in absence of a style sheet
+ * Window:addBlit() added, update() now calls flush() after repaints, the 
+ KEYDOWN message handler now checks if a popup to which this event may have
+ been forwarded collapsed already, improved key repeat/retrigger handling
+
+=== 0.8g: ===
+
+ * Argument parser: Arguments with whitespaces were treated incorrectly 
+ even if they were surrounded by quotes, corrected
+ * Documentation generator: Added --author, --created, --adddate options
+ * Markup: Added metadata options for "author" and "created"
+ * Canvas:damageChild() can now be called without a layout, allowing
+ ListGadget:repaint() to work outside Application:run()
+ * DirList: added onSelectEntry() handler
+ * Application, Window: Major simplification in setup and closedown 
+ procedure, the show() method is now invoked shortly after opening the
+ window
+ * Area: Changed meaning of the EraseBG attribute, removed calcOffset,
+ BGPen renamed to BGColor, getElementByXY() renamed to Area:getByXY()
+ * Drawable: removed closeFont(), fitMinAspect(), openFont(), drawPlot()
+ renamed to drawPoint()
+ * Gadget: Effect renamed to EffectClass, BGPen... to BG..., FGPen... to
+ FG..., InitialFocus is now functional, removed onHold(), simplified
+ * Gadget, FloatText: FGPen renamed to FGColor
+ * ListGadget: Renamed BGPenAlt to BGAlt
+ * TextInput: Renamed BGPenCursor to BGCursor
+ * Window:getWindowDimensions() renamed to askMinMax(), show() now invokes
+ Group.show() before askMinMax(), now creates a Drawable during setup()
+ and passes it to its superclass during show()
+ * Theme, stylesheets: effect renamed to effect-class, smaller handles
+ * Default Border, DrawHook, Border, Ripple Hook: show() renamed to
+ setup(), hide() renamed to cleanup() 
+ * Frame, ListGadget, TextInput: simplified
+ * ScrollBar, Slider: now register Hold notification themselves
+ * Application: Status can now be "init", "error", "run" and "quit", some
+ cleanup
+ * Application, Area and demos: Some cleanup, improved documentation,
+ demos, texts and imagery
+ * Visual module: Added VISUAL_USE_INTERNAL_HASH compile-time option
+ * Gendoc: Added --heading option
+ * Theme, internal stylesheet: Slightly changed looks of handles
+
+=== 0.8f: ===
+
+ * Element: Major speedup in parsing style properties
+ * Drawable:openFont(), closeFont(), fitMinAspect() added, Visual API:
+ font:getTextSize() added, Font and Display usage simplified in shortened
+ many classes
+ * Improved some demos, texts, localizations, and style sheets
+ * Compiler: added commandline arguments
+ * C sources and their symbol names are now better suited for amalgamed
+ builds
+ * Removed unused memory managers from TEKlib
+ * Application: Added GCControl
+ * Application, PopupWindow: Removed use of checkDescend()
+ * FloatText: corrected flaky color property evaluation, UnusedRegion,
+ updateUnusedRegion() removed, now handled by Canvas
+ * Gauge, Slider: Added BackgroundRegion, updateBackgroundRegion(), faster
+ repaint
+ * Region: now supports a custom datatype for rectangles, renamed
+ overlap...() to intersect...(), removed free() and intersect() methods,
+ added caching of rectangle nodes, management and caching of rectangle
+ nodes now more efficient, removed getRects(), replaced by forEach()
+ * Area, Canvas, FloatText, Gauge, Group, ImageGadget, ListGadget,
+ ScrollGroup, Slider, Window: Now using region:forEach() instead of
+ region:getRects()
+ * Default border, Border: getBorderRegion() renamed to getRegion(), now
+ expecting a border to be supplied by the caller, now determines group
+ color from getBGElement()
+ * UI: added allocRegion(), freeRegion(), newRegion(), reuseRegion(),
+ destroyHook(), ProgDir is now guaranteed to contain a trailing path
+ separator
+ * Area, Canvas, Frame, Gauge, Group, ListGadget, Slider: added region
+ caching and reusing
+ * ListGadget, FloatText: innerloop of draw() is now a separate function
+ * Element: Added getAttr()
+ * PopItem: implemented "menuitem-size" via getAttr()
+ * Area:getBackground() renamed to getBG(), getRectangle() to getRect(),
+ markDamage() to damage(), focusRectangle() to focusRect(),
+ BackgroundPosition to BGPosition, removed getElement(), added
+ getChildren(), getSiblings(), getParent(), getGroup(), getNext(),
+ getPrev(), checkHover(), getBGElement(), Display removed, show() now
+ takes only a Drawable as an argument and has no return value anymore
+ * Application: Renamed CollectGarbage to GCControl, VendorName to Vendor,
+ VendorDomain to Domain
+ * Canvas: renamed markChildDamage() to damageChild(), added UseChildBG
+ attribute, onSetChild() is no longer passed ui.NOTIFY_OLDVALUE, now
+ handles child margins
+ * CheckMark, RadioButton: renamed AltImage to SelectImage
+ * DirList: renamed getDirectoryIterator() to getDirIterator()
+ * Display: renamed colorNameToRGB() to colorToRGB(), closeFont() now
+ always returns false
+ * FloatText: renamed Reposition argument from "bottom" to "tail"
+ * Gadget: renamed EffectName to Effect
+ * X11 Display: Added missing X11 include, added support for UTF-8 encoded
+ window titles, added fontconfig closedown, fixed uninitialized stack and 
+ minor memory leak problems
+ * Window:handleInput() doesn't update MouseX,MouseY generally anymore
+ but in appropriate handlers
+ * PopList: Renamed onSelectEntry() to onSelectLine()
+ * Nano-X, X11 Display: stdin reader did not handle incomplete reads
+ correctly, fixed
+
+=== 0.8e: ===
+
+ * Eliminated the use of 'ipairs' in many classes 
+ * Visual API, Image, ImageGadget, stock images: Changed image table
+ structure, added preliminary support for bitmap pens in frect(), removed
+ futile attemps in rounding from drawimage()
+ * UI: Renamed createImage() to getStockImage(), added loadImage(),
+ "background-image" handled, simplified match patterns in property
+ preparation
+ * UI, Object: NOTIFY_ALWAYS now behaves like former NOTIFY_CHANGE,
+ NOTIFY_CHANGE has been removed
+ * Visual, Visual/Lua binding, display drivers: TVisualText() no longer
+ supports a background pen 
+ * Nano-X Display driver: drawbuffer now fully supported
+ * Visual/Lua binding: drawtext() now requires the complete text bounding
+ box, supports background pixmaps and an additional x/y argument for the
+ texture origin, frect() now supports an additional x/y argument pair for
+ the texture origin
+ * Default border: Group and element origins are now considered for texture
+ origins
+ * Area: Added BackgroundPosition attribute, "background-position" style
+ property, getBackground() function, erase() now handles texture origins,
+ init() now resets Focus, DamageRegion is or'ed to (no longer overwritten
+ during layout) and no longer reset in erase() but in refresh()
+ * Area, Canvas, FloatText, Gauge, Group, ImageGadget, ListGadget, Slider:
+ erase() and draw() now consider texture origin
+ * Display: Added AspectX, AspectY, added fitMinAspect(), added pixmap cache,
+ createPixmap(), loadPixmap(), getPixmap(), "ui-huge" font default is now
+ "Utopia", which is scalable and common under X11 even without Xft support
+ * Drawable: Removed AspectX, AspectY, added support for color allocation by
+ accessing Pens with an "#rrggbb" key, added texture loader reacting on
+ url(...) keys, RGB colors are now cached with an unique identifier to avoid
+ double allocation, some sanity checks added
+ * ImageGadget: Some layouting problems fixed, added several checks for
+ presence of an image, now supports ImageAspectX, ImageAspectY
+ * PopItem: removed "popup-root" and "popup-children" pseudo classes, these
+ are now predefined classes and set during connect() if no other Class is
+ specified
+ * Element, Application:getElementById(), getId() unified and renamed to
+ getById()
+ * Visual API: Added pixmap objects, createpixmap(), freepixmap(), renamed
+ drawppm() to drawpixmap(), frect() now supports rendering a pixmap with a
+ texture origin
+ * Merged BitmapImage and VectorImage class to Image
+ * Gadget: onActivate() now implements collapsing of popups, removed the same
+ functionality from PopItem - CheckMark, RadioButtons etc. are now functional
+ in popups
+ * Group:markDamage() checks for presence of a FreeRegion now, markDamage()
+ and layout() are now better prepared for tracking intra-area damages
+ * PopItem: no longer resets Selected and Focus when opening
+ * Region: checkoverlap() always returned true, corrected
+ * CHANGES, VERSION: added
+ * Documentation improved 
+ * Gendoc: Added support for the --header option in class tree documentations
+ * Theme, internal stylesheet: Added background-position attributes
+ * Installation: BitmapImage, VectorImage classes removed, Image class,
+ desktop.css, texture.css added
+ * Gauges with vertical orientation are now running from bottom to top
+ * Minor corrections in image layouting procedures and image data
+ * CheckMark, PopItem: Improved image size calculation
+ * MenuItem, PopList, Arrow Images: Corrected distorted coordinates
+ * X11 Display: Removed a kludge that disabled Xft font rendering when the
+ composite extension was detected
+ * Theme, Family, Element, Drawable, Button, Application, UTF8String: Minor
+ corrections in the documentation
+ * Demos: Images were incompletely read under Windows and appeared scrambled,
+ corrected, improved border demo, changed some font attributes
+
+=== 0.8d: ===
+
+ * Application:quit() added, can now be passed an initial Display
+ * Area, Canvas, Gadget: Added AutoPosition feature
+ * CheckMark:setState(): Hilite has now precedence over Selected
+ * CheckMark, RadioButton, ScrollBar: Now using external images
+ * Compiler: added
+ * Debug: Default level reset to WARN (this time also reflected in the
+ documentation)
+ * Display: added colors user1 ... user4, colorNameToRGB(),
+ getPaletteEntry(), removed allocPens()
+ * Drawable: now supports on-demand allocation of custom colors
+ * Element: Added getNumProperty(), slightly optimized
+ * List:changeItem() was using a global instead of an argument, corrected
+ * Installation procedure corrected
+ * Meter class and example rewritten
+ * Minor corrections and improvements in the documentation
+ * PopItems: corrected notification handler for Active, fixing long-standing
+ double-activation bug
+ * Region.new() can now cope with an empty initial rectangle
+ * Slider: AutoFocus is now false by default, improved keyboard usage
+ * Theme, internal stylesheet: minor corrections
+ * Text:getTextSize() now also returns the layouted x/y, if present
+ * UI: Added image class loader and createImage(), added PEN_NUMBER,
+ PEN_USER1
+ through PEN_USER4, createHook() now returns false on the predefined name
+ "none"
+ * UI, Display, Theme: PEN_LIGHT removed, added PEN_OUTLINE
+ * UTF8String: set() and char() can now be overridden, removed __tostring()
+ and __concat(), unpack() was not known in byte()
+ * VectorImage, BitmapImage: data fields are now indexed numerically
+ * Visual API: drawImage() data structure changed, implementation simplified
+ and several problems rectified
+ * Visual:drawImage(), ImageGadget, VectorImage:draw() now supports an
+ override_pen argument for rendering an image monochromatically
+
+=== 0.8c: ===
+
+ * README: Improved, updated
+ * Debug: verbosity set to ERROR
+ * Application: requestFile() arg.Center can now be set to false
+ * Area: layout() simplified, should handle more blitting cases
+ * Button, CheckMark, MenuItem, PopItem: keycode can now be set to false
+ * FloatText, ListGadget: TrackDamage can now be set to false
+ * Frame: border repaints can now be avoided if an element was blitted
+ * Text:onSetText() causes a less destructive repaint if KeepMinWidth is
+ enabled
+ * Window: blits and updates are now implemented in the overriden refresh()
+ method and synchronized, removed notify option in SetHiliteElement(),
+ setFocusElement(), setActiveElement(), setDblClickElement(), improved
+ documentation
+
+=== 0.8b: ===
+
+ * CHANGES added

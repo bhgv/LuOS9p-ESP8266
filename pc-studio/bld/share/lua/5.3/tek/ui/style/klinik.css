@@ -1,0 +1,406 @@
+
+/*
+**	tek/ui/style/klinik.css
+**
+**	Version: 1.3
+*/
+
+
+.page-button {
+        max-width: 0;
+        border-style: inset;
+/*
+        border-width: 1 0 1 1;
+        border-focus-width: 1 0 1 1;
+*/
+        border-width: 0;
+        color:gray;
+        font: ui-main:14;
+        font-focus: ui-main/b:14;
+        margin: 1 0 1 1;
+        padding: 0 30 0 30;
+}
+.page-button:active {
+        border-style: outset;
+        border-bottom-color: transparent;
+        background-color: transparent;
+        color:navy;
+}
+.page-button:focus {
+        background-color: hover;
+}
+.page-button:hover {
+        color:navy;
+}
+.page-button-fill {
+/*
+        border-style: inset;
+        border-width: 0 0 1 1;
+*/
+        border-width: 0 0 0 0;
+        border-focus-width: 0;
+/*
+        background-color: transparent;
+*/
+        background-color: #eee;
+        margin: 0 0 1 1;
+}
+.page-button-group {
+        margin: 0 1 0 0;
+        padding-left: 1;
+}
+.page-container {
+        border-width: 0 1 1 1;
+        margin: 0 2 2 2;
+        padding: 2;
+}
+
+
+
+
+tek.ui.class.display {
+	rgb-background: #eee;
+	rgb-dark: #000;
+	rgb-bright: #fff;
+	rgb-outline: #fff;
+	rgb-fill: #68c;
+	rgb-active: #ddd;
+	rgb-focus: #ddd;
+	rgb-hover: #ddd;
+	rgb-disabled: #e1e1e1;
+	rgb-detail: #222;
+	rgb-caption-detail: #444;
+	rgb-active-detail: #000;
+	rgb-focus-detail: #222;
+	rgb-hover-detail: #222;
+	rgb-disabled-detail: #666;
+	rgb-disabled-detail-shine: #fff;
+	rgb-border-shine: #f8f8f8;
+	rgb-border-shadow: #ccc;
+	rgb-border-rim: #999;
+	rgb-border-focus: #fff;
+	rgb-border-legend: #888;
+	rgb-menu: #fff;
+	rgb-menu-detail: #000;
+	rgb-menu-active: #68c;
+	rgb-menu-active-detail: #fff;
+	rgb-list: #fff;
+	rgb-list-alt: #f8f8f8;
+	rgb-list-detail: #000;
+	rgb-list-active: #68c;
+	rgb-list-active-detail: #fff;
+	rgb-cursor: #68c;
+	rgb-cursor-detail: #fff;
+	rgb-group: #fff;
+	rgb-shadow: #777;
+	rgb-shine: #fff;
+	rgb-half-shadow: #ddd;
+	rgb-half-shine: #e1e1e1;
+	rgb-paper: #fff;
+	rgb-ink: #000;
+}
+
+.textfield {
+	text-align: left;
+	border-style: solid;
+	border-width: 2;
+	border-rim-width: 0;
+	border-focus-width: 0;
+	border-color: background;
+	background-color: border-shine;
+	margin: 2;
+	width: fill;
+	height: fill;
+	valign: center;
+}
+
+
+tek.ui.class.popitem {
+	border-rim-width: 1;
+	border-width: 4;
+	border-color: shine half-shine half-shadow border-shine;
+	border-style: outset;
+	padding: 2 4 2 4;
+}
+
+tek.ui.class.menuitem:disabled {
+	background-color: menu;
+}
+
+
+.button {
+	border-rim-width: 1;
+	border-width: 4;
+	border-color: shine half-shine half-shadow border-shine;
+	border-style: outset;
+	padding: 2 4 2 4;
+}
+
+.button:active {
+	border-style: outset;
+}
+
+tek.ui.class.poplist {
+	border-rim-width: 1;
+	border-width: 4;
+	border-color: shine half-shine half-shadow border-shine;
+	border-style: outset;
+	padding: 2 4 2 4;
+}
+
+/*.caption {
+	color: caption-detail;
+	valign: center;
+}*/
+
+.app-dialog {
+	padding: 4;
+	border-width: 2;
+	border-style: solid;
+	border-color: dark;
+}
+
+
+tek.ui.class.slider {
+	border-style: solid;
+	border-width: 0;
+	border-focus-width: 0;
+	border-rim-width: 0;
+	border-color: border-shadow;
+	padding: 0;
+	margin: 10;
+}
+tek.ui.class.slider:active {
+	border-style: solid;
+	background-color: active;
+}
+tek.ui.class.slider:focus {
+	border-style: solid;
+	background-color: focus;
+}
+
+.knob {
+	padding: 6;
+	border-focus-width: 0;
+	border-style: outset;
+	border-rim-width: 1;
+	border-width: 3;
+	border-color: shine half-shine half-shadow border-shine;
+	margin: 0;
+	min-width: 12;
+	min-height: 12;
+}
+
+.knob-scrollbar {
+	effect-class: none;
+}
+
+.scrollbar-arrowup {
+	margin-bottom: 0;
+}
+.scrollbar-arrowright {
+	margin-left: 0;
+}
+.scrollbar-arrowdown {
+	margin-top: 0;
+}
+.scrollbar-arrowleft {
+	margin-right: 0;
+}
+
+_scrollbar-arrow.button { 
+	padding: 2;
+	border-rim-width: 0;
+	border-focus-width: 0;
+	border-width: 0;
+	margin: 0;
+	min-width: 12;
+	min-height: 12;
+}
+
+_scrollbar-arrow.button:focus { 
+	background-color: focus;
+}
+
+tek.ui.class.scrollbar {
+	border-width: 2;
+	border-focus-width: 1;
+	
+}
+
+_editinput { 
+	valign: center;
+}
+_editinput:disabled { 
+	color: disabled-detail;
+}
+
+tek.ui.class.input { 
+	border-style: solid;
+	padding: 0;
+	valign: center;
+}
+
+tek.ui.class.canvas.inputfield {
+	border-color: border-shadow;
+	border-width: 2;
+	margin: 1;
+	padding: 0;
+}
+
+tek.ui.class.text {
+	padding: 1 4 1 4;
+}
+
+/*tek.ui.class.widget {
+	padding: 3 6 3 6;
+}*/
+
+tek.ui.class.widget:hover {
+	background-color: background;
+	color: detail;
+}
+tek.ui.class.widget:focus {
+	background-color: background;
+	color: detail;
+}
+tek.ui.class.widget:active {
+	border-style: outset;
+}
+
+tek.ui.class.group {
+	padding: 0;
+	margin: 0;
+}
+
+
+tek.ui.class.lister {
+	cursor-width: 2;
+	border-color: #68c;
+/* 	font: sans-serif/s; */
+}
+
+.dirlist {
+	cursor-width: 1;
+	border-color: border-focus;
+}
+	
+tek.ui.class.checkmark {
+	margin: 4;
+}
+tek.ui.class.radiobutton {
+	margin: 4;
+}
+
+tek.ui.class.checkmark:active {
+	color: detail;
+}
+
+
+tek.ui.class.textedit.textlist {
+	font: ui-fixed:18;
+	margin: 12; /*18;*/
+}
+tek.ui.class.canvas.textlist {
+	border-style: solid;
+	border-color: #aaa;
+}
+
+
+/* frame with Legend attribute */
+.legend { 
+	border-style: solid;
+	border-color: half-shine;
+	border-width: 1 0 0 0;
+	margin: 8;
+	margin-top: 4;
+	padding: 4;
+	padding-top: 8;
+}
+
+
+tek.ui.class.frame {
+	border-style: solid;
+	border-width: 1;
+	border-color: half-shine;
+	border-legend-align: left;
+}
+
+.gauge-fill {
+	border-style: solid;
+	border-color: dark;
+	border-width: 0;
+	background-color: fill;
+}
+
+tek.ui.class.spacer {
+	border-style: solid;
+	border-width: 1;
+	border-color: half-shadow half-shadow border-shine border-shine;
+}
+
+
+tek.ui.class.button {
+	background-image: gradient(20,0,tint(background,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+tek.ui.class.button:hover {
+	background-image: gradient(20,0,tint(background,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+tek.ui.class.button:focus {
+	background-image: gradient(20,0,tint(background,border-shadow,60%),20,10,tint(background,border-shine,70%));
+}
+tek.ui.class.button:active {
+	background-image: gradient(20,0,tint(active,border-shadow,40%),20,10,tint(active,border-shine,60%));
+}
+tek.ui.class.button:disabled {
+	background-image: gradient(20,0,tint(disabled,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+
+tek.ui.class.poplist {
+	background-image: gradient(20,0,tint(background,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+tek.ui.class.poplist:hover {
+	background-image: gradient(20,0,tint(background,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+tek.ui.class.poplist:focus {
+	background-image: gradient(20,0,tint(background,border-shadow,60%),20,10,tint(background,border-shine,70%));
+}
+tek.ui.class.poplist:active {
+	background-image: gradient(20,0,tint(active,border-shadow,40%),20,10,tint(active,border-shine,60%));
+}
+tek.ui.class.poplist:disabled {
+	background-image: gradient(20,0,tint(disabled,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+
+.button {
+	background-image: gradient(20,0,tint(background,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+.button:hover {
+	background-image: gradient(20,0,tint(background,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+.button:selected {
+	background-image: gradient(20,0,tint(background,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+.button:focus {
+	background-image: gradient(20,0,tint(background,border-shadow,60%),20,10,tint(background,border-shine,70%));
+}
+.button:active {
+	background-image: gradient(20,0,tint(active,#daa,100%),20,10,tint(active,#fdb,80%));
+	border-color: tint(#daa,border-shine,60%) tint(#fdb,border-shadow,60%) tint(#fdb,border-shadow,60%) tint(#daa,border-shine,60%);
+}
+.button:disabled {
+	background-image: gradient(20,0,tint(disabled,border-shadow,30%),20,10,tint(background,border-shine,70%));
+}
+/*.button:activefocus {
+	background-image: gradient(20,0,tint(active,#daa,100%),20,10,tint(active,#fec,80%));
+	border-color: tint(#ebb,border-shine,60%) tint(#fec,border-shadow,60%) tint(#fec,border-shadow,60%) tint(#daa,border-shine,60%);
+}*/
+
+.menubar {
+	background-attachment: scrollable;
+	background-image: gradient(20,0,border-shine,20,40,border-shadow);
+}
+.menuitem {
+	background-color: transparent;
+	background-attachment: fixed;
+}

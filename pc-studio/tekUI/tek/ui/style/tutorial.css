@@ -1,0 +1,139 @@
+
+/*
+**	tek/ui/style/tutorial.css - Example stylesheet
+**	Written by Timm S. Mueller <tmueller at schulze-mueller.de>
+**	See copyright notice in COPYRIGHT
+**
+**	Version: 1.3
+*/
+
+tek.ui.class.display {
+  font-main: sans-serif,helvetica,Vera:28;
+  font-fixed: monospace,fixed,VeraMono:26;
+  font-menu: sans-serif,helvetica,Vera:28;
+  font-small: sans-serif,helvetica,Vera:18;
+  font-large: sans-serif,helvetica,Vera:24;
+  font-huge: sans-serif,helvetica,Vera:32;
+}
+
+tek.ui.class.checkmark {
+	border-width: 0;
+}
+
+tek.ui.class.lister {
+	border-focus-width: 0;
+	border-width: 0;
+}
+
+tek.ui.class.gauge {
+	margin: 1;
+	border-width: 10;
+	border-focus-width: 2;
+	border-rim-width: 2;
+}
+
+tek.ui.class.menuitem {
+	border-width: 0;
+	margin: 0;
+}
+
+tek.ui.class.slider {
+	margin: 1;
+	border-width: 10;
+	border-focus-width: 2;
+	border-rim-width: 2;
+}
+
+tek.ui.class.text {
+	margin: 1;
+	border-width: 10;
+	border-focus-width: 2;
+	border-rim-width: 2;
+}
+
+tek.ui.class.window {
+	padding: 10;
+}
+
+/*
+**	pre-defined classes:
+*/
+
+.button {
+	border-width: 10;
+}
+
+.caption {
+	border-width: 0;
+	background-color: transparent;
+	text-align: center;
+	vertical-align: center;
+}
+
+.gauge-fill {
+	border-style: solid;
+	border-color: dark;
+	border-width: 2;
+	background-color: fill;
+	padding: 10;
+}
+
+.knob {
+	border-width: 10;
+	border-rim-width: 2;
+}
+
+.legend {
+	border-style: groove;
+	border-width: 10;
+}
+
+.page-button {
+	border-style: inset;
+	border-width: 2 0 2 2;
+	border-focus-width: 0;
+	border-rim-width: 0;
+	margin: 0;
+}
+
+.page-button:active {
+	border-style: outset;
+	border-bottom-color: group;
+}
+
+.scrollbar-arrowup {
+	margin-bottom: 0;
+	border-width: 10;
+	border-focus-width: 2;
+	border-rim-width: 2;
+}
+
+.scrollbar-arrowdown {
+	margin-top: 0;
+	border-width: 10;
+	border-focus-width: 2;
+	border-rim-width: 2;
+}
+
+.scrollbar-arrowleft {
+	margin-right: 0;
+	border-width: 10;
+	border-focus-width: 2;
+	border-rim-width: 2;
+}
+
+.scrollbar-arrowright {
+	margin-left: 0;
+	border-width: 10;
+	border-focus-width: 2;
+	border-rim-width: 2;
+}
+
+/*
+**	internal classes:
+*/
+
+_scrollbar-arrow {
+	min-width: 20;
+	min-height: 20;
+}

@@ -1,0 +1,19 @@
+
+/*
+**	tek/ui/style/editor.css - editor.lua application stylesheet
+**	Version: 1.0
+*/
+
+_editinput.editor { 
+	font: fixed/b,ui-fixed/b:18;
+	background-color: #1a1b1e;
+	color: #e4e2c9;
+	mark-background-color: #4b1c23;
+	mark-color: #dcc;
+	bookmark-background-color: #2c3126;
+	bookmark-color: #e4e2c9;
+	cursor-background-color: #202728;
+	cursor-color: #e4e2c9;
+	findmark-background-color: #060;
+	findmark-color: #8f8;
+}

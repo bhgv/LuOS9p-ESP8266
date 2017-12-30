@@ -1,0 +1,79 @@
+
+/*
+**	tek/ui/style/monochrome.css - Monochrome stylesheet
+**	Written by Timm S. Mueller <tmueller at schulze-mueller.de>
+**	See copyright notice in COPYRIGHT
+**
+**	Version: 1.5
+*/
+
+tek.ui.class.display {
+  rgb-background: #000;
+  rgb-hover: #fff;
+  rgb-disabled: #000;
+  rgb-focus: #fff;
+  rgb-active: #000;
+  rgb-detail: #fff;
+  rgb-caption-detail: #fff;
+  rgb-hover-detail: #000;
+  rgb-disabled-detail: #000;
+  rgb-disabled-detail-shine: #fff;
+  rgb-active-detail: #fff;
+  rgb-focus-detail: #000;
+  rgb-group: #000;
+  rgb-border-shine: #fff;
+  rgb-border-shadow: #fff;
+  rgb-border-rim: #000;
+  rgb-border-focus: #fff;
+  rgb-border-legend: #fff;
+  rgb-cursor: #fff;
+  rgb-cursor-detail: #000;
+  rgb-dark: #000;
+  rgb-shine: #fff;
+  rgb-half-shine: #fff;
+  rgb-half-shadow: #000;
+  rgb-shadow: #000;
+  rgb-outline: #000;
+  rgb-fill: #fff;
+  rgb-menu: #000;
+  rgb-menu-detail: #fff;
+  rgb-menu-active: #fff;
+  rgb-menu-active-detail: #000;
+  rgb-list: #000;
+  rgb-list-alt: #000;
+  rgb-list-detail: #fff;
+  rgb-list-active: #fff;
+  rgb-list-active-detail: #000;
+  font: sans-serif,helvetica,Vera:18;
+  font-fixed: monospace,fixed,VeraMono:18;
+  font-menu: sans-serif,helvetica,Vera:18;
+  font-small: sans-serif,helvetica,Vera:14;
+  font-large: sans-serif,helvetica,Vera:24;
+  font-huge: sans-serif,helvetica,Vera:32;
+}
+
+tek.ui.class.checkmark:hover {
+	color: detail;
+}
+
+tek.ui.class.checkmark:active {
+	color: detail;
+}
+
+tek.ui.class.checkmark:focus {
+	color: detail;
+}
+
+tek.ui.class.popupwindow {
+	border-color: shine;
+	border-width: 2;
+}
+
+tek.ui.class.poplist:active {
+	color: shadow;
+	background-color: shine;
+}
+
+.caption {
+	color: caption-detail;
+}

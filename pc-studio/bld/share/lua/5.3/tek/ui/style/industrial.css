@@ -1,0 +1,138 @@
+
+/*
+**	tek/ui/style/industrial.css - Example stylesheet
+**	Written by Timm S. Mueller <tmueller at schulze-mueller.de>
+**	See copyright notice in COPYRIGHT
+**
+**	Version: 1.3
+*/
+
+tek.ui.class.display {
+  rgb-background: #0055ac;
+  rgb-hover: #fff;
+  rgb-disabled: #0055ac;
+  rgb-focus: #fff;
+  rgb-active: #ff8900;
+  rgb-detail: #fff;
+  rgb-caption-detail: #fff;
+  rgb-hover-detail: #0055ac;
+  rgb-disabled-detail: #0055ac;
+  rgb-disabled-detail-shine: #fff;
+  rgb-active-detail: #000;
+  rgb-focus-detail: #0055ac;
+  rgb-group: #0055ac;
+  rgb-border-shine: #fff;
+  rgb-border-shadow: #fff;
+  rgb-border-rim: #0055ac;
+  rgb-border-focus: #ff8900;
+  rgb-border-legend: #fff;
+  rgb-cursor: #fff;
+  rgb-cursor-detail: #0055ac;
+  rgb-dark: #000;
+  rgb-shine: #fff;
+  rgb-half-shine: #fff;
+  rgb-half-shadow: #0055ac;
+  rgb-shadow: #fff;
+  rgb-outline: #000;
+  rgb-fill: #ff8900;
+  rgb-menu: #0055ac;
+  rgb-menu-detail: #fff;
+  rgb-menu-active: #fff;
+  rgb-menu-active-detail: #0055ac;
+  rgb-list: #0055ac;
+  rgb-list-alt: #0055ac;
+  rgb-list-detail: #fff;
+  rgb-list-active: #fff;
+  rgb-list-active-detail: #0055ac;
+  font: sans-serif,helvetica,Vera:18;
+  font-fixed: monospace,fixed,VeraMono:19;
+  font-menu: sans-serif,helvetica,Vera:18;
+  font-small: sans-serif,helvetica,Vera:14;
+  font-large: sans-serif,helvetica,Vera:24;
+  font-huge: sans-serif,helvetica,Vera:32;
+}
+
+tek.ui.class.checkmark {
+	color: detail;
+}
+
+tek.ui.class.checkmark:hover {
+	color: hover-detail;
+	background-color: hover;
+}
+
+tek.ui.class.checkmark:active {
+	color: active-detail;
+	background-color: active;
+}
+
+tek.ui.class.checkmark:focus {
+	color: hover-detail;
+	background-color: hover;
+}
+
+tek.ui.class.popupwindow {
+	border-color: shine;
+	border-width: 2;
+}
+
+tek.ui.class.poplist:active {
+	color: background;
+	background-color: detail;
+}
+
+tek.ui.class.text {
+	margin: 1;
+	font: :24;
+}
+
+.button {
+	margin: 1;
+	border-width: 3;
+	border-rim-width: 0;
+}
+
+.page-button {
+	border-style: inset;
+	border-width: 2 0 2 2;
+	border-focus-width: 0;
+	margin: 0;
+}
+
+.page-button-fill {
+	border-style: inset;
+	border-width: 0 0 2 2;
+	border-focus-width: 0;
+	background-color: default;
+	margin: 0;
+}
+
+tek.ui.class.textinput {
+	border-style: inset;
+	margin: 1;
+}
+
+tek.ui.class.popitem {
+	margin: 1;
+	border-width: 3;
+	border-style: outset;
+	border-focus-width: 1;
+	border-rim-width: 0;
+	width: fill;
+}
+
+tek.ui.class.lister {
+	border-color: fill;
+}
+
+.caption {
+	padding: 2;
+}
+
+.japanese {
+	font: kochi mincho:28;
+}
+
+tek.ui.class.textinput {
+	font: monospace:24;
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+
+<tekui:application>
+	<application AuthorStyleSheets="tutorial">
+		<window Title="Tutorial 1">
+			<text>
+				Hello, World!
+			</text>
+		</window>
+	</application>
+</tekui:application>

@@ -1,0 +1,6 @@
+tek.lib.debug:tek/lib/debug.lua
+tek.class:tek/class.lua
+tek.class.object:tek/class/object.lua
+tek.ui:tek/ui.lua
+tek.ui.class.element:tek/ui/class/element.lua
+tek.ui.class.layout:tek/ui/class/layout.lua

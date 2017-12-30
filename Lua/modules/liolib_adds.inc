@@ -92,24 +92,33 @@ static int f_receive (lua_State *L) {
     int done;
     int bytes = 0;
 
-    unsigned char chunk[255];
+    unsigned char* chunk; //[255];
     unsigned char *cchunk;
     unsigned char chunk_size;
 
-    int buff_size = 10240;
+    int buff_size = 2*1024; //0;
 
     if (strlen(filename) == 0) return 0;
 
     FILE *f= fopen(filename, "w");
     if (f) {
+		chunk = malloc(256);
+		char c = 0;
+		int r;
+		
     	// Try to allocate a great buffer for output stream
     	while (setvbuf(f , NULL, _IOFBF, buff_size) != 0) {
-    		buff_size = buff_size - 1024;
+    		buff_size = buff_size - 128; //1024;
     	}
 
         uart_ll_lock(CONSOLE_UART);
         uart_ll_set_raw(1);
-        
+
+		do{
+			c = 0;
+			r = uart_read(CONSOLE_UART, &c, 2000);
+        }while( c != 'S' );
+
         // Clear received buffer
         uart_consume(CONSOLE_UART);
 
@@ -148,7 +157,10 @@ static int f_receive (lua_State *L) {
             uart_write(CONSOLE_UART, '\n');
         }
 
+		fflush(f);
         fclose(f);
+
+		free(chunk);
         
         if (!done) {
             uart_ll_set_raw(0);
@@ -174,7 +186,7 @@ static int f_send (lua_State *L) {
     int error;
     char c;
 
-    unsigned char chunk[255];
+    unsigned char* chunk;
     unsigned char *cchunk;
     unsigned char chunk_size;
   
@@ -182,6 +194,8 @@ static int f_send (lua_State *L) {
 
     FILE *f= fopen(filename, "r");
     if (f) {
+		chunk = malloc(256);
+		
     	uart_ll_lock(CONSOLE_UART);
     	uart_ll_set_raw(1);
 
@@ -196,12 +210,15 @@ static int f_send (lua_State *L) {
                     chunk_size++;
                 }
             }
-            
+
             // Wait for C\n
-            if (!uart_read(CONSOLE_UART, &c, 3*20000)) {done = 0; break;}
+            do{
+	            if (!uart_read(CONSOLE_UART, &c, 2000)) {done = 0; break;}
+			}while(c != 'C');
+			
             if (c != 'C') {done = 0; error = 1; break;}
-            
-            if (!uart_read(CONSOLE_UART, &c, 20000)) {done = 0; break;}
+                        
+            if (!uart_read(CONSOLE_UART, &c, 2000)) {done = 0; break;}
             if (c != '\n') {done = 0; error = 1; break;}
             
             // Send chunk size
@@ -215,12 +232,14 @@ static int f_send (lua_State *L) {
         }
                 
         fclose(f);
+
+		free(chunk);
         
         if (done){
             // Send last chunk with size 0
 
             // Wait for C\n
-            if (!uart_read(CONSOLE_UART, &c, 3*20000)) {
+            if (!uart_read(CONSOLE_UART, &c, 2000)) {
             	uart_ll_set_raw(0);
             	uart_ll_unlock(CONSOLE_UART);
             	return luaL_error(L, "timeout");
@@ -232,7 +251,7 @@ static int f_send (lua_State *L) {
             	return luaL_error(L, "unnexpected input");
             }
 
-            if (!uart_read(CONSOLE_UART, &c, 20000)) {
+            if (!uart_read(CONSOLE_UART, &c, 2000)) {
             	uart_ll_set_raw(0);
             	uart_ll_unlock(CONSOLE_UART);
             	return luaL_error(L, "timeout");

@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+
+<tekui:application>
+	<application>
+		<window Title="Alignment Demo" Orientation="vertical" HideOnEscape="true">
+			<group Legend="Horizontal" Orientation="vertical" Width="free">
+				<button	MaxWidth="0" MaxHeight="none" HAlign="left">
+					Begin
+				</button>
+				<button MaxWidth="0" MaxHeight="none" HAlign="center">
+					Center
+				</button>
+				<group Legend="Group" MaxWidth="0" MaxHeight="none" HAlign="right">
+					<button MaxHeight="none">
+						End
+					</button>
+				</group>
+			</group>
+			<group Legend="Vertical" Height="free">
+				<button VAlign="top">
+					Begin
+				</button>
+				<button VAlign="center">
+					Center
+				</button>
+				<group Legend="Group" VAlign="bottom">
+					<button VAlign="bottom">
+						End
+					</button>
+				</group>
+			</group>
+		</window>
+	</application>
+</tekui:application>

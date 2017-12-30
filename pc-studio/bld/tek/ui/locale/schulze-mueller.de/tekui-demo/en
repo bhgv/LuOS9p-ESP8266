@@ -1,0 +1,286 @@
+
+--
+--	tekUI demo - English locale
+--	Note: Use UTF-8 encoding for international characters
+--
+
+ABOUT_APPLICATION = "_Application";
+ABOUT_APPLICATION_INFORMATION = "Application Information";
+ABOUT_LICENSE = "_License";
+ABOUT_SYSTEM = "_System";
+ABOUT_TEKUI = "About tekUI";
+ALIGNMENT_BEGIN = "Begin";
+ALIGNMENT_BOTTOM = "Bottom";
+ALIGNMENT_BUTTON = "Alignment";
+ALIGNMENT_CENTER = "Center";
+ALIGNMENT_DESCRIPTION = [[
+» Alignment attributes determine how elements are adjusted if they do not fill up the space inside their group on a given axis.
+
+» The upper group is of a vertical orientation, and the elements have different horizontal alignments.
+
+» The lower group is of a horizontal orientation, and the elements have different vertical alignments.
+
+» The difference may become more apparent when the window is getting resized.
+]];
+ALIGNMENT_GROUP = "Group";
+ALIGNMENT_HORIZONTAL = "Align Horizontal";
+ALIGNMENT_LEFT = "Left";
+ALIGNMENT_RIGHT = "Right";
+ALIGNMENT_TITLE = "Alignment";
+ALIGNMENT_TOP = "Top";
+ALIGNMENT_VERTICAL = "Align Vertical";
+ANIMATIONS_BUTTON = "Animations";
+ANIMATIONS_DESCRIPTION = [[
+» tekUI supports an interval timer, which any GUI element can attach itself to. 
+
+» It provides a stable timer event source, which can be used for animated classes, multimedia controls and smooth animations.
+
+» The timer interval is initiated by the first element that requests it. tekUI is strictly event-driven and consumes zero CPU time when idle.
+]];
+ANIMATIONS_FOCUS = "Focus";
+ANIMATIONS_PARAMETERS = "Parameters";
+ANIMATIONS_SEGMENTS = "Segments";
+ANIMATIONS_SPEED = "Speed";
+ANIMATIONS_START = "_Start";
+ANIMATIONS_STOP = "Sto_p";
+ANIMATIONS_TITLE = "Animations";
+AVAILABLE_DEMOS = "Available Demos";
+BASEPATH = "Base path";
+BASEPATH_ANNOTATION = "The base path is an optional root in the filesystem\nin which the file requester is allowed to operate.";
+BORDER_BUTTON = "Borders";
+BORDER_CAPTION = "Border Caption";
+BORDER_DESCRIPTION = [[
+» The upper part shows the basic border styles: Solid, Inset, Outset, Groove, and Ridge.
+
+» What is commonly referred to as a border is actually a composition of three sub border components: Main, Rim, and Focus.
+]];
+BORDER_FOCUS = "Focus";
+BORDER_GROOVE = "Groove";
+BORDER_INDIVIDUAL_STYLE = "Individual Border Style";
+BORDER_INDIVIDUAL_STYLES = "Individual Styles";
+BORDER_INSET = "Inset";
+BORDER_MAIN = "Main";
+BORDER_OUTSET = "Outset";
+BORDER_RIDGE = "Ridge";
+BORDER_RIM = "Rim";
+BORDER_SOLID = "Solid";
+BORDER_STYLES = "Border Styles";
+BORDER_SUB = "Sub Borders";
+BORDER_TITLE = "Borders";
+BUTTONS_BUTTON = "Button";
+BUTTONS_CAPTION_STYLE = "Captions";
+BUTTONS_CENTER = "Center";
+BUTTONS_COLORS = "Colors";
+BUTTONS_DESCRIPTION = [[
+» The main determinants of an element's appearance and behavior are its (visual) class and mode.
+
+» Buttons are just Text elements with a "button" mode (behavioral attribute) and "button" class (visual attribute).
+
+» More attributes are available e.g. for colorization and the alignment of a button's text.
+ 
+» Different fonts and texts spanning multiple lines are supported.
+]];
+BUTTONS_NORMAL_STYLE = "Normal";
+BUTTONS_RIGHT_BOTTOM = "Right\nBottom";
+BUTTONS_TEXT_ALIGNMENTS = "Text Alignments";
+BUTTONS_TEXT_STYLES = "Text Styles";
+BUTTONS_TITLE = "Buttons";
+BUTTONS_TOP_LEFT = "Top\nLeft";
+CANCEL = "_Cancel";
+CHOICES_BEER = "_Beer";
+CHOICES_COFFEE = "_Coffee";
+CHOICES_DESCRIPTION = [[
+» This demonstrates the two basic kinds of selection elements: Radio buttons and check marks.
+]];
+CHOICES_DRINKING_STRAW = "_Drinking Straw";
+CHOICES_HOT = "_Hot";
+CHOICES_JUICE = "_Juice";
+CHOICES_MANGO_LASSI = "Mango _Lassi";
+CHOICES_ORDER_BEVERAGES = "Order Beverages";
+CHOICES_SHAKEN = "_Shaken";
+CHOICES_STIRRED = "S_tirred";
+CHOICES_TITLE = "Choices";
+CHOICES_WHISKY = "_Whisky";
+CHOICES_WITH_ICE = "With _Ice";
+CHOOSE_FILE = "_Choose File";
+CLOSE_ALL = "_Close all";
+COEFFICIENTS = "Coefficients";
+COMMENT = "Comment";
+CONFIRM_QUIT_APPLICATION = "Do you really want to quit\nthe application?";
+CUSTOMCLASS_ADDRESS = "Address";
+CUSTOMCLASS_DESCRIPTION = [[
+» Special tasks - like entering valid network numbers using a touchscreen - can be solved with custom classes in few lines of script.
+
+» In this example, a network input class was derived from the input class with special behavior for entering IP numbers.
+
+» The keypad buttons are descendants of the Text class, inserting their respective keyboard event into the window's message queue. 
+
+» The keypad as a whole is a compound class descending from the Group class.
+]];
+CUSTOMCLASS_DHCP = "Receive automatically (DHCP)";
+CUSTOMCLASS_DNS = "DNS";
+CUSTOMCLASS_GATEWAY = "Gateway";
+CUSTOMCLASS_KEYPAD = "Keypad";
+CUSTOMCLASS_NETMASK = "Netmask";
+CUSTOMCLASS_NETWORK_CONFIGURATION = "Network Configuration";
+CUSTOMCLASS_TITLE = "Custom Class";
+DEBUGGING = "Debugging";
+DEBUG_CONSOLE = "Debug Console";
+DEBUG_LEVEL = "Debug Level";
+DEBUG_OPTIONS = "Debug Options";
+DEMO_TEXT = [[
+» Welcome to the tekUI demo.
+
+» Use the buttons to the left to choose from the available demos, or use the menu to open all demos at once.
+
+» The demos are designed as plug-ins for the demo application, so they do not have to be started as separate processes. (But it remains possible to start them individually.)
+]];
+DISCLAIMER = "Disclaimer";
+DISCLAIMER_TEXT = [[
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.]];
+END = "End";
+FILE_REQUEST = "File Request";
+FLOATTEXT_DESCRIPTION = [[
+» The FloatText class handles both preformatted text and dynamic layouts.
+ 
+» In dynamic layout mode, the text is adaptive to the width of the element.
+]];
+FLOATTEXT_DYNAMIC_LAYOUT = "Dynamic Layout";
+FLOATTEXT_PREFORMATTED = "Preformatted";
+FLOATTEXT_TITLE = "Floattext";
+FLOATTEXT_YOU_CAN_DRAG_THE_BAR = "You can drag the bar between the elements.";
+WIDGET_MODES = "Widget Modes";
+WIDGET_UNSELECT = "Unselect";
+GARBAGE_COLLECTOR = "Garbage\nCollector";
+GC_PAUSE = "Pause";
+GC_STEPMUL = "Steps";
+GRADIENT_LEGEND_WINDOW_GROUP = "Window Group";
+GRADIENT_LEGEND_GROUP_BORDER = "Group Border";
+GRADIENT_LEGEND_BUTTON_BORDER = "Button Border";
+GRADIENT_BUTTON = "Button";
+GRADIENT_DESCRIPTION = [[
+» Backgrounds can be painted with a solid color, pixmap, or gradient.
+
+» Also, an element's background can be transparent, letting its parent element shine through.
+]],
+GRADIENT_TITLE = "Gradient",
+GRAPHICS_BACKGROUND = "Background";
+GRAPHICS_BITMAPS = "Bitmaps";
+GRAPHICS_CHECKMARKS = "Checkmarks";
+GRAPHICS_DESCRIPTION = [[
+» tekUI has a built-in scalable vector image class, which is used for standard elements like arrows, checkmarks and radio buttons.
+
+» The scaling and colorization of vector graphics is adaptive to the screen palette and element size. 
+
+» Stock images can be overlaid with bitmaps (or other vector graphics), but vector graphics are normally more resource-friendly than bitmaps.
+
+» If the upper bitmaps icon shows the flags of Spain and Italy, then PNG support is enabled. Otherwise, only the built-in PPM format is supported. If the image background spans the whole element and is not white, then the display driver supports alpha channel. If the element's background is a blue gradient, you have gradient support enabled in tekUI.
+]];
+GRAPHICS_RADIOBUTTONS = "Radio Buttons";
+GRAPHICS_TITLE = "Graphics";
+HELLO = "Hello";
+HELLO_WORLD = "Hello, World!";
+INPUT_DESCRIPTION = "Text Input",
+INPUT_TITLE = "Input",
+INPUT_FIELD = "Input field",
+INPUT_FIELD_TEXT = "Input field",
+INPUT_FIELD_MAX_LENGTH = "Length Limited",
+INPUT_FIELD_PASSWORD = "Password field",
+INPUT_FIELD_FIXED_WIDTH = "Fixed Width",
+INPUT_FIELD_MULTILINE = "Multiline",
+INPUT_FIELD_MULTILINE_TEXT = "Multiline\nText\nField\n",
+INTERPRETER_VERSION = "Lua interpreter version: %s";
+LAYOUT_BALANCING_GROUP = "Balancing Group";
+LAYOUT_DESCRIPTION = [[
+» In the upmost group, the size of each element is determined by the text it contains, while in the second group the size of all elements is determined by the broadest text.
+
+» In a balancing group, handles allow to resize elements individually.
+
+» The two bottommost groups use different weights for their elements, while some elements may be of a fixed size.
+]];
+LAYOUT_DIFFERENT_WEIGHTS = "Different Weights";
+LAYOUT_FIX = "fix";
+LAYOUT_FIXED_VS_FREE = "Fixed vs. Free";
+LAYOUT_GRID = "Grid";
+LAYOUT_RELATIVE_SIZES = "Relative Sizes";
+LAYOUT_SAME_SIZES = "Same Sizes";
+LAYOUT_TITLE = "Layout";
+LEGEND_SELECTION_TYPE = "Selection type";
+LEGEND_SELECT_PATHS = "Select paths...";
+LEGEND_SELECT_RESULT = "Selection result";
+LIST_DESCRIPTION = [[
+» Lists can contain any number of rows and columns. Their widths and heights can be fixed or adaptive.
+
+» Lists can support headings, a cursor, single and multi-line selections.
+
+» Lists can enable arrows and sliders automtically.
+]];
+LIST_TITLE = "Lists";
+LUA_COPYRIGHT_TEXT = [[
+Copyright © 1994-2007 Lua.org, PUC-Rio.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.]];
+LUA_LICENSE = "Lua License";
+LUA_VIRTUAL_MACHINE = "Lua Virtual Machine";
+MEMORY_USAGE = "Memory\nUsage";
+MENU_ABOUT = "_About...";
+MENU_FILE = "_File";
+MENU_OPEN_STYLESHEET = "Open Stylesheet...";
+MENU_QUIT = "_Quit";
+MENU_SETTINGS = "Settings";
+MULTISELECT = "_Multiselect";
+OKAY = "_Okay";
+OPEN_ALL = "_Open all";
+OUTPUT = "Output";
+PATH = "_Path";
+POPUPS_DESCRIPTION = [[
+» Popup items are recursive and may contain more popups as their children. In fact, popups may contain elements of almost any kind.
+
+» Menus are just groups of the 'Menubar' class with elements of the 'MenuItem' class. Other combinations are valid also. 
+
+» It is possible to have more than one menu per screen, and menus in unusual places and orientations.
+]];
+POPUPS_TITLE = "Popups";
+PRESENTATION_DESCRIPTION = [[
+» This 'ad-hoc' class diverts the Floattext class and uses an interval timer for its purpose.
+]];
+PRESENTATION_TITLE = "Presentation";
+PROPERTY = "Property";
+QUIT = "_Quit";
+REVOKED = "Revoked";
+SELECT = "Select";
+SELECTED = "Selected";
+SHOW_FILES_AND_DIRS = "Show files and directories",
+SHOW_ONLY_DIRS = "Show only directories",
+SLIDER_CONNECTIONS = "Connections";
+SLIDER_CONTINUOUS = "Continuous";
+SLIDER_DESCRIPTION = [[
+» Sliders come in different flavours for adjusting numbers and for scrolling.
+
+» They support a numerical minimum, maximum, default, value, and range, all of whose are adjustable using the notification system.
+
+» By default, sliders move continuously, but they can be forced to an integer step rate.
+]];
+SLIDER_GAUGE = "Gauge";
+SLIDER_INTEGER_STEP = "Integer Step";
+SLIDER_RANGE = "Range";
+SLIDER_SLIDERS = "Sliders";
+SLIDER_TITLE = "Sliders";
+SLOW_RENDERING = "Slow Rendering";
+STATUS = "Status";
+SYSTEM_INFORMATION = "System Information";
+TEKUI_COPYRIGHT_TEXT = [[
+Copyright © 2008-2015 by the authors:
+
+Timm S. Müller <tmueller@schulze-mueller.de>
+Franciska Schulze <fschulze@schulze-mueller.de>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.]];
+TEKUI_DEMO = "tekUI Demo";
+TEKUI_LICENSE = "tekUI License";
+TEKUI_PACKAGE_VERSION = "tekUI version: %s";
+VALUE = "Value";

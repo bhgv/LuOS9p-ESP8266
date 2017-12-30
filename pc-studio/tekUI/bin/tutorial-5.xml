@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<tekui:application>
+	<application AuthorStyleSheets="tutorial">
+		<window Title="Tutorial 5" Orientation="vertical" HideOnEscape="true">
+			<text Id="output" Legend="Output" Height="free" Style="font: :100" />
+			<slider Id="slider" Min="0" Max="100" Value="50" InitialFocus="true">
+				<method Name="onSetValue">
+					self:getClass().onSetValue(self, self.Value)
+					local output = self.Application:getById("output")
+					output:setValue("Text", ("%.2f"):format(self.Value))
+				</method>
+				<method Name="show">
+					self:getClass().show(self)
+					self:setValue("Value", self.Value, true)
+				</method>
+			</slider>
+			<group>
+				<text Class="caption" Style="text-align: left">
+					0
+				</text>
+				<text Class="caption" Style="text-align: right">
+					100
+				</text>
+			</group>
+		</window>
+	</application>
+</tekui:application>

@@ -6,7 +6,7 @@ var retries = 0;
 var val = 0.0;
 
 var rcvd_tm = 0;
-var rd_ch = 0; //-2 = dac, -3 = int adc, 0-3 = ext adc
+var rd_ch = 0;
 
 var interval_timeout = 0;
 

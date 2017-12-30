@@ -1,0 +1,2116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+	<head>
+		<title>tekUI</title>
+		<link rel="stylesheet" href="manual.css" />
+	</head>
+	<body>
+		<h1>
+			tekUI GUI Toolkit
+		</h1>
+		<p>
+			Version 1.12
+		</p>
+		<hr />
+		<h2>
+			Table of contents
+		</h2>
+		<blockquote>
+			<ul>
+				<li style="list-style-type: none">
+					1. <a href="#about">About tekUI</a> 
+					<blockquote>
+						<ul>
+							<li style="list-style-type: none">
+								1.1. <a href="#license">License</a> 
+							</li>
+							<li style="list-style-type: none">
+								1.2. <a href="#status">Status, requirements</a> 
+							</li>
+							<li style="list-style-type: none">
+								1.3. <a href="#support">Support and services</a> 
+							</li>
+							<li style="list-style-type: none">
+								1.4. <a href="#authors">Authors, links, downloads</a> 
+							</li>
+						</ul>
+					</blockquote>
+				</li>
+				<li style="list-style-type: none">
+					2. <a href="#overview">Technical overview</a> 
+					<blockquote>
+						<ul>
+							<li style="list-style-type: none">
+								2.1. <a href="#features">General features</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.2. <a href="#uielements">Supported user interface elements</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.3. <a href="#deployment">Deployment</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.4. <a href="#themes">Style sheets and themes</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.5. <a href="#clibrary">C library</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.6. <a href="#objectmodel">Lua, C and object model</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.7. <a href="#xmlapps">Writing applications in XML</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.8. <a href="#documentation">Documentation system</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.9. <a href="#embedded">Fitness for the use in embedded systems</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.10. <a href="#multitasking">Multitasking interface</a> 
+							</li>
+							<li style="list-style-type: none">
+								2.11. <a href="#futureplans">Future plans</a> 
+							</li>
+						</ul>
+					</blockquote>
+				</li>
+				<li style="list-style-type: none">
+					3. <a href="#buildinstall">Building and installing</a> 
+					<blockquote>
+						<ul>
+							<li style="list-style-type: none">
+								3.1. <a href="#requirements">Requirements</a> 
+								<blockquote>
+									<ul>
+										<li style="list-style-type: none">
+											3.1.1 <a href="#luamodules">External Lua modules</a> 
+										</li>
+									</ul>
+								</blockquote>
+							</li>
+							<li style="list-style-type: none">
+								3.2. <a href="#buildenv">Adjusting the build environment</a> 
+								<blockquote>
+									<ul>
+										<li style="list-style-type: none">
+											3.2.1 <a href="#notelinux">Linux notes</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.2 <a href="#notebsd">BSD notes</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.3 <a href="#notewindows">Windows notes</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.4 <a href="#notehpux">HP-UX notes</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.5 <a href="#notex11">X11 notes</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.6 <a href="#noterawfb">Raw framebuffer notes</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.7 <a href="#notedirectfb">DirectFB notes</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.8 <a href="#notefloat">Floating point support</a> 
+										</li>
+										<li style="list-style-type: none">
+											3.2.9 <a href="#noteluajit">LuaJIT support</a> 
+										</li>
+									</ul>
+								</blockquote>
+							</li>
+							<li style="list-style-type: none">
+								3.3. <a href="#building">Building</a> 
+							</li>
+							<li style="list-style-type: none">
+								3.4. <a href="#installation">Installation</a> 
+							</li>
+							<li style="list-style-type: none">
+								3.5. <a href="#envvariables">Environment variables</a> 
+							</li>
+							<li style="list-style-type: none">
+								3.6. <a href="#extraargs">Global Lua runtime arguments</a> 
+							</li>
+						</ul>
+					</blockquote>
+				</li>
+				<li style="list-style-type: none">
+					4. <a href="#usersguide">User's Guide</a> 
+					<blockquote>
+						<ul>
+							<li style="list-style-type: none">
+								4.1. <a href="#helloworld">Hello, World!</a> 
+							</li>
+							<li style="list-style-type: none">
+								4.2. <a href="#reactingoninput">Reacting on input</a> 
+							</li>
+							<li style="list-style-type: none">
+								4.3. <a href="#layout">Controlling the layout</a> 
+							</li>
+							<li style="list-style-type: none">
+								4.4. <a href="#handlers">List of predefined handlers</a> 
+							</li>
+							<li style="list-style-type: none">
+								4.5. <a href="#adhocclasses">Ad-hoc setup of classes</a> 
+							</li>
+						</ul>
+					</blockquote>
+				</li>
+				<li style="list-style-type: none">
+					5. <a href="#developersguide">Developer's Guide</a> 
+					<blockquote>
+						<ul>
+							<li style="list-style-type: none">
+								5.1. <a href="#lifecycle">The lifecycle of an element</a> 
+							</li>
+							<li style="list-style-type: none">
+								5.2. <a href="#debug">Debug library</a> 
+							</li>
+							<li style="list-style-type: none">
+								5.3. <a href="#proxied">Debugging objects</a> 
+							</li>
+							<li style="list-style-type: none">
+								5.4. <a href="#classsetup">Class setup</a> 
+							</li>
+							<li style="list-style-type: none">
+								5.5. <a href="#classdoc">Class documentation system</a> 
+							</li>
+							<li style="list-style-type: none">
+								5.6. <a href="#cssprecedence">Stylesheets precedence</a> 
+							</li>
+						</ul>
+					</blockquote>
+				</li>
+			</ul>
+		</blockquote>
+		<h3>
+			Links
+		</h3>
+		<blockquote>
+			<ul>
+				<li>
+					<a href="manual.html#tek.ui">tek.ui</a> module - library entrypoint
+				</li>
+				<li>
+					<a href="manual.html">Complete class and library reference manual</a> 
+				</li>
+				<li>
+					<a href="changes.html">Changelog</a> 
+				</li>
+			</ul>
+		</blockquote>
+		<hr />
+		<div class="node"><h1><a name="about" id="about">1. About tekUI</a></h1>
+			<p>
+				TekUI is a small, freestanding and portable graphical user interface
+				(GUI) toolkit written in Lua and C. It was initially developed for
+				the X Window System and has been ported to Linux framebuffer, raw
+				framebuffer, DirectFB, Windows, and other displays since. A
+				<a href="#noterawfb">VNC server option</a> is available that allows the remote
+				control of tekUI applications.
+			</p>
+			<p>
+				Its main focus is the rapid development of custom-made applications
+				with a custom appearance, such as for embedded devices with a display
+				controller
+				(see also <a href="#embedded">fitness for the use in embedded systems</a>).
+				In the long term, it is intended to feature a class library
+				supporting regular, general-purpose desktop and mobile applications.
+			</p>
+			<p>
+				Being mostly written in the
+				<a href="http://www.lua.org/">Lua scripting language</a> and using a simple
+				inheritance scheme and class library, tekUI is easily extensible with
+				new user interface elements. New controls can be written (or
+				prototyped) in Lua and ported to C later. The creation of new styles
+				and themes and fitting the software to a new device are equally
+				simple.
+			</p>
+			<p>
+				See below for a more detailed technical <a href="#overview">overview</a>.
+			</p>
+		</div>
+		<div class="node"><h2><a name="license" id="license">1.1. License</a></h2>
+			<p>
+				TekUI is free software under the same license as Lua itself: It can
+				be used for both academic and commercial purposes at no cost. It
+				qualifies as Open Source software, and its license is compatible with
+				the GPL &#8211; see <a href="copyright.html">copyright</a>. Additional components
+				are available under a commercial license &#8211; see below.
+			</p>
+		</div>
+		<div class="node"><h2><a name="status" id="status">1.2. Status, requirements</a></h2>
+			<p>
+				TekUI is slowly approaching feature completeness (&quot;beta&quot; stadium). It
+				is available for Windows and Unix-like operating systems such as
+				Linux, BSD, Mac OS X, Solaris and HP-UX, and it may work on other
+				flavours of Unix with few modifications.
+			</p>
+			<p>
+				Display drivers are included for X11, Windows, Linux framebuffer,
+				raw memory, and DirectFB. See also <a href="todo.html">TODO</a> for a list of
+				known bugs and missing features, and <a href="#requirements">requirements</a> for a list of
+				the required libraries.
+			</p>
+		</div>
+		<div class="node"><h2><a name="support" id="support">1.3. Support and services</a></h2>
+			<p>
+				Special adaptations, custom display drivers, new user interface
+				elements, and support and services for the integration of tekUI into
+				your products are available from the authors &#8211; see below. A
+				commercially licensed and supported version is available on request.
+			</p>
+		</div>
+		<div class="node"><h2><a name="authors" id="authors">1.4. Authors, links, downloads</a></h2>
+			<p>
+				Authors and contributors:
+			</p>
+			<blockquote>
+				<ul>
+					<li style="list-style-type: none">
+						Timm S. M&#252;ller &lt;tmueller at schulze-mueller.de&gt;
+					</li>
+					<li style="list-style-type: none">
+						Franciska Schulze &lt;fschulze at schulze-mueller.de&gt;
+					</li>
+					<li style="list-style-type: none">
+						Tobias Schwinger &lt;tschwinger at isonews2.com&gt;
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				Open source project website:
+			</p>
+			<blockquote>
+				<ul>
+					<li style="list-style-type: none">
+						<a href="http://tekui.neoscientists.org/">http://tekui.neoscientists.org/</a> 
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				Release downloads:
+			</p>
+			<blockquote>
+				<ul>
+					<li style="list-style-type: none">
+						<a href="http://tekui.neoscientists.org/releases/">http://tekui.neoscientists.org/releases/</a> 
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				Mailing list:
+			</p>
+			<blockquote>
+				<ul>
+					<li style="list-style-type: none">
+						<a href="http://lists.neoscientists.org/mailman/listinfo/tekui-devel">http://lists.neoscientists.org/mailman/listinfo/tekui-devel</a> 
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				Product website:
+			</p>
+			<blockquote>
+				<ul>
+					<li style="list-style-type: none">
+						<a href="http://www.schulze-mueller.de/products.html">http://www.schulze-mueller.de/products.html</a> 
+					</li>
+				</ul>
+			</blockquote>
+			<hr />
+		</div>
+		<div class="node"><h1><a name="overview" id="overview">2. Technical overview</a></h1>
+			<p>
+				TekUI is not a binding to an existing GUI library, and it makes no
+				attempt to conform to the looks of a host's native GUI (although this
+				can be emulated to a certain degree &#8211; see below for details). The
+				implementation is comparatively fast and resource-friendly, despite
+				its script-heavy nature. Among the benefits for developers are its
+				simplicity, transparency and modularity; in particular, custom
+				interface elements can be created with little effort.
+			</p>
+		</div>
+		<div class="node"><h2><a name="features" id="features">2.1. General features</a></h2>
+			<blockquote>
+				<ul>
+					<li>
+						Strictly event-driven
+					</li>
+					<li>
+						Automatic layouting and scalability
+					</li>
+					<li>
+						Font-sensitivity, support for antialiased fonts
+					</li>
+					<li>
+						UTF-8 and localization support, Unicode/metadata strings
+					</li>
+					<li>
+						Support for cascading style sheets (CSS) and themes
+					</li>
+					<li>
+						Allows for multi-windowed, tabbed and fullscreen applications
+					</li>
+					<li>
+						Incremental refresh logic with minimal overdraw
+					</li>
+					<li>
+						Concurrency thanks to inbuilt support for dispatching to
+						coroutines, preemptive tasks also supported
+					</li>
+					<li>
+						Applications can be written in Lua code, nested expressions, or
+						XML. The XML launcher can validate against the actual implementation
+					</li>
+					<li>
+						Works unmodified with stock (double precision), single precision
+						and integer versions of the Lua VM
+					</li>
+					<li>
+						Supplied with a documentation system supporting tekUI's object
+						model
+					</li>
+					<li>
+						Support for textures, color gradients and transparency
+					</li>
+					<li>
+						A text editor is included as an example
+					</li>
+					<li>
+						A graphical Lua compiler/linker/amalgamation tool is included
+					</li>
+				</ul>
+			</blockquote>
+		</div>
+		<div class="node"><h2><a name="uielements" id="uielements">2.2. Supported interface elements</a></h2>
+			<blockquote>
+				<ul>
+					<li>
+						Canvas
+					</li>
+					<li>
+						Checkmark
+					</li>
+					<li>
+						Directory lister
+					</li>
+					<li>
+						File requester
+					</li>
+					<li>
+						Floating text
+					</li>
+					<li>
+						Gauge
+					</li>
+					<li>
+						Group (horizontal, vertical, grids, in pages, scrollable)
+					</li>
+					<li>
+						Handle for group balancing
+					</li>
+					<li>
+						Images
+					</li>
+					<li>
+						Lister, also multi-column and multi-selection
+					</li>
+					<li>
+						Menu (popup and window), also nested
+					</li>
+					<li>
+						Popup item, also nested
+					</li>
+					<li>
+						Popup list ('combo box')
+					</li>
+					<li>
+						Radiobutton
+					</li>
+					<li>
+						Scrollgroup
+					</li>
+					<li>
+						Slider
+					</li>
+					<li>
+						Spacer
+					</li>
+					<li>
+						Text button (and label), also multi-line
+					</li>
+					<li>
+						Text input (single and multi-line, passwords, scrolling, ...)
+					</li>
+				</ul>
+			</blockquote>
+		</div>
+		<div class="node"><h2><a name="deployment" id="deployment">2.3. Deployment</a></h2>
+			<p>
+				Languages and formats currently supported for writing applications in
+				are Lua, and to some lesser extent, XML. Applications can communicate
+				with their host using
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						C bindings
+					</li>
+					<li>
+						I/O streams (see meter example)
+					</li>
+					<li>
+						datagram sockets (see socketmessage example, using LuaSocket)
+					</li>
+					<li>
+						pipes between parent and child process (see childprocess example,
+						using luaposix)
+					</li>
+					<li>
+						inter-task messages and signals (see childtask and childnotify
+						examples)
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				See also <a href="#futureplans">Future plans</a> and
+				<a href="#xmlapps">Writing applications in XML</a>.
+			</p>
+		</div>
+		<div class="node"><h2><a name="themes" id="themes">2.4. Style sheets and themes</a></h2>
+			<p>
+				TekUI comes with a cascading style sheets (CSS) engine for the
+				declaration of styles for element classes, custom classes, pseudo
+				classes, as well as for individual, direct and hardcoded class
+				formattings.
+			</p>
+			<p>
+				The only admission to a more common appearance is that tekUI tries to
+				import the color scheme found in a GTK+ configuration file, if the
+				<code>&quot;desktop&quot;</code> style sheet is used (which is the default, see also
+				<a href="#envvariables">environment variables</a>). If you are using KDE and
+				check the <em>Apply colors to non-KDE applications</em> option, KDE, GTK+
+				and tekUI all share the same color scheme.
+			</p>
+		</div>
+		<div class="node"><h2><a name="clibrary" id="clibrary">2.5. C library</a></h2>
+			<p>
+				The C library is based on the <a href="http://teklib.neoscientists.org/">TEKlib</a> 
+				middleware project. All required modules are contained in tekUI's
+				source code distribution, to reduce the hassle of building and
+				installing the software.
+			</p>
+			<p>
+				The C library isolates from the host and provides
+				performance-critical routines (e.g. the region management, default
+				layouter and string library). Rendering and input handling are
+				implemented as display drivers, which allow for easy exchangeability.
+			</p>
+			<p>
+				Aside from the display driver interface, the C library implements
+				OS-like facilities such as portable threads, a timer device and can
+				support a virtual filesystem interface.
+			</p>
+		</div>
+		<div class="node"><h2><a name="objectmodel" id="objectmodel">2.6. Lua, C and object model</a></h2>
+			<p>
+				Regardless of whether classes are written in Lua or C, they share a
+				common, single-inheritance object model, which is determined by the
+				Lua virtual machine and provides a referencing scheme and automatic
+				memory management.
+			</p>
+			<p>
+				Classes can be written in Lua and C interchangeably, meaning that
+				they can inherit from each other regardless of the language they are
+				written in. This makes it possible to prototype applications
+				quickly, and, should the need arise, to replace
+				performance-crititcal classes with their counterparts in C. When
+				porting classes to C, there is a certain degree of freedom in how
+				much reliance on the Lua VM and its automatic resource management
+				is desired.
+			</p>
+		</div>
+		<div class="node"><h2><a name="xmlapps" id="xmlapps">2.7. Writing applications in XML</a></h2>
+			<p>
+				TekUI applications can be written as nested expressions in Lua, and
+				this makes it easy to convert hierarchically structured formats such
+				as XML to fully functional applications that can be executed on the
+				Lua virtual machine. An examplary XML runner is included, e.g.:
+			</p>
+<pre>
+# bin/runxml.lua -e tutorial-5.xml
+</pre>
+			<p>
+				One benefit of writing an application in XML is that some validity
+				checks can be performed against a document type, and also against
+				tekUI's actual implementation:
+			</p>
+<pre>
+# bin/runxml.lua -c tutorial-5.xml
+</pre>
+			<p>
+				For this, it is required that you are using a debug version of
+				tekUI's base class, see <a href="#proxied">Debugging objects</a>.
+			</p>
+			<p>
+				XML support is still somewhat experimental. See the accompanying
+				examples on how to express interactions between elements using
+				notifications and the embedding of methods.
+			</p>
+		</div>
+		<div class="node"><h2><a name="documentation" id="documentation">2.8. Documentation system</a></h2>
+			<p>
+				TekUI comes with a documentation generator supporting its own object
+				model. It is capable of generating a function reference and
+				hierarchical class index from specially crafted comments in the
+				source code. To regenerate the full documentation, invoke
+			</p>
+<pre>
+# make docs
+</pre>
+			<p>
+				Note that you need
+				<a href="http://www.keplerproject.org/luafilesystem/">LuaFileSystem</a> for
+				the document generator to process the file system hierarchy.
+			</p>
+		</div>
+		<div class="node"><h2><a name="embedded" id="embedded">2.9. Fitness for the use in embedded systems</a></h2>
+			<p>
+				TekUI is as embeddable as Lua itself. Global data is basically
+				absent; there are a few extras requiring them, <code>ENABLE_XSHM</code> 
+				and <code>ENABLE_LAZY_SINGLETON</code>, that can be disabled or reworked.
+				Resting on an OS-like abstraction, it can be taken to environments
+				with no operating system at all, if just memory and a minimal
+				threading API is present (create, wait, signal, and e.g. atomic
+				in-/decrement). A display driver can be written on that premise and
+				tekUI's C library alone.
+			</p>
+			<p>
+				Complete solutions based on tekUI are in the reach of 512KiB ROM or
+				flash memory: A typical application and the required modules, if
+				compiled to Lua bytecode, can fit into 256KiB. Add to that approx.
+				128KiB for the C modules and another 128KiB for the Lua virtual
+				machine.
+			</p>
+			<p>
+				Generic, unmodified versions of tekUI have been deployed on PPC, ARM,
+				x86, and MIPS based microcontrollers with clock rates as low as
+				200MHz, while maintaining good reactivity and a pleasant look &amp; feel.
+				Lower clock rates are workable with some adaptations, by disabling
+				expensive features like style sheet support, by porting certain
+				classes to C, using display drivers which are more tightly connected
+				to the hardware, etc.
+			</p>
+		</div>
+		<div class="node"><h2><a name="multitasking" id="multitasking">2.10. LuaExec multitasking interface</a></h2>
+			<p>
+				TekUI rests on a C library that can provide preemptive multitasking
+				not only to GUI programs, but to all kinds of Lua applications. It
+				is fully contained in the tekUI package, but it can be used
+				independently and is also available as a separate project,
+				<a href="http://luaexec.neoscientists.org/">LuaExec</a>, which also provides
+				a <a href="http://luaexec.neoscientists.org/#tutorial">tutorial and primer</a> 
+				on multitasking.
+			</p>
+		</div>
+		<div class="node"><h2><a name="futureplans" id="futureplans">2.11. Future plans</a></h2>
+			<p>
+				Since version 1.12 tekUI supports messaging and signals between
+				preemptive tasks. While these are already available to Lua programs,
+				future versions shall additionally provide a C library interface for
+				the same purpose. See also above on tekUI's multitasking interface.
+			</p>
+			<p>
+				One future development goal is to fold the tekUI framework into
+				a freestanding C library, which enables applications to create
+				asynchronous GUI objects, communicating with their main program
+				using an application-level protocol. From this, the following
+				benefits are envisioned:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						GUIs integrate smoothly even into I/O-burdened applications
+						(clients, servers)
+					</li>
+					<li>
+						strict separation of GUI and functionality; the GUI runs in
+						a thread or process of its own
+					</li>
+					<li>
+						Faulty GUI application code, as it is written in a safe language,
+						cannot corrupt the heap or otherwise crash the device, even if it
+						is without a MMU.
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				Lua would continue to act as the toolkit's internal scripting
+				language, which can be used for complex interconnections
+				between GUI elements as well as many application tasks.
+			</p>
+			<hr />
+		</div>
+		<div class="node"><h1><a name="buildinstall" id="buildinstall">3. Building and installing</a></h1>
+		</div>
+		<div class="node"><h2><a name="requirements" id="requirements">3.1. Requirements</a></h2>
+			<p>
+				Development tools and libraries alongside with their tested versions
+				(as of this writing) are given below:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						Lua 5.1, 5.2 or 5.3
+					</li>
+					<li>
+						&gt;=libX11-1.1.3 (for the x11 driver)
+						<blockquote>
+							<ul>
+								<li>
+									&gt;=libXft-2.1.12 (for the x11 driver, enabled by default)
+								</li>
+								<li>
+									&gt;=fontconfig-2.5.0 (for the x11 driver, enabled by default)
+								</li>
+								<li>
+									XFree86VidMode extension (for the x11 driver, disabled by default)
+								</li>
+							</ul>
+						</blockquote>
+					</li>
+					<li>
+						&gt;=freetype-2.3.5 (for the rawfb and directfb drivers)
+					</li>
+					<li>
+						&gt;=DirectFB-0.9.25.1 (for the directfb driver)
+					</li>
+					<li>
+						LibVNCServer-0.9.9 (for the rawfb driver, disabled by default)
+					</li>
+					<li>
+						libpng (for PNG support, disabled by default)
+					</li>
+					<li>
+						MinGW (for building on the Windows platform)
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				Regarding LuaJIT 2.0 see annotations below.
+			</p>
+		</div>
+		<div class="node"><h3><a name="luamodules" id="luamodules">3.1.1. External Lua modules</a></h3>
+			<p>
+				TekUI does not strictly depend on any external Lua modules. The
+				following modules are supported:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						<a href="http://www.keplerproject.org/luafilesystem/">LuaFileSystem</a> 
+						for the <a href="manual.html#tek.ui.class.dirlist">DirList</a> class,
+						<a href="#documentation">documentation</a> generator, and main demo program
+					</li>
+					<li>
+						<a href="http://matthewwild.co.uk/projects/luaexpat/">LuaExpat</a> for
+						the XML runner
+					</li>
+					<li>
+						<a href="http://w3.impa.br/~diego/software/luasocket/">LuaSocket</a> 
+						for the socketmessage example
+					</li>
+					<li>
+						<a href="https://github.com/luaposix/luaposix">luaposix</a> for the
+						childprocess example
+					</li>
+				</ul>
+			</blockquote>
+		</div>
+		<div class="node"><h2><a name="buildenv" id="buildenv">3.2. Adjusting the build environment</a></h2>
+			<p>
+				TekUI was at some point tested and should compile and run on:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						Ubuntu Linux (tested: 14.04, 9.10, 8.04, 7.10)
+					</li>
+					<li>
+						FreeBSD (tested: 10.1, 8.1, 7.0), NetBSD (tested: 6.0), special
+						precautions needed, see <a href="#notebsd">BSD notes</a> 
+					</li>
+					<li>
+						Gentoo Linux (tested: amd64/13.0, x86/10.0, x86/2008.0,
+						amd64/2007.0, ppc/2007.0)
+					</li>
+					<li>
+						Windows (tested: 7, 2000, Wine)
+					</li>
+					<li>
+						Mac OS X (tested: 10.10, XQuartz)
+					</li>
+					<li>
+						Solaris (tested: 11, Sparc, x86)
+					</li>
+					<li>
+						HP-UX (tested: 11.31, HPPA, IA64), special precautions needed,
+						see <a href="#notehpux">HP-UX notes</a> 
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				If building fails for you, you may have to adjust the build
+				environment, which is located in the <code>config</code> file on the topmost
+				directory level. Supported build tools are <code>gmake</code> (common under
+				Linux) and <code>pmake</code> (common under FreeBSD).
+			</p>
+		</div>
+		<div class="node"><h3><a name="notelinux" id="notelinux">3.2.1. Linux notes</a></h3>
+			<p>
+				By popular request, these are the names of packages required to
+				compile and run tekUI on Ubuntu Linux: <code>lua5.1</code>,
+				<code>liblua5.1-0-dev</code>, <code>liblua5.1-filesystem0</code>, <code>libfreetype6-dev</code>,
+				<code>libxft-dev</code>, <code>libxext-dev</code>, <code>libxxf86vm-dev</code>.
+			</p>
+		</div>
+		<div class="node"><h3><a name="notebsd" id="notebsd">3.2.2. BSD notes</a></h3>
+			<p>
+				On FreeBSD and NetBSD you need a Lua binary which is linked with the
+				<code>-pthread</code> option, as tekUI is using multithreaded code in shared
+				libraries, which are dynamically loaded by the interpreter. For
+				linking on NetBSD uncomment the respective section in the <code>config</code> 
+				file. On recent versions of FreeBSD, you will possibly want to change
+				the compiler to <code>clang</code>.
+			</p>
+		</div>
+		<div class="node"><h3><a name="notewindows" id="notewindows">3.2.3. Windows notes</a></h3>
+			<p>
+				The native Windows display driver was incomplete, slow and shabbily
+				supported for a long time, but we have received a number of
+				high-class contributions and spent some additional effort on this
+				driver. It is functionally on par now and runs crisply.
+			</p>
+			<p>
+				For adjusting the build environment, see the <code>config</code> file. We can
+				recommend using the MSYS shell and MinGW under Windows, or to
+				cross-build for Windows using GCC or clang. An example configuration
+				is provided in <code>etc/</code>.
+			</p>
+		</div>
+		<div class="node"><h3><a name="notehpux" id="notehpux">3.2.4. HP-UX notes</a></h3>
+			<p>
+				In addition to the HP-UX settings and notes in the <code>config</code> file,
+				you need a Lua binary with a patch for loading shared libraries via
+				<code>shl_load()</code>, and pthreads support. For building Lua, use
+			</p>
+<pre>
+CPPFLAGS=-D_POSIX_C_SOURCE=199506L
+LDFLAGS=-lpthread
+</pre>
+		</div>
+		<div class="node"><h3><a name="notex11" id="notex11">3.2.5. X11 notes</a></h3>
+			<p>
+				By default, libXft and fontconfig are needed for building the x11
+				driver. But libXft is unnecessary if you stack the rawfb driver on
+				top of the x11 driver. Disable it by removing
+				<code>-DENABLE_XFT</code> from <code>X11_DEFS</code>.
+			</p>
+			<p>
+				The XFree86VidMode extension is no longer linked against by default.
+				It can be enabled by adding <code>-DENABLE_XVID</code> to <code>X11_DEFS</code> in the
+				<code>config</code> file. X11 fullscreen support is problematic.
+			</p>
+		</div>
+		<div class="node"><h3><a name="noterawfb" id="noterawfb">3.2.6. Raw framebuffer notes</a></h3>
+			<p>
+				The raw framebuffer driver performs all rendering in a chunk of
+				memory that can be supplied by a native display or the application.
+			</p>
+			<p>
+				It is recursive in that another tekUI display driver can be plugged
+				into it as a visualization and input device. This was originally
+				intended to act as a template (or skeleton) for specializations in
+				a target context, like custom hardware or a 3D game or simulation,
+				but it also comes in useful for providing a backbuffer for other
+				display types.
+			</p>
+			<p>
+				Support for the native Linux framebuffer (and input event interface)
+				can be compiled into the raw framebuffer directly. It then adapts to
+				the active screensize and pixel format automatically. The keymap is
+				compiled in, by default <code>/usr/share/keymaps/i386/qwerty/us.map.gz</code>,
+				and can be generated using a conversion tool, <code>etc/keymap2c</code>.
+			</p>
+			<p>
+				A VNC server option (through
+				<a href="http://libvncserver.sourceforge.net/">LibVNCServer</a>) is available
+				for this driver, which allows a tekUI application to be shared over
+				the network. This works both &quot;headless&quot; and with a local display. To
+				enable LibVNCServer support, enable the raw framebuffer and the
+				<code>VNCSERVER_</code> defines in the config file. Note: VNC support makes
+				this software a combined work with LibVNCServer, see also
+				<code>src/display_rawfb/vnc/COPYING</code>.
+			</p>
+			<p>
+				Any combination of the subdrivers tekUI, Linux framebuffer, and VNC
+				is valid. If none is selected, the GUI runs isolated from the outside
+				world, albeit in a very portable way, in its own chunk of memory.
+			</p>
+			<p>
+				The default configuration assumes the free fonts <em>DejaVuSans</em> and
+				<em>DejaVuSansMono</em> (in combination with their subtypes <em>Bold</em> and
+				<em>Oblique</em>) in the local directoy <code>tek/ui/font</code>, but you can also
+				point the <a href="#envvariables">environment variable</a> <code>FONTDIR</code> to a
+				directory containing these fonts. If they are unavailable, tekUI
+				performs various fallbacks, including to Bitstream <em>Vera</em>,
+				which is small enough to be included in tekUI's distribution.
+			</p>
+			<p>
+				A mouse pointer image is loaded from <code>DEF_CURSORFILE</code>, by default
+				<code>tek/ui/cursor/cursor-black.png</code>, with a fallback to a small,
+				built-in pointer image.
+			</p>
+		</div>
+		<div class="node"><h3><a name="notedirectfb" id="notedirectfb">3.2.7. DirectFB notes</a></h3>
+			<p>
+				The DirectFB display driver is not very actively supported at this
+				time. Some adaptations are likely needed. In case of problems,
+				consider using the raw framebuffer driver, or the DirectFB driver
+				as a rendering back-end for the raw framebuffer driver.
+			</p>
+		</div>
+		<div class="node"><h3><a name="notefloat" id="notefloat">3.2.8 Floating point support</a></h3>
+			<p>
+				TekUI is free of floating point arithmetics and works with a 32bit
+				integer version of the Lua virtual machine, with the following,
+				noncritical exceptions:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						Support for color gradients (see <code>-DENABLE_GRADIENT</code> in the
+						config file) requires the <code>float</code> data type in the C library.
+					</li>
+					<li>
+						The desktop style needs floating point support in the Lua VM to
+						import GTK+ colors (falls back to the default colorscheme if
+						unavailable at runtime).
+					</li>
+				</ul>
+			</blockquote>
+		</div>
+		<div class="node"><h3><a name="noteluajit" id="noteluajit">3.2.9 LuaJIT support</a></h3>
+			<p>
+				TekUI works with LuaJIT 2.0 - as long as tekUI's
+				<a href="#multitasking">multitasking interface</a> is not used,
+				and possibly even then, provided that LuaJIT implements or can be
+				made to implement <code>lua_newstate()</code> without reporting an error.
+				On x86_64 this has been found to not be the case. Currently the
+				impact of not using tekUI's multitasking API is small, and tekUI
+				should correctly handle the case by reporting that it could not
+				create a child task on LuaJIT.
+			</p>
+		</div>
+		<div class="node"><h2><a name="building" id="building">3.3. Building</a></h2>
+			<p>
+				To see all build targets, type
+			</p>
+<pre>
+# make help
+</pre>
+			<p>
+				The regular build procedure is invoked with
+			</p>
+<pre>
+# make all
+</pre>
+			<h4>
+				Building a tekUI executable
+			</h4>
+			<p>
+				To build a standalone executable implementing a Lua 5.1/5.2/5.3
+				interpreter, tekUI's C libraries and parts of its class library,
+				adjust <code>LUADISTDIR</code>, <code>LUAEXE_DEFS</code> and <code>LUAEXE_LIBS</code> in the
+				<code>config</code> file, and invoke
+			</p>
+<pre>
+# make tools
+</pre>
+			<p>
+				The resulting executable can then be found in <code>bin/tekui.exe</code>.
+				If this executable is present, the <code>bin/compiler.lua</code> tool will
+				additionally offer to save Lua programs into standalone executables.
+			</p>
+			<p>
+				The exact classes to be built into the executable can be adjusted
+				in <code>tek/lib/MODLIST</code>. This list will also be taken into account
+				by <code>bin/compiler.lua</code> to avoid linking modules twice.
+			</p>
+		</div>
+		<div class="node"><h2><a name="installation" id="installation">3.4. Installation</a></h2>
+			<p>
+				A system-wide installation of tekUI is not strictly required &#8211; in so
+				far as the majority of display drivers is concerned. The DirectFB
+				driver, in contrast, looks up fonts and cursors globally and must be
+				installed in any case.
+			</p>
+			<p>
+				Once tekUI is built, it can be worked with and developed against, as
+				long as you stay in the top-level directory of the distribution; all
+				required modules and classes will be found if programs are started
+				from there, e.g.:
+			</p>
+<pre>
+# bin/demo.lua
+</pre>
+			<p>
+				If staying in the top-level directory is not desirable, then tekUI
+				must be installed globally. By default, the installation paths are
+			</p>
+			<blockquote>
+				<ul>
+					<li style="list-style-type: none">
+						<code>/usr/local/lib/lua/5.1</code> 
+					</li>
+					<li style="list-style-type: none">
+						<code>/usr/local/share/lua/5.1</code> 
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				It is not unlikely that this is different from what is common for
+				your operating system, distribution or development needs, so be sure
+				to adjust these paths in the <code>config</code> file. The installation is
+				conveniently invoked with
+			</p>
+<pre>
+# sudo make install
+</pre>
+		</div>
+		<div class="node"><h2><a name="envvariables" id="envvariables">3.5. Environment variables</a></h2>
+			<blockquote>
+				<ul>
+					<li>
+						<code>FONTDIR</code> - TTF font directory for the rawfb and directfb
+						drivers, overriding the hardcoded default (<code>tek/ui/font</code>)
+					</li>
+					<li>
+						<code>FULLSCREEN</code> - <code>&quot;true&quot;</code> to try opening an application in
+						fullscreen mode. Note that for this option to take effect, the
+						application's first window must have the <code>RootWindow</code> attribute
+						set as well.
+					</li>
+					<li>
+						<code>GTK2_RC_FILES</code> - Possible locations of a gtkrc-2.0
+						configuration file.
+					</li>
+					<li>
+						<code>NOCURSOR</code> - <code>&quot;true&quot;</code> to disable the mouse pointer over a
+						tekUI application. This may be useful when running on a touch
+						screen.
+					</li>
+					<li>
+						<code>THEME</code> - Theme names corresponding to style sheet files in
+						<code>tek/ui/style</code>. Multiple themes can be separated by spaces,
+						e.g. <code>&quot;desktop gradient&quot;</code>. The default is <code>&quot;desktop&quot;</code>. The
+						<em>desktop</em> theme tries to import the color scheme found in a GTK2
+						configuration file. See also <a href="#cssprecedence">CSS precedence</a>.
+					</li>
+					<li>
+						<code>VNC_PORTNUMBER</code> - Specifies a VNC server's port number.
+					</li>
+				</ul>
+			</blockquote>
+		</div>
+		<div class="node"><h2><a name="extraargs" id="extraargs">3.6. Global Lua runtime arguments</a></h2>
+			<p>
+				Some properties of tekUI are configurable globally from Lua,
+				by modifying fields in the <code>ui</code> library at program start:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						<code>ui.ExtraArgs</code> - mostly used for hints to display drivers,
+						one argument per line, currently supported:
+						<blockquote>
+							<ul>
+								<li>
+									<code>fb_backbuffer=boolean</code> - If enabled, the framebuffer driver
+									uses a backbuffer even if not stricly needed. This can reduce
+									flicker and sometimes improve performance, although this varies
+									widely. Raspberry Pi, for example, was found to perform best on
+									16bit without backbuffer.
+								</li>
+								<li>
+									<code>fb_pixfmt=hexnumber</code> - Specify desired pixel format for the
+									framebuffer, e.g. <code>5650120b</code>. See <code>include/tek/mod/visual.h</code> 
+									for the defines prefixed with <code>TVPIXFMT_</code>.
+								</li>
+								<li>
+									<code>fb_winbackbuffer=boolean</code> - If enabled, windows on a
+									framebuffer use their own backing-store and do not encumber the
+									application with refreshes when moved or otherwise exposed.
+								</li>
+								<li>
+									<code>vnc_portnumber=num</code> - Overrides <code>VNC_PORTNUMBER</code>, see above
+								</li>
+							</ul>
+						</blockquote>
+					</li>
+					<li>
+						<code>ui.FullScreen</code> - boolean, overrides <code>FULLSCREEN</code> (see above)
+					</li>
+					<li>
+						<code>ui.Mode</code> - set this to <code>&quot;workbench&quot;</code> for windows to receive
+						buttons for dragging, resizing, closing, etc. This is intended for
+						running tekUI in a desktop-like manner on display subsystems which
+						do not provide a window manager.
+					</li>
+					<li>
+						<code>ui.MsgFileNo</code> - Number of the file descriptor used for
+						dispatching lines to messages of type <code>MSG_USER</code>. Default:
+						standard input. See also the <em>childprocess</em> example.
+					</li>
+					<li>
+						<code>ui.NoCursor</code> - Overrides <code>NOCURSOR</code>, see above
+					</li>
+					<li>
+						<code>ui.ShortcutMark</code> - Character to indicate that the following
+						character is used for a keyboard shortcut. Default: <code>&quot;_&quot;</code> 
+					</li>
+					<li>
+						<code>ui.ThemeName</code> - overrides <code>THEME</code>, see above. See also
+						<a href="#cssprecedence">CSS precedence</a>.
+					</li>
+					<li>
+						<code>ui.UserStyles</code> - see <a href="#cssprecedence">CSS precedence</a> 
+					</li>
+				</ul>
+			</blockquote>
+			<hr />
+		</div>
+		<div class="node"><h1><a name="usersguide" id="usersguide">4. User's Guide</a></h1>
+		</div>
+		<div class="node"><h2><a name="helloworld" id="helloworld">4.1. Hello, World!</a></h2>
+			<p>
+				The GUI version of the 'Hello, World!' program:
+			</p>
+<pre>
+ui = require &quot;tek.ui&quot;
+ui.Application:new
+{
+  Children =
+  {
+    ui.Window:new
+    {
+      Title = &quot;Hello&quot;,
+      Children =
+      {
+        ui.Text:new
+        {
+          Text = &quot;Hello, World!&quot;,
+          Class = &quot;button&quot;,
+          Mode = &quot;button&quot;,
+          Width = &quot;auto&quot;
+        }
+      }
+    }
+  }
+}:run()
+</pre>
+			<p>
+				As can be seen, tekUI allows a fully functional application to be
+				written in a single nested expression. The
+				<a href="manual.html#tek.ui">UI</a> library comes with an on-demand class
+				loader, so whenever a class (like
+				<a href="manual.html#tek.ui.class.application">Application</a>,
+				<a href="manual.html#tek.ui.class.window">Window</a> or
+				<a href="manual.html#tek.ui.class.text">Text</a>) is accessed for the first
+				time, it will be loaded from <code>tek/ui/class/</code> in the file system.
+			</p>
+			<p>
+				Note that a button class is not strictly needed: a button is just a
+				Text element behaving like a button with a frame giving it the
+				appearance of a button. We will later explain how you can write a
+				button class yourself, to save you some typing.
+			</p>
+			<p>
+				To quit, click the window's close button. Closing the
+				<a href="manual.html#tek.ui.class.application">Application</a>'s last
+				open window will cause the <code>run</code> method to return to its caller.
+			</p>
+		</div>
+		<div class="node"><h2><a name="reactingoninput" id="reactingoninput">4.2. Reacting on input</a></h2>
+			<p>
+				There are different ways for reacting to presses on the 'Hello,
+				World' button. The simplest form is to place an
+				<a href="manual.html#Object:onClick">Object:onClick</a> function into the
+				Text object:
+			</p>
+<pre>
+ui = require &quot;tek.ui&quot;
+ui.Application:new
+{
+  Children =
+  {
+    ui.Window:new
+    {
+      Title = &quot;Hello&quot;,
+      Children =
+      {
+        ui.Button:new
+        {
+          Text = &quot;Hello, World!&quot;,
+          Width = &quot;auto&quot;,
+          onClick = function(self)
+            print &quot;Hello, World!&quot;
+          end
+        }
+      }
+    }
+  }
+}:run()
+</pre>
+			<p>
+				But <code>onClick</code> is just a convenient shortcut for the most trivial
+				of all cases. To catch more events, you can override handler
+				functions which react on changes to an element's state variables,
+				like <code>Pressed</code> and <code>Selected</code>, to name but a few. They contain
+				booleans and are indicative of the Element's state, such as: Is it in
+				selected state, is it pressed down, is it hovered by the mouse, is it
+				receiving the input? The
+				<a href="manual.html#Widget:onPress">Widget:onPress</a> handler, for example,
+				can be used to catch not only releases, but also presses on the
+				element:
+			</p>
+<pre>
+ui = require &quot;tek.ui&quot;
+ui.Application:new
+{
+  Children =
+  {
+    ui.Window:new
+    {
+      Children =
+      {
+        ui.Text:new { },
+        ui.Button:new
+        {
+          Text = &quot;Click&quot;,
+          Width = &quot;auto&quot;,
+          onPress = function(self)
+            ui.Button.onPress(self)
+            self:getPrev():setValue(&quot;Text&quot;, tostring(self.Pressed))
+          end
+        }
+      }
+    }
+  }
+}:run()
+</pre>
+			<p>
+				When you overwrite a handler, you should forward the call to the
+				original implementation of the same method, as seen in the example.
+			</p>
+			<p>
+				Setting a value using
+				<a href="manual.html#Object:setValue">Object:setValue</a> may invoke a
+				notification handler. In our example, the neighboring element in the
+				group will be notified of an updated text, which will cause it to be
+				repainted.
+			</p>
+			<p>
+				For regular applications it is normally sufficient to stick to
+				overwriting the available <a href="#handlers">handlers</a> as in the previous example.
+				But the underlying mechanism to register a notification handler can
+				be interesting as well, especially if you plan on writing new GUI
+				classes yourself:
+			</p>
+<pre>
+ui = require &quot;tek.ui&quot;
+app = ui.Application:new()
+win = ui.Window:new { Title = &quot;Hello&quot;, HideOnEscape = true }
+text = ui.Button:new { Text = &quot;_Hello, World!&quot;, Width = &quot;auto&quot; }
+text:addNotify(&quot;Pressed&quot;, false, {
+  ui.NOTIFY_SELF,
+  ui.NOTIFY_FUNCTION,
+  function(self)
+    print &quot;Hello, World!&quot;
+  end
+})
+win:addMember(text)
+app:addMember(win)
+app:run()
+</pre>
+			<p>
+				See also <a href="manual.html#Object:addNotify">Object:addNotify</a> for
+				all the hairy details on notification handlers, and the
+				<a href="manual.html#tek.ui.class.area">Area</a> and
+				<a href="manual.html#tek.ui.class.widget">Widget</a> classes for the most
+				important state variables.
+			</p>
+		</div>
+		<div class="node"><h2><a name="layout" id="layout">4.3. Controlling the layout</a></h2>
+			<p>
+				By default a tekUI layout is dynamic. This means it will be
+				calculated and, if necessary, recalculated at runtime&#185;. Screen and
+				font characteristics are taken into account as well as style
+				properties controlling the appearance of individual elements.
+			</p>
+			<h4>
+				Group layouting attributes
+			</h4>
+			<blockquote>
+				<ul>
+					<li>
+						<code>Orientation</code> - <code>&quot;horizontal&quot;</code> or <code>&quot;vertical&quot;</code>, the default
+						is <code>&quot;horizontal&quot;</code>. This attribute informs the group of the primary
+						axis on which elements are to be layouted (left-to-right vs.
+						top-to-bottom). This applies to grids also.
+					</li>
+					<li>
+						<code>Columns</code> - Number of columns. A number greater than <code>1</code> 
+						turns the group into a grid.
+					</li>
+					<li>
+						<code>Rows</code> - Number of rows. A number greater than <code>1</code> turns the
+						group into a grid.
+					</li>
+					<li>
+						<code>Layout</code> - The name of a layouting class. Default: <code>&quot;default&quot;</code>,
+						which will try to load the <code>tek.ui.layout.default</code> class. It is
+						also possible to specify an instance of a layouter instead of just
+						the class name.
+					</li>
+					<li>
+						<code>SameSize</code> - boolean, <code>&quot;width&quot;</code> or <code>&quot;height&quot;</code>. Default is
+						<strong>false</strong>. If true, all elements in the group will have the same
+						size on their respective axis. If either of the string keywords is
+						given, this applies to only to the width or height.
+					</li>
+				</ul>
+			</blockquote>
+			<h4>
+				Common layouting attributes (apply to all elements)
+			</h4>
+			<blockquote>
+				<ul>
+					<li>
+						<code>HAlign</code> - The element's horizontal alignment inside the group
+						which it is part of. Possible values are <code>&quot;left&quot;</code>, <code>&quot;center&quot;</code>,
+						and <code>&quot;right&quot;</code>. The corresponding style property is <em>halign</em>.
+					</li>
+					<li>
+						<code>VAlign</code> - The element's vertical alignment inside the group
+						which it is part of. Possible values are <code>&quot;top&quot;</code>, <code>&quot;center&quot;</code>,
+						and <code>&quot;bottom&quot;</code>. The corresponding style property is <em>valign</em>.
+					</li>
+					<li>
+						<code>Width</code> - The width of the element, in pixels, or <code>&quot;auto&quot;</code> 
+						to reserve the minimum size, <code>&quot;free&quot;</code> for allowing the element
+						to grow to any size, or <code>&quot;fill&quot;</code> for allowing the element to
+						grow to no more than the maximum width that other elements in the
+						same group have claimed. The corresponding style property is
+						<em>width</em>.
+					</li>
+					<li>
+						<code>Height</code> - The height of the element, in pixels, or <code>&quot;auto&quot;</code> 
+						to reserve the minimum size, <code>&quot;free&quot;</code> for allowing the element
+						to grow to any size, or <code>&quot;fill&quot;</code> for allowing the element to
+						grow to no more than the maximum height that other elements in the
+						same group have claimed. The corresponding style property is
+						<em>Height</em>.
+					</li>
+					<li>
+						<code>MinWidth</code> - The minimum width of the element, in pixels. The
+						default is <code>0</code>. The corresponding style property is <em>min-width</em>.
+					</li>
+					<li>
+						<code>MinHeight</code> - The minimum height of the element, in pixels. The
+						default is <code>0</code>. The corresponding style property is
+						<em>min-height</em>.
+					</li>
+					<li>
+						<code>MaxWidth</code> - The maximum width of the element, in pixels, or
+						<code>&quot;none&quot;</code> for no limit (which is the default). The corresponding
+						style property is <em>max-width</em>.
+					</li>
+					<li>
+						<code>MaxHeight</code> - The maximum height of the element, in pixels, or
+						<code>&quot;none&quot;</code> for no limit (which is the default). The corresponding
+						style property is <em>max-height</em>.
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				Note that the <code>Min</code>/<code>Max</code> and <code>Width</code>/<code>Height</code> properties
+				will not override the actual size requirements of an element. An
+				element will not claim a larger or smaller size than what it is
+				capable of displaying. Style properties will be used as additional
+				hints when an element's size is flexible. As most elements are
+				scalable by nature, the style properties are normally considered.
+			</p>
+			<hr />
+			<p>
+				&#185; More layouting options are available, see also the <code>fixed.lua</code> 
+				and <code>layouthook.lua</code> examples on how to use and implement fixed
+				and custom layouting strategies.
+			</p>
+		</div>
+		<div class="node"><h2><a name="handlers" id="handlers">4.4. List of predefined handlers</a></h2>
+			<table>
+				<tr>
+					<td class="column1">
+						<strong>Name</strong> 
+					</td>
+					<td class="column2">
+						<strong>Base Class</strong> 
+					</td>
+					<td class="column3">
+						<strong>Cause</strong> 
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onActivate"><code>Widget:onActivate()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Active</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Window:onChangeStatus"><code>Window:onChangeStatus()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.window">Window</a> 
+					</td>
+					<td class="column3">
+						change of <code>Status</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onClick"><code>Widget:onClick()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						caused when <code>Pressed</code> changes to <strong>false</strong> 
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onDisable"><code>Widget:onDisable()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Disabled</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onDblClick"><code>Widget:onDblClick()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>DblClick</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Input:onEnter"><code>Input:onEnter()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.input">Input</a> 
+					</td>
+					<td class="column3">
+						change of <code>Enter</code> attribute, pressing enter
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onFocus"><code>Widget:onFocus()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Focus</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Window:onHide"><code>Window:onHide()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.window">Window</a> 
+					</td>
+					<td class="column3">
+						window close button, Escape key
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onHilite"><code>Widget:onHilite()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Hilite</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onHold"><code>Widget:onHold()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Hold</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onPress"><code>Widget:onPress()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Pressed</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Widget:onSelect"><code>Widget:onSelect()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.widget">Widget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Selected</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#DirList:onSelectEntry"><code>DirList:onSelectEntry()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.dirlist">DirList</a> 
+					</td>
+					<td class="column3">
+						item selected by the user
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Lister:onSelectLine"><code>Lister:onSelectLine()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.lister">Lister</a> 
+					</td>
+					<td class="column3">
+						change of the <code>SelectedLine</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#PopList:onSelectLine"><code>PopList:onSelectLine()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.poplist">PopList</a> 
+					</td>
+					<td class="column3">
+						change of the <code>SelectedLine</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Input:onSetChanged"><code>Input:onSetChanged()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.input">Input</a> 
+					</td>
+					<td class="column3">
+						setting the <code>Changed</code> attribute, on text changes
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Canvas:onSetChild"><code>Canvas:onSetChild()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.canvas">Canvas</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Child</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Element:onSetClass"><code>Element:onSetClass()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.element">Element</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Class</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Lister:onSetCursor"><code>Lister:onSetCursor()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.lister">Lister</a> 
+					</td>
+					<td class="column3">
+						change of the <code>CursorLine</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#ImageWidget:onSetImage"><code>ImageWidget:onSetImage()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.imagewidget">ImageWidget</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Image</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Numeric:onSetMax"><code>Numeric:onSetMax()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.numeric">Numeric</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Max</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#ScrollBar:onSetMax"><code>ScrollBar:onSetMax()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.scrollbar">ScrollBar</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Max</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Numeric:onSetMin"><code>Numeric:onSetMin()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.numeric">Numeric</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Min</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#ScrollBar:onSetMin"><code>ScrollBar:onSetMin()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.scrollbar">ScrollBar</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Min</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#PageGroup:onSetPageNumber"><code>PageGroup:onSetPageNumber()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.pagegroup">PageGroup</a> 
+					</td>
+					<td class="column3">
+						change of the <code>PageNumber</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#ScrollBar:onSetRange"><code>ScrollBar:onSetRange()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.scrollbar">ScrollBar</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Range</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Slider:onSetRange"><code>Slider:onSetRange()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.slider">Slider</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Range</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Element:onSetStyle"><code>Element:onSetStyle()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.element">Element</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Style</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#FloatText:onSetText"><code>FloatText:onSetText()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.floattext">FloatText</a> 
+					</td>
+					<td class="column3">
+						change of <code>Text</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Input:onSetText"><code>Input:onSetText()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.input">Input</a> 
+					</td>
+					<td class="column3">
+						change of <code>Text</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Text:onSetText"><code>Text:onSetText()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.text">Text</a> 
+					</td>
+					<td class="column3">
+						change of <code>Text</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#Numeric:onSetValue"><code>Numeric:onSetValue()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.numeric">Numeric</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Value</code> attribute
+					</td>
+				</tr>
+				<tr>
+					<td class="column1">
+						<a href="manual.html#ScrollBar:onSetValue"><code>ScrollBar:onSetValue()</code></a> 
+					</td>
+					<td class="column2">
+						<a href="manual.html#tek.ui.class.scrollbar">ScrollBar</a> 
+					</td>
+					<td class="column3">
+						change of the <code>Value</code> attribute
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="node"><h2><a name="adhocclasses" id="adhocclasses">4.5. Ad-hoc setup of classes</a></h2>
+			<p>
+				To inherit properties and functionality from existing classes and to
+				consequently reuse existing code, it is often desirable to create new
+				classes yourself. There are different scopes in which new classes can
+				be useful:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						Global classes are written as separate source files, located in
+						the system-wide installation path under <code>tek/ui/class</code> and set up
+						using a procedure as described in the <a href="#classsetup">class setup</a> 
+						section.
+					</li>
+					<li>
+						Application classes are created in the same way, but they are
+						located in <code>tek/ui/class</code> relative to the application's local
+						program directory.
+					</li>
+					<li>
+						Another scope is inside a running application or module. We call
+						this the <em>ad-hoc</em> style, because new classes are often created
+						out of a spontaneous need.
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				For the <em>ad-hoc</em> style, it is not necessary to create a new source
+				file or module. For example, a Button class can be derived from the
+				Text class whereever you see fit:
+			</p>
+<pre>
+local Button = ui.Text:newClass { _NAME = &quot;_button&quot; }
+</pre>
+			<p>
+				<em>ad-hoc</em> classes may be named arbitrarily, but their names should
+				be prefixed with an underscore to distinguish them from global
+				classes. You can even do without a name, as tekUI will create one
+				for you if necessary, but you will find it difficult to reference
+				such a class in a style sheet.
+			</p>
+			<p>
+				From this point, the new class can be extended, e.g. for
+				initializations which turn a Text into a Button:
+			</p>
+<pre>
+function Button.init(self)
+  self.Class = &quot;button&quot;
+  self.Mode = self.Mode or &quot;button&quot;
+  self.KeyCode = true
+  return ui.Text.init(self)
+end
+</pre>
+			<p>
+				As shown in the example, we also passed the call on to our
+				super class, which we expect to perform the missing initializations.
+			</p>
+			<p>
+				Finally, a new object from our new class can be created:
+			</p>
+<pre>
+button = Button:new { Text = &quot;_Hello, World!&quot; }
+</pre>
+			<p>
+				Also refer to the <a href="manual.html#tek.class">Class reference</a> and
+				the <a href="#classsetup">Class setup</a> section for further information.
+			</p>
+			<hr />
+		</div>
+		<div class="node"><h1><a name="developersguide" id="developersguide">5. Developer's Guide</a></h1>
+		</div>
+		<div class="node"><h2><a name="lifecycle" id="lifecycle">5.1. The lifecycle of an element</a></h2>
+			<p>
+				A GUI element is set up in several stages, all of which are initiated
+				by the tekUI framework. Normally, you do not call any of these
+				methods yourself (aside from passing a call on to the same method in
+				your super class):
+			</p>
+			<blockquote>
+				<ul>
+					<li style="list-style-type: none">
+						1. <a href="manual.html#Object:init">Object.init()</a> - gets called when
+						an element is created
+					</li>
+					<li style="list-style-type: none">
+						2. <a href="manual.html#Element:connect">Element:connect()</a> - connects
+						the element with a parent element
+					</li>
+					<li style="list-style-type: none">
+						3. The element's properties are decoded.
+					</li>
+					<li style="list-style-type: none">
+						4. <a href="manual.html#Element:setup">Element:setup()</a> - registers the
+						element with the application
+					</li>
+					<li style="list-style-type: none">
+						5. <a href="manual.html#Area:askMinMax">Area:askMinMax()</a> - queries the
+						element's minimal and maximal dimensions
+					</li>
+					<li style="list-style-type: none">
+						6. The window is opened.
+					</li>
+					<li style="list-style-type: none">
+						7. <a href="manual.html#Area:show">Area:show()</a> - gets called when the
+						element is about to be shown
+					</li>
+					<li style="list-style-type: none">
+						8. <a href="manual.html#Area:layout">Area:layout()</a> - layouts the
+						element into a rectangle
+					</li>
+					<li style="list-style-type: none">
+						9. <a href="manual.html#Area:draw">Area:draw()</a> - paints the element
+						onto the screen
+					</li>
+					<li style="list-style-type: none">
+						10. <a href="manual.html#Area:hide">Area:hide()</a> - gets called when the
+						element is about to hide
+					</li>
+					<li style="list-style-type: none">
+						11. The window is closed.
+					</li>
+					<li style="list-style-type: none">
+						12. <a href="manual.html#Element:cleanup">Element:cleanup()</a> -
+						unregisters the element
+					</li>
+					<li style="list-style-type: none">
+						13. <a href="manual.html#Element:disconnect">Element:disconnect()</a> -
+						disconnects the element from its parent
+					</li>
+				</ul>
+			</blockquote>
+			<h3>
+				Drawing an element
+			</h3>
+			<p>
+				In the drawing method, the control flow is roughly as follows:
+			</p>
+<pre>
+function ElementClass:draw()
+  if SuperClass.draw(self) then
+    -- your rendering here
+    return true
+  end
+end
+</pre>
+			<p>
+				There are rare cases in which a class modifies the drawing context,
+				e.g. by setting a coordinate displacement. Such modifications must
+				be performed in <a href="manual.html#Area:drawBegin">Area:drawBegin()</a> and
+				reverted in <a href="manual.html#Area:drawEnd">Area:drawEnd()</a>, and the
+				control flow looks like this:
+			</p>
+<pre>
+function ElementClass:draw()
+  if SuperClass.draw(self) then
+    if self:drawBegin() then
+      -- your rendering here
+      self:drawEnd()
+    end
+    return true
+  end
+end
+</pre>
+		</div>
+		<div class="node"><h2><a name="debug" id="debug">5.2. Debug library</a></h2>
+			<p>
+				The debug library used throughout tekUI is
+				<a href="manual.html#tek.lib.debug">tek.lib.debug</a>. The default debug
+				level is 10 (<code>ERROR</code>). To increase verbosity, set <code>level</code> to
+				a lower value, either by modifying <code>tek/lib/debug.lua</code>, or by
+				setting it after including the module:
+			</p>
+<pre>
+db = require &quot;tek.lib.debug&quot;
+db.level = db.INFO
+</pre>
+			<p>
+				See also the module's documentation for redirecting the output.
+			</p>
+		</div>
+		<div class="node"><h2><a name="proxied" id="proxied">5.3. Debugging objects</a></h2>
+			<p>
+				If you wish to use <a href="#xmlapps">validation of XML files</a> against
+				tekUI's implementation, of if you plan on extending existing
+				classes or develop your own, you are advised to set the following
+				configurable parameters in <a href="manual.html#tek.class">tek.class</a>,
+				the base class of all tekUI classes:
+			</p>
+<pre>
+local PROXY = true
+local DEBUG = true
+</pre>
+			<p>
+				The <code>PROXY</code> option allows for intercepting read/write accesses to
+				objects, which will be harnessed by the <code>DEBUG</code> option for tracking
+				accesses to uninitialized class members. So whenever a <strong>nil</strong> 
+				value is read from or written to an object, this causes <code>tek.class</code> 
+				to bail out with an error and a meaningful message.
+			</p>
+			<p>
+				As a result, all member variables must be initialized during
+				<code>new()</code> or <code>init()</code> &#8211; or more specifically, before the class
+				metatable is attached and an object is becoming fully functional.
+				This will assist in keeping variables neatly together, and you won't
+				end up in a fluff of variables of limited scope and significance,
+				getting initialized at random places. This also means that you cannot
+				assign a distinct meaning to <strong>nil</strong> for a class member &#8211; you will
+				have to use <strong>false</strong> instead, or find another arrangement. (This
+				convention of not using <strong>nil</strong> for class variables is found
+				throughout the whole tekUI framework.)
+			</p>
+			<p>
+				Once your application is tested and ready for deployment, you can
+				disable <code>PROXY</code>, as this will improve performance and reduce memory
+				consumption.
+			</p>
+		</div>
+		<div class="node"><h2><a name="classsetup" id="classsetup">5.4. Class setup</a></h2>
+			<p>
+				A class (in a module) is usually set up in a prologue like this:
+			</p>
+<pre>
+local Widget = require &quot;tek.ui.class.widget&quot;
+local Button = Widget.module(&quot;tek.ui.class.button&quot;, &quot;tek.ui.class.widget&quot;)
+Button._VERSION = &quot;Button Widget 1.0&quot;
+...
+return Button
+</pre>
+			<p>
+				This first argument to <a href="manual.html#Class:module">Class.module()</a> 
+				is the name of the class to be created. The second argument is the
+				name of its superclass, the class  to derive the new class from. The
+				result is the class table that should be the module's return value
+				also.
+			</p>
+			<p>
+				Finally, methods in the newly created class may look like this (note
+				that, thanks to the <code>Button</code> variable, the second example provides
+				an implicit <code>self</code>):
+			</p>
+<pre>
+function Button.new(class, self)
+  ...
+  return Widget.new(class, self)
+end
+
+function Button:method()
+  Widget.method(self)
+  ...
+end
+</pre>
+			<p>
+				Also, don't forget to add a <code>_VERSION</code> variable, as it will be used
+				by the documentation system &#8211; see also the next section.
+			</p>
+		</div>
+		<div class="node"><h2><a name="classdoc" id="classdoc">5.5. Class documentation system</a></h2>
+			<p>
+				Don't stray off too far from the class setup described in the
+				previous section, as it contains valuable informations for tekUI's
+				documentation generator, which tries to assemble a self-contained
+				class hierarchy from individual class / child class relations.
+			</p>
+			<h3>
+				Tokens for markup
+			</h3>
+			<p>
+				Aside from the aforementioned <code>module</code> and <code>_VERSION</code> keys (see
+				section <a href="#classsetup">Class setup</a>), the source code parser reacts
+				on the following tokens.
+			</p>
+			<p>
+				Long lines of dashes signify the beginnings and endings of comment
+				blocks that are subject to processing
+				<a href="manual.html#tek.class.markup">markup notation</a>, e.g.
+			</p>
+<pre>
+----------------------------------------------------------------
+--  OVERVIEW::
+--    Area - implements margins, layouting and drawing
+----------------------------------------------------------------
+</pre>
+			<p>
+				The other condition that must be met for the following text to appear
+				in the documentation is the recognition of either a definition (as
+				seen in the example) or function marker inside such a comment block.
+				The template for a definition is this:
+			</p>
+<pre>
+DEFINITION::
+</pre>
+			<p>
+				And the function template:
+			</p>
+<pre>
+ret1, ret2, ... = function(arg1, arg2, ...): ...
+</pre>
+			<p>
+				The marker and the following text will then become part of the
+				documentation. (In other words, by avoiding these markers, it is also
+				possible to write comment blocks that do not show up in the
+				documentation.)
+			</p>
+			<p>
+				Functions inside classes will automatically receive a symbolic name
+				as their class prefix (from assigning the module table <code>_M</code> to a
+				local variable, see <a href="#classsetup">Class setup</a>). Hereinafter, they
+				can be cross-referenced using the following notations:
+			</p>
+<pre>
+Class:function()
+Class.function()
+</pre>
+			<p>
+				For further information, consult the sources in the
+				<a href="manual.html">class hierarchy</a> as examples, and the source code
+				containing the
+				<a href="manual.html#tek.class.markup">markup notation reference</a>, which
+				can be found in <code>tek.class.markup</code>.
+			</p>
+		</div>
+		<div class="node"><h2><a name="cssprecedence" id="cssprecedence">5.6. Stylesheets precedence</a></h2>
+			<p>
+				TekUI uses a cascading stylesheets (CSS) engine, which borrows from
+				the W3C recommendations. The order of precedence is as follows:
+			</p>
+			<blockquote>
+				<ul>
+					<li>
+						Hardcoded class defaults
+					</li>
+					<li>
+						User agent: tekUI's built-in stylesheets, either <code>&quot;default&quot;</code> or
+						<code>&quot;minimal&quot;</code>. The implied default is <code>&quot;default&quot;</code>, unless the
+						first word in the <code>THEME</code> variable is <code>&quot;minimal&quot;</code>. <code>&quot;minimal&quot;</code> 
+						is hardwired into the ui library, while <code>&quot;default&quot;</code> is an actual
+						stylesheet file.
+					</li>
+					<li>
+						User: Names of stylesheet files from the <code>THEME</code> environment
+						variable, e.g. <code>&quot;stain gradient&quot;</code>. The default is <code>&quot;desktop&quot;</code>.
+					</li>
+					<li>
+						Author: Names of stylesheet files specified in
+						<code>Application.AuthorStyleSheets</code>.
+					</li>
+					<li>
+						Author: Styles specified in <code>Application.AuthorStyles</code>.
+					</li>
+					<li>
+						User important: The <code>user.css</code> stylesheet.
+					</li>
+				</ul>
+			</blockquote>
+			<p>
+				To shut off interferences from user styles, use a predefined cascade
+				by overwriting the <code>THEME</code> variable inside your application, e.g.:
+			</p>
+<pre>
+local ui = require &quot;tek.ui&quot;
+ui.ThemeName = &quot;mycompany&quot; -- also implies &quot;default&quot;
+ui.UserStyles = false -- to also disable the user.css file
+</pre>
+			<p>
+				See also <a href="#extraargs">Global Lua runtime arguments</a>.
+			</p>
+		</div>
+	</body>
+</html>

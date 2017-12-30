@@ -50,6 +50,87 @@
 static int totl=0;
 
 
+int strip_st = 0;
+
+static int do_text_strip(char* buf, int len){
+	int i, j;
+	int st = strip_st;
+	
+	for(i=0, j = 0; i < len; i++){
+		char c = buf[i];
+		switch(st){
+			case 0:
+			case 1:
+				if(c == ' ' || c == '\t' || c == '\r' || c == '\n'){
+					if(st == 0){
+						buf[ j++ ] = ' ';
+						st = 1;
+					}
+				}else if(c == '/'){
+					st = 2;
+				}else if(c == '\"'){
+					buf[ j++ ] = c;
+					st = 7;
+				}else if(c == '\''){
+					buf[ j++ ] = c;
+					st = 8;
+				}else{
+					buf[ j++ ] = c;
+					st = 0;
+				}
+				break;
+
+			case 2:
+				if(c == '/')
+					st = 3;
+				else if(c == "*")
+					st = 4;
+				else{
+					buf[ j++ ] = '/';
+					buf[ j++ ] = c;
+					st = 0;
+				}
+				break;
+
+			case 3:
+				if(c == '\r' || c == '\n'){
+					st = 0;
+				}
+				break;
+				
+			case 4:
+				if(c == '*')
+					st = 5;
+				break;
+					
+			case 5:
+				if(c == '/')
+					st = 0;
+				else
+					st = 4;
+				break;
+						
+			case 7:
+				buf[ j++ ] = c;
+				if(c == '\"')
+					st = 0;
+				break;
+				
+			case 8:
+				buf[ j++ ] = c;
+				if(c == '\'')
+					st = 0;
+				break;
+					
+		}
+	}
+
+	strip_st = st;
+
+	return j;
+}
+
+
 int do_file_pas(nc_node *node){
 	err_t err;
 	char* buf=NULL;
@@ -58,7 +139,7 @@ int do_file_pas(nc_node *node){
 	
 	DBG("pre malloc of %d\n", OUT_BUF_LEN );
 	buf = malloc(OUT_BUF_LEN);
-	buf_len = OUT_BUF_LEN-4;
+	buf_len = OUT_BUF_LEN -4;
 
 	if(buf == NULL) return ERR_MEM;
 	
@@ -78,6 +159,9 @@ int do_file_pas(nc_node *node){
 		int t_is_httpd_run = is_httpd_run;
 		if( check_conn(__func__, __LINE__) ){
 			DBG("%s: %d client=%x\n", __func__, __LINE__, node->clnt );
+
+			tlen = do_text_strip(buf, tlen);
+		
 			err = netconn_write(node->clnt, buf, tlen, NETCONN_NOCOPY);
 			DBG("post netconn_write %d, err=%d\n", node->cur_f, err );
 			print_err(err, __func__, __LINE__);
@@ -117,6 +201,33 @@ int do_file_begin(char **uri, int uri_len, char *hdr, char* hdr_sz, nc_node *nod
 	
 	if(node->cur_f > 0){
 		totl = 0;
+
+		
+		char* buf = malloc(OUT_BUF_LEN);
+		int buf_len = OUT_BUF_LEN -4;
+		int tlen, fl_len;
+
+		strip_st = 0;
+		
+		if(buf != NULL){
+			flen = 0;
+			do{
+				tlen = SPIFFS_read(&fs, node->cur_f, buf, buf_len); 
+				if(tlen <= 0){
+					break;
+				}
+
+				//if(tlen > 0){
+					tlen = do_text_strip(buf, tlen);
+				//}
+				flen += tlen;
+			}while(tlen > 0);
+			free(buf);
+			buf = NULL;
+		}
+		SPIFFS_lseek(&fs, node->cur_f, 0, SPIFFS_SEEK_SET);
+
+		strip_st = 0;
 		
 		DBG("pre hdr_net_wrt %x %d f=%d\n", hdr, strlen(hdr), node->cur_f );
 		if( check_conn(__func__, __LINE__) ){

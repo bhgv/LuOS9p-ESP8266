@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<tekui:application>
+	<application AuthorStyleSheets="tutorial">
+		<window Title="Tutorial 2">
+			<button>
+				Hello, World!
+				<method Name="onPress">
+					self:getClass().onPress(self)
+					if self.Pressed == false then
+						print "Hello, World!"
+					end
+				</method>
+			</button>
+		</window>
+	</application>
+</tekui:application>
