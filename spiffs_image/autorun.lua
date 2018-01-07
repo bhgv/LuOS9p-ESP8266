@@ -20,6 +20,7 @@ while sel_mnu ~= 5 do
 
     if sel_mnu == 4 then
 	gui.run "menu/soldr.lua"
+
     elseif sel_mnu == 2 then
 	net.sta(WIFI_SSID, WIFI_PASS)
 
@@ -35,8 +36,18 @@ while sel_mnu ~= 5 do
 
 	httpd.stop()
 	thread.sleep(1)
+
     elseif sel_mnu == 3 then
 	gui.run "menu/main.lua"
+
+    elseif sel_mnu == 7 then
+	thread.start( styx.loop )
+	thread.sleep(1)
+	gui.run "menu/styx.lua"
+
+	styx.stop()
+	thread.sleep(1)
+
     end
 
 end

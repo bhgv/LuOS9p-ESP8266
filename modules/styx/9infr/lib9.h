@@ -391,6 +391,7 @@ struct Qid
 	uvlong	path;
 	ulong	vers;
 	uchar	type;
+	uchar	my_type;
 } Qid;
 
 typedef

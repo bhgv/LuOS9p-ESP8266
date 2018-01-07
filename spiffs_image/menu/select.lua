@@ -10,6 +10,7 @@ local sel_acts = {
 }
 
 local menu_sel = {
+	{name="run Styx", par=7, act=sel_acts, },
 	{name="run HTTPd", par=1, act=sel_acts, },
 	{name="sel Ap/Sta", par=2, act=sel_acts, },
 	{name="run Dev Menu", par=3, act=sel_acts, },

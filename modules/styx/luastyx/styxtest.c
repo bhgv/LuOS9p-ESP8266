@@ -6,11 +6,20 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "ltm.h"
 
 
 
 #include <lib9.h>
 #include "styxserver.h"
+#include "styx.h"
+
+#include "lrotable.h"
+
+/* Externally defined read-only table array */
+extern const luaR_entry lua_rotable[];
+
+
 
 
 enum {
@@ -21,7 +30,19 @@ enum {
 	FL_T_L_CB,
 };
 
+enum {
+	FS_ROOT = 0,
+	FS_DEV,
+	FS_DEV_FILE,
+	FS_FILE,
+	FS_FILE_DIR,
+	FS_FILE_FILE,
+};
 
+enum {
+	SC_BYNAME,
+	SC_BYPOS,
+};
 
 /*
  * An in-memory file server
@@ -37,6 +58,9 @@ int nq = Qroot+1;
 Styxserver *server = NULL;
 
 int is_styx_srv_run = 1;
+
+lua_State* intL = NULL;
+
 
 
 int pwm_cb(Styxfile* f, int v){
@@ -57,12 +81,49 @@ int adc_cb(Styxfile* f, int v){
 
 
 
+
+void*
+scan_devs(luaR_entry *hdr_entry, char* nm, int type){
+	int i = 1;
+	luaR_entry *entry = hdr_entry; //lua_rotable;
+	const TValue *val;
+
+	for ( ; entry->key.id.strkey; entry++, i++ ) {
+		if (entry->key.len >= 0) {
+			if(type == SC_BYNAME && !strncmp(nm, entry->key.id.strkey, entry->key.len) )
+				return (void*)i;
+			else if( type == SC_BYPOS && i == *(int*)nm ){
+				val = &entry->value;
+				if (ttnov(val) == LUA_TROTABLE && (luaR_entry *)val->value_.p != hdr_entry) {
+					//printf("VVV  %s (%x != %x) VVV\n", entry->key.id.strkey, val->value_.p, hdr_entry);
+					return (void*) val->value_.p;
+				}else{
+					return NULL;
+				}
+			}
+		}
+	}
+
+	return NULL;
+}
+
+
+
+
+
+void fsnewclient(Client *c){
+//	switch(c->)
+}
+
+
 char*
 fsopen(Qid *qid, int mode)
 {
 	Styxfile *f;
 
 	f = styxfindfile(server, qid->path);
+
+printf("fsopen 1 qid->type = %d\n", qid->type);
 	if(mode&OTRUNC){	/* truncate on open */
 		styxfree(f->u);
 		f->u = nil;
@@ -71,6 +132,7 @@ fsopen(Qid *qid, int mode)
 	return nil;
 }
 
+
 char*
 fsclose(Qid qid, int mode)
 {
@@ -78,6 +140,7 @@ fsclose(Qid qid, int mode)
 		return fsremove(qid);
 	return nil;
 }
+
 
 char *
 fscreate(Qid *qid, char *name, int perm, int mode)
@@ -112,26 +175,158 @@ fsremove(Qid qid)
 	return nil;
 }
 
+
 char *
-fsread(Qid qid, char *buf, ulong *n, vlong off)
+fswalk(Qid* qid, char *nm)
+{
+	//if(p->d.qid.my_type == 1){
+	switch(qid->my_type){
+	case FS_DEV:
+		{
+			int i = (int)scan_devs(lua_rotable, nm, SC_BYNAME);
+			if(i > 0){
+				qid->path = (1<<16) + i;
+				qid->type = 0;
+				
+				qid->my_type = FS_DEV_FILE;
+				
+				qid->vers = 0;
+				
+				return nil;
+			}
+		}
+		break;
+
+	}
+	//}else
+	return 1;
+}
+
+
+
+char *
+fsread(Qid qid, char *buf, ulong *n, vlong *off)
 {
 	int m;
 	Styxfile *f;
+	int i;
+	int dri = *off;
+	int pth;
 
-printf("fsread 1 buf = %x, *n = %d, off = %d\n", buf, *n, off);
+	switch( qid.my_type ){
+		case FS_DEV:
+			{
+				Dir d;
+				int m = 0;
+				int dsz = 0;
 
-	f = styxfindfile(server, qid.path);
-	m = f->d.length;
-	if(off >= m)
-		*n = 0;
-	else{
-		if(off + *n > m)
-			*n = m-off;
-		memmove(buf, (char*)f->u+off, *n);
+				memset( &d, 0, sizeof(Dir) );
+
+				luaR_entry *entry = lua_rotable;
+
+				for( i =0; entry->key.id.strkey && i < dri; ){
+					//printf("i = %d  <  off = %d\n", i, dri);
+					entry++;
+					i++;
+				}
+				
+				for ( ; entry->key.id.strkey && m < *n; entry++, i++ ) {
+					if (entry->key.len >= 0) {
+						d.name = entry->key.id.strkey;
+
+						dsz = convD2M(&d, (uchar*)buf, *n-m);
+						if(dsz <= BIT16SZ)
+								break;
+						m += dsz;
+						buf += dsz;
+					}else {
+						//printf("  [%d] --> %x\r\n", entry->key.id.numkey,
+						//		(unsigned int) rvalue(&entry->value));
+					}
+				}
+				*n = m;
+				*off = i;
+			}
+			break;
+			
+		case FS_DEV_FILE:
+			{
+				const TValue *val;
+				luaR_entry *entry, *root_entry;
+				
+				pth = qid.path & 0xffff;
+				
+				entry = (luaR_entry*)scan_devs(lua_rotable, (char*)&pth, SC_BYPOS);
+				root_entry = entry;
+
+				m = 0;
+				for ( ; entry->key.id.strkey && (m - dri) < (*n); entry++ ) {
+					if (entry->key.len >= 0) {
+						int l = entry->key.len;
+						char* nm = entry->key.id.strkey;
+						char* t_nm;
+						int t_ln;
+						int type;
+
+						val = &entry->value;
+						type = ttnov(val);
+
+						if(LUA_TNONE <= type && type < LUA_NUMTAGS){
+							t_nm = ttypename(type);
+						}else{
+							t_nm = "";
+						}
+						t_ln = strlen(t_nm);
+					
+						//printf("  [%s] --> %x (t = %d)\r\n", nm,
+						//		(unsigned int) rvalue(&entry->value), type);
+						if( type != LUA_TROTABLE && !(nm[0] == '_' && nm[1] == '_') ){
+							if(m + l + 3 + t_ln + 1 > dri){
+								if( m + l + 3 + t_ln + 1 - dri > (*n) )
+									break;
+								memmove(buf, nm, l);
+								buf += l;
+								memmove(buf, "\t-\t", 3);
+								buf += 3;
+								if(t_ln > 0) 
+									memmove(buf, t_nm, t_ln);
+								buf += t_ln;
+								memmove(buf, "\n", 1);
+								buf += 1;
+							}
+							m += l + 3 + t_ln + 1;
+						}
+					}
+				}
+				*n = m;
+			}
+			break;
+			
+		case FS_FILE:
+			break;
+			
+		case FS_FILE_DIR:
+			break;
+			
+		case FS_FILE_FILE:
+			break;
+			
+		default:
+			f = styxfindfile(server, qid.path);
+			m = f->d.length;
+			if(*off >= m)
+				*n = 0;
+			else{
+				if(*off + *n > m)
+					*n = m-(*off);
+				memmove(buf, (char*)f->u + (*off), *n);
+			}
+			break;
 	}
-printf("fsread 2 buf = %x, *n = %d, off = %d\n", buf, *n, off);
+
 	return nil;
 }
+
 
 char*
 fswrite(Qid qid, char *buf, ulong *n, vlong off)
@@ -140,22 +335,96 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 	vlong m, p;
 	char *u;
 
-	f = styxfindfile(server, qid.path);
-	m = f->d.length;
-	p = off + *n;
-	if(p > m){	/* just grab a larger piece of memory */
-		u = styxmalloc(p);
-		if(u == nil)
-			return "out of memory";
-		memset(u, 0, p);
-		memmove(u, f->u, m);
-		styxfree(f->u);
-		f->u = u;
-		f->d.length = p;
+	int i;
+	int dri = off;
+	int pth;
+
+	switch( qid.my_type ){
+		case FS_DEV_FILE:
+			{
+				const TValue *val;
+				luaR_entry *entry, *root_entry;
+				
+				pth = qid.path & 0xffff;
+				
+				entry = (luaR_entry*)scan_devs(lua_rotable, (char*)&pth, SC_BYPOS);
+				root_entry = entry;
+
+				m = 0;
+				for ( ; entry->key.id.strkey && (m - dri) < (*n); entry++ ) {
+					if (entry->key.len >= 0) {
+						int l = entry->key.len;
+						char* nm = entry->key.id.strkey;
+						char* t_nm;
+						int t_ln;
+						int type;
+
+						val = &entry->value;
+						type = ttnov(val);
+
+						if(LUA_TNONE <= type && type < LUA_NUMTAGS){
+							t_nm = ttypename(type);
+						}else{
+							t_nm = "";
+						}
+						t_ln = strlen(t_nm);
+					
+						printf("  [%s] --> %x (t = %d)\r\n", nm,
+								(unsigned int) rvalue(&entry->value), type);
+						if( type != LUA_TROTABLE && !(nm[0] == '_' && nm[1] == '_') ){
+							if(m + l + 3 + t_ln + 1 > dri){
+								if( m + l + 3 + t_ln + 1 - dri > (*n) )
+									break;
+								memmove(buf, nm, l);
+								buf += l;
+								memmove(buf, "\t-\t", 3);
+								buf += 3;
+								if(t_ln > 0) 
+									memmove(buf, t_nm, t_ln);
+								buf += t_ln;
+								memmove(buf, "\n", 1);
+								buf += 1;
+							}
+							m += l + 3 + t_ln + 1;
+						}
+					}
+				}
+				*n = m;
+			}
+			break;
+			
+		case FS_FILE:
+			break;
+			
+		case FS_FILE_DIR:
+			break;
+			
+		case FS_FILE_FILE:
+			break;
+			
+		default:
+			f = styxfindfile(server, qid.path);
+			m = f->d.length;
+			p = off + *n;
+			if(p > m){	/* just grab a larger piece of memory */
+				u = styxmalloc(p);
+				if(u == nil)
+					return "out of memory";
+				memset(u, 0, p);
+				memmove(u, f->u, m);
+				styxfree(f->u);
+				f->u = u;
+				f->d.length = p;
+			}
+			memmove((char*)f->u+off, buf, *n);
+
+			break;
+
 	}
-	memmove((char*)f->u+off, buf, *n);
+	
 	return nil;
 }
+
 
 char*
 fswstat(Qid qid, Dir *d)
@@ -213,12 +482,12 @@ fswstat(Qid qid, Dir *d)
 	return nil;
 }
 
-Styxops ops = {
-	nil,			/* newclient */
+Styxops p9_root_ops = {
+	fsnewclient,			/* newclient */
 	nil,			/* freeclient */
 
 	nil,			/* attach */
-	nil,			/* walk */
+	fswalk,			/* walk */
 	fsopen,		/* open */
 	fscreate,		/* create */
 	fsread,		/* read */
@@ -231,15 +500,32 @@ Styxops ops = {
 
 
 
+
 void
-myinit(Styxserver *s)
+myinit(/*Styxserver *s*/)
 {
 	int i, j;
 	Styxfile* f;
 	char nm[5];
 	
-	styxadddir(s, Qroot, 1, "dev", 0555, "inferno");
+	//styxadddir(server, Qroot, Qroot, "/", 0555, "inferno");
 	
+	f = styxadddir(server, Qroot, 1, "dev", 0555, "inferno");
+	//f->d.type = FS_DEV;
+	f->d.qid.my_type = FS_DEV;
+	
+	f = styxaddfile(server, 1, 1000, "tst", 0666, "inferno");
+
+	f = styxadddir(server, Qroot, 2, "fs", 0555, "inferno");
+	//f->d.type = FS_FILE;
+	f->d.qid.my_type = FS_FILE;
+	
+
+	j = 3;
+
+	
+
+/*
 	styxadddir(s, 1, 2, "pwm", 0555, "inferno");
 	j = 2;
 	for(i = 0; i < 16; i++){
@@ -267,8 +553,7 @@ myinit(Styxserver *s)
 		f->par.p = (void*)adc_cb;
 	}
 	j = j + 1 + i;
-
-
+*/
 
 //	styxaddfile(s, Qroot, 1, "fred", 0664, "inferno");
 //	styxaddfile(s, Qroot, 2, "joe", 0664, "q56");
@@ -310,17 +595,18 @@ lstyx_stop(lua_State* L){
 	
 int
 lstyx_loop(lua_State* L){
-	//Styxserver s;
-
 	if(server != NULL){
 		free(server);
 	}
 	server = malloc(sizeof(Styxserver));
+
+	intL = L;
 	
 	styxdebug();
-	styxinit(server, &ops, "6701", 0777, 1);
 	
-	myinit(server);
+	styxinit(server, &p9_root_ops, "6701", 0777, 0/*1*/);
+	
+	myinit();
 
 	is_styx_srv_run = 1;
 	while(is_styx_srv_run){
@@ -334,7 +620,9 @@ lstyx_loop(lua_State* L){
 
 	free(server);
 	server = NULL;
-//	exits(nil);
+
+	intL = NULL;
+	
 	return 0;
 }
 
@@ -358,8 +646,38 @@ const LUA_REG_TYPE styx_map[] = {
 };
 
 
-int luaopen_styx( lua_State *L ) {
+
+void ro_traverse(luaR_entry *entry){
+	const TValue *val;
+
+	luaR_entry *hdr_entry = entry;
 	
+	while (entry->key.id.strkey) {
+		if (entry->key.len >= 0) {
+			printf("  [%s] --> %x\r\n", entry->key.id.strkey,
+					(unsigned int) rvalue(&entry->value));
+		} else {
+			printf("  [%d] --> %x\r\n", entry->key.id.numkey,
+					(unsigned int) rvalue(&entry->value));
+		}
+
+		val = &entry->value;
+		if (ttnov(val) == LUA_TROTABLE && (luaR_entry *)val->value_.p != hdr_entry) {
+			printf("VVV  %s (%x != %x) VVV\n", entry->key.id.strkey, val->value_.p, hdr_entry);
+			ro_traverse( (luaR_entry *)val->value_.p );
+			printf("AAA  %s  AAA\n\n", entry->key.id.strkey);
+		}
+
+		
+		entry++;
+	}
+
+}
+
+int luaopen_styx( lua_State *L ) {
+
+	ro_traverse(lua_rotable);
+
 	return 0;
 }
 

@@ -123,6 +123,7 @@ newclient(Styxserver *server, int fd)
 	c->uname = strdup(eve);
 	c->aname = strdup("");
 	c->next = server->clients;
+	c->ops = NULL;
 	server->clients = c;
 	if(server->ops->newclient)
 		server->ops->newclient(c);
@@ -469,20 +470,26 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 	wq = styxmalloc(sizeof(Walkqid)+(nname-1)*sizeof(Qid));
 	wq->nqid = 0;
 
+printf("%s: %d\n", __func__, __LINE__);
 	p = file;
-	qid = p != nil ? p->d.qid : fp->qid;
+	qid = (p != nil) ? p->d.qid : fp->qid;
 	for(j = 0; j < nname; j++){
-		if(!(qid.type&QTDIR)){
-			if(j == 0)
+		if(!(qid.type & QTDIR)){
+printf("%s: %d\n", __func__, __LINE__);
+			if(j == 0){
+printf("%s: %d\n", __func__, __LINE__);
 				styxfatal("devwalk error");
+			}
 			*err = Enotdir;
 			goto Done;
 		}
 		if(p != nil && !styxperm(p, c->uname, OEXEC)){
+printf("%s: %d\n", __func__, __LINE__);
 			*err = Eperm;
 			goto Done;
 		}
 		n = name[j];
+printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
 		if(strcmp(n, ".") == 0){
     Accept:
 			wq->qid[wq->nqid++] = nfp->qid;
@@ -507,25 +514,47 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 				decreff(nfp);
 				nfp->qid = qid;
 				increff(nfp);
+printf("%s: %d\n", __func__, __LINE__);
 				p = styxfindfile(server, qid.path);
 				if(server->needfile && p == nil)
 					goto Done;
-				qid = p != nil ? p->d.qid : nfp->qid;
+				qid = (p != nil) ? p->d.qid : nfp->qid;
 				goto Accept;
 			}
 		}
 
-		if(p != nil)
-		for(f = p->child; f != nil; f = f->sibling){
-			if(strcmp(n, f->d.name) == 0){
-				decref(p);
-				nfp->qid.path = f->d.qid.path;
-				nfp->qid.type = f->d.qid.type;
-				nfp->qid.vers = 0;
-				incref(f);
-				p = f;
-				qid = p->d.qid;
-				goto Accept;
+		if(p != nil){
+			/*
+			if(p->d.qid.my_type == 1){
+				int i = scan_devs(n);
+				if(i > 0){
+					nfp->qid.path = (1<<16) + i;
+					nfp->qid.type = 0;
+					
+					nfp->qid.my_type = 2;
+					
+					nfp->qid.vers = 0;
+					
+					goto Accept;
+				}
+			}else
+			*/
+			for(f = p->child; f != nil; f = f->sibling){
+printf("%s: %d. name = %s\n", __func__, __LINE__, f->d.name);
+				if(strcmp(n, f->d.name) == 0){
+printf("%s: %d. res nm = %s\n", __func__, __LINE__, n);
+					decref(p);
+					nfp->qid.path = f->d.qid.path;
+					nfp->qid.type = f->d.qid.type;
+
+					nfp->qid.my_type = f->d.qid.my_type;
+					
+					nfp->qid.vers = 0;
+					incref(f);
+					p = f;
+					qid = p->d.qid;
+					goto Accept;
+				}
 			}
 		}
 		if(j == 0 && *err == nil)
@@ -624,6 +653,9 @@ newfile(Styxserver *server, Styxfile *parent, int isdir, Path qid, char *name, i
 	d.qid.path = qid;
 	d.qid.type = 0;
 	d.qid.vers = 0;
+	
+	//d.qid.my_type = 0;
+
 	d.mode = mode;
 	d.atime = styxtime(0);
 	d.mtime = boottime;
@@ -677,7 +709,12 @@ run(Client *c)
 		free(f);
 		return;
 	}
-	ops = c->server->ops;
+
+	if(c->ops == NULL)
+		ops = c->server->ops;
+	else
+		ops = c->ops;
+	
 	file = nil;
 	fp = findfid(c, f->fid);
 	if(f->type != Tversion && f->type != Tauth && f->type != Tattach){
@@ -749,8 +786,14 @@ printf("%s: %d\n", __func__, __LINE__);
 			f->type = Rwalk;
 			f->nwqid = wq->nqid;
 printf("%s: %d\n", __func__, __LINE__);
-			for(i = 0; i < wq->nqid; i++)
+			for(i = 0; i < wq->nqid; i++){
 				f->wqid[i] = wq->qid[i];
+printf("%s: %d. %d) my_type=%d, t=%d, pth=%d\n", __func__, __LINE__, 
+					i, wq->qid[i].my_type,
+					wq->qid[i].type, 
+					wq->qid[i].path
+					);
+			}
 			styxfree(wq);
 		}
 printf("%s: %d\n", __func__, __LINE__);
@@ -844,7 +887,10 @@ printf("%s: %d file = %x, ops = %x, ops->read = %x\n", __func__, __LINE__, file,
 			if(file == nil){
 				f->ename = Eperm;
 printf("%s: %d\n", __func__, __LINE__);
-				if(ops->read && (f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), fp->dri)) == nil){
+				if(
+					ops->read && 
+					(f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
+				){
 					f->data = c->data;
 printf("%s: %d\n", __func__, __LINE__);
 				}
@@ -852,20 +898,31 @@ printf("%s: %d\n", __func__, __LINE__);
 					f->type = Rerror;
 			}
 			else{
+				if(
+					fp->qid.my_type != 0 &&
+					ops->read && 
+					(f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
+				){
+					f->data = c->data;
 printf("%s: %d\n", __func__, __LINE__);
-				f->count = devdirread(fp, file, c->data, f->count);
-				f->data = c->data;
+				}
+				else{
+				//	f->type = Rerror;
 printf("%s: %d\n", __func__, __LINE__);
+					f->count = devdirread(fp, file, c->data, f->count);
+					f->data = c->data;
+printf("%s: %d\n", __func__, __LINE__);
+				}
 			}		
 printf("%s: %d\n", __func__, __LINE__);
 		}else{
 			f->ename = Eperm;
 			f->type = Rerror;
 printf("%s: %d\n", __func__, __LINE__);
-			if(ops->read && (f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), f->offset)) == nil){
+			if(ops->read && (f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &f->offset)) == nil){
 printf("%s: %d\n", __func__, __LINE__);
 				f->type = Rread;
-				f->data = c->data;			
+				f->data = c->data;
 			}
 printf("%s: %d\n", __func__, __LINE__);
 		}

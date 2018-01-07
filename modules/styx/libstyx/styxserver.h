@@ -47,6 +47,8 @@ struct Client
 	char		*uname;	/* uid */
 	char		*aname;	/* attach name */
 	void		*u;
+	
+	Styxops *ops;
 };
 
 struct Styxops
@@ -58,7 +60,7 @@ struct Styxops
 	char *(*walk)(Qid *qid, char *name);
 	char *(*open)(Qid *qid, int mode);
 	char *(*create)(Qid *qid, char *name, int perm, int mode);
-	char *(*read)(Qid qid, char *buf, ulong *n, vlong offset);
+	char *(*read)(Qid qid, char *buf, ulong *n, vlong *offset);
 	char *(*write)(Qid qid, char *buf, ulong *n, vlong offset);
 	char *(*close)(Qid qid, int mode);
 	char *(*remove)(Qid qid);
