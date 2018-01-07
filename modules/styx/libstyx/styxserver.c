@@ -470,26 +470,26 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 	wq = styxmalloc(sizeof(Walkqid)+(nname-1)*sizeof(Qid));
 	wq->nqid = 0;
 
-printf("%s: %d\n", __func__, __LINE__);
+//printf("%s: %d\n", __func__, __LINE__);
 	p = file;
 	qid = (p != nil) ? p->d.qid : fp->qid;
 	for(j = 0; j < nname; j++){
 		if(!(qid.type & QTDIR)){
-printf("%s: %d\n", __func__, __LINE__);
+//printf("%s: %d\n", __func__, __LINE__);
 			if(j == 0){
-printf("%s: %d\n", __func__, __LINE__);
+//printf("%s: %d\n", __func__, __LINE__);
 				styxfatal("devwalk error");
 			}
 			*err = Enotdir;
 			goto Done;
 		}
 		if(p != nil && !styxperm(p, c->uname, OEXEC)){
-printf("%s: %d\n", __func__, __LINE__);
+//printf("%s: %d\n", __func__, __LINE__);
 			*err = Eperm;
 			goto Done;
 		}
 		n = name[j];
-printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
+//printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
 		if(strcmp(n, ".") == 0){
     Accept:
 			wq->qid[wq->nqid++] = nfp->qid;
@@ -514,7 +514,7 @@ printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
 				decreff(nfp);
 				nfp->qid = qid;
 				increff(nfp);
-printf("%s: %d\n", __func__, __LINE__);
+//printf("%s: %d\n", __func__, __LINE__);
 				p = styxfindfile(server, qid.path);
 				if(server->needfile && p == nil)
 					goto Done;
@@ -540,9 +540,9 @@ printf("%s: %d\n", __func__, __LINE__);
 			}else
 			*/
 			for(f = p->child; f != nil; f = f->sibling){
-printf("%s: %d. name = %s\n", __func__, __LINE__, f->d.name);
+//printf("%s: %d. name = %s\n", __func__, __LINE__, f->d.name);
 				if(strcmp(n, f->d.name) == 0){
-printf("%s: %d. res nm = %s\n", __func__, __LINE__, n);
+//printf("%s: %d. res nm = %s\n", __func__, __LINE__, n);
 					decref(p);
 					nfp->qid.path = f->d.qid.path;
 					nfp->qid.type = f->d.qid.type;
@@ -600,11 +600,11 @@ devdirread(Fid *fp, Styxfile *file, char *d, long n)
 		m += dsz;
 		d += dsz;
 		f = f->sibling;
-printf("%s: %d m = %d < n = %d, dsz = %d, f = %x, fp->dri=%d\n", __func__, __LINE__, 
-						m, n, dsz, f, fp->dri);
+//printf("%s: %d m = %d < n = %d, dsz = %d, f = %x, fp->dri=%d\n", __func__, __LINE__, 
+//						m, n, dsz, f, fp->dri);
 	}
 	
-printf("%s: %d out cnt = %d\n", __func__, __LINE__, m);
+//printf("%s: %d out cnt = %d\n", __func__, __LINE__, m);
 
 	return m;
 }

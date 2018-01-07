@@ -44,6 +44,12 @@ enum {
 	SC_BYPOS,
 };
 
+enum {
+	RD_ST_LIST,
+	RD_ST_RES,
+};
+
+
 /*
  * An in-memory file server
  * allowing truncation, removal on closure, wstat and
@@ -60,6 +66,9 @@ Styxserver *server = NULL;
 int is_styx_srv_run = 1;
 
 lua_State* intL = NULL;
+
+int rd_state = RD_ST_LIST;
+char *rd_res = NULL;
 
 
 
@@ -108,8 +117,25 @@ scan_devs(luaR_entry *hdr_entry, char* nm, int type){
 }
 
 
+char*
+dev_call_parse_next_par(char* buf, int *plen){
+	int l = 0;
+	char *p, *r = NULL;
 
+//printf("%s: %d\n", __func__, __LINE__);
+	if(buf != NULL){
+		for(p = buf; *p == ' ' || *p == '\t' || *p == '\r' || *p == '\n'; p++);
+		r = p;
+		
+		for(l = 0; *p != ' ' && *p !='\t' && *p != '\r' && *p != '\n' && *p != '\0'; p++, l++);
+		*p = 0;
+	}
 
+	if(plen != NULL) *plen = l;
+
+//printf("%s: %d. r=%s, l=%d\n", __func__, __LINE__, r, l);
+	return r;
+}
 
 void fsnewclient(Client *c){
 //	switch(c->)
@@ -121,14 +147,27 @@ fsopen(Qid *qid, int mode)
 {
 	Styxfile *f;
 
-	f = styxfindfile(server, qid->path);
+//printf("fsopen 1 qid->type = %d, qid.my_type = %d\n", qid->type, qid->my_type);
+	switch( qid->my_type ){
+		case FS_DEV:
+		case FS_DEV_FILE:
+		case FS_FILE:
+		case FS_FILE_DIR:
+		case FS_FILE_FILE:
+			break;
 
-printf("fsopen 1 qid->type = %d\n", qid->type);
-	if(mode&OTRUNC){	/* truncate on open */
-		styxfree(f->u);
-		f->u = nil;
-		f->d.length = 0;
+		default:
+			f = styxfindfile(server, qid->path);
+
+			if(mode&OTRUNC){	/* truncate on open */
+				styxfree(f->u);
+				f->u = nil;
+				f->d.length = 0;
+			}
+			break;
+			
 	}
+	
 	return nil;
 }
 
@@ -250,7 +289,29 @@ fsread(Qid qid, char *buf, ulong *n, vlong *off)
 			break;
 			
 		case FS_DEV_FILE:
-			{
+			if(rd_state == RD_ST_RES){
+				if(rd_res == NULL) {
+					rd_state = RD_ST_LIST;
+					return nil;
+				}
+				m = strlen(rd_res);
+
+//printf("\nrd_res = %s\n\n", rd_res);
+
+				if(*off >= m){
+					free(rd_res);
+					rd_res = NULL;
+				
+					rd_state = RD_ST_LIST;
+				
+					*n = 0;
+				}else{
+					if(dri + *n > m)
+						*n = m-dri;
+					memmove(buf, rd_res + dri, *n);
+				}
+				
+			}else{
 				const TValue *val;
 				luaR_entry *entry, *root_entry;
 				
@@ -338,26 +399,79 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 	int i;
 	int dri = off;
 	int pth;
+	
+	static char *foo_nm = NULL;
 
+//printf("%s: %d\n", __func__, __LINE__);
 	switch( qid.my_type ){
 		case FS_DEV_FILE:
 			{
 				const TValue *val;
 				luaR_entry *entry, *root_entry;
-				
+
+				char* p_buf = buf;
+				int l;
+
+//printf("%s: %d\n", __func__, __LINE__);
+				if(off == 0){
+					char *s, *op;
+
+					if(foo_nm != NULL) {
+						free(foo_nm);
+						foo_nm = NULL;
+					}
+					
+					op = dev_call_parse_next_par(buf, &l);
+					buf += l + 1;
+					
+					if( l == 0 || !strncmp(op, "list", l) ){
+						rd_state = RD_ST_LIST;
+
+						return nil;
+					}else{
+						rd_state = RD_ST_RES;
+
+						if(rd_res != NULL){
+							free(rd_res);
+							rd_res = NULL;
+						}
+						
+						s = dev_call_parse_next_par(buf, &l);
+						if(intL == NULL || l == 0){
+							return nil;
+						}
+
+						foo_nm = styxmalloc(l + 1);
+						memcpy(foo_nm, s, l);
+						foo_nm[ l ] = '\0';
+
+//printf("%s: %d. foo_nm = %s, l = %d\n", __func__, __LINE__, foo_nm, l);
+						buf += l + 1;
+					}
+				}
 				pth = qid.path & 0xffff;
 				
 				entry = (luaR_entry*)scan_devs(lua_rotable, (char*)&pth, SC_BYPOS);
 				root_entry = entry;
+//printf("%s: %d. ent(%d)=%x\n", __func__, __LINE__, pth, entry);
 
 				m = 0;
-				for ( ; entry->key.id.strkey && (m - dri) < (*n); entry++ ) {
-					if (entry->key.len >= 0) {
-						int l = entry->key.len;
-						char* nm = entry->key.id.strkey;
+				for ( ; entry->key.id.strkey /*&& (m - dri) < (*n)*/; entry++ ) {
+					if (
+						entry->key.len >= 0 && 
+						ttnov(&entry->value) == LUA_TFUNCTION &&
+						!strncmp(foo_nm, entry->key.id.strkey, entry->key.len) 
+					) {
+						int k_ln = entry->key.len;
+						char* k_nm = entry->key.id.strkey;
 						char* t_nm;
 						int t_ln;
 						int type;
+						int rn, ltop, i, lk, ls = 0;
+						char *k, *s;
+						float v;
+
+//printf("%s: %d. mmbr_nm = %s, l = %d\n", __func__, __LINE__, k_nm, k_ln);
 
 						val = &entry->value;
 						type = ttnov(val);
@@ -369,24 +483,97 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 						}
 						t_ln = strlen(t_nm);
 					
-						printf("  [%s] --> %x (t = %d)\r\n", nm,
-								(unsigned int) rvalue(&entry->value), type);
-						if( type != LUA_TROTABLE && !(nm[0] == '_' && nm[1] == '_') ){
-							if(m + l + 3 + t_ln + 1 > dri){
-								if( m + l + 3 + t_ln + 1 - dri > (*n) )
+//printf("  [%s] --> %x (t = %d, %s), intL = %x\r\n", k_nm, (unsigned int) rvalue(val), type, t_nm, intL);
+						ltop = lua_gettop(intL);
+//printf("%s: %d\n", __func__, __LINE__);
+						
+						luaA_pushobject(intL, val);
+
+//printf("%s: %d\n", __func__, __LINE__);
+						k = dev_call_parse_next_par(buf, &lk);
+						//buf += l + 1;
+						
+						for(
+							i = 0 ; 
+							lk > 0 && k[0] == '-'; 
+							k = dev_call_parse_next_par(buf, &lk)
+						){
+							//if(lk > 0 && k[0] == '-'){
+								if(lk > 2)
+									buf += 2;
+								else
+									buf += lk + 1;
+								
+								s = dev_call_parse_next_par(buf, &ls);
+								if(ls == 0)
 									break;
-								memmove(buf, nm, l);
-								buf += l;
-								memmove(buf, "\t-\t", 3);
-								buf += 3;
-								if(t_ln > 0) 
-									memmove(buf, t_nm, t_ln);
-								buf += t_ln;
-								memmove(buf, "\n", 1);
-								buf += 1;
-							}
-							m += l + 3 + t_ln + 1;
+								buf += ls + 1;
+								
+//printf("%s: %d. k=%s, s=%s\n", __func__, __LINE__, k, s);
+								switch(k[1]){
+									case 'n':
+										lua_pushnumber(intL, atof(s) );
+										i++;
+										break;
+
+									case 'i':
+										lua_pushinteger(intL, atoi(s) );
+										i++;
+										break;
+										
+									case 's':
+									default:
+										lua_pushstring(intL, s);
+										i++;
+										break;
+
+								}
+							//}
 						}
+
+						lua_call(intL, i, LUA_MULTRET);
+
+						rn = lua_gettop(intL) - ltop;
+//printf("%s: %d. i=%d, rn=%d\n", __func__, __LINE__, i, rn);
+						l = 0;
+						for(i = ltop+1; i <= ltop + rn; i ++){
+							int il;
+//printf("%s: %d. i=%d, vtype=%s, %s\n", __func__, __LINE__, i, 
+//								lua_typename(intL, lua_type(intL, i) ),
+//								lua_tostring(intL, i) );
+							lua_tolstring(intL, i, &il);
+							l += il + 1;
+						}
+
+						rd_res = styxmalloc(l + 1);
+						l = 0;
+						for(i = ltop+1; i <= ltop + rn; i ++){
+							int il;
+							char *is;
+							is = lua_tolstring(intL, i, &il);
+							memcpy(&rd_res[ l ], is, il);
+							l += il;
+							rd_res[ l ] = '\t';
+							l += 1;
+							rd_res[ l ] = '\0';
+/*
+							switch( lua_type(intL, i) ){
+								case 
+#define LUA_TNONE		(-1)
+									
+#define LUA_TNIL		0
+#define LUA_TBOOLEAN		1
+#define LUA_TLIGHTUSERDATA	2
+#define LUA_TNUMBER		3
+#define LUA_TSTRING		4
+#define LUA_TTABLE		5
+#define LUA_TFUNCTION		6
+#define LUA_TUSERDATA		7
+#define LUA_TTHREAD		8
+							}
+*/
+						}
+//printf("%s: %d. rd_res = %s\n", __func__, __LINE__, rd_res);
 					}
 				}
 				*n = m;

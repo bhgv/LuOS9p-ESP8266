@@ -84,23 +84,34 @@ static int lpwm_o_drain( lua_State* L ) {
 static int lpwm_set_val( lua_State* L ) {
 	int n = lua_gettop(L);
 	int ch = luaL_checkinteger(L, 1);
-	int v = luaL_checkinteger(L, 2);
 
-	int max = 4095;
-	if(n > 2) max = luaL_checkinteger(L, 3);
-	
 	if(ch < 0 || ch > 15) return 0;
 	
-	if(max <= 0) max = 1;
-	else if(max > 4095) max = 4095;
+	if(n > 1){
+		float v = luaL_checknumber(L, 2);
 
-	if(v < 0) v = 0;
-	else if(v > max) v = max;
-	
-	v = v * 4095 / max;
-    pca9685_set_pwm_value(ADDR, ch, v);
+//		int max = 4095;
+//		if(n > 2) max = luaL_checkinteger(L, 3);
+				
+//		if(max <= 0) max = 1;
+//		else if(max > 4095) max = 4095;
+
+		if(v < 0.0) v = 0.0;
+		else if(v > 100.0) v = 100.0;
+		
+		if(ch == 5 || ch == 6) v = 100.0 - v; //inv for SGN0 & SGN1
+		
+		v = v * 4095.0 /100.0;
+	    pca9685_set_pwm_value(ADDR, ch, (int)v);
+
+		return 0;
+	}else{
+		float v = 100.0*( (float)pca9685_get_pwm_value(ADDR, ch) / 4095.0);
+		if(ch == 5 || ch == 6) v = 100.0 - v; //inv for SGN0 & SGN1
+		lua_pushnumber( L, v);
+	}
     
-    lua_pushboolean(L, 1);
+    //lua_pushboolean(L, 1);
     return 1;
 }
 
