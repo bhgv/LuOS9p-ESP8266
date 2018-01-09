@@ -392,6 +392,7 @@ struct Qid
 	ulong	vers;
 	uchar	type;
 	uchar	my_type;
+	char*	my_name;
 } Qid;
 
 typedef

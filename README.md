@@ -22,12 +22,21 @@ Features
 * big set of easy to use shell commands (filesystem, ports, devices, network, server, other)
 * net Ap and Sta modes,
 * one command WiFi Sta search,
+* PID regulator module,
 
 * Webserver (with compressing):
   1. static HTML,
   1. CGI,
   1. WebSock (up to 5 connections),
   1. direct access to devices/ports using WebSock,
+
+* 9p2000/Styx (Plan9/Inferno os) network virtual file system + server (currently in the work). What the functionality is work now:
+  1. list of devices (ex: **ls /n/dev**),
+  1. list of device's functions (ex: **cat /n/dev/pwm**),
+  1. call a device's function (ex: **echo ch_val -i 5 -n 0.4 > /n/dev/pwm**),
+  1. read the result of the call of the device's function (ex: **cat /n/dev/pwm** immediatly after the call),
+  1. read a file/folder list from the real fs on the device (ex: **ls /n/fs/html/js**),
+  1. read a file in the real device's fs (ex: **cat /n/fs/html/js/common.js**)
 
 * PC-Studio for easyer upload/download/edit files into the luOS embedded filesystem. also PC-Studio contains remote terminal for luOS and (in the future) other features.
 

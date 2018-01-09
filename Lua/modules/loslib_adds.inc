@@ -274,16 +274,16 @@ static int os_ls (lua_State *L) {
     char type;
     char size[9];
     char cpath[PATH_MAX];
-    char tpath[PATH_MAX];
-    char tbuffer[250];
-    struct stat sb;
-    struct tm *tm_info;
+    //char tpath[PATH_MAX];
+    //char *tbuffer = NULL; //[250];
+    //struct stat sb;
+    //struct tm *tm_info;
 
     // If path is not present get the current directory as path
     if (!path) {
         if (!getcwd(cpath, PATH_MAX)) {
             return luaL_fileresult(L, 0, cpath);
-        }    
+        }
         
         path = cpath;
     }
@@ -295,13 +295,15 @@ static int os_ls (lua_State *L) {
     }
 
     //tty_lock();
-    
+
+	//tbuffer = malloc(250);
+	
     // Read entries
     while ((ent = readdir(dir)) != NULL) {
-        strcpy(tpath, path);
-        strcat(tpath,"/");
-        strcat(tpath,ent->d_name);
-        tbuffer[0] = '\0';
+//        strcpy(tpath, path);
+//        strcat(tpath,"/");
+//        strcat(tpath,ent->d_name);
+        //tbuffer[0] = '\0';
 
 //        if (strcmp((const char *)mount_device(tpath),"fat") == 0) {
 //        	if (stat(tpath, &sb) == 0) {
@@ -321,10 +323,10 @@ static int os_ls (lua_State *L) {
             strcpy(size, "       -");
         }
         
-        printf("%c\t%s\t%s\t%s\n",
+        printf("%c\t%s\t%s\n",
             type,
             size,
-            tbuffer,
+            //tbuffer,
             ent->d_name
         );
     }
@@ -332,6 +334,8 @@ static int os_ls (lua_State *L) {
     //tty_unlock();
     
     closedir(dir);
+
+	//free(tbuffer);
 
     return 0;
 }

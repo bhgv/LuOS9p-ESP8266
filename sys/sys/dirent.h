@@ -53,9 +53,9 @@ struct dirent {
     u_int8_t  d_type;               /* file type, see below */
     u_int8_t  d_namlen;             /* length of string in d_name */
 #ifdef _POSIX_SOURCE
-    char    d_name[255 + 1];        /* name must be no longer than this */
+    char    d_name[64 + 1];        /* name must be no longer than this */
 #else
-#define MAXNAMLEN   255
+#define MAXNAMLEN   64
     char    d_name[MAXNAMLEN + 1];  /* name must be no longer than this */
 #endif
     u_int32_t d_fsize;

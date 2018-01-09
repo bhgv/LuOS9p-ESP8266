@@ -263,6 +263,9 @@ sremove(Styxserver *server, Styxfile *f)
 			*p = f->sibling;
 			break;
 		}
+	
+	if(f->d.qid.my_name)
+		styxfree(f->d.qid.my_name);
 	styxfree(f->d.name);
 	styxfree(f->d.uid);
 	styxfree(f->d.gid);
@@ -396,6 +399,8 @@ deletefid(Client *c, Fid *d)
 			decreff(d);
 			decopen(d);
 			*f = d->next;
+			if(d->qid.my_name)
+				styxfree(d->qid.my_name);
 			styxfree(d);
 			return;
 		}
@@ -410,6 +415,8 @@ deletefids(Client *c)
 		decreff(f);
 		decopen(f);
 		g = f->next;
+		if(f->qid.my_name)
+			styxfree(f->qid.my_name);
 		styxfree(f);
 	}
 }
@@ -563,6 +570,14 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 	}
 Done:
 	if(*err != nil){
+//		if(wq.clone->qid.my_name){
+//			styxfree(wq.clone->qid.my_name);
+//			wq.clone->qid.my_name = NULL;
+//		}
+//		for(int i = 0; i < wq.nqid; i++){
+//			styxfree(wq.qid[i].my_name);
+//			wq.qid[i].my_name = NULL;
+//		}
 		styxfree(wq);
 		return nil;
 	}
@@ -654,7 +669,8 @@ newfile(Styxserver *server, Styxfile *parent, int isdir, Path qid, char *name, i
 	d.qid.type = 0;
 	d.qid.vers = 0;
 	
-	//d.qid.my_type = 0;
+	d.qid.my_type = 0;
+	d.qid.my_name = NULL;
 
 	d.mode = mode;
 	d.atime = styxtime(0);

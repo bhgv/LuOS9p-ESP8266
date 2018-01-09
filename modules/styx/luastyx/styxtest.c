@@ -8,6 +8,13 @@
 #include "lauxlib.h"
 #include "ltm.h"
 
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 
 #include <lib9.h>
@@ -49,6 +56,31 @@ enum {
 	RD_ST_RES,
 };
 
+//enum {
+#define 	PATH_MAIN_PT_STEP	7ULL
+
+#define 	PATH_DEV			(Path)( 1ULL << 60 )
+#define 	PATH_FILE			(Path)( 2ULL << 60 )
+	
+#define 	PATH_BODY_MASK		(Path)( (1ULL<<60) - 1ULL )
+	
+#define 	PATH_STEP_MASK		(Path)( ( 1ULL << PATH_MAIN_PT_STEP )  - 1ULL)
+
+#define 	PATH_LVL_MASK		(Path)0xfULL
+
+#define 	PATH_MAIN_PT_MASK	(Path)( ( 1ULL << (60-4) ) - 1ULL )
+
+#define		PATH_TYPE_MASK		(Path)(0xfULL << 60)
+//};
+#define PATH_LVL_GET(p)			( ( (Path)p >> (60 - 4) ) & PATH_LVL_MASK)
+
+#define PATH_LVL_SET(p, lvl)	p &= ~(PATH_LVL_MASK << (60 - 4));  \
+							p |= ( ( (Path)lvl & PATH_LVL_MASK) << (60 - 4) )
+
+#define PATH_TYPE_COPY(p, t)	p &= ~PATH_TYPE_MASK; \
+							p |= ( (Path)t & PATH_TYPE_MASK)
+
+
 
 /*
  * An in-memory file server
@@ -72,6 +104,7 @@ char *rd_res = NULL;
 
 
 
+/*
 int pwm_cb(Styxfile* f, int v){
 	return v;
 }
@@ -83,7 +116,7 @@ int pio_cb(Styxfile* f, int v){
 int adc_cb(Styxfile* f, int v){
 	return v;
 }
-
+*/
 
 
 
@@ -121,13 +154,28 @@ char*
 dev_call_parse_next_par(char* buf, int *plen){
 	int l = 0;
 	char *p, *r = NULL;
+	char c, prt = 0, slsh = 0;;
 
 //printf("%s: %d\n", __func__, __LINE__);
 	if(buf != NULL){
 		for(p = buf; *p == ' ' || *p == '\t' || *p == '\r' || *p == '\n'; p++);
 		r = p;
 		
-		for(l = 0; *p != ' ' && *p !='\t' && *p != '\r' && *p != '\n' && *p != '\0'; p++, l++);
+		for(l = 0; *p != '\0'; p++, l++){
+			c = *p;
+			if(prt == 0 && r == p && ( c == '"' ||c == '\'' ) ){
+				prt = c;
+				r++;
+			}else if(prt != 0 && slsh == 0 && c == '\\'){
+				slsh = c;
+			}else if(slsh == '\\'){
+				slsh = 0;
+			}else if(prt != 0 && c == prt){
+				prt = 0;
+				break;
+			}else if( prt == 0 && (c == ' ' || c =='\t' || c == '\r' || c == '\n') )
+				break;
+		}
 		*p = 0;
 	}
 
@@ -136,6 +184,240 @@ dev_call_parse_next_par(char* buf, int *plen){
 //printf("%s: %d. r=%s, l=%d\n", __func__, __LINE__, r, l);
 	return r;
 }
+
+
+
+char*
+ls_dir_rd_out(const char *path, Qid qid, char *buf, ulong *n, vlong *off){
+	Dir d;
+	int m = 0;
+	int dsz = 0;
+
+	int dri = *off;
+
+	int i;
+	
+	DIR *dir = NULL;
+	struct dirent *ent;
+	
+	
+	memset( &d, 0, sizeof(Dir) );
+
+//	d.uid = eve;
+//	d.gid = eve;
+	
+	// Open directory
+	dir = opendir(path);
+	if (!dir) {
+		*n = 0;
+		return nil;
+	}
+	
+	// Read entries
+	i = 0; m = 0;
+	while ((ent = readdir(dir)) != NULL) {
+		//d.qid.path = (1<<17) + i;
+		
+		d.length = 0;
+		d.qid.my_type = FS_FILE_DIR;
+		
+		d.qid.type = QTDIR;
+		d.mode = DMDIR;
+
+		//type = 'd';
+		if (ent->d_type == DT_REG) {
+			d.qid.my_type = FS_FILE_FILE;
+			//type = 'f';
+			d.length = ent->d_fsize;
+
+			d.qid.type = QTFILE;
+ 			d.mode = DMREAD | DMWRITE | DMEXEC;
+
+//			sprintf(size,"%8d", ent->d_fsize);
+		}
+
+		d.name = ent->d_name;
+
+		if(i >= dri){
+			dsz = convD2M(&d, (uchar*)buf, *n-m);
+			if(dsz <= BIT16SZ)
+					break;
+			m += dsz;
+			buf += dsz;
+		}
+	
+		i++;
+	}
+	closedir(dir);
+	
+	*n = m;
+	*off = i;
+
+	return nil;
+}
+
+
+Path
+make_file_path(Path new_type, Path oldp, int idx){
+	Path newp = 0ULL;
+//printf("\n%s:%d oldp = %x:%x, i = %d\n", __func__, __LINE__, (int)(oldp>>32), (int)oldp, idx);
+	Path lvl = PATH_LVL_GET(oldp);
+//printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
+
+	Path mainpt = oldp & PATH_MAIN_PT_MASK;
+//printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+
+	Path curpt = idx & PATH_STEP_MASK;
+	curpt <<= lvl * PATH_MAIN_PT_STEP;
+//printf("%s:%d curpt = %x:%x\n", __func__, __LINE__, (int)(curpt>>32), (int)curpt);
+
+	mainpt &= ~( PATH_STEP_MASK << (lvl * PATH_MAIN_PT_STEP) );
+//printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+	mainpt |= curpt;
+//printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+
+	lvl++;
+//printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
+
+	PATH_LVL_SET(newp, lvl);
+//printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+	newp |= mainpt;
+//printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+//printf("%s:%d new_type = %x:%x\n", __func__, __LINE__, (int)(new_type>>32), (int)new_type);
+	PATH_TYPE_COPY(newp, new_type);
+//printf("%s:%d newp = %x:%x\n\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+	
+	return newp;
+}
+
+
+char*
+scan_fs_dir(Qid *qid, const char *path, char *nm){
+	int i;
+	
+	DIR *dir = NULL;
+	struct dirent *ent;
+	
+	// Open directory
+	dir = opendir(path);
+	if (!dir) {
+		return nil;
+	}
+	
+	// Read entries
+	i = 0; 
+//printf("\nscan_fs_dir old_path = %x:%x\n\n", (int)(qid->path >> 32), (int)qid->path );
+	while ((ent = readdir(dir)) != NULL) {
+		if( !strcmp(ent->d_name, nm) ){
+//			qid->path = PATH_FILE + (PATH_STEP_MASK & i);
+			qid->path = make_file_path( PATH_FILE, qid->path, i);
+//printf("\n\nscan_fs_dir new path = %x:%x\n\n\n", (int)(qid->path >> 32), (int)qid->path );
+			
+			//d.length = 0;
+			qid->my_type = FS_FILE_DIR;
+			
+			qid->type = QTDIR;
+			//d.mode = DMDIR;
+
+			//type = 'd';
+			if (ent->d_type == DT_REG) {
+				qid->my_type = FS_FILE_FILE;
+				//type = 'f';
+				//d.length = ent->d_fsize;
+
+				qid->type = QTFILE; //QTDIR;
+				//d.mode = DMDIR;
+
+	//			sprintf(size,"%8d", ent->d_fsize);
+			}
+
+			qid->my_name = strdup(ent->d_name);
+
+			break;
+		}
+		i++;
+	}
+	closedir(dir);
+	
+	return nil;
+}
+
+
+int
+file_pathname_from_path(Path path, char* buf, int max_len){
+	int i;
+		
+	DIR *dir = NULL;
+	struct dirent *ent;
+
+//printf("%s:%d path = %x:%x\n", __func__, __LINE__, (int)(path>>32), (int)path);
+
+	Path lvl = PATH_LVL_GET(path);
+	Path mainpt = path & PATH_MAIN_PT_MASK;
+
+//	char *pthnm = "/";
+	int cur_len = 0;
+	char *cur_nm;
+
+	char *pbuf = buf;
+
+for( ; lvl > 0; lvl--){
+	int cur_n = (int)(mainpt & PATH_STEP_MASK);
+	mainpt >>= PATH_MAIN_PT_STEP;
+
+	cur_len++;
+	if(cur_len > max_len) return 0;
+	
+	*pbuf = '/';
+	pbuf++;
+	*pbuf = '\0';
+
+//printf("file_pathname_from_path path = %s\n", buf );
+	// Open directory
+	dir = opendir( buf );
+	if (!dir) {
+		return 0;
+	}
+	
+	// Read entries
+	i = 0; 
+//printf("\nfile_pathname_from_path lvl = %d, cur_n = %d\n", lvl, cur_n );
+	while ((ent = readdir(dir)) != NULL) {
+		if( i == cur_n ){
+			int l = ent->d_namlen;
+			
+			cur_nm = ent->d_name;
+//printf("file_pathname_from_path cur_nm = %s, nm_len = %d, %d\n", cur_nm, l, strlen(cur_nm) );
+			if (ent->d_type == DT_REG) {
+				if( lvl > 1){
+//printf("\nERROR! file_pathname_from_path. lvl = %d, but fn = %s is a file!\n\n", lvl, cur_nm);
+					return 0;
+				}
+				//d.length = ent->d_fsize;
+			}
+			
+			cur_len += l;
+			if(cur_len > max_len){
+				closedir(dir);
+				return 0;
+			}
+			
+			memcpy(pbuf, cur_nm, l);
+			pbuf += l;
+			*pbuf = '\0';
+			
+			break;
+		}
+		i++;
+	}
+	closedir(dir);
+}
+
+
+	return cur_len;
+}
+
+
 
 void fsnewclient(Client *c){
 //	switch(c->)
@@ -224,20 +506,35 @@ fswalk(Qid* qid, char *nm)
 		{
 			int i = (int)scan_devs(lua_rotable, nm, SC_BYNAME);
 			if(i > 0){
-				qid->path = (1<<16) + i;
-				qid->type = 0;
-				
-				qid->my_type = FS_DEV_FILE;
-				
+				//qid->path = PATH_DEV + (PATH_STEP_MASK & i);
+				qid->path = make_file_path( PATH_DEV, qid->path, i);
+				qid->type = 0; //QTDIR;
 				qid->vers = 0;
+
+				qid->my_type = FS_DEV_FILE;
+				qid->my_name = strdup(nm);
 				
 				return nil;
 			}
 		}
 		break;
 
+	case FS_FILE:
+		scan_fs_dir(qid, "/", nm);
+		return nil;
+		
+	case FS_FILE_DIR:
+		{
+			char *buf = malloc(256);
+			int l = file_pathname_from_path(qid->path, buf, 255);
+			scan_fs_dir(qid, buf, nm);
+			free(buf);
+		}
+		return nil;
+		
 	}
 	//}else
+	
 	return 1;
 }
 
@@ -251,6 +548,11 @@ fsread(Qid qid, char *buf, ulong *n, vlong *off)
 	int i;
 	int dri = *off;
 	int pth;
+
+printf("\nfsread my_type = %d", qid.my_type);
+if(qid.my_name)
+	printf(", my_name = %s", qid.my_name);
+printf("\n\n");
 
 	switch( qid.my_type ){
 		case FS_DEV:
@@ -275,12 +577,12 @@ fsread(Qid qid, char *buf, ulong *n, vlong *off)
 
 						dsz = convD2M(&d, (uchar*)buf, *n-m);
 						if(dsz <= BIT16SZ)
-								break;
+							break;
 						m += dsz;
 						buf += dsz;
 					}else {
-						//printf("  [%d] --> %x\r\n", entry->key.id.numkey,
-						//		(unsigned int) rvalue(&entry->value));
+//printf("  [%d] --> %x\r\n", entry->key.id.numkey,
+//		(unsigned int) rvalue(&entry->value));
 					}
 				}
 				*n = m;
@@ -315,7 +617,7 @@ fsread(Qid qid, char *buf, ulong *n, vlong *off)
 				const TValue *val;
 				luaR_entry *entry, *root_entry;
 				
-				pth = qid.path & 0xffff;
+				pth = (int)(qid.path & PATH_STEP_MASK);
 				
 				entry = (luaR_entry*)scan_devs(lua_rotable, (char*)&pth, SC_BYPOS);
 				root_entry = entry;
@@ -364,12 +666,52 @@ fsread(Qid qid, char *buf, ulong *n, vlong *off)
 			break;
 			
 		case FS_FILE:
+			ls_dir_rd_out("/", qid, buf, n, off);
 			break;
 			
 		case FS_FILE_DIR:
+			{
+				char *pth = malloc(256);
+				int l = file_pathname_from_path(qid.path, pth, 255);
+//printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+				ls_dir_rd_out(pth, qid, buf, n, off);
+				free(pth);
+			}
 			break;
 			
 		case FS_FILE_FILE:
+			{
+				FILE *fp;
+				int c;
+				int i, j;
+				char *pth = malloc(256);
+//printf("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)qid.path);
+				int l = file_pathname_from_path(qid.path, pth, 255);
+
+//printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
+				fp = fopen(pth,"r");
+
+				free(pth);
+				
+				if (!fp) {
+					*n = 0;
+					break;
+				}
+
+				i = 0; j = 0;
+				while((c = fgetc(fp)) != EOF && j < *n) {
+					if(i >= dri){
+//printf("%c", c);
+						buf[ j ] = c;
+						j++;
+					}
+					i++;
+				}
+				fclose(fp);
+//printf("\n%s: %d. i = %d, j = %d\n\n", __func__, __LINE__, i, j);
+				*n = j;
+				*off = i;
+			}
 			break;
 			
 		default:
@@ -420,7 +762,8 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 						free(foo_nm);
 						foo_nm = NULL;
 					}
-					
+
+/*
 					op = dev_call_parse_next_par(buf, &l);
 					buf += l + 1;
 					
@@ -428,7 +771,9 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 						rd_state = RD_ST_LIST;
 
 						return nil;
-					}else{
+					}else
+*/
+					{
 						rd_state = RD_ST_RES;
 
 						if(rd_res != NULL){
@@ -614,17 +959,73 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 
 
 char*
+fsstat(Qid qid, Dir *d)
+{
+	Styxfile *file;
+
+//printf("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
+
+	switch(qid.my_type){
+		case FS_FILE_DIR:
+			{
+				memset(d, 0, sizeof(Dir) );
+				
+				//d->type = 'X';
+				//d->dev = 'x';
+				
+				//d->qid.path = qid.path;
+				//d->qid.type = 0;
+				//d->qid.vers = 0;
+				
+				//d->qid.my_type = 0;
+
+				d->qid = qid;
+				
+				d->mode = 0; //mode;
+				d->atime = styxtime(0);
+				d->mtime = styxtime(0); //boottime;
+				d->length = 0;
+				d->name = strdup(qid.my_name); //strdup(qid.my_name);
+				//d->uid = strdup(owner);
+				//d->gid = strdup(eve);
+				d->muid = "";
+				
+				if(qid.my_type == FS_FILE_DIR){
+					d->qid.type |= QTDIR;
+					d->mode |= DMDIR;
+				}
+				else{
+					d->qid.type &= ~QTDIR;
+					d->mode &= ~DMDIR;
+				}
+			}
+			break;
+
+		case FS_DEV:
+		case FS_FILE:
+		case FS_ROOT:
+			file = styxfindfile(server, qid.path);
+			*d = file->d;
+			break;
+	
+	}
+	
+	return nil;
+}
+
+	
+char*
 fswstat(Qid qid, Dir *d)
 {
 	Styxfile *f, *tf;
 	Client *c;
-	int owner;
+//	int owner;
 
 	/* the most complicated operation when fully allowed */
 
 	c = styxclient(server);
 	f = styxfindfile(server, qid.path);
-	owner = strcmp(c->uname, f->d.uid) == 0;
+//	owner = strcmp(c->uname, f->d.uid) == 0;
 	if(d->name != nil && strcmp(d->name, f->d.name) != 0){
 		/* need write permission in parent directory */
 		if(!styxperm(f->parent, c->uname, OWRITE))
@@ -642,32 +1043,34 @@ fswstat(Qid qid, Dir *d)
 		f->d.name = strdup(d->name);	
 	}
 	if(d->uid != nil && strcmp(d->uid, f->d.uid) != 0){
-		if(!owner)
-			return Eperm;
+//		if(!owner)
+//			return Eperm;
 		styxfree(f->d.uid);
 		f->d.uid = strdup(d->uid);
 	}
 	if(d->gid != nil && strcmp(d->gid, f->d.gid) != 0){
-		if(!owner)
-			return Eperm;
+//		if(!owner)
+//			return Eperm;
 		styxfree(f->d.gid);
 		f->d.gid = strdup(d->gid);
 	}
 	if(d->mode != ~0 && d->mode != f->d.mode){
-		if(!owner)
-			return Eperm;
-		if((d->mode&DMDIR) != (f->d.mode&DMDIR))
+//		if(!owner)
+//			return Eperm;
+		if((d->mode & DMDIR) != (f->d.mode & DMDIR))
 			return Eperm;	/* cannot change file->directory or vice-verse */
 		f->d.mode = d->mode;
 	}
 	if(d->mtime != ~0 && d->mtime != f->d.mtime){
-		if(!owner)
-			return Eperm;
+//		if(!owner)
+//			return Eperm;
 		f->d.mtime = d->mtime;
 	}
 	/* all other file attributes cannot be changed by wstat */
 	return nil;
 }
+
+
 
 Styxops p9_root_ops = {
 	fsnewclient,			/* newclient */
@@ -681,7 +1084,7 @@ Styxops p9_root_ops = {
 	fswrite,		/* write */
 	fsclose,		/* close */
 	fsremove,	/* remove */
-	nil,			/* stat */
+	fsstat,			/* stat */
 	fswstat,		/* wstat */
 };
 
