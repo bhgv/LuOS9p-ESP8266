@@ -163,6 +163,7 @@ nbread(Client *c, int nr)
 	if(c->state&CDISC)
 		return -1;
 	nb = styxrecv(c->server, c->fd, c->msg + c->nread, nr, 0);
+printf("%s: %d nb=%d\n", __func__, __LINE__, nb);
 	if(nb <= 0){
 		c->nread = 0;
 		c->state |= CDISC;
@@ -184,7 +185,7 @@ rd(Client *c, Fcall *r)
 		memmove(c->msg, c->msg+c->nc, c->nread);
 		c->nc = 0;
 	}
-	if(c->state&CRECV){
+	if(c->state & CRECV){
 		if(nbread(c, MSGMAX - c->nread) != 0){
 			r->ename = "unexpected EOF";
 			return -1;
@@ -223,7 +224,7 @@ wr(Client *c, Fcall *r)
 	char* buf = malloc( l ); //MSGMAX); //[MSGMAX];
 	int ret;
 
-	printf("%s: %d sz=%d, MAX=%d\n", __func__, __LINE__,  l, MSGMAX);
+printf("%s: %d sz=%d, MAX=%d\n", __func__, __LINE__,  l, MSGMAX);
 
 	n = convS2M(r, (uchar*)buf, l); //sizeof(buf));
 	if(n < 0){
@@ -232,6 +233,7 @@ wr(Client *c, Fcall *r)
 	}
 	/* fprint(2, "wr: %F\n", r); */
 	ret = styxsend(c->server, c->fd, buf, n, 0);
+printf("%s: %d\n", __func__, __LINE__ );
 
 	free(buf);
 	
@@ -399,8 +401,8 @@ deletefid(Client *c, Fid *d)
 			decreff(d);
 			decopen(d);
 			*f = d->next;
-			if(d->qid.my_name)
-				styxfree(d->qid.my_name);
+			//if(d->qid.my_name)
+			//	styxfree(d->qid.my_name);
 			styxfree(d);
 			return;
 		}
@@ -477,26 +479,26 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 	wq = styxmalloc(sizeof(Walkqid)+(nname-1)*sizeof(Qid));
 	wq->nqid = 0;
 
-//printf("%s: %d\n", __func__, __LINE__);
+printf("%s: %d\n", __func__, __LINE__);
 	p = file;
 	qid = (p != nil) ? p->d.qid : fp->qid;
 	for(j = 0; j < nname; j++){
 		if(!(qid.type & QTDIR)){
-//printf("%s: %d\n", __func__, __LINE__);
+printf("%s: %d\n", __func__, __LINE__);
 			if(j == 0){
-//printf("%s: %d\n", __func__, __LINE__);
+printf("%s: %d\n", __func__, __LINE__);
 				styxfatal("devwalk error");
 			}
 			*err = Enotdir;
 			goto Done;
 		}
 		if(p != nil && !styxperm(p, c->uname, OEXEC)){
-//printf("%s: %d\n", __func__, __LINE__);
+printf("%s: %d\n", __func__, __LINE__);
 			*err = Eperm;
 			goto Done;
 		}
 		n = name[j];
-//printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
+printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
 		if(strcmp(n, ".") == 0){
     Accept:
 			wq->qid[wq->nqid++] = nfp->qid;
@@ -521,7 +523,7 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 				decreff(nfp);
 				nfp->qid = qid;
 				increff(nfp);
-//printf("%s: %d\n", __func__, __LINE__);
+printf("%s: %d\n", __func__, __LINE__);
 				p = styxfindfile(server, qid.path);
 				if(server->needfile && p == nil)
 					goto Done;
@@ -547,9 +549,9 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 			}else
 			*/
 			for(f = p->child; f != nil; f = f->sibling){
-//printf("%s: %d. name = %s\n", __func__, __LINE__, f->d.name);
+printf("%s: %d. name = %s\n", __func__, __LINE__, f->d.name);
 				if(strcmp(n, f->d.name) == 0){
-//printf("%s: %d. res nm = %s\n", __func__, __LINE__, n);
+printf("%s: %d. res nm = %s\n", __func__, __LINE__, n);
 					decref(p);
 					nfp->qid.path = f->d.qid.path;
 					nfp->qid.type = f->d.qid.type;
@@ -820,22 +822,29 @@ printf("%s: %d\n", __func__, __LINE__);
 			printf("\nTopen %d\n", f->fid);
 //			fprint(2, "Topen %d\n", f->fid);
 		f->ename = nil;
+printf("%s: %d. fp->open = %d, fp->qid.type = %x, f->mode = %x\n", __func__, __LINE__, fp->open, fp->qid.type, f->mode);
 		if(fp->open)
 			f->ename = Eopen;
-		else if((fp->qid.type&QTDIR) && (f->mode&(OWRITE|OTRUNC|ORCLOSE)))
+//		else if(file == nil && (f->mode&(OWRITE|OTRUNC|ORCLOSE)))
+//			f->ename = Eperm;
+		else if((fp->qid.type & QTDIR) && (f->mode & (OWRITE|OTRUNC|ORCLOSE))){
+printf("%s: %d\n", __func__, __LINE__);
 			f->ename = Eperm;
-		else if(file != nil && !styxperm(file, c->uname, f->mode))
+		}else if(file != nil && !styxperm(file, c->uname, f->mode))
 			f->ename = Eperm;
-		else if((f->mode&ORCLOSE) && file != nil && file->parent != nil && !styxperm(file->parent, c->uname, OWRITE))
+		else if((f->mode & ORCLOSE) && file != nil && file->parent != nil && !styxperm(file->parent, c->uname, OWRITE))
 			f->ename = Eperm;
 		if(f->ename != nil){
+printf("%s: %d\n", __func__, __LINE__);
 			f->type = Rerror;
 			wr(c, f);
 			break;
 		}
+printf("%s: %d\n", __func__, __LINE__);
 		f->ename = Enonexist;
 		decreff(fp);
 		if(ops->open == nil || (f->ename = ops->open(&fp->qid, f->mode)) == nil){
+printf("%s: %d\n", __func__, __LINE__);
 			f->type = Ropen;
 			f->qid = fp->qid;
 			fp->mode = f->mode;
@@ -845,6 +854,7 @@ printf("%s: %d\n", __func__, __LINE__);
 		}
 		else
 			f->type = Rerror;
+printf("%s: %d\n", __func__, __LINE__);
 		increff(fp);
 		wr(c, f);
 		break;

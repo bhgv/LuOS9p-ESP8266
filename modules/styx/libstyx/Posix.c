@@ -367,7 +367,7 @@ styxwaitmsg(Styxserver *server)
 int
 styxrecv(Styxserver *server, int fd, char *buf, int n, int m)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+printf("%s: %d\n", __func__, __LINE__);
 /*
 	//struct netconn* nc = NULL;
 	struct netbuf* nb =NULL;
@@ -398,7 +398,7 @@ styxrecv(Styxserver *server, int fd, char *buf, int n, int m)
 int
 styxsend(Styxserver *server, int fd, char *buf, int n, int m)
 {
-	printf("%s: %d fd=%d, buf=%x, l=%d\n", __func__, __LINE__, fd, buf, n);
+printf("%s: %d fd=%d, buf=%x, l=%d\n", __func__, __LINE__, fd, buf, n);
 
 //	if(buf == NULL || n == 0) return 0;
 /*
@@ -411,7 +411,7 @@ styxsend(Styxserver *server, int fd, char *buf, int n, int m)
 	}
 */
 	int r = lwip_send(fd, buf, n, m);
-	printf("%s: %d fd = %d, ret = %d\n", __func__, __LINE__, fd, r);
+printf("%s: %d fd = %d, ret = %d\n", __func__, __LINE__, fd, r);
 	return r; //lwip_send(fd, buf, n, m);
 }
 
