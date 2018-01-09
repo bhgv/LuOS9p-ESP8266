@@ -470,16 +470,52 @@ fscreate(Qid *qid, char *name, int perm, int mode)
 	Styxfile *f;
 
 	USED(mode);
-	isdir = perm&DMDIR;
-	if(isdir)
-		f = styxadddir(server, qid->path, nq++, name, perm, "inferno");
-	else
-		f = styxaddfile(server, qid->path, nq++, name, perm, "inferno");
-	if(f == nil)
-		return Eexist;
-	f->u = nil;
-	f->d.length = 0;
-	*qid = f->d.qid;
+	isdir = perm & DMDIR;
+
+
+	switch( qid->my_type ){
+		case FS_FILE:
+		case FS_FILE_DIR:
+			{
+				char *pth = malloc(256);
+				int nm_len = strlen(name);
+				int l = file_pathname_from_path(qid->path, pth, 255);
+//printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+				if(l + 1 + nm_len > 255)
+					return 1;
+				pth[ l ] = '/';
+				l++;
+				memcpy( &pth[ l ], name, nm_len);
+				l += nm_len;
+				if(isdir){
+					mkdir(pth, 0);
+					qid->my_type = FS_FILE_DIR;
+				}else{
+					FILE *f = fopen(pth, "a");
+					fclose(f);
+					qid->my_type = FS_FILE_FILE;
+				}
+				qid->my_name = strdup(name);
+				
+				free(pth);
+			}
+			break;
+
+		case FS_ROOT:
+			if(isdir)
+				f = styxadddir(server, qid->path, nq++, name, perm, "inferno");
+			else
+				f = styxaddfile(server, qid->path, nq++, name, perm, "inferno");
+			if(f == nil)
+				return Eexist;
+			f->u = nil;
+			f->d.length = 0;
+			*qid = f->d.qid;
+
+			break;
+
+	}
+	
 	return nil;
 }
 
@@ -488,11 +524,54 @@ fsremove(Qid qid)
 {
 	Styxfile *f;
 
-	f = styxfindfile(server, qid.path);
-	if((f->d.qid.type&QTDIR) && f->child != nil)
-		return "directory not empty";
-	styxfree(f->u);
-	styxrmfile(server, qid.path);	
+	struct stat statbuf;
+
+	switch( qid.my_type ){
+		case FS_FILE:
+			break;
+	
+		case FS_FILE_DIR:
+			{
+				char *pth = malloc(256);
+				int l = file_pathname_from_path(qid.path, pth, 255);
+//printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+				if (stat(pth, &statbuf) != 0) {
+					return 1;
+				}
+				
+				if (S_ISDIR(statbuf.st_mode)) {
+					rmdir(pth);
+				}
+				free(pth);
+			}
+			break;
+
+		case FS_FILE_FILE:
+			{
+				char *pth = malloc(256);
+				int l = file_pathname_from_path(qid.path, pth, 255);
+//printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+				if (stat(pth, &statbuf) != 0) {
+					return 1;
+				}
+				
+				if (!S_ISDIR(statbuf.st_mode)) {
+					remove(pth);
+				}
+				free(pth);
+			}
+			break;
+
+		case FS_ROOT:
+			f = styxfindfile(server, qid.path);
+			if((f->d.qid.type&QTDIR) && f->child != nil)
+				return "directory not empty";
+			styxfree(f->u);
+			styxrmfile(server, qid.path);
+			break;
+
+	}
+	
 	return nil;
 }
 
