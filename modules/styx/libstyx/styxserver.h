@@ -1,4 +1,8 @@
 
+#ifndef _STYXSERVER_H
+#define _STYXSERVER_H
+
+
 #define Qroot	0
 
 //#define MSGMAX	((((8192+128)*2)+3) & ~3)
@@ -101,3 +105,7 @@ void *styxmalloc(int n);
 void styxfree(void *p);
 void styxdebug(void);
 void styxsetowner(char*);
+
+
+#endif
+

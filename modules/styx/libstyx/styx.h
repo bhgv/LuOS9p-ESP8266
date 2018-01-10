@@ -1,6 +1,10 @@
 //#pragma src "/usr/inferno/lib9"
 //#pragma	lib	"libc.a"
 
+#ifndef _STYX_H
+#define _STYX_H
+
+
 #define	VERSION9P	"9P2000"
 
 #define	MAXWELEM	16
@@ -138,3 +142,6 @@ int	read9pmsg(int, void*, uint);
 //#pragma	varargck	type	"F"	Fcall*
 //#pragma	varargck	type	"M"	ulong
 //#pragma	varargck	type	"D"	Dir*
+
+#endif
+

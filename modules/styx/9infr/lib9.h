@@ -1,4 +1,9 @@
 /* define _BSD_SOURCE to use ISO C, POSIX, and 4.3BSD things. */
+
+#ifndef _LIB9_H 
+#define _LIB9_H
+
+
 #define	USE_PTHREADS
 #ifndef _DEFAULT_SOURCE
 #define	_DEFAULT_SOURCE
@@ -495,3 +500,6 @@ extern	void	setfcr(ulong);
 extern	void	setfsr(ulong);
 extern	ulong	getfcr(void);
 extern	ulong	getfsr(void);
+
+#endif
+
