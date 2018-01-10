@@ -95,6 +95,7 @@ ls_dir_rd_out(const char *path, Qid qid, char *buf, ulong *n, vlong *off){
 }
 
 
+/*
 Path
 make_file_path(Path new_type, Path oldp, int idx){
 	Path newp = 0ULL;
@@ -127,7 +128,7 @@ make_file_path(Path new_type, Path oldp, int idx){
 	
 	return newp;
 }
-
+*/
 
 char*
 scan_fs_dir(Qid *qid, const char *path, char *nm){
@@ -145,12 +146,12 @@ scan_fs_dir(Qid *qid, const char *path, char *nm){
 	
 	// Read entries
 	i = 0; 
-//printf("\nscan_fs_dir old_path = %x:%x\n\n", (int)(qid->path >> 32), (int)qid->path );
+printf("\n%s:%d. old_path = %x:%x\n\n", __func__, __LINE__, (int)(qid->path >> 32), (int)qid->path );
 	while ((ent = readdir(dir)) != NULL) {
 		if( !strcmp(ent->d_name, nm) ){
 //			qid->path = PATH_FILE + (PATH_STEP_MASK & i);
-			qid->path = make_file_path( PATH_FILE, qid->path, i);
-//printf("\n\nscan_fs_dir new path = %x:%x\n\n\n", (int)(qid->path >> 32), (int)qid->path );
+			qid->path = make_file_path( PATH_FILE, (Path)qid->path, i);
+printf("\n%s:%d new_path = %x:%x\n\n", __func__, __LINE__, (int)(qid->path >> 32), (int)qid->path );
 			
 			//d.length = 0;
 			qid->my_type = FS_FILE_DIR;

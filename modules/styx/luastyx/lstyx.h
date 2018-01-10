@@ -3,6 +3,10 @@
  * Copyright bhgv 2017
  */
 
+#ifndef _LSTYX_H
+#define _LSTYX_H
+
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -87,8 +91,6 @@ extern lua_State* intL;
 
 
 
-
-
 /*
  * An in-memory file server
  * allowing truncation, removal on closure, wstat and
@@ -98,4 +100,15 @@ extern lua_State* intL;
 char *fsremove(Qid);
 
 
+Path make_file_path(Path new_type, Path oldp, int idx);
+
+char* ls_dir_rd_out(const char *path, Qid qid, char *buf, ulong *n, vlong *off);
+char* scan_fs_dir(Qid *qid, const char *path, char *nm);
+int file_pathname_from_path(Path path, char* buf, int max_len);
+
+void* scan_devs(luaR_entry *hdr_entry, char* nm, int type);
+char* dev_call_parse_next_par(char* buf, int *plen);
+
+
+#endif
 

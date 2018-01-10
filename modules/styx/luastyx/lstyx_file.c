@@ -38,11 +38,44 @@ fsfileopen(Qid *qid, int mode)
 
 printf("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
 	switch( qid->my_type ){
-		case FS_DEV:
-		case FS_DEV_FILE:
 		case FS_FILE:
 		case FS_FILE_DIR:
+			break;
+		
 		case FS_FILE_FILE:
+			{
+//				char mo[10], *pmo;
+				char *otype = NULL;
+
+				FILE* f = NULL;
+				char *buf = malloc(256);
+				
+				int isread = (mode & 0xf) == OREAD | (mode & 0xf) == OEXEC;
+				int iswrite =(mode & 0xf) == OWRITE;
+				int isrdwr = (mode & 0xf) == ORDWR;
+				int istrunc = (mode & 0xf0) == OTRUNC;
+				
+//				pmo = mo;
+				if(isread)
+					otype = "r";
+				else if(istrunc)
+					otype = "w";
+				else if(iswrite)
+					otype = "r+";
+				else if(isrdwr)
+					otype = "r+";
+				
+				int l = file_pathname_from_path(qid->path, buf, 255);
+				if(l == 0)
+					return "File not found";
+
+				if(otype != NULL)
+					f = fopen(buf, otype);
+
+				qid->my_f = f;
+				
+				free(buf);
+			}
 			break;
 
 	}
@@ -54,6 +87,37 @@ printf("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, 
 char*
 fsfileclose(Qid qid, int mode)
 {
+printf("%s: %d, qid->my_type = %d, mode = %x\n", __func__, __LINE__, qid.my_type, mode);
+
+	switch( qid.my_type ){
+		case FS_FILE_FILE:
+			{
+				FILE* f = NULL;
+				
+				int isrm = mode & ORCLOSE;
+printf("%s: %d, qid->my_f = %x\n", __func__, __LINE__, qid.my_f);
+
+				f = qid.my_f;
+				if(f != NULL)
+					fclose(f);
+				qid.my_f = NULL;
+
+				if(isrm){
+					char *buf = malloc(256);
+					int l = file_pathname_from_path(qid.path, buf, 255);
+					if(l == 0){
+						return "File not found";
+					}
+					
+					remove(buf);
+				
+					free(buf);
+				}
+
+			}
+			break;
+	}
+	
 	return nil;
 }
 
@@ -68,7 +132,8 @@ fsfilecreate(Qid *qid, char *name, int perm, int mode)
 
 	USED(mode);
 	isdir = perm & DMDIR;
-printf("%s: %d\n", __func__, __LINE__);
+printf("%s: %d, qid->my_type = %d, mode = %x, name = %s, perm = %x\n", __func__, __LINE__, 
+				qid->my_type, mode, name, perm);
 
 	switch( qid->my_type ){
 		case FS_FILE:
@@ -94,12 +159,14 @@ printf("%s: %d, pth = %s\n", __func__, __LINE__, pth);
 				if(isdir){
 printf("%s: %d\n", __func__, __LINE__);
 					mkdir(pth, 0);
+					qid->my_f = NULL;
 //					qid->type = QTDIR;
 //					qid->my_type = FS_FILE_DIR;
 				}else{
 printf("%s: %d\n", __func__, __LINE__);
-					FILE *f = fopen(pth, "a");
-					fclose(f);
+					FILE *f = fopen(pth, "w+");
+					qid->my_f = f;
+//					fclose(f);
 //					qid->type = QTFILE;
 //					qid->my_type = FS_FILE_FILE;
 				}
@@ -109,7 +176,6 @@ printf("%s: %d\n", __func__, __LINE__);
 				er = scan_fs_dir(qid, pth, name);
 				
 				free(pth);
-//				er = nil;
 			}
 			break;
 
@@ -125,6 +191,8 @@ fsfileremove(Qid qid)
 
 	struct stat statbuf;
 
+printf("\n%s: %d. qid.my_type = %d, qid.path = %x:%x\n", __func__, __LINE__, qid.my_type, 
+												(int)(qid.path>>32), (int)qid.path );
 	switch( qid.my_type ){
 		case FS_FILE:
 			break;
@@ -132,10 +200,12 @@ fsfileremove(Qid qid)
 		case FS_FILE_DIR:
 			{
 				char *pth = malloc(256);
+				pth[0] = '\0';
 				int l = file_pathname_from_path(qid.path, pth, 255);
-//printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
 				if (stat(pth, &statbuf) != 0) {
-					return 1;
+					free(pth);
+					return nil;
 				}
 				
 				if (S_ISDIR(statbuf.st_mode)) {
@@ -148,10 +218,18 @@ fsfileremove(Qid qid)
 		case FS_FILE_FILE:
 			{
 				char *pth = malloc(256);
+				pth[0] = '\0';
 				int l = file_pathname_from_path(qid.path, pth, 255);
-//printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+
+				if(qid.my_f != NULL){
+					fclose(qid.my_f );
+					qid.my_f = NULL;
+				}
+				
 				if (stat(pth, &statbuf) != 0) {
-					return 1;
+					free(pth);
+					return nil;
 				}
 				
 				if (!S_ISDIR(statbuf.st_mode)) {
@@ -237,14 +315,14 @@ printf("\n\n");
 				FILE *fp;
 				int c;
 				int i, j;
-				char *pth = malloc(256);
+//				char *pth = malloc(256);
 printf("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)qid.path);
-				int l = file_pathname_from_path(qid.path, pth, 255);
+//				int l = file_pathname_from_path(qid.path, pth, 255);
 
-printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
-				fp = fopen(pth,"r");
+//printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
+				fp = qid.my_f;  //fopen(pth,"r");
 
-				free(pth);
+//				free(pth);
 				
 				if (!fp) {
 					*n = 0;
@@ -260,7 +338,7 @@ printf("%c", c);
 					}
 					i++;
 				}
-				fclose(fp);
+//				fclose(fp);
 printf("\n%s: %d. i = %d, j = %d\n\n", __func__, __LINE__, i, j);
 				*n = j;
 				//*off = i;
@@ -299,14 +377,14 @@ fsfilewrite(Qid qid, char *buf, ulong *n, vlong off)
 				FILE *fp;
 				int c;
 				int i, j;
-				char *pth = malloc(256);
+//				char *pth = malloc(256);
 printf("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)qid.path);
-				int l = file_pathname_from_path(qid.path, pth, 255);
+//				int l = file_pathname_from_path(qid.path, pth, 255);
 
-printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
-				fp = fopen(pth,"w+");
+//printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
+				fp = qid.my_f;  //fopen(pth,"w+");
 
-				free(pth);
+//				free(pth);
 				
 				if (!fp) {
 					*n = 0;
@@ -320,12 +398,12 @@ printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, 
 						fputc(c, fp);
 printf("%c", c);
 						j++;
-					}else{
-						c = fgetc(fp);
+//					}else{
+//						c = fgetc(fp);
 					}
 					i++;
 				}
-				fclose(fp);
+//				fclose(fp);
 printf("\n%s: %d. i = %d, j = %d\n\n", __func__, __LINE__, i, j);
 				*n = j;
 				//*off = i;
@@ -343,10 +421,12 @@ fsfilestat(Qid qid, Dir *d)
 {
 	Styxfile *file;
 
-//printf("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
+printf("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
 
 	switch(qid.my_type){
+//		case FS_FILE:
 		case FS_FILE_DIR:
+		case FS_FILE_FILE:
 			{
 				memset(d, 0, sizeof(Dir) );
 				
@@ -361,7 +441,7 @@ fsfilestat(Qid qid, Dir *d)
 
 				d->qid = qid;
 				
-				d->mode = 0; //mode;
+				d->mode = 0777; //mode;
 				d->atime = styxtime(0);
 				d->mtime = styxtime(0); //boottime;
 				d->length = 0;

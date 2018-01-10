@@ -863,14 +863,19 @@ printf("%s: %d\n", __func__, __LINE__);
 			printf("\nTcreate %d %s\n", f->fid, f->name);
 //			fprint(2, "Tcreate %d %s\n", f->fid, f->name);
 		f->ename = nil;
+printf("%s: %d, f->perm = %x, f->mode = %x, file = %x\n", __func__, __LINE__, f->perm, f->mode, file);
 		if(fp->open)
 			f->ename = Eopen;
-		else if(!(fp->qid.type&QTDIR))
+		else if(!(fp->qid.type & QTDIR)){
+printf("%s: %d\n", __func__, __LINE__);
 			f->ename = Enotdir;
-		else if((f->perm&DMDIR) && (f->mode&(OWRITE|OTRUNC|ORCLOSE)))
+		}else if((f->perm & DMDIR) && (f->mode & (OWRITE|OTRUNC|ORCLOSE))){
+printf("%s: %d\n", __func__, __LINE__);
 			f->ename = Eperm;
-		else if(file != nil && !styxperm(file, c->uname, OWRITE))
+		}else if(file != nil && !styxperm(file, c->uname, OWRITE)){
+printf("%s: %d\n", __func__, __LINE__);
 			f->ename = Eperm;
+		}
 		if(f->ename != nil){
 			f->type = Rerror;
 			wr(c, f);
@@ -879,7 +884,7 @@ printf("%s: %d\n", __func__, __LINE__);
 		f->ename = Eperm;
 		decreff(fp);
 		if(file != nil){
-			if(f->perm&DMDIR)
+			if(f->perm & DMDIR)
 				f->perm = (f->perm&~0777) | (file->d.mode & f->perm & 0777) | DMDIR;
 			else
 				f->perm = (f->perm&(~0777 | 0111)) | (file->d.mode & f->perm & 0666);

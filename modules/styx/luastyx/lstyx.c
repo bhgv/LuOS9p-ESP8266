@@ -35,36 +35,36 @@ int is_styx_srv_run = 1;
 
 
 
-#if 0
+#if 1
 Path
 make_file_path(Path new_type, Path oldp, int idx){
 	Path newp = 0ULL;
-//printf("\n%s:%d oldp = %x:%x, i = %d\n", __func__, __LINE__, (int)(oldp>>32), (int)oldp, idx);
+printf("\n%s:%d oldp = %x:%x, i = %d\n", __func__, __LINE__, (int)(oldp>>32), (int)oldp, idx);
 	Path lvl = PATH_LVL_GET(oldp);
-//printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
+printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
 
 	Path mainpt = oldp & PATH_MAIN_PT_MASK;
-//printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
 
 	Path curpt = idx & PATH_STEP_MASK;
 	curpt <<= lvl * PATH_MAIN_PT_STEP;
-//printf("%s:%d curpt = %x:%x\n", __func__, __LINE__, (int)(curpt>>32), (int)curpt);
+printf("%s:%d curpt = %x:%x\n", __func__, __LINE__, (int)(curpt>>32), (int)curpt);
 
 	mainpt &= ~( PATH_STEP_MASK << (lvl * PATH_MAIN_PT_STEP) );
-//printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
 	mainpt |= curpt;
-//printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
 
 	lvl++;
-//printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
+printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
 
 	PATH_LVL_SET(newp, lvl);
-//printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
 	newp |= mainpt;
-//printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
-//printf("%s:%d new_type = %x:%x\n", __func__, __LINE__, (int)(new_type>>32), (int)new_type);
+printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+printf("%s:%d new_type = %x:%x\n", __func__, __LINE__, (int)(new_type>>32), (int)new_type);
 	PATH_TYPE_COPY(newp, new_type);
-//printf("%s:%d newp = %x:%x\n\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+printf("%s:%d newp = %x:%x\n\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
 	
 	return newp;
 }
@@ -112,8 +112,18 @@ printf("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, 
 char*
 fsclose(Qid qid, int mode)
 {
-	if(mode&ORCLOSE)	/* remove on close */
-		return fsremove(qid);
+
+	switch( qid.my_type ){
+//		case FS_FILE:
+		case FS_FILE_DIR:
+		case FS_FILE_FILE:
+			return fsfileclose(qid, mode);
+	
+		case FS_ROOT:
+			if(mode&ORCLOSE)	/* remove on close */
+				return fsremove(qid);
+			
+	}
 	return nil;
 }
 
@@ -405,9 +415,9 @@ myinit(/*Styxserver *s*/)
 	//f->d.type = FS_DEV;
 	f->d.qid.my_type = FS_DEV;
 	
-	f = styxaddfile(server, 1, 1000, "tst", 0666, "inferno");
+//	f = styxaddfile(server, 1, 1000, "tst", 0666, "inferno");
 
-	f = styxadddir(server, Qroot, 2, "fs", 0555, "inferno");
+	f = styxadddir(server, Qroot, 2, "fs", 0777, "inferno");
 	//f->d.type = FS_FILE;
 	f->d.qid.my_type = FS_FILE;
 	

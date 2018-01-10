@@ -398,6 +398,7 @@ struct Qid
 	uchar	type;
 	uchar	my_type;
 	char*	my_name;
+	void*	my_f;
 } Qid;
 
 typedef
