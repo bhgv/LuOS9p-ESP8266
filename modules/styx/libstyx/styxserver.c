@@ -4,6 +4,19 @@
 #include "styxserver.h"
 #include "styxaux.h"
 
+
+
+
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
+
+
+
 #define MAXSTAT	256 //512
 //#define EMSGLEN			256		/* %r */
 
@@ -163,7 +176,7 @@ nbread(Client *c, int nr)
 	if(c->state&CDISC)
 		return -1;
 	nb = styxrecv(c->server, c->fd, c->msg + c->nread, nr, 0);
-printf("%s: %d nb=%d\n", __func__, __LINE__, nb);
+DBG("%s: %d nb=%d\n", __func__, __LINE__, nb);
 	if(nb <= 0){
 		c->nread = 0;
 		c->state |= CDISC;
@@ -224,7 +237,7 @@ wr(Client *c, Fcall *r)
 	char* buf = malloc( l ); //MSGMAX); //[MSGMAX];
 	int ret;
 
-printf("%s: %d sz=%d, MAX=%d\n", __func__, __LINE__,  l, MSGMAX);
+DBG("%s: %d sz=%d, MAX=%d\n", __func__, __LINE__,  l, MSGMAX);
 
 	n = convS2M(r, (uchar*)buf, l); //sizeof(buf));
 	if(n < 0){
@@ -233,7 +246,7 @@ printf("%s: %d sz=%d, MAX=%d\n", __func__, __LINE__,  l, MSGMAX);
 	}
 	/* fprint(2, "wr: %F\n", r); */
 	ret = styxsend(c->server, c->fd, buf, n, 0);
-printf("%s: %d\n", __func__, __LINE__ );
+DBG("%s: %d\n", __func__, __LINE__ );
 
 	free(buf);
 	
@@ -479,26 +492,26 @@ devwalk(Client *c, Styxfile *file, Fid *fp, Fid *nfp, char **name, int nname, ch
 	wq = styxmalloc(sizeof(Walkqid)+(nname-1)*sizeof(Qid));
 	wq->nqid = 0;
 
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	p = file;
 	qid = (p != nil) ? p->d.qid : fp->qid;
 	for(j = 0; j < nname; j++){
 		if(!(qid.type & QTDIR)){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			if(j == 0){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 				styxfatal("devwalk error");
 			}
 			*err = Enotdir;
 			goto Done;
 		}
 		if(p != nil && !styxperm(p, c->uname, OEXEC)){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			*err = Eperm;
 			goto Done;
 		}
 		n = name[j];
-printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
+DBG("%s: %d. nm=%s\n", __func__, __LINE__, n);
 		if(strcmp(n, ".") == 0){
     Accept:
 			wq->qid[wq->nqid++] = nfp->qid;
@@ -523,7 +536,7 @@ printf("%s: %d. nm=%s\n", __func__, __LINE__, n);
 				decreff(nfp);
 				nfp->qid = qid;
 				increff(nfp);
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 				p = styxfindfile(server, qid.path);
 				if(server->needfile && p == nil)
 					goto Done;
@@ -549,9 +562,9 @@ printf("%s: %d\n", __func__, __LINE__);
 			}else
 			*/
 			for(f = p->child; f != nil; f = f->sibling){
-printf("%s: %d. name = %s\n", __func__, __LINE__, f->d.name);
+DBG("%s: %d. name = %s\n", __func__, __LINE__, f->d.name);
 				if(strcmp(n, f->d.name) == 0){
-printf("%s: %d. res nm = %s\n", __func__, __LINE__, n);
+DBG("%s: %d. res nm = %s\n", __func__, __LINE__, n);
 					decref(p);
 					nfp->qid.path = f->d.qid.path;
 					nfp->qid.type = f->d.qid.type;
@@ -598,7 +611,7 @@ devdirread(Fid *fp, Styxfile *file, char *d, long n)
 //		char slop[100];	/* TO DO */
 	}dir;
 
-//printf("%s: %d n = %d\n", __func__, __LINE__, n);
+//DBG("%s: %d n = %d\n", __func__, __LINE__, n);
 	f = file->child;
 	for(i = 0; i < fp->dri; i++){
 		if(f == 0)
@@ -617,11 +630,11 @@ devdirread(Fid *fp, Styxfile *file, char *d, long n)
 		m += dsz;
 		d += dsz;
 		f = f->sibling;
-//printf("%s: %d m = %d < n = %d, dsz = %d, f = %x, fp->dri=%d\n", __func__, __LINE__, 
+//DBG("%s: %d m = %d < n = %d, dsz = %d, f = %x, fp->dri=%d\n", __func__, __LINE__, 
 //						m, n, dsz, f, fp->dri);
 	}
 	
-//printf("%s: %d out cnt = %d\n", __func__, __LINE__, m);
+//DBG("%s: %d out cnt = %d\n", __func__, __LINE__, m);
 
 	return m;
 }
@@ -772,17 +785,17 @@ run(Client *c)
 			deletefid(c, nfp);
 			nfp = nil;
 		}
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		if(nfp){
 			f->ename = "fid in use";
 			if(Debug) printf("walk: %s\n", f->ename);
 //			if(Debug) fprint(2, "walk: %s\n", f->ename);
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			wr(c, f);
 			break;
 		}else if(fp->open){
 			f->ename = "can't clone";
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			wr(c, f);
 			break;
 		}
@@ -790,11 +803,11 @@ printf("%s: %d\n", __func__, __LINE__);
 			nfp = fidclone(fp, f->newfid);
 		else
 			nfp = fp;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		if((wq = devwalk(c, file, fp, nfp, f->wname, f->nwname, &f->ename)) == nil){
 			if(nfp != fp)
 				deletefid(c, nfp);
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			f->type = Rerror;
 		}else{
 			if(nfp != fp){
@@ -803,10 +816,10 @@ printf("%s: %d\n", __func__, __LINE__);
 			}
 			f->type = Rwalk;
 			f->nwqid = wq->nqid;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			for(i = 0; i < wq->nqid; i++){
 				f->wqid[i] = wq->qid[i];
-printf("%s: %d. %d) my_type=%d, t=%d, pth=%d\n", __func__, __LINE__, 
+DBG("%s: %d. %d) my_type=%d, t=%d, pth=%d\n", __func__, __LINE__, 
 					i, wq->qid[i].my_type,
 					wq->qid[i].type, 
 					wq->qid[i].path
@@ -814,7 +827,7 @@ printf("%s: %d. %d) my_type=%d, t=%d, pth=%d\n", __func__, __LINE__,
 			}
 			styxfree(wq);
 		}
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		wr(c, f);
 		break;
 	case	Topen:
@@ -822,29 +835,29 @@ printf("%s: %d\n", __func__, __LINE__);
 			printf("\nTopen %d\n", f->fid);
 //			fprint(2, "Topen %d\n", f->fid);
 		f->ename = nil;
-printf("%s: %d. fp->open = %d, fp->qid.type = %x, f->mode = %x\n", __func__, __LINE__, fp->open, fp->qid.type, f->mode);
+DBG("%s: %d. fp->open = %d, fp->qid.type = %x, f->mode = %x\n", __func__, __LINE__, fp->open, fp->qid.type, f->mode);
 		if(fp->open)
 			f->ename = Eopen;
 //		else if(file == nil && (f->mode&(OWRITE|OTRUNC|ORCLOSE)))
 //			f->ename = Eperm;
 		else if((fp->qid.type & QTDIR) && (f->mode & (OWRITE|OTRUNC|ORCLOSE))){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			f->ename = Eperm;
 		}else if(file != nil && !styxperm(file, c->uname, f->mode))
 			f->ename = Eperm;
 		else if((f->mode & ORCLOSE) && file != nil && file->parent != nil && !styxperm(file->parent, c->uname, OWRITE))
 			f->ename = Eperm;
 		if(f->ename != nil){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			f->type = Rerror;
 			wr(c, f);
 			break;
 		}
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		f->ename = Enonexist;
 		decreff(fp);
 		if(ops->open == nil || (f->ename = ops->open(&fp->qid, f->mode)) == nil){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			f->type = Ropen;
 			f->qid = fp->qid;
 			fp->mode = f->mode;
@@ -854,7 +867,7 @@ printf("%s: %d\n", __func__, __LINE__);
 		}
 		else
 			f->type = Rerror;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		increff(fp);
 		wr(c, f);
 		break;
@@ -863,17 +876,17 @@ printf("%s: %d\n", __func__, __LINE__);
 			printf("\nTcreate %d %s\n", f->fid, f->name);
 //			fprint(2, "Tcreate %d %s\n", f->fid, f->name);
 		f->ename = nil;
-printf("%s: %d, f->perm = %x, f->mode = %x, file = %x\n", __func__, __LINE__, f->perm, f->mode, file);
+DBG("%s: %d, f->perm = %x, f->mode = %x, file = %x\n", __func__, __LINE__, f->perm, f->mode, file);
 		if(fp->open)
 			f->ename = Eopen;
 		else if(!(fp->qid.type & QTDIR)){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			f->ename = Enotdir;
 		}else if((f->perm & DMDIR) && (f->mode & (OWRITE|OTRUNC|ORCLOSE))){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			f->ename = Eperm;
 		}else if(file != nil && !styxperm(file, c->uname, OWRITE)){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			f->ename = Eperm;
 		}
 		if(f->ename != nil){
@@ -911,19 +924,19 @@ printf("%s: %d\n", __func__, __LINE__);
 			wr(c, f);
 			break;
 		}
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		if(fp->qid.type & QTDIR || (file != nil && file->d.qid.type & QTDIR)){
 			f->type = Rread;
-printf("%s: %d file = %x, ops = %x, ops->read = %x\n", __func__, __LINE__, file, ops, ops->read);
+DBG("%s: %d file = %x, ops = %x, ops->read = %x\n", __func__, __LINE__, file, ops, ops->read);
 			if(file == nil){
 				f->ename = Eperm;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 				if(
 					ops->read && 
 					(f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
 				){
 					f->data = c->data;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 				}
 				else
 					f->type = Rerror;
@@ -935,31 +948,31 @@ printf("%s: %d\n", __func__, __LINE__);
 					(f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
 				){
 					f->data = c->data;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 				}
 				else{
 				//	f->type = Rerror;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 					f->count = devdirread(fp, file, c->data, f->count);
 					f->data = c->data;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 				}
 			}		
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		}else{
 			f->ename = Eperm;
 			f->type = Rerror;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 			if(ops->read && (f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &f->offset)) == nil){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 				f->type = Rread;
 				f->data = c->data;
 			}
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		}
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		wr(c, f);
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 		break;
 	case	Twrite:
 		if(Debug)

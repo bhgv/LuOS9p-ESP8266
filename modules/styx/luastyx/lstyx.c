@@ -24,6 +24,17 @@
 #include "lstyx.h"
 
 
+
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...) ;
+#endif
+
+
+
+
 char *fsremove(Qid);
 
 
@@ -39,32 +50,32 @@ int is_styx_srv_run = 1;
 Path
 make_file_path(Path new_type, Path oldp, int idx){
 	Path newp = 0ULL;
-printf("\n%s:%d oldp = %x:%x, i = %d\n", __func__, __LINE__, (int)(oldp>>32), (int)oldp, idx);
+DBG("\n%s:%d oldp = %x:%x, i = %d\n", __func__, __LINE__, (int)(oldp>>32), (int)oldp, idx);
 	Path lvl = PATH_LVL_GET(oldp);
-printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
+DBG("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
 
 	Path mainpt = oldp & PATH_MAIN_PT_MASK;
-printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+DBG("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
 
 	Path curpt = idx & PATH_STEP_MASK;
 	curpt <<= lvl * PATH_MAIN_PT_STEP;
-printf("%s:%d curpt = %x:%x\n", __func__, __LINE__, (int)(curpt>>32), (int)curpt);
+DBG("%s:%d curpt = %x:%x\n", __func__, __LINE__, (int)(curpt>>32), (int)curpt);
 
 	mainpt &= ~( PATH_STEP_MASK << (lvl * PATH_MAIN_PT_STEP) );
-printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+DBG("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
 	mainpt |= curpt;
-printf("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
+DBG("%s:%d mainpt = %x:%x\n", __func__, __LINE__, (int)(mainpt>>32), (int)mainpt);
 
 	lvl++;
-printf("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
+DBG("%s:%d lvl = %x:%x\n", __func__, __LINE__, (int)(lvl>>32), (int)lvl);
 
 	PATH_LVL_SET(newp, lvl);
-printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+DBG("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
 	newp |= mainpt;
-printf("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
-printf("%s:%d new_type = %x:%x\n", __func__, __LINE__, (int)(new_type>>32), (int)new_type);
+DBG("%s:%d newp = %x:%x\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+DBG("%s:%d new_type = %x:%x\n", __func__, __LINE__, (int)(new_type>>32), (int)new_type);
 	PATH_TYPE_COPY(newp, new_type);
-printf("%s:%d newp = %x:%x\n\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
+DBG("%s:%d newp = %x:%x\n\n", __func__, __LINE__, (int)(newp>>32), (int)newp);
 	
 	return newp;
 }
@@ -82,7 +93,7 @@ fsopen(Qid *qid, int mode)
 {
 	Styxfile *f;
 
-printf("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
+DBG("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
 	switch( qid->my_type ){
 		case FS_DEV:
 		case FS_DEV_FILE:
@@ -138,7 +149,7 @@ fscreate(Qid *qid, char *name, int perm, int mode)
 
 	USED(mode);
 	isdir = perm & DMDIR;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 
 	switch( qid->my_type ){
 		case FS_FILE:
@@ -197,7 +208,7 @@ fswalk(Qid* qid, char *nm)
 {
 	char *er = "Not found";
 
-printf("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
+DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
 	switch(qid->my_type){
 	case FS_DEV:
 		return fsdevwalk(qid, nm);
@@ -223,10 +234,10 @@ fsread(Qid qid, char *buf, ulong *n, vlong *off)
 	int dri = *off;
 	int pth;
 
-printf("\nfsread my_type = %d", qid.my_type);
+DBG("\nfsread my_type = %d", qid.my_type);
 if(qid.my_name)
-	printf(", my_name = %s", qid.my_name);
-printf("\n\n");
+	DBG(", my_name = %s", qid.my_name);
+DBG("\n\n");
 
 	switch( qid.my_type ){
 		case FS_DEV:
@@ -268,7 +279,7 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 	
 	static char *foo_nm = NULL;
 
-//printf("%s: %d\n", __func__, __LINE__);
+//DBG("%s: %d\n", __func__, __LINE__);
 	switch( qid.my_type ){
 		case FS_DEV_FILE:
 			return fsdevwrite(qid, buf, n, off);
@@ -306,7 +317,7 @@ fsstat(Qid qid, Dir *d)
 {
 	Styxfile *file;
 
-//printf("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
+//DBG("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
 
 	switch(qid.my_type){
 		case FS_FILE:
@@ -474,10 +485,6 @@ lstyx_add_file(lua_State* L){
 	char *path = luaL_checklstring(L, 1, &ln);
 
 	if(path == NULL || ln <= 0) return 0;
-
-//	char* p = malloc(ln+1);
-//	memcpy(p, path, ln);
-//	p[ln] = '\0';
 	
 	Styxfile* f = styxaddfile(server, Qroot, nq, path, 0666, "inferno");
 	f->type = FL_T_FILE;
@@ -503,7 +510,7 @@ lstyx_loop(lua_State* L){
 
 	intL = L;
 	
-	styxdebug();
+//	styxdebug();
 	
 	styxinit(server, &p9_root_ops, "6701", 0777, 0/*1*/);
 	

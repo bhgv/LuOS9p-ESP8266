@@ -21,6 +21,16 @@
 #include "styxaux.h"
 
 
+
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
+
+
 #define NC_MAX 5
 
 typedef struct Fdset Fdset;
@@ -40,7 +50,7 @@ static int nc_pool_idx = 0;
 
 
 int is_nc_pool_have_place(){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	int i;
 	for(i=0; i<nc_pool_idx; i++){
 		if(nc_pool[i] == NULL)
@@ -53,7 +63,7 @@ printf("%s: %d\n", __func__, __LINE__);
 }
 
 int add_to_nc_pool(struct netconn *nc){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	int i;
 	if(nc_pool_idx >= NC_MAX)
 		return -1;
@@ -74,7 +84,7 @@ printf("%s: %d\n", __func__, __LINE__);
 }
 
 struct netconn * get_from_nc_pool(int skt){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	//skt--;
 	if(skt >= nc_pool_idx) return NULL;
 	
@@ -82,7 +92,7 @@ printf("%s: %d\n", __func__, __LINE__);
 }
 
 struct netbuf * get_from_nb_pool(int skt){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	//skt--;
 	if(skt >= nc_pool_idx) return NULL;
 	
@@ -90,7 +100,7 @@ printf("%s: %d\n", __func__, __LINE__);
 }
 
 void set_to_nb_pool(int skt, struct netbuf *nb){
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	//skt--;
 	if(skt >= nc_pool_idx) return;
 	
@@ -98,7 +108,7 @@ void set_to_nb_pool(int skt, struct netbuf *nb){
 }
 
 void del_from_nc_pool(int skt){
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	//skt--;
 	if(skt >= nc_pool_idx) return;
 	
@@ -118,7 +128,7 @@ void del_from_nc_pool(int skt){
 int
 styxinitsocket(void)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	int i;
 	for(i=0; i<NC_MAX; i++){
 		nc_pool[i] = NULL;
@@ -132,13 +142,13 @@ styxinitsocket(void)
 void
 styxendsocket(void)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 }
 
 void
 styxclosesocket(int fd)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	/*
 	struct netconn* nc = get_from_nc_pool(fd);
 
@@ -155,7 +165,7 @@ styxclosesocket(int fd)
 int
 styxannounce(Styxserver *server, char *port)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	struct sockaddr_in sin;
 	int s, one;
 
@@ -185,7 +195,7 @@ styxannounce(Styxserver *server, char *port)
 	one = 1;
 
 	if(lwip_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)&one, sizeof(one)) < 0)
-		printf("setsockopt failed\n");
+DBG("setsockopt failed\n");
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = 0;
@@ -218,7 +228,7 @@ styxannounce(Styxserver *server, char *port)
 int
 styxaccept(Styxserver *server)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	struct sockaddr_in sin;
 	int s;
 	socklen_t len;
@@ -231,7 +241,7 @@ styxaccept(Styxserver *server)
 	s = lwip_accept(server->connfd, (struct sockaddr *)&sin, &len);
 	if(s < 0){
 		if(errno != EINTR)
-			printf("error in accept: %s\n", strerror(errno));
+DBG("error in accept: %s\n", strerror(errno));
 	}
 	/*
 	if(!is_nc_pool_have_place()) return -1;
@@ -247,7 +257,7 @@ styxaccept(Styxserver *server)
 			netconn_delete(clnt);
 		}
 		if(errno != EINTR)
-			printf("error in accept: %s\n", strerror(errno));
+DBG("error in accept: %s\n", strerror(errno));
 		return -1;
 	}
 
@@ -262,7 +272,7 @@ styxaccept(Styxserver *server)
 void
 styxinitwait(Styxserver *server)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	Fdset *fs;
 
 	server->priv = fs = malloc(sizeof(Fdset));
@@ -285,7 +295,7 @@ styxnewcall(Styxserver *server)
 void
 styxnewclient(Styxserver *server, int s)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	Fdset *fs;
 
 	fs = server->priv;
@@ -295,7 +305,7 @@ styxnewclient(Styxserver *server, int s)
 void
 styxfreeclient(Styxserver *server, int s)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	Fdset *fs;
 
 	fs = server->priv;
@@ -354,7 +364,7 @@ styxwaitmsg(Styxserver *server)
 				netconn_recv(nc, &nb);
 
 				if(nb != NULL)
-					printf("%s: %d fd = %d\n", __func__, __LINE__, i);
+DBG("%s: %d fd = %d\n", __func__, __LINE__, i);
 			}
 			set_to_nb_pool(i, nb);
 		}
@@ -367,7 +377,7 @@ styxwaitmsg(Styxserver *server)
 int
 styxrecv(Styxserver *server, int fd, char *buf, int n, int m)
 {
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 /*
 	//struct netconn* nc = NULL;
 	struct netbuf* nb =NULL;
@@ -398,7 +408,7 @@ printf("%s: %d\n", __func__, __LINE__);
 int
 styxsend(Styxserver *server, int fd, char *buf, int n, int m)
 {
-printf("%s: %d fd=%d, buf=%x, l=%d\n", __func__, __LINE__, fd, buf, n);
+DBG("%s: %d fd=%d, buf=%x, l=%d\n", __func__, __LINE__, fd, buf, n);
 
 //	if(buf == NULL || n == 0) return 0;
 /*
@@ -411,20 +421,20 @@ printf("%s: %d fd=%d, buf=%x, l=%d\n", __func__, __LINE__, fd, buf, n);
 	}
 */
 	int r = lwip_send(fd, buf, n, m);
-printf("%s: %d fd = %d, ret = %d\n", __func__, __LINE__, fd, r);
+DBG("%s: %d fd = %d, ret = %d\n", __func__, __LINE__, fd, r);
 	return r; //lwip_send(fd, buf, n, m);
 }
 
 void
 styxexit(int n)
 {
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	//exit(n);
-	printf("exit %d\n", n);
+DBG("exit %d\n", n);
 	while(1);
 }
 
 ulong styxtime(int ulong){
-	printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 	return sdk_system_get_time();
 }

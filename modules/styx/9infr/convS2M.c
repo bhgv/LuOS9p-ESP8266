@@ -1,6 +1,16 @@
 #include	"lib9.h"
 #include	"fcall.h"
 
+
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
+
+
 static
 uchar*
 pstring(uchar *p, char *s)
@@ -55,7 +65,7 @@ sizeS2M(Fcall *f)
 	n += BIT8SZ;	/* type */
 	n += BIT16SZ;	/* tag */
 
-printf("%s: f->type = %d\n", __func__, f->type);
+DBG("%s: f->type = %d\n", __func__, f->type);
 	switch(f->type)
 	{
 	default:

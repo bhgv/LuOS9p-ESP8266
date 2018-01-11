@@ -25,6 +25,16 @@
 
 
 
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
+
+
+
 void*
 scan_devs(luaR_entry *hdr_entry, char* nm, int type){
 	int i = 1;
@@ -57,7 +67,7 @@ dev_call_parse_next_par(char* buf, int *plen){
 	char *p, *r = NULL;
 	char c, prt = 0, slsh = 0;;
 
-//printf("%s: %d\n", __func__, __LINE__);
+//DBG("%s: %d\n", __func__, __LINE__);
 	if(buf != NULL){
 		for(p = buf; *p == ' ' || *p == '\t' || *p == '\r' || *p == '\n'; p++);
 		r = p;
@@ -82,7 +92,7 @@ dev_call_parse_next_par(char* buf, int *plen){
 
 	if(plen != NULL) *plen = l;
 
-//printf("%s: %d. r=%s, l=%d\n", __func__, __LINE__, r, l);
+//DBG("%s: %d. r=%s, l=%d\n", __func__, __LINE__, r, l);
 	return r;
 }
 

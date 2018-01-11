@@ -24,11 +24,14 @@
 #include "lstyx.h"
 
 
-/*
- * An in-memory file server
- * allowing truncation, removal on closure, wstat and
- * all other file operations
- */
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)  ;
+#endif
+
+
 
 
 char*
@@ -36,7 +39,7 @@ fsfileopen(Qid *qid, int mode)
 {
 	Styxfile *f;
 
-printf("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
+DBG("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
 	switch( qid->my_type ){
 		case FS_FILE:
 		case FS_FILE_DIR:
@@ -87,7 +90,7 @@ printf("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, 
 char*
 fsfileclose(Qid qid, int mode)
 {
-printf("%s: %d, qid->my_type = %d, mode = %x\n", __func__, __LINE__, qid.my_type, mode);
+DBG("%s: %d, qid->my_type = %d, mode = %x\n", __func__, __LINE__, qid.my_type, mode);
 
 	switch( qid.my_type ){
 		case FS_FILE_FILE:
@@ -95,7 +98,7 @@ printf("%s: %d, qid->my_type = %d, mode = %x\n", __func__, __LINE__, qid.my_type
 				FILE* f = NULL;
 				
 				int isrm = mode & ORCLOSE;
-printf("%s: %d, qid->my_f = %x\n", __func__, __LINE__, qid.my_f);
+DBG("%s: %d, qid->my_f = %x\n", __func__, __LINE__, qid.my_f);
 
 				f = qid.my_f;
 				if(f != NULL)
@@ -132,7 +135,7 @@ fsfilecreate(Qid *qid, char *name, int perm, int mode)
 
 	USED(mode);
 	isdir = perm & DMDIR;
-printf("%s: %d, qid->my_type = %d, mode = %x, name = %s, perm = %x\n", __func__, __LINE__, 
+DBG("%s: %d, qid->my_type = %d, mode = %x, name = %s, perm = %x\n", __func__, __LINE__, 
 				qid->my_type, mode, name, perm);
 
 	switch( qid->my_type ){
@@ -143,7 +146,7 @@ printf("%s: %d, qid->my_type = %d, mode = %x, name = %s, perm = %x\n", __func__,
 				int nm_len = strlen(name);
 				int l = file_pathname_from_path(qid->path, pth, 255);
 				int pth_l = l;
-printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+DBG("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
 
 				if(l + 1 + nm_len > 255){
 					free(pth);
@@ -154,16 +157,16 @@ printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
 				memcpy( &pth[ l ], name, nm_len);
 				l += nm_len;
 				pth[ l ] = '\0';
-printf("%s: %d, pth = %s\n", __func__, __LINE__, pth);
+DBG("%s: %d, pth = %s\n", __func__, __LINE__, pth);
 
 				if(isdir){
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 					mkdir(pth, 0);
 					qid->my_f = NULL;
 //					qid->type = QTDIR;
 //					qid->my_type = FS_FILE_DIR;
 				}else{
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 					FILE *f = fopen(pth, "w+");
 					qid->my_f = f;
 //					fclose(f);
@@ -191,7 +194,7 @@ fsfileremove(Qid qid)
 
 	struct stat statbuf;
 
-printf("\n%s: %d. qid.my_type = %d, qid.path = %x:%x\n", __func__, __LINE__, qid.my_type, 
+DBG("\n%s: %d. qid.my_type = %d, qid.path = %x:%x\n", __func__, __LINE__, qid.my_type, 
 												(int)(qid.path>>32), (int)qid.path );
 	switch( qid.my_type ){
 		case FS_FILE:
@@ -202,7 +205,7 @@ printf("\n%s: %d. qid.my_type = %d, qid.path = %x:%x\n", __func__, __LINE__, qid
 				char *pth = malloc(256);
 				pth[0] = '\0';
 				int l = file_pathname_from_path(qid.path, pth, 255);
-printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+DBG("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
 				if (stat(pth, &statbuf) != 0) {
 					free(pth);
 					return nil;
@@ -220,7 +223,7 @@ printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
 				char *pth = malloc(256);
 				pth[0] = '\0';
 				int l = file_pathname_from_path(qid.path, pth, 255);
-printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+DBG("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
 
 				if(qid.my_f != NULL){
 					fclose(qid.my_f );
@@ -250,7 +253,7 @@ fsfilewalk(Qid* qid, char *nm)
 {
 	char *er = "Not found";
 
-printf("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
+DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
 	switch(qid->my_type){
 	case FS_FILE:
 		er = scan_fs_dir(qid, "/", nm);
@@ -290,10 +293,10 @@ fsfileread(Qid qid, char *buf, ulong *n, vlong *off)
 	int dri = *off;
 	int pth;
 
-printf("\nfsread my_type = %d", qid.my_type);
+DBG("\nfsread my_type = %d", qid.my_type);
 if(qid.my_name)
-	printf(", my_name = %s", qid.my_name);
-printf("\n\n");
+	DBG(", my_name = %s", qid.my_name);
+DBG("\n\n");
 
 	switch( qid.my_type ){
 		case FS_FILE:
@@ -304,7 +307,7 @@ printf("\n\n");
 			{
 				char *pth = malloc(256);
 				int l = file_pathname_from_path(qid.path, pth, 255);
-//printf("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
+//DBG("\n%s: %d. len = %d, pth = %s\n", __func__, __LINE__, l, pth);
 				ls_dir_rd_out(pth, qid, buf, n, off);
 				free(pth);
 			}
@@ -316,10 +319,10 @@ printf("\n\n");
 				int c;
 				int i, j;
 //				char *pth = malloc(256);
-printf("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)qid.path);
+DBG("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)qid.path);
 //				int l = file_pathname_from_path(qid.path, pth, 255);
 
-//printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
+//DBG("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
 				fp = qid.my_f;  //fopen(pth,"r");
 
 //				free(pth);
@@ -332,14 +335,14 @@ printf("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)q
 				i = 0; j = 0;
 				while((c = fgetc(fp)) != EOF && j < *n) {
 					if(i >= dri){
-printf("%c", c);
+DBG("%c", c);
 						buf[ j ] = c;
 						j++;
 					}
 					i++;
 				}
 //				fclose(fp);
-printf("\n%s: %d. i = %d, j = %d\n\n", __func__, __LINE__, i, j);
+DBG("\n%s: %d. i = %d, j = %d\n\n", __func__, __LINE__, i, j);
 				*n = j;
 				//*off = i;
 			}
@@ -364,7 +367,7 @@ fsfilewrite(Qid qid, char *buf, ulong *n, vlong off)
 	
 	static char *foo_nm = NULL;
 
-//printf("%s: %d\n", __func__, __LINE__);
+//DBG("%s: %d\n", __func__, __LINE__);
 	switch( qid.my_type ){
 		case FS_FILE:
 			break;
@@ -378,10 +381,10 @@ fsfilewrite(Qid qid, char *buf, ulong *n, vlong off)
 				int c;
 				int i, j;
 //				char *pth = malloc(256);
-printf("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)qid.path);
+DBG("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)qid.path);
 //				int l = file_pathname_from_path(qid.path, pth, 255);
 
-//printf("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
+//DBG("%s: %d. pth = %s, dri = %d, *n = %d\n\n", __func__, __LINE__, pth, dri, *n);
 				fp = qid.my_f;  //fopen(pth,"w+");
 
 //				free(pth);
@@ -396,7 +399,7 @@ printf("\n%s:%d path = %x:%x\n", __func__, __LINE__, (int)(qid.path>>32), (int)q
 					if(i >= dri){
 						c = buf[ j ];
 						fputc(c, fp);
-printf("%c", c);
+DBG("%c", c);
 						j++;
 //					}else{
 //						c = fgetc(fp);
@@ -404,7 +407,7 @@ printf("%c", c);
 					i++;
 				}
 //				fclose(fp);
-printf("\n%s: %d. i = %d, j = %d\n\n", __func__, __LINE__, i, j);
+DBG("\n%s: %d. i = %d, j = %d\n\n", __func__, __LINE__, i, j);
 				*n = j;
 				//*off = i;
 			}
@@ -421,7 +424,7 @@ fsfilestat(Qid qid, Dir *d)
 {
 	Styxfile *file;
 
-printf("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
+DBG("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
 
 	switch(qid.my_type){
 //		case FS_FILE:

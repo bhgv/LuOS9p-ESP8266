@@ -23,6 +23,18 @@
 
 #include "lstyx.h"
 
+
+
+
+#if 0
+#define DBG(...) printf(__VA_ARGS__)
+#else
+#define DBG(...)
+#endif
+
+
+
+
 /* Externally defined read-only table array */
 extern const luaR_entry lua_rotable[];
 
@@ -45,7 +57,7 @@ fsdevopen(Qid *qid, int mode)
 {
 	Styxfile *f;
 
-printf("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
+DBG("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
 	switch( qid->my_type ){
 		case FS_DEV:
 		case FS_DEV_FILE:
@@ -74,7 +86,7 @@ fsdevcreate(Qid *qid, char *name, int perm, int mode)
 
 	USED(mode);
 	isdir = perm & DMDIR;
-printf("%s: %d\n", __func__, __LINE__);
+DBG("%s: %d\n", __func__, __LINE__);
 
 	switch( qid->my_type ){
 
@@ -101,7 +113,7 @@ fsdevwalk(Qid* qid, char *nm)
 {
 	char *er = "Not found";
 
-printf("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
+DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
 	switch(qid->my_type){
 	case FS_DEV:
 		{
@@ -136,10 +148,10 @@ fsdevread(Qid qid, char *buf, ulong *n, vlong *off)
 	int dri = *off;
 	int pth;
 
-printf("\nfsread my_type = %d", qid.my_type);
+DBG("\nfsread my_type = %d", qid.my_type);
 if(qid.my_name)
-	printf(", my_name = %s", qid.my_name);
-printf("\n\n");
+	DBG(", my_name = %s", qid.my_name);
+DBG("\n\n");
 
 	switch( qid.my_type ){
 		case FS_DEV:
@@ -168,7 +180,7 @@ printf("\n\n");
 						m += dsz;
 						buf += dsz;
 					}else {
-//printf("  [%d] --> %x\r\n", entry->key.id.numkey,
+//DBG("  [%d] --> %x\r\n", entry->key.id.numkey,
 //		(unsigned int) rvalue(&entry->value));
 					}
 				}
@@ -185,7 +197,7 @@ printf("\n\n");
 				}
 				m = strlen(rd_res);
 
-//printf("\nrd_res = %s\n\n", rd_res);
+//DBG("\nrd_res = %s\n\n", rd_res);
 
 				if(*off >= m){
 					free(rd_res);
@@ -271,7 +283,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 	
 	static char *foo_nm = NULL;
 
-//printf("%s: %d\n", __func__, __LINE__);
+//DBG("%s: %d\n", __func__, __LINE__);
 	switch( qid.my_type ){
 		case FS_DEV_FILE:
 			{
@@ -281,7 +293,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 				char* p_buf = buf;
 				int l;
 
-//printf("%s: %d\n", __func__, __LINE__);
+//DBG("%s: %d\n", __func__, __LINE__);
 				if(off == 0){
 					char *s, *op;
 
@@ -317,7 +329,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 						memcpy(foo_nm, s, l);
 						foo_nm[ l ] = '\0';
 
-//printf("%s: %d. foo_nm = %s, l = %d\n", __func__, __LINE__, foo_nm, l);
+//DBG("%s: %d. foo_nm = %s, l = %d\n", __func__, __LINE__, foo_nm, l);
 						buf += l + 1;
 					}
 				}
@@ -325,7 +337,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 				
 				entry = (luaR_entry*)scan_devs(lua_rotable, (char*)&pth, SC_BYPOS);
 				root_entry = entry;
-//printf("%s: %d. ent(%d)=%x\n", __func__, __LINE__, pth, entry);
+//DBG("%s: %d. ent(%d)=%x\n", __func__, __LINE__, pth, entry);
 
 				m = 0;
 				for ( ; entry->key.id.strkey /*&& (m - dri) < (*n)*/; entry++ ) {
@@ -343,7 +355,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 						char *k, *s;
 						float v;
 
-//printf("%s: %d. mmbr_nm = %s, l = %d\n", __func__, __LINE__, k_nm, k_ln);
+//DBG("%s: %d. mmbr_nm = %s, l = %d\n", __func__, __LINE__, k_nm, k_ln);
 
 						val = &entry->value;
 						type = ttnov(val);
@@ -355,13 +367,13 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 						}
 						t_ln = strlen(t_nm);
 					
-//printf("  [%s] --> %x (t = %d, %s), intL = %x\r\n", k_nm, (unsigned int) rvalue(val), type, t_nm, intL);
+//DBG("  [%s] --> %x (t = %d, %s), intL = %x\r\n", k_nm, (unsigned int) rvalue(val), type, t_nm, intL);
 						ltop = lua_gettop(intL);
-//printf("%s: %d\n", __func__, __LINE__);
+//DBG("%s: %d\n", __func__, __LINE__);
 						
 						luaA_pushobject(intL, val);
 
-//printf("%s: %d\n", __func__, __LINE__);
+//DBG("%s: %d\n", __func__, __LINE__);
 						k = dev_call_parse_next_par(buf, &lk);
 						//buf += l + 1;
 						
@@ -381,7 +393,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 									break;
 								buf += ls + 1;
 								
-//printf("%s: %d. k=%s, s=%s\n", __func__, __LINE__, k, s);
+//DBG("%s: %d. k=%s, s=%s\n", __func__, __LINE__, k, s);
 								switch(k[1]){
 									case 'n':
 										lua_pushnumber(intL, atof(s) );
@@ -406,11 +418,11 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 						lua_call(intL, i, LUA_MULTRET);
 
 						rn = lua_gettop(intL) - ltop;
-//printf("%s: %d. i=%d, rn=%d\n", __func__, __LINE__, i, rn);
+//DBG("%s: %d. i=%d, rn=%d\n", __func__, __LINE__, i, rn);
 						l = 0;
 						for(i = ltop+1; i <= ltop + rn; i ++){
 							int il;
-//printf("%s: %d. i=%d, vtype=%s, %s\n", __func__, __LINE__, i, 
+//DBG("%s: %d. i=%d, vtype=%s, %s\n", __func__, __LINE__, i, 
 //								lua_typename(intL, lua_type(intL, i) ),
 //								lua_tostring(intL, i) );
 							lua_tolstring(intL, i, &il);
@@ -445,7 +457,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 							}
 */
 						}
-//printf("%s: %d. rd_res = %s\n", __func__, __LINE__, rd_res);
+//DBG("%s: %d. rd_res = %s\n", __func__, __LINE__, rd_res);
 					}
 				}
 				*n = m;
@@ -464,7 +476,7 @@ fsdevstat(Qid qid, Dir *d)
 {
 	Styxfile *file;
 
-//printf("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
+//DBG("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
 
 	switch(qid.my_type){
 		case FS_DEV:
