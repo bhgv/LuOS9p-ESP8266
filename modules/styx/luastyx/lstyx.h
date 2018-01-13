@@ -48,6 +48,10 @@ enum {
 	FS_FILE,
 	FS_FILE_DIR,
 	FS_FILE_FILE,
+
+	FS_RPC,
+
+	FS_CGI,
 };
 
 enum {
@@ -89,6 +93,7 @@ extern Styxserver *server;
 
 extern lua_State* intL;
 
+extern char *eve;
 
 
 /*

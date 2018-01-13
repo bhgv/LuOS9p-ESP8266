@@ -64,9 +64,9 @@ struct Styxops
 	char *(*walk)(Qid *qid, char *name);
 	char *(*open)(Qid *qid, int mode);
 	char *(*create)(Qid *qid, char *name, int perm, int mode);
-	char *(*read)(Qid qid, char *buf, ulong *n, vlong *offset);
-	char *(*write)(Qid qid, char *buf, ulong *n, vlong offset);
-	char *(*close)(Qid qid, int mode);
+	char *(*read)(Qid *qid, char *buf, ulong *n, vlong *offset);
+	char *(*write)(Qid *qid, char *buf, ulong *n, vlong offset);
+	char *(*close)(Qid *qid, int mode);
 	char *(*remove)(Qid qid);
 	char *(*stat)(Qid qid, Dir *d);
 	char *(*wstat)(Qid qid, Dir *d);
@@ -82,7 +82,7 @@ struct Styxfile
 	int ref;
 	int open;
 	int type;
-	union {int i; void* p; } par;
+//	union {int i; void* p; } par;
 	void	*u;
 };
 

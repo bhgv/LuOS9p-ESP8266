@@ -105,6 +105,9 @@ DBG("%s: %d, qid->my_f = %x\n", __func__, __LINE__, qid.my_f);
 					fclose(f);
 				qid.my_f = NULL;
 
+				if(qid.my_name != NULL)
+					styxfree(qid.my_name);
+
 				if(isrm){
 					char *buf = malloc(256);
 					int l = file_pathname_from_path(qid.path, buf, 255);

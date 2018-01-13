@@ -23,7 +23,7 @@
 #define TABSZ	32	/* power of 2 */
 
 static	unsigned long		boottime;
-static	char*	eve = "inferno";
+char*	eve = "inferno";
 static	int		Debug = 0;
 
 char Enomem[] =		"out of memory";
@@ -110,7 +110,8 @@ styxmalloc(int bytes)
 void
 styxfree(void *p)
 {
-	free(p);
+	if(p) free(p);
+	
 }
 
 void
@@ -666,7 +667,7 @@ newfile(Styxserver *server, Styxfile *parent, int isdir, Path qid, char *name, i
 	}
 	file = (Styxfile *)styxmalloc(sizeof(Styxfile));
 	file->type = 0;
-	file->par.i = 0;
+//	file->par.i = 0;
 	file->parent = parent;
 	file->child = nil;
 	h = hash(qid);
@@ -933,7 +934,7 @@ DBG("%s: %d file = %x, ops = %x, ops->read = %x\n", __func__, __LINE__, file, op
 DBG("%s: %d\n", __func__, __LINE__);
 				if(
 					ops->read && 
-					(f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
+					(f->ename = ops->read(&fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
 				){
 					f->data = c->data;
 DBG("%s: %d\n", __func__, __LINE__);
@@ -945,7 +946,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 				if(
 					fp->qid.my_type != 0 &&
 					ops->read && 
-					(f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
+					(f->ename = ops->read(&fp->qid, c->data, (ulong*)(&f->count), &fp->dri)) == nil
 				){
 					f->data = c->data;
 DBG("%s: %d\n", __func__, __LINE__);
@@ -963,7 +964,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 			f->ename = Eperm;
 			f->type = Rerror;
 DBG("%s: %d\n", __func__, __LINE__);
-			if(ops->read && (f->ename = ops->read(fp->qid, c->data, (ulong*)(&f->count), &f->offset)) == nil){
+			if(ops->read && (f->ename = ops->read(&fp->qid, c->data, (ulong*)(&f->count), &f->offset)) == nil){
 DBG("%s: %d\n", __func__, __LINE__);
 				f->type = Rread;
 				f->data = c->data;
@@ -985,7 +986,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 		}
 		f->ename = Eperm;
 		f->type = Rerror;
-		if(ops->write && (f->ename = ops->write(fp->qid, f->data, (ulong*)(&f->count), f->offset)) == nil){
+		if(ops->write && (f->ename = ops->write(&fp->qid, f->data, (ulong*)(&f->count), f->offset)) == nil){
 			f->type = Rwrite;
 		}
 		wr(c, f);
@@ -998,7 +999,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 		qid = fp->qid;
 		deletefid(c, fp);
 		f->type = Rclunk;
-		if(open && ops->close && (f->ename = ops->close(qid, mode)) != nil)
+		if(open && ops->close && (f->ename = ops->close(&qid, mode)) != nil)
 			f->type = Rerror;
 		wr(c, f);
 		break;
@@ -1089,6 +1090,10 @@ DBG("%s: %d\n", __func__, __LINE__);
 			q.path = Qroot;
 			q.type = QTDIR;
 			q.vers = 0;
+
+			q.my_type = 0;
+			q.my_name = NULL;
+
 			fp = newfid(c, f->fid, q);
 			f->type = Rattach;
 			f->fid = fp->fid;

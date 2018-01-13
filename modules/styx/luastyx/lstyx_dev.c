@@ -26,7 +26,7 @@
 
 
 
-#if 0
+#if 1
 #define DBG(...) printf(__VA_ARGS__)
 #else
 #define DBG(...)
@@ -41,8 +41,8 @@ extern const luaR_entry lua_rotable[];
 
 lua_State* intL = NULL;
 
-int rd_state = RD_ST_LIST;
-char *rd_res = NULL;
+//int rd_state = RD_ST_LIST;
+//char *rd_res = NULL;
 
 
 
@@ -57,10 +57,14 @@ fsdevopen(Qid *qid, int mode)
 {
 	Styxfile *f;
 
-DBG("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
+DBG("\nfsdevopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid->my_type, mode);
 	switch( qid->my_type ){
 		case FS_DEV:
+			break;
+	
 		case FS_DEV_FILE:
+			qid->my_buf = NULL; //styxmalloc(256);
+			qid->my_buf_idx = 0;
 			break;
 
 	}
@@ -70,8 +74,27 @@ DBG("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid
 
 
 char*
-fsdevclose(Qid qid, int mode)
+fsdevclose(Qid *qid, int mode)
 {
+DBG("\n%s:%d, qid->my_buf = %x\n", __func__, __LINE__, qid->my_buf  );
+	switch( qid->my_type ){
+		case FS_DEV:
+			if(qid->my_name != NULL)
+				styxfree(qid->my_name);
+			break;
+	
+		case FS_DEV_FILE:
+			if(qid->my_name != NULL)
+				styxfree(qid->my_name);
+			
+			if( qid->my_buf == NULL){
+				styxfree( qid->my_buf );
+				qid->my_buf = NULL;
+				qid->my_buf_idx = 0;
+			}
+			break;
+
+	}
 	return nil;
 }
 
@@ -119,7 +142,6 @@ DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm
 		{
 			int i = (int)scan_devs(lua_rotable, nm, SC_BYNAME);
 			if(i > 0){
-				//qid->path = PATH_DEV + (PATH_STEP_MASK & i);
 				qid->path = make_file_path( PATH_DEV, qid->path, i);
 				qid->type = 0; //QTDIR;
 				qid->vers = 0;
@@ -148,7 +170,7 @@ fsdevread(Qid qid, char *buf, ulong *n, vlong *off)
 	int dri = *off;
 	int pth;
 
-DBG("\nfsread my_type = %d", qid.my_type);
+DBG("\nfsdevread my_type = %d", qid.my_type);
 if(qid.my_name)
 	DBG(", my_name = %s", qid.my_name);
 DBG("\n\n");
@@ -165,7 +187,7 @@ DBG("\n\n");
 				luaR_entry *entry = lua_rotable;
 
 				for( i =0; entry->key.id.strkey && i < dri; ){
-					//printf("i = %d  <  off = %d\n", i, dri);
+DBG("i = %d  <  off = %d\n", i, dri);
 					entry++;
 					i++;
 				}
@@ -180,8 +202,7 @@ DBG("\n\n");
 						m += dsz;
 						buf += dsz;
 					}else {
-//DBG("  [%d] --> %x\r\n", entry->key.id.numkey,
-//		(unsigned int) rvalue(&entry->value));
+DBG("  [%d] --> %x\r\n", entry->key.id.numkey, (unsigned int) rvalue(&entry->value));
 					}
 				}
 				*n = m;
@@ -190,28 +211,25 @@ DBG("\n\n");
 			break;
 			
 		case FS_DEV_FILE:
-			if(rd_state == RD_ST_RES){
-				if(rd_res == NULL) {
-					rd_state = RD_ST_LIST;
-					return nil;
-				}
-				m = strlen(rd_res);
+DBG("\n%s:%d, qid.my_buf = %x\n", __func__, __LINE__, qid.my_buf  );
+			if(qid.my_buf != NULL){
+				m = strlen(qid.my_buf );
 
-//DBG("\nrd_res = %s\n\n", rd_res);
+DBG("\nqid.my_buf = %s\n\n", qid.my_buf );
 
 				if(*off >= m){
-					free(rd_res);
-					rd_res = NULL;
+//					free(rd_res);
+//					rd_res = NULL;
 				
-					rd_state = RD_ST_LIST;
+//					rd_state = RD_ST_LIST;
 				
 					*n = 0;
 				}else{
 					if(dri + *n > m)
 						*n = m-dri;
-					memmove(buf, rd_res + dri, *n);
+					memmove(buf, qid.my_buf + dri, *n);
 				}
-				
+			
 			}else{
 				const TValue *val;
 				luaR_entry *entry, *root_entry;
@@ -271,7 +289,7 @@ DBG("\n\n");
 
 
 char*
-fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
+fsdevwrite(Qid *qid, char *buf, ulong *n, vlong off)
 {
 	Styxfile *f;
 	vlong m, p;
@@ -284,7 +302,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 	static char *foo_nm = NULL;
 
 //DBG("%s: %d\n", __func__, __LINE__);
-	switch( qid.my_type ){
+	switch( qid->my_type ){
 		case FS_DEV_FILE:
 			{
 				const TValue *val;
@@ -295,31 +313,14 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 
 //DBG("%s: %d\n", __func__, __LINE__);
 				if(off == 0){
-					char *s, *op;
+					char *s;
 
 					if(foo_nm != NULL) {
 						free(foo_nm);
 						foo_nm = NULL;
 					}
 
-/*
-					op = dev_call_parse_next_par(buf, &l);
-					buf += l + 1;
-					
-					if( l == 0 || !strncmp(op, "list", l) ){
-						rd_state = RD_ST_LIST;
-
-						return nil;
-					}else
-*/
-					{
-						rd_state = RD_ST_RES;
-
-						if(rd_res != NULL){
-							free(rd_res);
-							rd_res = NULL;
-						}
-						
+					{						
 						s = dev_call_parse_next_par(buf, &l);
 						if(intL == NULL || l == 0){
 							return nil;
@@ -333,7 +334,7 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 						buf += l + 1;
 					}
 				}
-				pth = qid.path & 0xffff;
+				pth = qid->path & 0xffff;
 				
 				entry = (luaR_entry*)scan_devs(lua_rotable, (char*)&pth, SC_BYPOS);
 				root_entry = entry;
@@ -429,35 +430,35 @@ fsdevwrite(Qid qid, char *buf, ulong *n, vlong off)
 							l += il + 1;
 						}
 
-						rd_res = styxmalloc(l + 1);
-						l = 0;
+						if(qid->my_buf == NULL){
+							qid->my_buf = styxmalloc( 256 );
+							qid->my_buf_idx = 0;
+						}
+
+						l = qid->my_buf_idx;
+						qid->my_buf[ l ] = '\0';
+						
 						for(i = ltop+1; i <= ltop + rn; i ++){
 							int il;
 							char *is;
 							is = lua_tolstring(intL, i, &il);
-							memcpy(&rd_res[ l ], is, il);
+
+							if(l + il + 2 > 256)
+								break;
+							
+							memcpy(&qid->my_buf[ l ], is, il);
 							l += il;
-							rd_res[ l ] = '\t';
+							qid->my_buf [ l ] = '\t';
 							l += 1;
-							rd_res[ l ] = '\0';
+							qid->my_buf [ l ] = '\0';
 /*
 							switch( lua_type(intL, i) ){
 								case 
-#define LUA_TNONE		(-1)
-									
-#define LUA_TNIL		0
-#define LUA_TBOOLEAN		1
-#define LUA_TLIGHTUSERDATA	2
-#define LUA_TNUMBER		3
-#define LUA_TSTRING		4
-#define LUA_TTABLE		5
-#define LUA_TFUNCTION		6
-#define LUA_TUSERDATA		7
-#define LUA_TTHREAD		8
 							}
 */
 						}
-//DBG("%s: %d. rd_res = %s\n", __func__, __LINE__, rd_res);
+						qid->my_buf_idx = l;
+DBG("%s: %d. qid->my_buf  = %s\n", __func__, __LINE__, qid->my_buf );
 					}
 				}
 				*n = m;

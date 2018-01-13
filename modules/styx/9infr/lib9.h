@@ -396,9 +396,13 @@ struct Qid
 	uvlong	path;
 	ulong	vers;
 	uchar	type;
+
+	uchar	my_state;
 	uchar	my_type;
 	char*	my_name;
 	void*	my_f;
+	char*	my_buf;
+	int		my_buf_idx;
 } Qid;
 
 typedef

@@ -26,7 +26,7 @@
 
 
 
-#if 0
+#if 1
 #define DBG(...) printf(__VA_ARGS__)
 #else
 #define DBG(...) ;
@@ -104,6 +104,12 @@ DBG("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid
 		case FS_FILE_FILE:
 			return fsfileopen(qid, mode);
 
+		case FS_RPC:
+			return fsrpcopen(qid, mode);
+			
+		case FS_CGI:
+			return fscgiopen(qid, mode);
+			
 		default:
 			f = styxfindfile(server, qid->path);
 
@@ -121,18 +127,29 @@ DBG("\nfsopen 1 qid->type = %d, qid.my_type = %d, mode = %x\n\n", qid->type, qid
 
 
 char*
-fsclose(Qid qid, int mode)
+fsclose(Qid *qid, int mode)
 {
 
-	switch( qid.my_type ){
+	switch( qid->my_type ){
+		case FS_DEV:
+		case FS_DEV_FILE:
+			return fsdevclose(qid, mode);
+		
 //		case FS_FILE:
 		case FS_FILE_DIR:
 		case FS_FILE_FILE:
-			return fsfileclose(qid, mode);
+			return fsfileclose(*qid, mode);
 	
+		case FS_RPC:
+			return fsrpcclose(*qid, mode);
+			
+		case FS_CGI:
+			return fscgiclose(*qid, mode);
+			
 		case FS_ROOT:
+		//default:
 			if(mode&ORCLOSE)	/* remove on close */
-				return fsremove(qid);
+				return fsremove(*qid);
 			
 	}
 	return nil;
@@ -156,6 +173,12 @@ DBG("%s: %d\n", __func__, __LINE__);
 		case FS_FILE_DIR:
 			return fsfilecreate(qid, name, perm, mode);
 
+		case FS_RPC:
+			return fsrpccreate(qid, name, perm, mode);
+			
+		case FS_CGI:
+			return fscgicreate(qid, name, perm, mode);
+			
 		case FS_ROOT:
 			if(isdir)
 				f = styxadddir(server, qid->path, nq++, name, perm, "inferno");
@@ -189,6 +212,12 @@ fsremove(Qid qid)
 		case FS_FILE_FILE:
 			return fsfileremove(qid);
 
+		case FS_RPC:
+			return fsrpcremove(qid);
+			
+		case FS_CGI:
+			return fscgiremove(qid);
+			
 		case FS_ROOT:
 			f = styxfindfile(server, qid.path);
 			if((f->d.qid.type&QTDIR) && f->child != nil)
@@ -218,6 +247,16 @@ DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm
 	case FS_FILE_FILE:
 		return fsfilewalk(qid, nm);
 		
+	case FS_RPC:
+		return fsrpcwalk(qid, nm);
+
+	case FS_CGI:
+		return fscgiwalk(qid, nm);
+
+	default:
+//		er = nil;
+		break;
+		
 	}
 	
 	return er;
@@ -226,7 +265,7 @@ DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm
 
 
 char *
-fsread(Qid qid, char *buf, ulong *n, vlong *off)
+fsread(Qid *qid, char *buf, ulong *n, vlong *off)
 {
 	int m;
 	Styxfile *f;
@@ -234,23 +273,32 @@ fsread(Qid qid, char *buf, ulong *n, vlong *off)
 	int dri = *off;
 	int pth;
 
-DBG("\nfsread my_type = %d", qid.my_type);
-if(qid.my_name)
-	DBG(", my_name = %s", qid.my_name);
+DBG("\n%s:%d, qid->my_buf = %x\n", __func__, __LINE__, qid->my_buf  );
+
+DBG("\nfsread my_type = %d", qid->my_type);
+if(qid->my_name){
+	DBG(", my_name = %s", qid->my_name);
+}
 DBG("\n\n");
 
-	switch( qid.my_type ){
+	switch( qid->my_type ){
 		case FS_DEV:
 		case FS_DEV_FILE:
-			return fsdevread(qid, buf, n, off);
+			return fsdevread(*qid, buf, n, off);
 			
 		case FS_FILE:
 		case FS_FILE_DIR:
 		case FS_FILE_FILE:
-			return fsfileread(qid, buf, n, off);
+			return fsfileread(*qid, buf, n, off);
 			
+		case FS_RPC:
+			return fsrpcread(qid, buf, n, off);
+		
+		case FS_CGI:
+			return fscgiread(qid, buf, n, off);
+		
 		default:
-			f = styxfindfile(server, qid.path);
+			f = styxfindfile(server, qid->path);
 			m = f->d.length;
 			if(*off >= m)
 				*n = 0;
@@ -267,7 +315,7 @@ DBG("\n\n");
 
 
 char*
-fswrite(Qid qid, char *buf, ulong *n, vlong off)
+fswrite(Qid *qid, char *buf, ulong *n, vlong off)
 {
 	Styxfile *f;
 	vlong m, p;
@@ -279,18 +327,29 @@ fswrite(Qid qid, char *buf, ulong *n, vlong off)
 	
 	static char *foo_nm = NULL;
 
-//DBG("%s: %d\n", __func__, __LINE__);
-	switch( qid.my_type ){
+DBG("%s: %d, qid->my_type = %d, *n=%d, off=%d\n", __func__, __LINE__, qid->my_type, *n, off);
+	switch( qid->my_type ){
 		case FS_DEV_FILE:
+DBG("%s: %d\n", __func__, __LINE__);
 			return fsdevwrite(qid, buf, n, off);
 			
 		case FS_FILE:
 		case FS_FILE_DIR:
 		case FS_FILE_FILE:
-			return fsfilewrite(qid, buf, n, off);
-			
+DBG("%s: %d\n", __func__, __LINE__);
+			return fsfilewrite(*qid, buf, n, off);
+		
+		case FS_RPC:
+DBG("%s: %d\n", __func__, __LINE__);
+			return fsrpcwrite(qid, buf, n, off);
+		
+		case FS_CGI:
+DBG("%s: %d\n", __func__, __LINE__);
+			return fscgiwrite(qid, buf, n, off);
+		
 		default:
-			f = styxfindfile(server, qid.path);
+DBG("%s: %d\n", __func__, __LINE__);
+			f = styxfindfile(server, qid->path);
 			m = f->d.length;
 			p = off + *n;
 			if(p > m){	/* just grab a larger piece of memory */
@@ -317,8 +376,8 @@ fsstat(Qid qid, Dir *d)
 {
 	Styxfile *file;
 
-//DBG("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
-
+DBG("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, 
+			(int)qid.my_type, qid.my_name ? qid.my_name : "");
 	switch(qid.my_type){
 		case FS_FILE:
 		case FS_FILE_DIR:
@@ -326,10 +385,17 @@ fsstat(Qid qid, Dir *d)
 
 		case FS_DEV:
 		case FS_ROOT:
+		//default:
 			file = styxfindfile(server, qid.path);
 			*d = file->d;
 			break;
 	
+		case FS_RPC:
+			return fsrpcstat(qid, d);
+		
+		case FS_CGI:
+			return fscgistat(qid, d);
+		
 	}
 	
 	return nil;
@@ -416,83 +482,61 @@ Styxops p9_root_ops = {
 void
 myinit(/*Styxserver *s*/)
 {
-	int i, j;
+//	int i, j;
 	Styxfile* f;
-	char nm[5];
+//	char nm[5];
+
+	server->root->d.qid.my_type = FS_ROOT;
 	
-	//styxadddir(server, Qroot, Qroot, "/", 0555, "inferno");
-	
-	f = styxadddir(server, Qroot, 1, "dev", 0555, "inferno");
-	//f->d.type = FS_DEV;
+	f = styxadddir(server, Qroot, 1, "dev", 0555, eve);
 	f->d.qid.my_type = FS_DEV;
-	
-//	f = styxaddfile(server, 1, 1000, "tst", 0666, "inferno");
 
-	f = styxadddir(server, Qroot, 2, "fs", 0777, "inferno");
-	//f->d.type = FS_FILE;
+	f = styxadddir(server, Qroot, 2, "fs", 0777, eve);
 	f->d.qid.my_type = FS_FILE;
-	
 
-	j = 3;
-
+	f = styxaddfile(server, Qroot, 3, "rpc", 0666, eve);
+	f->d.qid.my_type = FS_RPC;
 	
-
-/*
-	styxadddir(s, 1, 2, "pwm", 0555, "inferno");
-	j = 2;
-	for(i = 0; i < 16; i++){
-		snprintf(nm, 5, "%d", i);
-		f = styxaddfile(s, j, j+1+i, nm, 0666, "inferno");
-		f->type = FL_T_DEV;
-		f->par.p = (void*)pwm_cb;
-	}
-	j = j + 1 + i;
-	
-	styxadddir(s, 1, j, "pio", 0555, "inferno");
-	for(i = 0; i < 16; i++){
-		snprintf(nm, 5, "%d", i);
-		f = styxaddfile(s, j, j+1+i, nm, 0666, "inferno");
-		f->type = FL_T_DEV;
-		f->par.p = (void*)pio_cb;
-	}
-	j = j + 1 + i;
-	
-	styxadddir(s, 1, j, "adc", 0555, "inferno");
-	for(i = 0; i < 4; i++){
-		snprintf(nm, 5, "%d", i);
-		f = styxaddfile(s, j, j + i + 1, nm, 0666, "inferno");
-		f->type = FL_T_DEV;
-		f->par.p = (void*)adc_cb;
-	}
-	j = j + 1 + i;
-*/
-
-//	styxaddfile(s, Qroot, 1, "fred", 0664, "inferno");
-//	styxaddfile(s, Qroot, 2, "joe", 0664, "q56");
-//	styxadddir(s, Qroot, 3, "adir", 0775, "inferno");
-//	styxaddfile(s, 3, 4, "bill", 0664, "inferno");
-//	styxadddir(s, Qroot, 5, "new", 0775, "inferno");
-//	styxadddir(s, 5, 6, "cdir", 0775, "inferno");
-//	styxaddfile(s, 6, 7, "cfile", 0664, "inferno");
-	nq = j;
+	nq = 4;
 }
 
+
+
+TValue *index2addr (lua_State *L, int idx) ;
 
 
 int
 lstyx_add_file(lua_State* L){
 	int ln;
+	int n = lua_gettop(L);
 	char *path = luaL_checklstring(L, 1, &ln);
 
-	if(path == NULL || ln <= 0) return 0;
+	if(path == NULL || ln <= 0 || n < 2 || !lua_isfunction(L, 2) ) return 0;
 	
-	Styxfile* f = styxaddfile(server, Qroot, nq, path, 0666, "inferno");
-	f->type = FL_T_FILE;
+	Styxfile* f = styxaddfile(server, Qroot, nq++, path, 0666, eve);
+	f->d.qid.my_type = FS_CGI;
+	f->u = index2addr(L, 2);
+	//luaA_pushobject(intL, val);
 //	f->par.p = (void*)p;
 	
 	return 0;
 }
+
+
+int
+lstyx_add_folder(lua_State* L){
+	int ln;
+	char *path = luaL_checklstring(L, 1, &ln);
+
+	if(path == NULL || ln <= 0) return 0;
 	
+	Styxfile* f = styxadddir(server, Qroot, nq++, path, 0777, eve);
+//	f->type = FL_T_FILE;
+//	f->par.p = (void*)p;
+	
+	return 0;
+}
+
 
 
 int
@@ -510,7 +554,7 @@ lstyx_loop(lua_State* L){
 
 	intL = L;
 	
-//	styxdebug();
+	styxdebug();
 	
 	styxinit(server, &p9_root_ops, "6701", 0777, 0/*1*/);
 	
@@ -545,7 +589,8 @@ const LUA_REG_TYPE styx_map[] = {
 		
 		{ LSTRKEY( "stop" ),			LFUNCVAL( lstyx_stop ) },
 		
-		{ LSTRKEY( "add_file" ),			LFUNCVAL( lstyx_add_file ) },
+		{ LSTRKEY( "add_file" ),		LFUNCVAL( lstyx_add_file ) },
+		{ LSTRKEY( "add_dir" ),			LFUNCVAL( lstyx_add_folder ) },
 		
 //		{ LSTRKEY( "recv_timeout" ),	LFUNCVAL( httpd_recv_timeout ) },
 //		{ LSTRKEY( "send_timeout" ),	LFUNCVAL( httpd_send_timeout ) },
