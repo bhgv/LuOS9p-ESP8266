@@ -83,7 +83,10 @@ struct Styxfile
 	int open;
 	int type;
 //	union {int i; void* p; } par;
-	void	*u;
+	union {
+		void	*u;
+		int		fi;
+	}
 };
 
 char *styxinit(Styxserver *server, Styxops *ops, char *port, int perm, int needfile);

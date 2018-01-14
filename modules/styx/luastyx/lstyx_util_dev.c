@@ -111,7 +111,10 @@ call_virtual_foo(const TValue *foo, Qid *qid, char *buf, ulong *n, vlong off)
 	ltop = lua_gettop(intL);
 //DBG("%s: %d\n", __func__, __LINE__);
 
-	luaA_pushobject(intL, foo);
+	if(foo != NULL)
+		luaA_pushobject(intL, foo);
+	else
+		ltop--;
 
 //DBG("%s: %d\n", __func__, __LINE__);
 	k = dev_call_parse_next_par(buf, &lk);

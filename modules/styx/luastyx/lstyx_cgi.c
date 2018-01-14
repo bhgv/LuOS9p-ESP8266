@@ -26,7 +26,7 @@
 
 
 
-#if 1
+#if 0
 #define DBG(...) printf(__VA_ARGS__)
 #else
 #define DBG(...) ;
@@ -203,9 +203,11 @@ DBG("\n\n");
 		case FS_CGI:
 			if(qid->my_buf != NULL){
 				m = strlen(qid->my_buf );
-DBG("\n%s qid.my_buf = %s\n\n", __func__,  qid->my_buf );
+DBG("\n%s dri=%d, *n=%d, qid.my_buf = %s\n\n", __func__, dri, *n, qid->my_buf );
 
-				if(*off >= m){
+				dri = 0;
+				
+				if(dri >= m){
 					*n = 0;
 				}else{
 					if(dri + *n > m)
@@ -248,12 +250,19 @@ DBG("%s: %d\n", __func__, __LINE__);
 
 				int type;
 				Styxfile* f = styxfindfile(server, qid->path);
-				const TValue *val;
+//				const TValue *val;
 
 DBG("%s: %d f=%x\n", __func__, __LINE__, f);
 				if(f == NULL)
 					break;
 
+				int fi = f->fi;
+DBG("%s: %d fi=%d\n", __func__, __LINE__, fi);
+				lua_getfield(intL, LUA_REGISTRYINDEX, styx_cgi_reg);
+				lua_rawgeti(intL, -1, fi);
+				lua_remove(intL, -2);
+
+#if 0
 				val = (const TValue *)f->u;
 				
 				if(val == NULL)
@@ -263,6 +272,8 @@ DBG("%s: %d val=%x\n", __func__, __LINE__, val);
 //				m = 0;
 
 				type = ttnov(val);
+#endif
+				type = lua_type(intL, -1);
 DBG("%s: %d type=%d\n", __func__, __LINE__, type);
 
 				if ( type == LUA_TFUNCTION) {
@@ -278,10 +289,12 @@ DBG("%s: %d type=%d\n", __func__, __LINE__, type);
 //					}
 //					t_ln = strlen(t_nm);
 
-					call_virtual_foo(val, qid, buf, n, off);
+					call_virtual_foo(NULL, qid, buf, n, off);
 					break;
+				}else{
+					lua_pop(intL, 1);
 				}
-//				*n = m;
+				*n = 0; //m;
 			}
 			break;
 

@@ -34,11 +34,13 @@ Features
   1. list of devices (ex: `ls /n/dev`),
   1. list of device's functions (ex: `cat /n/dev/pwm`),
   1. call a device's function (ex: `echo ch_val -i 5 -n 0.4 > /n/dev/pwm`),
-  1. read the result of the function's call (ex: `cat /n/dev/pwm` immediatly after the call),
+  1. read the result of the function's call (ex: `<> /n/dev/pwm {echo ch_val -i 5 >[1=0]; read}`),
   1. read a file/folder list from the fisical filesystem of the device (ex: `ls /n/fs/html/js`),
   1. read/write/create files on the device's fisical filesystem (ex: `cat /n/fs/html/js/common.js` or `echo a Text > /n/fs/afile.txt`),
   1. create new folders on the device's fisical filesystem (ex: `mkdir /n/fs/new_folder`),
-  1. remove files or folders from the fisical device's filesystem (ex: `rm /n/fs/html/a_file_or_folder`).
+  1. remove files or folders from the fisical device's filesystem (ex: `rm /n/fs/html/a_file_or_folder`),
+  1. RPC channel (synthetic file `/rpc`). it allows to send Lua chunk to the device, run it there and return the result. (ex: `<> /n/rpc {echo 'pwm[5] = 0.2; return "adc_1=", adc[1];' >[1=0]; read}`),
+  1. user's CGI-like synthetic files. (ex: on the remote device: `styx.addfile("a_file", function(a) return a + 8; end);`, from the inferno-shell: `<> /n/a_file {echo -n 10.9 >[1=0]; read}`).
 
 * PC-Studio for easyer upload/download/edit files into/from/on the luOS9p embedded filesystem. also PC-Studio contains remote terminal for luOS9p and other features (in the future). It is written on the Lua and may be edited/expanded easily. It also contains a plugin system for extensions, but it isn't activated for now.
 

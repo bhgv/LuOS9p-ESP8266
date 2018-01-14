@@ -26,7 +26,7 @@
 
 
 
-#if 1
+#if 0
 #define DBG(...) printf(__VA_ARGS__)
 #else
 #define DBG(...) ;
@@ -43,6 +43,8 @@ int nq = Qroot+1;
 Styxserver *server = NULL;
 
 int is_styx_srv_run = 1;
+
+char* styx_cgi_reg = "styx_cgi";
 
 
 
@@ -505,6 +507,7 @@ myinit(/*Styxserver *s*/)
 TValue *index2addr (lua_State *L, int idx) ;
 
 
+#if 0
 LUA_API void* lua_tolfunction (lua_State *L, int idx) {
   StkId o = index2addr(L, idx);
   //if (ttislcf(o)) return fvalue(o);
@@ -513,7 +516,7 @@ LUA_API void* lua_tolfunction (lua_State *L, int idx) {
     return clLvalue(o)->f;
   else return NULL;  /* not a C function */
 }
-
+#endif
 
 
 
@@ -522,7 +525,7 @@ LUA_API void* lua_tolfunction (lua_State *L, int idx) {
 
 int
 lstyx_add_file(lua_State* L){
-	int ln;
+	int ln, i;
 	int n = lua_gettop(L);
 	char *path = luaL_checklstring(L, 1, &ln);
 
@@ -535,16 +538,48 @@ DBG("%s: %d\n", __func__, __LINE__);
 	
 	f->d.qid.my_type = FS_CGI;
 DBG("%s: %d\n", __func__, __LINE__);
-	f->u = index2addr(L, 2);
+
+	lua_getfield(L, LUA_REGISTRYINDEX, styx_cgi_reg);
+DBG("%s: %d reg_tbl_cgi_type=%s\n", __func__, __LINE__, luaL_typename(L, -1));
+	int ti = lua_gettop(L);
+	
+	lua_len(L, -1);
+	int al = lua_tointeger(L, -1);
+DBG("%s: %d al=%d\n", __func__, __LINE__, al);
+	lua_settop(L, ti);
+	
+	for(i = 1; i <= al; i++){
+		lua_rawgeti(L, -1, i);
+		int isf = lua_isfunction(L, -1);
+		lua_settop(L, ti);
+
+		if(!isf){
+			break;
+		}
+	}
+DBG("%s: %d i=%d\n", __func__, __LINE__, i);
+	if(i == 0) i++;
+	
+	lua_pushvalue(L, 2);
+DBG("%s: %d reg_tbl_cgi_type=%s, val=%s\n", __func__, __LINE__, 
+			luaL_typename(L, ti), luaL_typename(L, -1));
+	lua_rawseti(L, ti, i);
+
+	lua_settop(L, ti - 1);
+DBG("%s: %d i=%d\n", __func__, __LINE__, i);
+
+	f->fi = i;
+
+#if 0
+	 TValue *val = index2addr(L, 2);
 	//luaA_pushobject(intL, val);
 //	f->par.p = (void*)p;
 
+	f->u = val_(val).gc;
+	
 DBG("%s: %d, f->u = %x\n", __func__, __LINE__, f->u);
 
 	int type;
-	TValue *val;
-	val = (TValue *)f->u;
-//	val_(val).p
 
 	//val->tt_ &= ~BIT_ISCOLLECTABLE;
 	
@@ -562,6 +597,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 	t_ln = strlen(t_nm);
 
 DBG("%s: %d. type_nm = %s, l = %d\n", __func__, __LINE__, t_nm, t_ln);
+#endif
 		
 	return 0;
 }
@@ -598,7 +634,7 @@ lstyx_loop(lua_State* L){
 
 	intL = L;
 	
-	styxdebug();
+//	styxdebug();
 	
 	styxinit(server, &p9_root_ops, "6701", 0777, 0/*1*/);
 	
@@ -628,16 +664,11 @@ lstyx_loop(lua_State* L){
 #include "modules.h"
 
 const LUA_REG_TYPE styx_map[] = {
-		{ LSTRKEY( "loop" ),		LFUNCVAL( lstyx_loop ) },
-//		{ LSTRKEY( "add_to_callbacks" ),	LFUNCVAL( httpd_task_cb_run ) },
+		{ LSTRKEY( "loop" ),		LFUNCVAL( lstyx_loop ) },		
+		{ LSTRKEY( "stop" ),		LFUNCVAL( lstyx_stop ) },
 		
-		{ LSTRKEY( "stop" ),			LFUNCVAL( lstyx_stop ) },
-		
-		{ LSTRKEY( "add_file" ),		LFUNCVAL( lstyx_add_file ) },
-		{ LSTRKEY( "add_dir" ),			LFUNCVAL( lstyx_add_folder ) },
-		
-//		{ LSTRKEY( "recv_timeout" ),	LFUNCVAL( httpd_recv_timeout ) },
-//		{ LSTRKEY( "send_timeout" ),	LFUNCVAL( httpd_send_timeout ) },
+		{ LSTRKEY( "add_file" ),	LFUNCVAL( lstyx_add_file ) },
+		{ LSTRKEY( "add_dir" ),		LFUNCVAL( lstyx_add_folder ) },
 		
 		{ LNILKEY, LNILVAL }
 };
@@ -645,7 +676,8 @@ const LUA_REG_TYPE styx_map[] = {
 
 
 int luaopen_styx( lua_State *L ) {
-
+	lua_createtable(L, 0, 0); 
+	lua_setfield(L, LUA_REGISTRYINDEX, styx_cgi_reg);
 	//ro_traverse(lua_rotable);
 
 	return 0;

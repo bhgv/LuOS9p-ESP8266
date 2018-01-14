@@ -26,7 +26,7 @@
 
 
 
-#if 1
+#if 0
 #define DBG(...) printf(__VA_ARGS__)
 #else
 #define DBG(...)
@@ -222,11 +222,6 @@ DBG("\n%s:%d, qid.my_buf = %x\n", __func__, __LINE__, qid.my_buf  );
 DBG("\nqid.my_buf = %s\n\n", qid.my_buf );
 
 				if(*off >= m){
-//					free(rd_res);
-//					rd_res = NULL;
-				
-//					rd_state = RD_ST_LIST;
-				
 					*n = 0;
 				}else{
 					if(dri + *n > m)

@@ -95,6 +95,9 @@ extern lua_State* intL;
 
 extern char *eve;
 
+extern char* styx_cgi_reg;
+
+
 
 /*
  * An in-memory file server
