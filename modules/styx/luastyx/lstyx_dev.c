@@ -41,8 +41,7 @@ extern const luaR_entry lua_rotable[];
 
 lua_State* intL = NULL;
 
-//int rd_state = RD_ST_LIST;
-//char *rd_res = NULL;
+static char *foo_nm = NULL;
 
 
 
@@ -87,10 +86,15 @@ DBG("\n%s:%d, qid->my_buf = %x\n", __func__, __LINE__, qid->my_buf  );
 			if(qid->my_name != NULL)
 				styxfree(qid->my_name);
 			
-			if( qid->my_buf == NULL){
+			if( qid->my_buf != NULL){
 				styxfree( qid->my_buf );
 				qid->my_buf = NULL;
 				qid->my_buf_idx = 0;
+			}
+			
+			if(foo_nm != NULL) {
+				free(foo_nm);
+				foo_nm = NULL;
 			}
 			break;
 
@@ -105,7 +109,7 @@ fsdevcreate(Qid *qid, char *name, int perm, int mode)
 	int isdir;
 	Styxfile *f;
 
-	char *er = "Create error";
+	char *er = Eperm;
 
 	USED(mode);
 	isdir = perm & DMDIR;
@@ -127,14 +131,14 @@ fsdevremove(Qid qid)
 
 	}
 	
-	return nil;
+	return Eperm;
 }
 
 
 char *
 fsdevwalk(Qid* qid, char *nm)
 {
-	char *er = "Not found";
+	char *er = Enonexist;
 
 DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
 	switch(qid->my_type){
@@ -299,7 +303,7 @@ fsdevwrite(Qid *qid, char *buf, ulong *n, vlong off)
 	int dri = off;
 	int pth;
 	
-	static char *foo_nm = NULL;
+//	static char *foo_nm = NULL;
 
 //DBG("%s: %d\n", __func__, __LINE__);
 	switch( qid->my_type ){
@@ -334,13 +338,13 @@ fsdevwrite(Qid *qid, char *buf, ulong *n, vlong off)
 						buf += l + 1;
 					}
 				}
-				pth = qid->path & 0xffff;
+				pth = qid->path & PATH_STEP_MASK;
 				
 				entry = (luaR_entry*)scan_devs(lua_rotable, (char*)&pth, SC_BYPOS);
 				root_entry = entry;
 //DBG("%s: %d. ent(%d)=%x\n", __func__, __LINE__, pth, entry);
 
-				m = 0;
+//				m = 0;
 				for ( ; entry->key.id.strkey /*&& (m - dri) < (*n)*/; entry++ ) {
 					if (
 						entry->key.len >= 0 && 
@@ -349,15 +353,13 @@ fsdevwrite(Qid *qid, char *buf, ulong *n, vlong off)
 					) {
 						int k_ln = entry->key.len;
 						char* k_nm = entry->key.id.strkey;
+
+						
 						char* t_nm;
 						int t_ln;
 						int type;
-						int rn, ltop, i, lk, ls = 0;
-						char *k, *s;
-						float v;
 
 //DBG("%s: %d. mmbr_nm = %s, l = %d\n", __func__, __LINE__, k_nm, k_ln);
-
 						val = &entry->value;
 						type = ttnov(val);
 
@@ -367,105 +369,16 @@ fsdevwrite(Qid *qid, char *buf, ulong *n, vlong off)
 							t_nm = "";
 						}
 						t_ln = strlen(t_nm);
-					
-//DBG("  [%s] --> %x (t = %d, %s), intL = %x\r\n", k_nm, (unsigned int) rvalue(val), type, t_nm, intL);
-						ltop = lua_gettop(intL);
-//DBG("%s: %d\n", __func__, __LINE__);
-						
-						luaA_pushobject(intL, val);
 
-//DBG("%s: %d\n", __func__, __LINE__);
-						k = dev_call_parse_next_par(buf, &lk);
-						//buf += l + 1;
-						
-						for(
-							i = 0 ; 
-							lk > 0 && k[0] == '-'; 
-							k = dev_call_parse_next_par(buf, &lk)
-						){
-							//if(lk > 0 && k[0] == '-'){
-								if(lk > 2)
-									buf += 2;
-								else
-									buf += lk + 1;
-								
-								s = dev_call_parse_next_par(buf, &ls);
-								if(ls == 0)
-									break;
-								buf += ls + 1;
-								
-//DBG("%s: %d. k=%s, s=%s\n", __func__, __LINE__, k, s);
-								switch(k[1]){
-									case 'n':
-										lua_pushnumber(intL, atof(s) );
-										i++;
-										break;
-
-									case 'i':
-										lua_pushinteger(intL, atoi(s) );
-										i++;
-										break;
-										
-									case 's':
-									default:
-										lua_pushstring(intL, s);
-										i++;
-										break;
-
-								}
-							//}
-						}
-
-						lua_call(intL, i, LUA_MULTRET);
-
-						rn = lua_gettop(intL) - ltop;
-//DBG("%s: %d. i=%d, rn=%d\n", __func__, __LINE__, i, rn);
-						l = 0;
-						for(i = ltop+1; i <= ltop + rn; i ++){
-							int il;
-//DBG("%s: %d. i=%d, vtype=%s, %s\n", __func__, __LINE__, i, 
-//								lua_typename(intL, lua_type(intL, i) ),
-//								lua_tostring(intL, i) );
-							lua_tolstring(intL, i, &il);
-							l += il + 1;
-						}
-
-						if(qid->my_buf == NULL){
-							qid->my_buf = styxmalloc( 256 );
-							qid->my_buf_idx = 0;
-						}
-
-						l = qid->my_buf_idx;
-						qid->my_buf[ l ] = '\0';
-						
-						for(i = ltop+1; i <= ltop + rn; i ++){
-							int il;
-							char *is;
-							is = lua_tolstring(intL, i, &il);
-
-							if(l + il + 2 > 256)
-								break;
-							
-							memcpy(&qid->my_buf[ l ], is, il);
-							l += il;
-							qid->my_buf [ l ] = '\t';
-							l += 1;
-							qid->my_buf [ l ] = '\0';
-/*
-							switch( lua_type(intL, i) ){
-								case 
-							}
-*/
-						}
-						qid->my_buf_idx = l;
-DBG("%s: %d. qid->my_buf  = %s\n", __func__, __LINE__, qid->my_buf );
+						call_virtual_foo(val, qid, buf, n, off);
+						break;
 					}
 				}
-				*n = m;
+//				*n = m;
+				*n = 0;
 			}
 			break;
 			
-
 	}
 	
 	return nil;

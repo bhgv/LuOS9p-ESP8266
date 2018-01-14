@@ -94,19 +94,19 @@ fscgiopen(Qid *qid, int mode)
 
 DBG("\n%s:%d qid->type = %d, qid.my_type = %d, mode = %x\n\n", __func__, __LINE__, qid->type, qid->my_type, mode);
 	switch( qid->my_type ){
-		case FS_RPC:
+		case FS_CGI:
 			qid->my_buf = NULL;
 			qid->my_buf_idx = 0;
 
 			qid->my_state = 0;
 		
-			f = styxfindfile(server, qid->path);
+//			f = styxfindfile(server, qid->path);
 
-			if(mode&OTRUNC){	/* truncate on open */
-				styxfree(f->u);
-				f->u = nil;
-				f->d.length = 0;
-			}
+//			if(mode&OTRUNC){	/* truncate on open */
+//				styxfree(f->u);
+//				f->u = nil;
+//				f->d.length = 0;
+//			}
 			break;
 			
 	}
@@ -119,13 +119,13 @@ char*
 fscgiclose(Qid qid, int mode)
 {
 	switch( qid.my_type ){
-		case FS_RPC:
+		case FS_CGI:
 			if(qid.my_buf)
 				styxfree(qid.my_buf);
 			
-			if(mode&ORCLOSE)	/* remove on close */
-				//return fsremove(qid);
-				break;
+//			if(mode&ORCLOSE)	/* remove on close */
+//				//return fsremove(qid);
+//				break;
 			
 	}
 	return nil;
@@ -135,17 +135,17 @@ fscgiclose(Qid qid, int mode)
 char *
 fscgicreate(Qid *qid, char *name, int perm, int mode)
 {
-	int isdir;
-	Styxfile *f;
+//	int isdir;
+//	Styxfile *f;
 
-	char *er = "Create error";
+	char *er = Eperm;
 
-	USED(mode);
-	isdir = perm & DMDIR;
+//	USED(mode);
+//	isdir = perm & DMDIR;
 DBG("%s: %d\n", __func__, __LINE__);
 
 	switch( qid->my_type ){
-	case FS_RPC:
+	case FS_CGI:
 			break;
 
 	}
@@ -160,8 +160,8 @@ fscgiremove(Qid qid)
 	Styxfile *f;
 
 	switch( qid.my_type ){
-		case FS_RPC:
-			return "not possible";
+		case FS_CGI:
+			return Eperm;
 
 	}
 	
@@ -172,11 +172,11 @@ fscgiremove(Qid qid)
 char *
 fscgiwalk(Qid* qid, char *nm)
 {
-	char *er = nil; //"Not found";
+	char *er = Enonexist;
 
 DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
 	switch(qid->my_type){
-	case FS_RPC:
+	case FS_CGI:
 		break;
 		
 	}
@@ -200,31 +200,19 @@ if(qid->my_name)
 DBG("\n\n");
 
 	switch( qid->my_type ){
-		case FS_RPC:
-			{
-				char st = qid->my_state;
-				if(st != 1 && st != 2)
-					break;
-				
-				if(st == 1){
-					qid->my_buf_idx = call_cgi(&qid->my_buf, qid->my_buf_idx);
-					*off = 0;
-					dri = 0;
-				}
-				st = 2;
-				
-				i = qid->my_buf_idx;
-				m = strlen( qid->my_buf ); //qid->my_buf_idx; //f->d.length;
-			
-DBG("%s: %d, qid->my_buf = %x, off = %d, *n = %d\n", __func__, __LINE__, qid->my_buf, dri, *n);
-				if(dri >= m){
+		case FS_CGI:
+			if(qid->my_buf != NULL){
+				m = strlen(qid->my_buf );
+DBG("\n%s qid.my_buf = %s\n\n", __func__,  qid->my_buf );
+
+				if(*off >= m){
 					*n = 0;
 				}else{
 					if(dri + *n > m)
-						*n = m - dri;
+						*n = m-dri;
 					memmove(buf, qid->my_buf + dri, *n);
 				}
-DBG("%s: %d, qid->my_buf = '%s', off = %d, *n = %d\n", __func__, __LINE__, qid->my_buf, dri, *n);
+		
 			}
 			break;
 	}
@@ -245,45 +233,55 @@ fscgiwrite(Qid *qid, char *buf, ulong *n, vlong off)
 	int dri = off;
 	int pth;
 	
-	static char *foo_nm = NULL;
+//	static char *foo_nm = NULL;
 
 DBG("%s: %d\n", __func__, __LINE__);
 	switch( qid->my_type ){
-		case FS_RPC:
+		case FS_CGI:
 			{
-				char *tb = qid->my_buf;
-DBG("%s: %d, tb = %x, off = %d, *n = %d\n", __func__, __LINE__, tb, off, *n);
-				if(*n > 0){
-					p = (int)off + (int)(*n);
-DBG("%s: %d, p = %d\n", __func__, __LINE__, p);
-					qid->my_buf = styxmalloc(p+1);
-					if(tb != NULL){
-DBG("%s: %d\n", __func__, __LINE__);
-						if(off > 0)
-							memmove(qid->my_buf, tb, off);
-						styxfree(tb);
-					}
+				char* p_buf = buf;
+				int l, m;
 
-					tb = qid->my_buf;
-DBG("%s: %d, tb = %x\n", __func__, __LINE__, tb);
-#if 0
-			if(p > m){	/* just grab a larger piece of memory */
-				u = styxmalloc(p);
-				if(u == nil)
-					return "out of memory";
-				memset(u, 0, p);
-				memmove(u, f->u, m);
-				styxfree(f->u);
-				f->u = u;
-				f->d.length = p;
-			}
-#endif
-					memmove(tb + off, buf, *n);
-					tb[p] = '\0';
-					qid->my_buf_idx = p; 
-
-					qid->my_state = 1;
+				if(intL == NULL){
+					return nil;
 				}
+
+				int type;
+				Styxfile* f = styxfindfile(server, qid->path);
+				const TValue *val;
+
+DBG("%s: %d f=%x\n", __func__, __LINE__, f);
+				if(f == NULL)
+					break;
+
+				val = (const TValue *)f->u;
+				
+				if(val == NULL)
+					break;
+
+DBG("%s: %d val=%x\n", __func__, __LINE__, val);
+//				m = 0;
+
+				type = ttnov(val);
+DBG("%s: %d type=%d\n", __func__, __LINE__, type);
+
+				if ( type == LUA_TFUNCTION) {
+//					char* t_nm;
+//					int t_ln;
+
+//DBG("%s: %d. mmbr_nm = %s, l = %d\n", __func__, __LINE__, k_nm, k_ln);
+
+//					if(LUA_TNONE <= type && type < LUA_NUMTAGS){
+//						t_nm = ttypename(type);
+//					}else{
+//						t_nm = "";
+//					}
+//					t_ln = strlen(t_nm);
+
+					call_virtual_foo(val, qid, buf, n, off);
+					break;
+				}
+//				*n = m;
 			}
 			break;
 
@@ -300,7 +298,7 @@ fscgistat(Qid qid, Dir *d)
 
 DBG("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type, qid.my_name);
 	switch(qid.my_type){
-		case FS_RPC:
+		case FS_CGI:
 			file = styxfindfile(server, qid.path);
 			*d = file->d;
 			break;
@@ -310,7 +308,7 @@ DBG("%s: %d. qid.my_type = %d, my_name = %s\n", __func__, __LINE__, qid.my_type,
 	return nil;
 }
 
-	
+
 char*
 fscgiwstat(Qid qid, Dir *d)
 {

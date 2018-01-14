@@ -62,7 +62,8 @@ DBG("\n%s: %d\n%s\n\n", __func__, __LINE__, buf);
 		m += l + 1;
 	}
 
-	char *tb = styxmalloc(l + 1);
+DBG("%s: %d, i=%d, n=%d, j=%d, m=%d\n", __func__, __LINE__, i, n, j, m);
+	char *tb = styxmalloc(m + 1);
 	tb[0] = '\0';
 	
 	m = 0;

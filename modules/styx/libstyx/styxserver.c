@@ -101,6 +101,7 @@ void *
 styxmalloc(int bytes)
 {
 	char *m = malloc(bytes);
+	
 	if(m == nil)
 		styxfatal(Enomem);
 	memset(m, 0, bytes);
@@ -710,7 +711,7 @@ newfile(Styxserver *server, Styxfile *parent, int isdir, Path qid, char *name, i
 	file->ref = 0;
 	file->open = 0;
 	if(Debug)
-		printf("New file %s Qid=%llx\n", name, qid);
+		printf("New file %s Qid=%x:%x\n", name, (int)(qid>>32), (int)qid );
 //		fprint(2, "New file %s Qid=%llx\n", name, qid);
 	return file;
 }

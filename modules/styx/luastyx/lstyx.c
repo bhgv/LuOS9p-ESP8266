@@ -235,7 +235,7 @@ fsremove(Qid qid)
 char *
 fswalk(Qid* qid, char *nm)
 {
-	char *er = "Not found";
+	char *er = Enonexist;
 
 DBG("%s: %d, qid->my_type = %d, nm = %s\n", __func__, __LINE__, qid->my_type, nm);
 	switch(qid->my_type){
@@ -355,7 +355,7 @@ DBG("%s: %d\n", __func__, __LINE__);
 			if(p > m){	/* just grab a larger piece of memory */
 				u = styxmalloc(p);
 				if(u == nil)
-					return "out of memory";
+					return "2 out of memory";
 				memset(u, 0, p);
 				memmove(u, f->u, m);
 				styxfree(f->u);
@@ -505,6 +505,21 @@ myinit(/*Styxserver *s*/)
 TValue *index2addr (lua_State *L, int idx) ;
 
 
+LUA_API void* lua_tolfunction (lua_State *L, int idx) {
+  StkId o = index2addr(L, idx);
+  //if (ttislcf(o)) return fvalue(o);
+  //else 
+  if (ttisLclosure(o))
+    return clLvalue(o)->f;
+  else return NULL;  /* not a C function */
+}
+
+
+
+
+
+
+
 int
 lstyx_add_file(lua_State* L){
 	int ln;
@@ -513,12 +528,41 @@ lstyx_add_file(lua_State* L){
 
 	if(path == NULL || ln <= 0 || n < 2 || !lua_isfunction(L, 2) ) return 0;
 	
+DBG("%s: %d\n", __func__, __LINE__);
 	Styxfile* f = styxaddfile(server, Qroot, nq++, path, 0666, eve);
+	if(f == NULL)
+		return 0;
+	
 	f->d.qid.my_type = FS_CGI;
+DBG("%s: %d\n", __func__, __LINE__);
 	f->u = index2addr(L, 2);
 	//luaA_pushobject(intL, val);
 //	f->par.p = (void*)p;
+
+DBG("%s: %d, f->u = %x\n", __func__, __LINE__, f->u);
+
+	int type;
+	TValue *val;
+	val = (TValue *)f->u;
+//	val_(val).p
+
+	//val->tt_ &= ~BIT_ISCOLLECTABLE;
 	
+	type = ttnov(val);
+DBG("%s: %d\n", __func__, __LINE__);
+
+	char* t_nm;
+	int t_ln;
+	
+	if(LUA_TNONE <= type && type < LUA_NUMTAGS){
+		t_nm = ttypename(type);
+	}else{
+		t_nm = "";
+	}
+	t_ln = strlen(t_nm);
+
+DBG("%s: %d. type_nm = %s, l = %d\n", __func__, __LINE__, t_nm, t_ln);
+		
 	return 0;
 }
 
