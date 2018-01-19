@@ -3,6 +3,8 @@ luOS9p
 
 It is an OS for ESP8266 IoT microcontrollers based on Lua-RTOS-ESP8266. But it was significally checked, changed and expanded.
 
+https://youtu.be/ojTmyH3cTSQ
+
 Features
 ========
 * Lua 5.3.4,
