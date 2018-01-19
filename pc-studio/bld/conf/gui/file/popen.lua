@@ -69,6 +69,8 @@ local set_ports_bauds = function() --mk_type)
     out[#out + 1] = v --{{ "" .. v }}
     print("port", v[1][1])
   end
+  port_nm = ports[1][1][1]
+  
   wjt_portslist:setList(List:new { Items = out })
   wjt_portslist:setValue("SelectedLine", 1)
   

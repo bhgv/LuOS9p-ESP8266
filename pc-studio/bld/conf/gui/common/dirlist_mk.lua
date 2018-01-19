@@ -150,13 +150,17 @@ end
 function DirList:getDirIterator(vpath)
 	local path = self:VToRealPath(vpath)
   local msg = ""
+  local t
   local m
   
   MK:send("HIDEUARTOTPUT")
   MK:send("SINGLE")
   MK:send("os.ls('" .. vpath .."')\r\n")
 
-  msg = MK:recv()
+  while t == nil or t == "" do
+    t = MK:recv()
+    msg = msg .. t
+  end
   
   MK:send("SHOWUARTOTPUT")
 
@@ -164,20 +168,25 @@ function DirList:getDirIterator(vpath)
     local ar = {}
     local ln, i
     
+--    print(msg)
+    
     for ln in msg:gmatch("([^\r\n]+)") do
       local type, siz, name = ln:match("([^\t ]+)[\t ]+([^\t ]+)[\t ]+([^\t ]+)")
       ar[ #ar + 1 ] = name
+      
+--      print(":>:", #ar, ar[#ar])
     end
     
-    i = 2
+    i = 0
     
 		return function()
-			local e = ar[i]
-      i = i + 1
+			local e
       
-      if i >= #ar then
-        return nil
-      end
+      repeat
+        i = i + 1
+        e = ar[i]
+      until(e ~= nil or i > #ar)
+
 			--repeat
 			--	repeat
 			--		e = dir(iter)
@@ -216,6 +225,7 @@ end
 function DirList:getFileStat(path, name, attr, idx)
 	path = self:VToRealPath(path)
   local t = "size"
+  local msg
   
   if attr == "mode" then
     t = "type"
@@ -235,7 +245,9 @@ function DirList:getFileStat(path, name, attr, idx)
           t ..
           "']\r\n")
 
-  msg = MK:recv()
+  while msg == nil or msg == "" do
+    msg = MK:recv()
+  end
   
   MK:send("SHOWUARTOTPUT")
 
@@ -243,9 +255,14 @@ function DirList:getFileStat(path, name, attr, idx)
     local ar = {}
     local ln, i
     
+--    print(msg)
+    
     for ln in msg:gmatch("([^\r\n]+)") do
       ar[ #ar + 1 ] = ln
+--      print("[" .. #ar .. "]", ln)
     end
+    
+--    print(":gfs:", ar[2])
     
     return ar[2]
   end

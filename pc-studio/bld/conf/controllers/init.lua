@@ -95,9 +95,17 @@ local port_loop = function(param)
         end
 
         local _recv = function()
+          local buf = ""
+          local t
+          
           if not PORT then return nil end
           
-          buf = PORT:read(256, 50) --read_timeout) --200)
+          t = PORT:read(256, 50) --read_timeout) --200)
+          
+          while t ~= nil and t ~= "" do
+            buf = buf .. t
+            t = PORT:read(256, 50) --read_timeout) --200)
+          end
           
           return buf
         end
@@ -116,64 +124,18 @@ local port_loop = function(param)
                 if is_out_to_term then
                   local pt
                   for pt in string.gmatch(msg, "([^\n\r]+)" ) do
-                    --print(pt)
-                    --if pt ~= "/ > " then
                       pt = string.gsub(pt, "\t", "    ")
                       lib:display_rx_msg(pt)
-                    --end
                   end
                 else
-                  
                   while not exec.sendmsg("*p", msg) do
                   end
                 end
-              --elseif msg == "" and not is_out_to_term then
-              --    while msg and not exec.sendmsg("*p", "") do
-              --    end
+              elseif msg == "" and not is_out_to_term then
+                  while msg and not exec.sendmsg("*p", "") do
+                  end
               end
-              
-              --[=[
-              if --[[msg and]] --[[msg.ok and]] MK.out_access and req_inc_cmd then
-                if icmd < #gthread then
-                  icmd = icmd + 1 
-                else
-                  state = "stop"
-                  icmd = 1
-                  exec.sendport("*p", "ui", "<MESSAGE>Stop")
-                end
-                req_inc_cmd = false
-              end
-              ]=]
-              
---[[
-              if msg.err then
-                exec.sendport("*p", "ui", "<MESSAGE>" 
-                              .. msg.msg:match("([^\u{a}\u{d}]+)") 
-                              .. " (ln: " .. (send_from + icmd - 1) .. ")"
-                              )
-                state = "stop"
-                --stat_on = true
-                --icmd = icmd + 1
-              end
-]]
 
-            --[[
-              if msg then --or int_state ~= "rs" then
-              --  if msg.stat then --or int_state == "rs" then
-                  int_state = "m"
-              --  else --if msg.ok or msg.err or not msg.msg then
-              --    int_state = "s"
-              --  end
-              elseif (not msg) then
-                local st, stms = Visual.getTime() 
---                if int_state ~= "rs" and stat_on and (st - status_time) >= 1 then
---                  status_time = st
---                  int_state = "s"
---                else
-                  int_state = "m"
---                end
-            end
-            ]]
               int_state = "m"
             
             else --if int_state == "m" then
@@ -195,8 +157,7 @@ local port_loop = function(param)
                   (#gthread >= icmd and state == "run") or 
                   (#sthread > 0 and state == "single")
               ) then
-                --print(is_resp_handled, oks, oks_max)
-                if out_access then --? is_resp_handled and oks < oks_max then
+                if out_access then 
                   local num_str
                   if state == "single" then
                     --cmd = sthread[#sthread]
@@ -214,8 +175,6 @@ local port_loop = function(param)
                     )
                     num_str = '(' .. (send_from + icmd - 1) .. ') '
                   end
-                  
-                  --lib:display_tx( '(' .. (send_from + icmd - 1) .. ') ' .. cmd )
                   
                   if #GFilters > 0 then
                     local i,flt
@@ -250,26 +209,17 @@ local port_loop = function(param)
             Log:msg("msg = " .. msg)
             --print("msg = " .. msg)
             if msg == "PORT" then
-              --local mk = exec.waitmsg(2000)
               local prt = exec.waitmsg(2000)
               local bod = exec.waitmsg(2000)
               if prt ~= "" and bod ~= "" then
-                --MK = MKs:get(mk)
---                local r = MK:open(prt, bod)
---                PORT = r
                   PORT = rs232(prt, tonumber(bod) )
                   out_access = PORT ~= nil
                 if PORT then
---                  if MK:open(prt, 0 + bod) then
---                    local out = MK:init()
---                    lib:split(out.msg, "[^\u{a}\u{d}]+", lib.display_rx_msg)
                     exec.sendport("*p", "ui", "<MESSAGE>Connected to " .. prt .. ", " .. bod)
                     state = "stop"
                     int_state = "r"
                   else
---                    MK = nil
                     exec.sendport("*p", "ui", "<MESSAGE>Can't connect to " .. prt)
---                  end
                 end
               end
             elseif msg == "NEW" then
@@ -382,6 +332,7 @@ local port_loop = function(param)
       end
     }
 end
+
 
 local newcmd = function(cmd)
 --  print("newcmd ", cmd)
