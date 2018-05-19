@@ -400,7 +400,23 @@ static void gui_controller( lua_State *L){
 	  sub_menu(L, m);
     }
   }
-  else if((b & _ekey) == 0 ){
+  else /*if((b & _ekey) == 0 )*/{
+	if( act != 0 /*and act.rpg != 0*/ ){
+//	act.rpg(par);
+		lua_pushliteral(L,"ekey");
+		lua_rawget( L, act);
+		if(lua_isfunction(L, -1)){
+			//usleep(50);
+			lua_pushvalue(L, par);
+			lua_pushboolean(L, (b & _ekey) == 0 );
+			lua_call(L, 2, 0);
+		}else{
+			lua_pop(L, 1);
+		}
+		luaC_fullgc(L, 1);
+		//usleep(50);
+		is_need_redraw = 1; //draw(L);
+	}
   }
   
   lua_settop( L, n);
@@ -416,6 +432,8 @@ static void _cb_task (lua_State *L ) {
 	int cb_to = 0;
 	
 	uint32_t dly = 0;
+
+	lua_checkstack(L, 100);
 
 	while(guiqueue != NULL) {
 		if(!portIN_ISR()){
