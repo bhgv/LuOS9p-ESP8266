@@ -82,6 +82,7 @@ COMPONENTS     ?= $(EXTRA_COMPONENTS) \
 		    $(ROOT)modules/luadata_io \
 		    $(ROOT)modules/styx \
 		    $(ROOT)modules/pid \
+		    $(ROOT)modules/pnmio \
 
 
 #		    $(ROOT)modules/9p/curie \

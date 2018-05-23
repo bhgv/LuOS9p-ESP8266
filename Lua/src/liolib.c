@@ -859,7 +859,7 @@ LUAMOD_API int luaopen_io (lua_State *L) {
   lua_setmetatable(L, -2);
 #endif
 
-  luaL_newmetarotable(L, LUA_FILEHANDLE, (void*)flib );
+  luaL_newmetarotable(L, LUA_FILEHANDLE, (void*)flib_load_funcs); //flib );
 #if 0
   luaL_newmetatable(L, LUA_FILEHANDLE);  /* create metatable for file handles */
   lua_pushvalue(L, -1);  /* push metatable */
