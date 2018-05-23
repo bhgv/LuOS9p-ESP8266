@@ -41,12 +41,11 @@ static const LUA_REG_TYPE ldisplay_map[];
 
 
 // helper function: retrieve given number of integer arguments
-static void ldisp_get_int_args( lua_State *L, uint8_t stack, uint8_t num, int *args)
+static void ldisp_get_int_args( lua_State *L, uint8_t stack, uint8_t num, u8g_uint_t *args)
 {
     while (num-- > 0)
     {
         *args++ = luaL_checkinteger( L, stack++ );
-//        *args++ = lua_tointeger( L, stack++ );
     }
 }
 
@@ -201,7 +200,7 @@ static int lu8g_generic_drawStr( lua_State *L, uint8_t rot )
 // Lua: pix_len = u8g.drawStr( self, x, y, string )
 static int ldisp_drawStr( lua_State *L )
 {
-    int args[2];
+    u8g_uint_t args[2];
     ldisp_get_int_args( L, 1, 2, args );
 
     const char *s = luaL_checkstring( L, 1+2 );
@@ -406,68 +405,21 @@ static int ldisp_drawVLine( lua_State *L )
     return 1;
 }
 
-
-#include "pnmio.h"
-
 // Lua: u8g.drawXBM( self, x, y, width, height, data )
-static int ldisp_drawPBM( lua_State *L )
+static int ldisp_drawXBM( lua_State *L )
 {
-    int args[2];
-    ldisp_get_int_args( L, 1, 2, args );
-	int w, h;
-	int tmp;
-	FILE *f;
+    u8g_uint_t args[4];
+    ldisp_get_int_args( L, 1, 4, args );
 
-    char *xbm_data;
-    const char *xbm_name = luaL_checkstring( L, 1+2 );
-    if (xbm_name == NULL)
+    const char *xbm_data = luaL_checkstring( L, 1+4 );
+    if (xbm_data == NULL)
         return 0;
 
-	f = fopen(xbm_name, "r");
-//printf("f=%x, %s\n", f, xbm_name);
-	if(!f) return 0;
+    ssd1306_load_xbm(ADDR, (const uint8_t *)xbm_data, ssd1306_buffer);
 
-/*
-	tmp = get_pnm_type(f);
-printf("t=%x\n", tmp);
-	if(tmp != PBM_BINARY && tmp != PBM_ASCII){
-		fclose(f);
-		return 0;
-	}
-*/
-
-//	fseek(f, 0, SEEK_SET);
-	read_pbm_header(f, &w, &h, &tmp);
-//printf("w=%d, h=%d, a=%d\n", w, h, tmp);
-	if(w == 0 || h == 0 || (tmp != 0 && tmp != 1)){
-		fclose(f);
-		return 0;
-	}
-
-	xbm_data = malloc((w + 1)*(h/8 + 1));
-//printf("dat=%x\n", xbm_data);
-	if(xbm_data == NULL){
-		fclose(f);
-		return 0;
-	}
-	
-	read_pbm_data(f, xbm_data, w*h/8, tmp);
-//printf("aft r-pbm (%d,%d)\n", args[0], args[1]);
-	ssd1306_load_xbm(ADDR, 
-    	args[0],
-    	args[1],
-    	w,
-    	h,
-    	(const uint8_t *)xbm_data, ssd1306_buffer);
-
-	free(xbm_data);
-
-//	lua_pushrotable(L, (void *)ldisplay_map); 
-	lua_pushinteger(L, w);
-	lua_pushinteger(L, h);
-    return 2;
+	lua_pushrotable(L, (void *)ldisplay_map); 
+    return 1;
 }
-
 
 // Lua: u8g.drawBitmap( self, x, y, count, height, data )
 static int ldisp_drawBitmap( lua_State *L )
@@ -479,12 +431,7 @@ static int ldisp_drawBitmap( lua_State *L )
     if (bm_data == NULL)
         return 0;
 
-    ssd1306_load_xbm(ADDR, 
-    	args[0],
-    	args[1],
-    	args[2],
-    	args[3],
-    	(const uint8_t *)bm_data, ssd1306_buffer);
+    ssd1306_load_xbm(ADDR, (const uint8_t *)bm_data, ssd1306_buffer);
 
 	lua_pushrotable(L, (void *)ldisplay_map); 
     return 1;
@@ -580,7 +527,7 @@ static const LUA_REG_TYPE ldisplay_map[] = {
 //  { LSTRKEY( "drawStr270" ),                   LFUNCVAL( ldisp_drawStr270 ) },
   { LSTRKEY( "triangle" ),                 LFUNCVAL( ldisp_drawTriangle ) },
   { LSTRKEY( "vline" ),                    LFUNCVAL( ldisp_drawVLine ) },
-  { LSTRKEY( "PBM" ),						LFUNCVAL( ldisp_drawPBM ) },
+  { LSTRKEY( "XBM" ),						LFUNCVAL( ldisp_drawXBM ) },
 
   { LSTRKEY( "setContrast" ),				LFUNCVAL( ldisp_setContrast ) },
   { LSTRKEY( "setColorIndex" ),				LFUNCVAL( ldisp_setColorIndex ) },

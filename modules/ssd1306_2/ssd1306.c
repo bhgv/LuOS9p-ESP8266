@@ -544,44 +544,24 @@ int ssd1306_set_whole_display_lighting(uint8_t addr, bool light)
 /* one byte of xbm - 8 dots in line of picture source
  * one byte of fb - 8 rows for 1 column of screen
  */
-int ssd1306_load_xbm(uint8_t addr, int x, int y, int w, int h, uint8_t *xbm, uint8_t *fb)
+int ssd1306_load_xbm(uint8_t addr, uint8_t *xbm, uint8_t *fb)
 {
-    char bit = 0;
-	int xe, ye;
+    uint8_t bit = 0;
 
     int row = 0;
     int column = 0;
-	char nb;
-
-	int _x, _y, _w;
-
-	if(x+w<0 || y+h<0 || x >= 128 || y >= 64) return 0;
-	
-	xe = x + w;
-	ye = y + h;
-	if(xe > 128) xe = 128;
-	if(ye > 64) ye = 64;
-
-	_w = w>>3; // /8;
-	
-//print("^^^^^^^^^^ %d x %d\n", w, h);
-    for (row = 0; row < /*64*/h; row++) {
-        for (column = 0; column < /*128*/w /*/ 8*/; column++/*+=8*/) {
-			_x = column + x; _y = row + y;
-			if(_x >= 0 && _y >= 0 && _x < xe && _y < ye){
-				uint16_t xbm_offset = row * _w/*(w/8)*/  + (column/8);
-				nb = xbm[ xbm_offset ];
-				bit = 7-(column & 7/*% 8*/);
-//				print("%c", (nb & (1 << bit)) ? 'X': '_');
-//            	for (bit = 7; bit >= 0; bit--) {
-                	if (nb & (1 << bit)) {
-                    	fb[ 128*((63-_y)>>3/*/8*/) + (127-_x/*-7+bit*/) ] |= 
-                    						1 << ((63-_y) & 7/*% 8*/);
-                	}
-//            	}
-			}
+//    for (row = 0; row < dev->height; row ++) {
+//        for (column = 0; column < dev->width / 8; column++) {
+    for (row = 0; row < 64; row ++) {
+        for (column = 0; column < 128 / 8; column++) {
+            uint16_t xbm_offset = row * 16  + column;
+            for (bit = 0; bit < 8; bit++) {
+                if (*(xbm + xbm_offset) & 1 << bit) {
+//                    *(fb + dev->width * (row / 8) + column * 8 + bit) |= 1 << row % 8;
+                    *(fb + 128 * (row / 8) + column * 8 + bit) |= 1 << row % 8;
+                }
+            }
         }
-//		print("\n");
     }
 
     return ssd1306_load_frame_buffer(addr, fb);

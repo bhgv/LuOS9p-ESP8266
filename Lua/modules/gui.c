@@ -76,7 +76,6 @@ static void draw_menu( lua_State *L, int menu_cur){
     int i, yc;
     int y = 0; 
     int bg = 1;
-	int udy = -1;
 //	menu_cur_len = lua_rawlen(L, menu_cur);
 	char* s;
 	int n = lua_gettop( L);
@@ -99,10 +98,10 @@ static void draw_menu( lua_State *L, int menu_cur){
     }
     for( i = bg; i<=menu_cur_len; i++ ){
 		lua_rawgeti(L, menu_cur, i);
-//		if( i == m_cur_pos ){
-//			ssd1306_draw_hline(ADDR, ssd1306_buffer, 5, y+m_str_step, 128-10, 1);
-//			ssd1306_fill_rectangle(ADDR, ssd1306_buffer, 2, y+3, 4, 4, 1 );
-//		}
+		if( i == m_cur_pos ){
+			ssd1306_draw_hline(ADDR, ssd1306_buffer, 5, y+m_str_step, 128-10, 1);
+			ssd1306_fill_rectangle(ADDR, ssd1306_buffer, 2, y+3, 4, 4, 1 );
+		}
 		lua_pushliteral(L,"name");
 		lua_rawget( L, -2);
 		if( lua_isstring(L, -1) ){
@@ -113,29 +112,18 @@ static void draw_menu( lua_State *L, int menu_cur){
 		
 		lua_pushliteral(L,"ind_t");
 		lua_rawget( L, -2);
-		udy = -1;
 		if( lua_isfunction(L, -1) ){
 			//usleep(50);
 			lua_pushinteger( L, y);
 			lua_pushliteral(L,"par");
 			lua_rawget( L, -4);
-			lua_call(L, 2, 1);
-			if(!lua_isnil(L, -1)){
-				udy = lua_tonumber(L, -1);
-			}
-			lua_pop(L, 1);
+			lua_call(L, 2, 0);
 		} else{
 			lua_pop(L, 1);
 		}
 		luaC_fullgc(L, 1);
 		//usleep(50);
-		if( i == m_cur_pos ){
-			ssd1306_draw_hline(ADDR, ssd1306_buffer, 
-				5, y+(udy > 0 ? udy : m_str_step), 
-				128-10, 1);
-			ssd1306_fill_rectangle(ADDR, ssd1306_buffer, 2, y+3, 4, 4, 1 );
-		}
-		y = y + (udy > 0 ? udy + 2 : m_str_step);
+		y = y + m_str_step;
 		if( y >= 64 /*-m_str_step*/)
 			break;
     }
@@ -185,7 +173,6 @@ static int new_cur_m( lua_State *L, int m ){
 
 static int new_menu( lua_State *L, int m ){
 	lua_settop( L, m);
-	luaC_fullgc(L, 1);
 	menu=m; 
 	menu_cur=new_cur_m(L, m);
 	m_cur_pos=1;
@@ -193,14 +180,7 @@ static int new_menu( lua_State *L, int m ){
 }
 
 static int sub_menu( lua_State *L, int m ){
-    int i;
-	lua_replace(L,menu_cur);
-//	luaC_fullgc(L, 1);
-
-	lua_settop(L, menu_cur);
-	luaC_fullgc(L, 1);
-
-	i=new_cur_m(L, menu_cur); //m);
+    int i=new_cur_m(L, m);
 	lua_replace(L,menu_cur);
 	luaC_fullgc(L, 1);
 
@@ -311,8 +291,7 @@ static void gui_controller( lua_State *L){
   if((b & _ok) == 0 ){
   	gui_screen_lightup(L);
     if( i == menu_cur_len ){
-//		lua_settop( L, menu);
-//		luaC_fullgc(L, 1);
+		lua_settop( L, menu);
 		new_menu(L, menu);
     }else if( m != 0 ){
 		lua_settop( L, m);
@@ -494,9 +473,9 @@ static void _cb_task (lua_State *L ) {
 							//ssd1306_display_on(ADDR, true);
 							//ssd1306_set_contrast(ADDR, 0x9f) ;
 							no_sleep--;
-						}else if(0xbf+no_sleep > 0){
+						}else if(0x9f+no_sleep > 0){
 							no_sleep--;
-							ssd1306_set_contrast(ADDR, 0xbf+no_sleep) ;
+							ssd1306_set_contrast(ADDR, 0x9f+no_sleep) ;
 					  	}else{
 							static uint16_t blnk = 0;
 							char ch;
