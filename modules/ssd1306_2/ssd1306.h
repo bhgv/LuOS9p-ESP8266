@@ -138,7 +138,7 @@ int ssd1306_init(uint8_t addr);
  * @param fb Pointer to local buffer for storing converted xbm image
  * @return Non-zero if error occured
  */
-int ssd1306_load_xbm(uint8_t addr, uint8_t *xbm, uint8_t *fb);
+int ssd1306_load_xbm(uint8_t addr, int x, int y, int w, int h, uint8_t *xbm, uint8_t *fb);
 
 /**
  * Load local framebuffer into the SSD1306 RAM.
