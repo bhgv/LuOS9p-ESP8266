@@ -56,7 +56,7 @@ struct Fid
 	ushort	open;
 	ushort	mode;	/* read/write */
 	ulong	offset;	/* in file */
-	int		dri;		/* dirread index */
+	/*int*/vlong	dri;	/* dirread index */
 	Qid		qid;
 };
 
