@@ -5,6 +5,8 @@ It is an OS for ESP8266 IoT microcontrollers based on Lua-RTOS-ESP8266. But it w
 
 https://youtu.be/ojTmyH3cTSQ
 
+[schemaic+pcb](pcb/eagle) (Eagle CAD)
+
 Features
 ========
 * Lua 5.3.4,
@@ -85,6 +87,6 @@ Now your IoT device's styx virtual fs is mounted to `/n` folder, including branc
 
 A special board for the luOS9p
 ==============================
-For this OS was designed a special PCB that included all the necessary hardware/drivers and supports all the features of the OS.
+For this OS was designed a [special PCB](pcb/eagle/) that included all the necessary hardware/drivers and supports all the features of the OS.
 ![LuOS9p-PCB](doku/PCB-LuOS9p.jpg)
 But the OS may be used with the most esp8266-based boards (maybe with changes in the drivers part of the OS according to the target hardware)
