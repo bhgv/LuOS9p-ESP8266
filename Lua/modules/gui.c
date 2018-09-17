@@ -454,7 +454,7 @@ static void _cb_task (lua_State *L ) {
 	
 	uint32_t dly = 0;
 
-	lua_checkstack(L, 100);
+	lua_checkstack(L, 20); // ???
 
 	while(guiqueue != NULL) {
 		if(!portIN_ISR()){
