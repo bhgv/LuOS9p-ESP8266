@@ -10,6 +10,7 @@
 
 #include <dirent.h>
 #include <errno.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,53 +37,61 @@
 
 
 
+/* Execute one length-delimited command and retain the caller's Lua stack.
+ * Replies keep the existing tab-separated representation. Non-string values
+ * occupy an empty field; embedded NUL bytes are counted in the return length.
+ * The allocator accepts int, so include the final NUL in its checked bound.
+ */
 int
-call_rpc(char**pbuf, int len){
-	char *buf = *pbuf;
+call_rpc(char **pbuf, int len)
+{
+	char *buf, *reply;
+	const char *value;
+	size_t length, total;
+	int base, count, j, status;
 
-	if(buf == NULL)
+	if(pbuf == NULL || *pbuf == NULL || intL == NULL || len < 0)
 		return 0;
-
-DBG("\n%s: %d\n%s\n\n", __func__, __LINE__, buf);
-
-	int n = lua_gettop(intL);
-	
-	int er = luaL_loadstring(intL, buf);
-	if(er == LUA_OK){
-		lua_call(intL, 0, LUA_MULTRET);
-//	}else{
-//		lua_pushstring(intL, "Error!");
+	buf = *pbuf;
+	base = lua_gettop(intL);
+	status = luaL_loadbuffer(intL, buf, (size_t)len, "styx command");
+	if(status == LUA_OK)
+		status = lua_pcall(intL, 0, LUA_MULTRET, 0);
+	/* Both compilation and runtime errors leave one error value on the stack. */
+	count = lua_gettop(intL) - base;
+	total = 0;
+	for(j = 0; j < count; j++){
+		length = 0;
+		lua_tolstring(intL, base + 1 + j, &length);
+		if(total >= (size_t)INT_MAX - 1 ||
+		   length > (size_t)INT_MAX - total - 2){
+			lua_settop(intL, base);
+			buf[0] = '\0';
+			return 0;
+		}
+		total += length + 1;
 	}
 
-	int m, l, j, i = lua_gettop(intL) - n;
-
-	m = 0;
-	for(j = 0; j < i; j++){
-		lua_tolstring(intL, n + 1 + j, &l);
-		m += l + 1;
+	reply = styxmalloc((int)total + 1);
+	if(reply == NULL){
+		lua_settop(intL, base);
+		buf[0] = '\0';
+		return 0;
 	}
-
-DBG("%s: %d, i=%d, n=%d, j=%d, m=%d\n", __func__, __LINE__, i, n, j, m);
-	char *tb = styxmalloc(m + 1);
-	tb[0] = '\0';
-	
-	m = 0;
-	for(j = 0; j < i; j++){
-		char *s = lua_tolstring(intL, n + 1 + j, &l);
-		memcpy(&tb[ m ], s, l);
-		m += l;
-		tb[m] ='\t';
-		m++;
-		tb[m] = '\0';
+	total = 0;
+	for(j = 0; j < count; j++){
+		length = 0;
+		value = lua_tolstring(intL, base + 1 + j, &length);
+		if(length != 0)
+			memcpy(reply + total, value, length);
+		total += length;
+		reply[total++] = '\t';
 	}
-	
-
+	reply[total] = '\0';
+	lua_settop(intL, base);
 	styxfree(buf);
-	*pbuf = tb;
-
-	lua_settop(intL, n);
-	
-	return m;
+	*pbuf = reply;
+	return (int)total;
 }
 
 
@@ -212,7 +221,8 @@ DBG("\n\n");
 					*off = 0;
 					dri = 0;
 				}
-				st = 2;
+				/* Cache the reply: later reads must not execute it as Lua. */
+				qid->my_state = 2;
 				
 				i = qid->my_buf_idx;
 				m = strlen( qid->my_buf ); //qid->my_buf_idx; //f->d.length;
